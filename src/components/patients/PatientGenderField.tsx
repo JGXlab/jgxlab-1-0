@@ -11,11 +11,11 @@ export function PatientGenderField({ form }) {
           <FormLabel>Gender</FormLabel>
           <Select onValueChange={field.onChange} defaultValue={field.value}>
             <FormControl>
-              <SelectTrigger className="bg-white/50 border-primary/20 focus:border-primary">
+              <SelectTrigger className="bg-white border-primary/20 focus:border-primary">
                 <SelectValue placeholder="Select gender" />
               </SelectTrigger>
             </FormControl>
-            <SelectContent>
+            <SelectContent className="bg-white border shadow-md z-50">
               <SelectItem value="male">Male</SelectItem>
               <SelectItem value="female">Female</SelectItem>
               <SelectItem value="other">Other</SelectItem>
