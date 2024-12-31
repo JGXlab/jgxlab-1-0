@@ -13,6 +13,7 @@ import AdminLogin from "./pages/admin/Login";
 import AdminDashboard from "./pages/admin/Dashboard";
 import Notifications from "./pages/admin/Notifications";
 import Clinics from "./pages/admin/Clinics";
+import AdminPatients from "./pages/admin/Patients";
 import LabScripts from "./pages/admin/LabScripts";
 import Settings from "./pages/admin/Settings";
 import Profile from "./pages/admin/Profile";
@@ -37,6 +38,7 @@ const App = () => (
               <Route path="/admin/dashboard" element={<AdminDashboard />} />
               <Route path="/admin/notifications" element={<Notifications />} />
               <Route path="/admin/clinics" element={<Clinics />} />
+              <Route path="/admin/patients" element={<AdminPatients />} />
               <Route path="/admin/lab-scripts" element={<LabScripts />} />
               <Route path="/admin/settings" element={<Settings />} />
               <Route path="/admin/profile" element={<Profile />} />
