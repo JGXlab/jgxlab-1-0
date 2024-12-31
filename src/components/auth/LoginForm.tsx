@@ -141,7 +141,11 @@ export const LoginForm = () => {
 
         <p className="text-center text-sm text-gray-500">
           Don't have an account?{" "}
-          <Button variant="link" className="p-0 h-auto text-[#9b87f5]">
+          <Button 
+            variant="link" 
+            className="p-0 h-auto text-[#9b87f5]"
+            onClick={() => navigate("/register")}
+          >
             Create account
           </Button>
         </p>
