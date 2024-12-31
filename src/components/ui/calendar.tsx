@@ -38,10 +38,9 @@ function Calendar({
         ),
         day: cn(
           buttonVariants({ variant: "ghost" }),
-          "h-9 w-9 p-0 font-normal text-gray-900 hover:bg-gray-100",
+          "h-9 w-9 p-0 font-normal text-gray-900 hover:bg-gray-100 cursor-pointer",
           "aria-selected:opacity-100 hover:bg-primary hover:text-primary-foreground"
         ),
-        day_range_end: "day-range-end",
         day_selected:
           "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground rounded-md",
         day_today: "bg-accent text-accent-foreground",
