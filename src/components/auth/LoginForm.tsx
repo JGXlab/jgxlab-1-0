@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { Globe, Mail } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -20,26 +20,31 @@ export const LoginForm = () => {
     setIsLoading(true);
     
     try {
+      console.log("Attempting to sign in with email:", email);
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) {
-        if (error.message === "Email not confirmed") {
+        console.error("Login error details:", error);
+        
+        // Check if the error is due to unconfirmed email
+        if (error.message.includes("Email not confirmed")) {
           toast({
             variant: "destructive",
             title: "Email Not Verified",
-            description: "Please check your email and verify your account before logging in.",
+            description: "Please check your email inbox and click the verification link to activate your account. If you need a new verification email, please register again.",
           });
         } else {
           toast({
             variant: "destructive",
-            title: "Error",
+            title: "Login Failed",
             description: error.message,
           });
         }
       } else {
+        console.log("Login successful, redirecting...");
         toast({
           title: "Welcome to JGX Design Lab",
           description: "Successfully logged in to your account.",
@@ -47,7 +52,7 @@ export const LoginForm = () => {
         navigate("/clinic/dashboard");
       }
     } catch (error) {
-      console.error("Login error:", error);
+      console.error("Unexpected login error:", error);
       toast({
         variant: "destructive",
         title: "Error",
