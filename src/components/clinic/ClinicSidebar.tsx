@@ -69,19 +69,25 @@ export const ClinicSidebar = () => {
     <Sidebar>
       <SidebarHeader className="p-4">
         <div className="flex items-center gap-2">
-          <div className="text-primary text-2xl font-bold">JGX Design Lab</div>
+          <div className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent transition-all duration-300 hover:scale-105">
+            JGX Design Lab
+          </div>
         </div>
       </SidebarHeader>
       <SidebarContent>
         <SidebarMenu>
           {menuItems.map((item) => (
             <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton asChild tooltip={item.title}>
+              <SidebarMenuButton
+                asChild
+                tooltip={item.title}
+                className="transition-all duration-300 hover:bg-accent/10"
+              >
                 <Link to={item.path} className="flex items-center gap-2">
-                  <item.icon className="h-5 w-5" />
-                  <span>{item.title}</span>
+                  <item.icon className="h-5 w-5 transition-transform duration-300 group-hover:scale-110" />
+                  <span className="transition-colors duration-300">{item.title}</span>
                   {item.badge && (
-                    <span className="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
+                    <span className="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full animate-pulse">
                       {item.badge}
                     </span>
                   )}
@@ -95,10 +101,10 @@ export const ClinicSidebar = () => {
         <SidebarMenuButton
           asChild
           variant="outline"
-          className="w-full justify-start"
+          className="w-full justify-start transition-colors duration-300 hover:bg-red-50 hover:text-red-600"
         >
           <Link to="/logout" className="flex items-center gap-2 text-red-500">
-            <LogOut className="h-5 w-5" />
+            <LogOut className="h-5 w-5 transition-transform duration-300 group-hover:scale-110" />
             <span>Log out</span>
           </Link>
         </SidebarMenuButton>
