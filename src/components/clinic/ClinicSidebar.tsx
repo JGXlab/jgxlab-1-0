@@ -71,7 +71,7 @@ export const ClinicSidebar = () => {
         <div className="flex items-center justify-center">
           <Link to="/clinic/dashboard" className="text-2xl font-bold text-primary">
             <span className="text-3xl">JGX</span>
-            <span className="text-sm text-muted block text-center">Healthcare Solutions</span>
+            <span className="text-sm text-muted block text-center">Design Lab</span>
           </Link>
         </div>
       </SidebarHeader>
