@@ -23,13 +23,13 @@ export const LoginForm = () => {
     if (email.includes("clinic")) {
       navigate("/clinic/dashboard");
       toast({
-        title: "Welcome back!",
+        title: "Welcome to JGX Design Lab",
         description: "Successfully logged in to your clinic account.",
       });
     } else if (email.includes("designer")) {
       navigate("/designer/dashboard");
       toast({
-        title: "Welcome back!",
+        title: "Welcome to JGX Design Lab",
         description: "Successfully logged in to your designer account.",
       });
     } else {
@@ -44,13 +44,13 @@ export const LoginForm = () => {
   };
 
   return (
-    <Card className="w-full max-w-md mx-auto">
-      <CardHeader>
-        <CardTitle className="text-2xl text-center text-primary">
-          Dental Design Hub
+    <Card className="w-full max-w-md mx-auto bg-white shadow-lg border-2 border-[#9b87f5]">
+      <CardHeader className="bg-[#9b87f5] text-white py-6">
+        <CardTitle className="text-3xl text-center font-bold">
+          JGX Design Lab
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-6 space-y-6">
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Input
@@ -59,7 +59,7 @@ export const LoginForm = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full"
+              className="w-full border-[#7E69AB] focus:ring-[#9b87f5]"
             />
           </div>
           <div className="space-y-2">
@@ -69,12 +69,12 @@ export const LoginForm = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full"
+              className="w-full border-[#7E69AB] focus:ring-[#9b87f5]"
             />
           </div>
           <Button
             type="submit"
-            className="w-full"
+            className="w-full bg-[#9b87f5] hover:bg-[#7E69AB] transition-colors duration-300"
             disabled={isLoading}
           >
             {isLoading ? "Signing in..." : "Sign In"}
