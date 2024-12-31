@@ -37,7 +37,11 @@ const AdminDashboard = () => {
   }, [navigate, toast]);
 
   return (
-    <div className="min-h-screen bg-white"></div>
+    <div className="min-h-screen bg-white p-8">
+      <div className="border border-black rounded-lg p-4 max-w-3xl mx-auto">
+        {/* Content will go here */}
+      </div>
+    </div>
   );
 };
 
