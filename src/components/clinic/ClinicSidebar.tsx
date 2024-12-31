@@ -68,16 +68,11 @@ export const ClinicSidebar = () => {
   return (
     <Sidebar className="border-r border-gray-100">
       <SidebarHeader className="p-4">
-        <div className="flex items-center gap-3">
-          <img
-            src="/lovable-uploads/f7b0a4d1-3f84-40bd-b1a8-2844b36a34f7.png"
-            alt="Profile"
-            className="w-10 h-10 rounded-full"
-          />
-          <div className="text-left">
-            <h3 className="text-sm font-medium">John Smith</h3>
-            <p className="text-xs text-gray-500">CEO, Oxish</p>
-          </div>
+        <div className="flex items-center justify-center">
+          <Link to="/clinic/dashboard" className="text-2xl font-bold text-primary">
+            <span className="text-3xl">JGX</span>
+            <span className="text-sm text-muted block text-center">Healthcare Solutions</span>
+          </Link>
         </div>
       </SidebarHeader>
       <SidebarContent>
