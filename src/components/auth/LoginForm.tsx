@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
-import { Apple, Facebook, Globe, Google } from "lucide-react";
+import { Apple, Facebook, Globe, Mail } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 
 export const LoginForm = () => {
@@ -62,9 +62,9 @@ export const LoginForm = () => {
           <Button 
             variant="outline" 
             className="w-full"
-            onClick={() => console.log("Google login clicked")}
+            onClick={() => console.log("Email login clicked")}
           >
-            <Google className="w-5 h-5" />
+            <Mail className="w-5 h-5" />
           </Button>
           <Button 
             variant="outline" 
