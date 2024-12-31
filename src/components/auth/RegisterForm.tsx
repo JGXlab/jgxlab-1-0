@@ -4,7 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
-import { Globe, Mail } from "lucide-react";
+import { Globe } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 export const RegisterForm = () => {
   const [email, setEmail] = useState("");
@@ -28,15 +29,34 @@ export const RegisterForm = () => {
       return;
     }
 
-    // TODO: Implement actual registration
-    console.log("Registration attempt:", { email });
+    try {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+      });
+
+      if (error) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: error.message,
+        });
+      } else {
+        toast({
+          title: "Account created",
+          description: "Please check your email to verify your account.",
+        });
+        navigate("/");
+      }
+    } catch (error) {
+      console.error("Registration error:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
+      });
+    }
     
-    toast({
-      title: "Account created",
-      description: "You can now sign in with your credentials.",
-    });
-    
-    navigate("/");
     setIsLoading(false);
   };
 

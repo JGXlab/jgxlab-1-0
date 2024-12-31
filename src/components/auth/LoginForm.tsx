@@ -4,8 +4,9 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
-import { Apple, Facebook, Globe, Mail } from "lucide-react";
+import { Globe, Mail } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
+import { supabase } from "@/integrations/supabase/client";
 
 export const LoginForm = () => {
   const [email, setEmail] = useState("");
@@ -18,27 +19,31 @@ export const LoginForm = () => {
     e.preventDefault();
     setIsLoading(true);
     
-    // TODO: Implement actual authentication
-    console.log("Login attempt:", { email });
-    
-    // Temporary mock login for demonstration
-    if (email.includes("clinic")) {
-      navigate("/clinic/dashboard");
-      toast({
-        title: "Welcome to JGX Design Lab",
-        description: "Successfully logged in to your clinic account.",
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
       });
-    } else if (email.includes("designer")) {
-      navigate("/designer/dashboard");
-      toast({
-        title: "Welcome to JGX Design Lab",
-        description: "Successfully logged in to your designer account.",
-      });
-    } else {
+
+      if (error) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: error.message,
+        });
+      } else {
+        toast({
+          title: "Welcome to JGX Design Lab",
+          description: "Successfully logged in to your account.",
+        });
+        navigate("/clinic/dashboard");
+      }
+    } catch (error) {
+      console.error("Login error:", error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Invalid credentials. Please try again.",
+        description: "An unexpected error occurred. Please try again.",
       });
     }
     
@@ -56,39 +61,6 @@ export const LoginForm = () => {
           </div>
           <h1 className="text-2xl font-semibold text-gray-900">Welcome back</h1>
           <p className="text-gray-500">Please enter your details to sign in</p>
-        </div>
-
-        <div className="grid grid-cols-3 gap-3">
-          <Button 
-            variant="outline" 
-            className="w-full"
-            onClick={() => console.log("Email login clicked")}
-          >
-            <Mail className="w-5 h-5" />
-          </Button>
-          <Button 
-            variant="outline" 
-            className="w-full"
-            onClick={() => console.log("Apple login clicked")}
-          >
-            <Apple className="w-5 h-5" />
-          </Button>
-          <Button 
-            variant="outline" 
-            className="w-full"
-            onClick={() => console.log("Facebook login clicked")}
-          >
-            <Facebook className="w-5 h-5" />
-          </Button>
-        </div>
-
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t" />
-          </div>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-white px-2 text-gray-500">or</span>
-          </div>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
