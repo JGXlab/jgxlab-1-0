@@ -6,7 +6,7 @@ import {
   Calendar,
   FileText,
   BarChart3,
-  Receipt,
+  CreditCard,
   Settings,
   LogOut,
 } from "lucide-react";
@@ -52,7 +52,7 @@ const sidebarButtons: SidebarButton[] = [
     path: "/admin/analytics",
   },
   {
-    icon: Receipt,
+    icon: CreditCard,
     label: "Billing",
     path: "/admin/billing",
   },
@@ -67,7 +67,7 @@ export const ClinicSidebarButtons = () => {
   const location = useLocation();
 
   return (
-    <div className="flex flex-col gap-1 px-2">
+    <div className="flex flex-col gap-2 px-4">
       {sidebarButtons.map((button) => {
         const isActive = location.pathname === button.path;
         return (
@@ -77,19 +77,24 @@ export const ClinicSidebarButtons = () => {
             className={cn(
               "flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors relative group",
               isActive
-                ? "bg-primary text-white"
-                : "text-gray-600 hover:bg-gray-50"
+                ? "bg-blue-50 text-blue-600"
+                : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
             )}
           >
             <button.icon
               className={cn(
-                "h-5 w-5 transition-transform group-hover:scale-110",
-                isActive ? "text-white" : "text-gray-500 group-hover:text-primary"
+                "h-5 w-5",
+                isActive ? "text-blue-600" : "text-gray-500 group-hover:text-gray-700"
               )}
             />
-            <span className="font-medium">{button.label}</span>
+            <span className={cn(
+              "font-medium",
+              isActive ? "text-blue-600" : "text-gray-500 group-hover:text-gray-700"
+            )}>
+              {button.label}
+            </span>
             {button.badge && (
-              <span className="absolute right-4 top-1/2 -translate-y-1/2 bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full">
+              <span className="absolute right-3 bg-red-400 text-white text-xs px-2 py-0.5 rounded-full">
                 {button.badge}
               </span>
             )}
@@ -98,10 +103,10 @@ export const ClinicSidebarButtons = () => {
       })}
       <Link
         to="/logout"
-        className="flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors mt-auto text-gray-600 hover:bg-red-50 group"
+        className="flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors mt-auto text-gray-500 hover:text-red-600 hover:bg-red-50 group"
       >
-        <LogOut className="h-5 w-5 text-gray-500 transition-transform group-hover:scale-110 group-hover:text-red-500" />
-        <span className="font-medium group-hover:text-red-500">Log out</span>
+        <LogOut className="h-5 w-5 group-hover:text-red-600" />
+        <span className="font-medium group-hover:text-red-600">Log out</span>
       </Link>
     </div>
   );
