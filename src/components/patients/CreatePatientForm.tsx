@@ -47,6 +47,11 @@ const formSchema = z.object({
 export function CreatePatientForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      gender: "",
+    },
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
@@ -114,6 +119,7 @@ export function CreatePatientForm() {
                 <PopoverTrigger asChild>
                   <FormControl>
                     <Button
+                      type="button"
                       variant="outline"
                       className={cn(
                         "w-full pl-3 text-left font-normal bg-white/50 border-primary/20",
@@ -130,7 +136,7 @@ export function CreatePatientForm() {
                   </FormControl>
                 </PopoverTrigger>
                 <PopoverContent
-                  className="w-auto p-0 z-[100]"
+                  className="w-auto p-0 bg-white z-[100]"
                   align="start"
                 >
                   <Calendar
