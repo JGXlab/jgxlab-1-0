@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import {
   LayoutDashboard,
   Users,
-  MessageCircle,
+  MessageSquare,
   Calendar,
   FileText,
   BarChart2,
@@ -33,9 +33,9 @@ const menuItems = [
   },
   {
     title: "Message",
-    icon: MessageCircle,
+    icon: MessageSquare,
     path: "/clinic/messages",
-    badge: "20",
+    badge: "120",
   },
   {
     title: "Appointment",
@@ -69,8 +69,9 @@ export const ClinicSidebar = () => {
     <Sidebar>
       <SidebarHeader className="p-4">
         <div className="flex items-center gap-2">
-          <div className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent transition-all duration-300 hover:scale-105">
-            JGX Design Lab
+          <div className="text-2xl font-bold text-primary">
+            <span className="text-blue-600">Xenity</span>
+            <span className="text-gray-900">health</span>
           </div>
         </div>
       </SidebarHeader>
@@ -81,13 +82,15 @@ export const ClinicSidebar = () => {
               <SidebarMenuButton
                 asChild
                 tooltip={item.title}
-                className="transition-all duration-300 hover:bg-accent/10"
+                className="transition-all duration-300 hover:bg-blue-50 dark:hover:bg-blue-900/20"
               >
                 <Link to={item.path} className="flex items-center gap-2">
-                  <item.icon className="h-5 w-5 transition-transform duration-300 group-hover:scale-110" />
-                  <span className="transition-colors duration-300">{item.title}</span>
+                  <item.icon className="h-5 w-5 text-gray-500" />
+                  <span className="text-gray-700 dark:text-gray-200">
+                    {item.title}
+                  </span>
                   {item.badge && (
-                    <span className="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full animate-pulse">
+                    <span className="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
                       {item.badge}
                     </span>
                   )}
@@ -104,7 +107,7 @@ export const ClinicSidebar = () => {
           className="w-full justify-start transition-colors duration-300 hover:bg-red-50 hover:text-red-600"
         >
           <Link to="/logout" className="flex items-center gap-2 text-red-500">
-            <LogOut className="h-5 w-5 transition-transform duration-300 group-hover:scale-110" />
+            <LogOut className="h-5 w-5" />
             <span>Log out</span>
           </Link>
         </SidebarMenuButton>
