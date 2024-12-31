@@ -18,6 +18,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { format } from "date-fns";
+import { CalendarIcon, User, Users } from "lucide-react";
+import { toast } from "sonner";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
@@ -25,9 +28,6 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { format } from "date-fns";
-import { Calendar as CalendarIcon, User, Users } from "lucide-react";
-import { toast } from "sonner";
 
 const formSchema = z.object({
   firstName: z.string().min(2, {
@@ -122,7 +122,7 @@ export function CreatePatientForm() {
                       type="button"
                       variant="outline"
                       className={cn(
-                        "w-full pl-3 text-left font-normal bg-white/50 border-primary/20",
+                        "w-full pl-3 text-left font-normal bg-white/50 border-primary/20 hover:bg-primary/5",
                         !field.value && "text-muted-foreground"
                       )}
                     >
@@ -136,19 +136,30 @@ export function CreatePatientForm() {
                   </FormControl>
                 </PopoverTrigger>
                 <PopoverContent
-                  className="w-auto p-0 bg-white z-[100]"
+                  className="w-auto p-0"
                   align="start"
                 >
-                  <Calendar
-                    mode="single"
-                    selected={field.value}
-                    onSelect={field.onChange}
-                    disabled={(date) =>
-                      date > new Date() || date < new Date("1900-01-01")
-                    }
-                    initialFocus
-                    className="rounded-md border shadow-md"
-                  />
+                  <div className="bg-white rounded-md border shadow-lg">
+                    <Calendar
+                      mode="single"
+                      selected={field.value}
+                      onSelect={field.onChange}
+                      disabled={(date) =>
+                        date > new Date() || date < new Date("1900-01-01")
+                      }
+                      initialFocus
+                      className="rounded-md"
+                      styles={{
+                        head_cell: { width: "100%" },
+                        cell: { width: "100%" },
+                        button: { width: "100%" },
+                        nav_button: {
+                          color: "var(--primary)",
+                        },
+                        caption: { color: "var(--primary)" },
+                      }}
+                    />
+                  </div>
                 </PopoverContent>
               </Popover>
               <FormMessage />
