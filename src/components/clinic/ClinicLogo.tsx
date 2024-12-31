@@ -37,7 +37,8 @@ export const ClinicLogo = () => {
         </svg>
       </div>
       <div className="flex flex-col">
-        <span className="text-lg font-bold text-gray-900">Xenityhealth</span>
+        <span className="text-2xl font-bold tracking-tight text-primary">JGX</span>
+        <span className="text-sm font-medium text-gray-600">Xenityhealth</span>
       </div>
     </Link>
   );
