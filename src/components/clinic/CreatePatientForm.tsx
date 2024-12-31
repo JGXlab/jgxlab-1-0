@@ -115,12 +115,7 @@ export function CreatePatientForm() {
                     </Button>
                   </FormControl>
                 </PopoverTrigger>
-                <PopoverContent 
-                  className="w-auto p-0 bg-white" 
-                  align="start"
-                  sideOffset={5}
-                  style={{ zIndex: 1000 }}
-                >
+                <PopoverContent className="w-auto p-0" align="start">
                   <Calendar
                     mode="single"
                     selected={field.value}
@@ -129,7 +124,6 @@ export function CreatePatientForm() {
                       date > new Date() || date < new Date("1900-01-01")
                     }
                     initialFocus
-                    className="rounded-md border shadow-md"
                   />
                 </PopoverContent>
               </Popover>
