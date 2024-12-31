@@ -1,0 +1,116 @@
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent } from "@/components/ui/card";
+import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
+import { Eye, EyeOff, Shield } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+
+const AdminLogin = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    
+    try {
+      console.log("Attempting admin login with email:", email);
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        console.error("Admin login error:", error);
+        toast({
+          variant: "destructive",
+          title: "Login Failed",
+          description: error.message,
+        });
+      } else {
+        console.log("Admin login successful");
+        toast({
+          title: "Welcome Admin",
+          description: "Successfully logged in to admin panel.",
+        });
+        navigate("/admin/dashboard");
+      }
+    } catch (error) {
+      console.error("Unexpected admin login error:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
+      });
+    }
+    
+    setIsLoading(false);
+  };
+
+  return (
+    <div className="h-screen w-screen flex items-center justify-center bg-gray-50">
+      <Card className="w-full max-w-[420px] mx-auto bg-white shadow-lg rounded-3xl border-0">
+        <CardContent className="p-8">
+          <div className="text-center space-y-4 mb-8">
+            <div className="flex justify-center">
+              <Shield className="h-12 w-12 text-primary" />
+            </div>
+            <h1 className="text-2xl font-semibold text-gray-900">Admin Login</h1>
+            <p className="text-gray-500">Enter your credentials to access admin panel</p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-2">
+              <label className="text-sm text-gray-600">Email</label>
+              <Input
+                type="email"
+                placeholder="admin@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="h-12 rounded-xl bg-gray-50/50 border-gray-200"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm text-gray-600">Password</label>
+              <div className="relative">
+                <Input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="h-12 rounded-xl bg-gray-50/50 border-gray-200 pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
+            </div>
+
+            <Button
+              type="submit"
+              className="w-full h-12 bg-primary hover:bg-primary-hover text-white rounded-xl font-medium"
+              disabled={isLoading}
+            >
+              {isLoading ? "Signing in..." : "Sign in"}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+export default AdminLogin;
