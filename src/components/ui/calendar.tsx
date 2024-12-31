@@ -33,22 +33,20 @@ function Calendar({
         head_cell: "text-gray-600 rounded-md w-9 font-medium text-[0.9rem]",
         row: "flex w-full mt-2",
         cell: cn(
-          "relative p-0 text-center text-sm focus-within:relative focus-within:z-20",
-          "h-9 w-9 [&:has([aria-selected])]:bg-primary [&:has([aria-selected])]:text-primary-foreground [&:has([aria-selected])]:rounded-md"
+          "relative p-0 text-center text-sm focus-within:relative focus-within:z-20 cursor-pointer",
+          "[&:has([aria-selected])]:bg-primary [&:has([aria-selected])]:rounded-md"
         ),
         day: cn(
           buttonVariants({ variant: "ghost" }),
-          "h-9 w-9 p-0 font-normal text-gray-900 hover:bg-gray-100 cursor-pointer",
-          "aria-selected:opacity-100 hover:bg-primary hover:text-primary-foreground"
+          "h-9 w-9 p-0 font-normal text-gray-900 hover:bg-primary/20 cursor-pointer",
+          "aria-selected:opacity-100"
         ),
         day_selected:
           "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground rounded-md",
         day_today: "bg-accent text-accent-foreground",
         day_outside:
-          "day-outside text-gray-400 opacity-50 aria-selected:bg-primary/50 aria-selected:text-primary-foreground aria-selected:opacity-30",
+          "text-gray-400 opacity-50 aria-selected:bg-primary/50 aria-selected:text-primary-foreground aria-selected:opacity-30",
         day_disabled: "text-gray-400 opacity-50",
-        day_range_middle:
-          "aria-selected:bg-accent aria-selected:text-accent-foreground",
         day_hidden: "invisible",
         ...classNames,
       }}
