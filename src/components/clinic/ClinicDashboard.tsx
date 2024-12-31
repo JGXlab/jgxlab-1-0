@@ -1,14 +1,8 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  LineChart,
-  Line,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-} from "recharts";
+import { StatsCard } from "./dashboard/StatsCard";
+import { OverviewChart } from "./dashboard/OverviewChart";
+import { DiagnoseChart } from "./dashboard/DiagnoseChart";
+import { LatestVisits } from "./dashboard/LatestVisits";
 
 const monthlyData = [
   { name: "Jan", value: 30 },
@@ -120,124 +114,13 @@ export const ClinicDashboard = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {statsData.map((stat, index) => (
-          <Card
-            key={index}
-            className="bg-white hover:shadow-lg transition-all duration-300"
-          >
-            <CardContent className="p-6">
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="text-sm text-gray-500">{stat.label}</p>
-                  <h3 className="text-2xl font-bold mt-1">{stat.value}</h3>
-                  <p
-                    className={`text-sm mt-1 ${
-                      stat.positive ? "text-green-500" : "text-red-500"
-                    }`}
-                  >
-                    {stat.change}
-                  </p>
-                </div>
-                <div className="w-24 h-12">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={stat.trend.map((value, i) => ({ value }))}>
-                      <Line
-                        type="monotone"
-                        dataKey="value"
-                        stroke={stat.positive ? "#4F46E5" : "#EF4444"}
-                        strokeWidth={2}
-                        dot={false}
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <StatsCard key={index} {...stat} />
         ))}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card className="lg:col-span-2 bg-white">
-          <CardContent className="p-6">
-            <div className="flex justify-between items-center mb-6">
-              <div>
-                <h3 className="text-lg font-semibold">Overview</h3>
-                <p className="text-sm text-gray-500">Avg per month</p>
-                <p className="text-2xl font-bold mt-1">
-                  $138,500{" "}
-                  <span className="text-sm text-green-500">+13.45%</span>
-                </p>
-              </div>
-              <Tabs defaultValue="1y" className="w-auto">
-                <TabsList>
-                  <TabsTrigger value="1y" className="text-sm">
-                    1 Year
-                  </TabsTrigger>
-                  <TabsTrigger value="6m" className="text-sm">
-                    6 Months
-                  </TabsTrigger>
-                  <TabsTrigger value="3m" className="text-sm">
-                    3 Months
-                  </TabsTrigger>
-                  <TabsTrigger value="1m" className="text-sm">
-                    1 Month
-                  </TabsTrigger>
-                </TabsList>
-              </Tabs>
-            </div>
-            <div className="h-[300px] mt-4">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={monthlyData}>
-                  <Line
-                    type="monotone"
-                    dataKey="value"
-                    stroke="#4F46E5"
-                    strokeWidth={2}
-                    dot={false}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-white">
-          <CardContent className="p-6">
-            <h3 className="text-lg font-semibold mb-6">Avg Diagnose</h3>
-            <div className="h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={pieData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={80}
-                    paddingAngle={5}
-                    dataKey="value"
-                  >
-                    {pieData.map((entry, index) => (
-                      <Cell key={index} fill={entry.color} />
-                    ))}
-                  </Pie>
-                </PieChart>
-              </ResponsiveContainer>
-              <div className="mt-4 space-y-2">
-                {pieData.map((item, index) => (
-                  <div key={index} className="flex items-center gap-2">
-                    <div
-                      className="w-3 h-3 rounded-full"
-                      style={{ backgroundColor: item.color }}
-                    />
-                    <span className="text-sm">
-                      {item.value} {item.name}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <OverviewChart data={monthlyData} />
+        <DiagnoseChart data={pieData} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -249,35 +132,7 @@ export const ClinicDashboard = () => {
             </div>
           </CardContent>
         </Card>
-
-        <Card className="bg-white">
-          <CardContent className="p-6">
-            <h3 className="text-lg font-semibold mb-6">Latest Visits</h3>
-            <div className="space-y-4">
-              {appointments.map((appointment, index) => (
-                <div
-                  key={index}
-                  className="flex items-center justify-between py-2"
-                >
-                  <div className="flex items-center gap-3">
-                    <img
-                      src={appointment.avatar}
-                      alt={appointment.name}
-                      className="w-10 h-10 rounded-full"
-                    />
-                    <div>
-                      <p className="font-medium">{appointment.name}</p>
-                      <p className="text-sm text-gray-500">
-                        {appointment.specialty}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="text-sm text-gray-500">{appointment.time}</div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+        <LatestVisits appointments={appointments} />
       </div>
     </div>
   );
