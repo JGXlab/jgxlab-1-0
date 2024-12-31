@@ -5,6 +5,7 @@ interface Visit {
   specialty: string;
   time: string;
   avatar: string;
+  status: string;
 }
 
 interface LatestVisitsProps {
@@ -26,11 +27,14 @@ export const LatestVisits = ({ appointments }: LatestVisitsProps) => {
                   className="w-10 h-10 rounded-full"
                 />
                 <div>
-                  <p className="font-medium">{appointment.name}</p>
+                  <p className="font-medium text-gray-900">{appointment.name}</p>
                   <p className="text-sm text-gray-500">{appointment.specialty}</p>
                 </div>
               </div>
-              <div className="text-sm text-gray-500">{appointment.time}</div>
+              <div className="text-right">
+                <p className="text-sm text-gray-500">{appointment.status}</p>
+                <p className="text-sm font-medium">{appointment.time}</p>
+              </div>
             </div>
           ))}
         </div>

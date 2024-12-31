@@ -12,11 +12,19 @@ interface DiagnoseChartProps {
 }
 
 export const DiagnoseChart = ({ data }: DiagnoseChartProps) => {
+  const total = data.reduce((sum, item) => sum + item.value, 0);
+
   return (
     <Card className="bg-white">
       <CardContent className="p-6">
-        <h3 className="text-lg font-semibold mb-6">Avg Diagnose</h3>
-        <div className="h-[300px]">
+        <div className="flex justify-between items-start mb-6">
+          <div>
+            <h3 className="text-lg font-semibold">Avg Diagnose</h3>
+            <p className="text-3xl font-bold mt-2">{total}</p>
+            <p className="text-sm text-gray-500">Total Patients</p>
+          </div>
+        </div>
+        <div className="h-[200px]">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
@@ -36,14 +44,15 @@ export const DiagnoseChart = ({ data }: DiagnoseChartProps) => {
           </ResponsiveContainer>
           <div className="mt-4 space-y-2">
             {data.map((item, index) => (
-              <div key={index} className="flex items-center gap-2">
-                <div
-                  className="w-3 h-3 rounded-full"
-                  style={{ backgroundColor: item.color }}
-                />
-                <span className="text-sm">
-                  {item.value} {item.name}
-                </span>
+              <div key={index} className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div
+                    className="w-3 h-3 rounded-full"
+                    style={{ backgroundColor: item.color }}
+                  />
+                  <span className="text-sm text-gray-600">{item.name}</span>
+                </div>
+                <span className="text-sm font-medium">{item.value}</span>
               </div>
             ))}
           </div>
