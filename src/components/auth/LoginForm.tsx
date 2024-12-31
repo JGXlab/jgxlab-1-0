@@ -131,34 +131,6 @@ export const LoginForm = () => {
           >
             {isLoading ? "Signing in..." : "Sign in"}
           </Button>
-
-          <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-200"></div>
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-4 text-gray-500 bg-white">OR</span>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <Button
-              type="button"
-              variant="outline"
-              className="h-12 rounded-xl border-gray-200 hover:bg-gray-50"
-            >
-              <img src="/google.svg" alt="Google" className="w-5 h-5 mr-2" />
-              Sign up with Google
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              className="h-12 rounded-xl border-gray-200 hover:bg-gray-50"
-            >
-              <img src="/apple.svg" alt="Apple" className="w-5 h-5 mr-2" />
-              Sign up with Apple
-            </Button>
-          </div>
         </form>
 
         <p className="text-center text-sm text-gray-600 mt-8">
