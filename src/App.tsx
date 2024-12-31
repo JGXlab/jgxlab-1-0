@@ -10,6 +10,7 @@ import Register from "./pages/Register";
 import PatientsPage from "./pages/clinic/Patients";
 import NewLabRequest from "./pages/clinic/NewLabRequest";
 import AdminLogin from "./pages/admin/Login";
+import AdminDashboard from "./pages/admin/Dashboard";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +29,7 @@ const App = () => (
               <Route path="/clinic/lab-request/new" element={<NewLabRequest />} />
               <Route path="/register" element={<Register />} />
               <Route path="/admin/login" element={<AdminLogin />} />
+              <Route path="/admin/dashboard" element={<AdminDashboard />} />
             </Routes>
           </div>
         </SidebarProvider>
