@@ -3,7 +3,7 @@ import { ClinicSidebarButtons } from "./ClinicSidebarButtons";
 
 export const ClinicSidebar = () => {
   return (
-    <div className="flex flex-col w-64 h-screen bg-white border-r border-gray-100">
+    <div className="fixed left-0 top-0 flex flex-col w-64 h-screen bg-white border-r border-gray-100">
       <ClinicLogo />
       <div className="flex-1 overflow-y-auto py-4">
         <ClinicSidebarButtons />

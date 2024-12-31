@@ -7,7 +7,7 @@ const Dashboard = () => {
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-gray-50">
         <ClinicSidebar />
-        <main className="flex-1">
+        <main className="flex-1 ml-64">
           <ClinicDashboard />
         </main>
       </div>
