@@ -116,7 +116,7 @@ export function CreatePatientForm() {
                     <Button
                       variant="outline"
                       className={cn(
-                        "w-full pl-3 text-left font-normal bg-white/50 border-primary/20 hover:bg-white/80",
+                        "w-full pl-3 text-left font-normal bg-white border-primary/20 hover:bg-white/80",
                         !field.value && "text-muted-foreground"
                       )}
                     >
@@ -129,7 +129,7 @@ export function CreatePatientForm() {
                     </Button>
                   </FormControl>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
+                <PopoverContent className="w-auto p-0 bg-white z-50" align="start">
                   <Calendar
                     mode="single"
                     selected={field.value}
