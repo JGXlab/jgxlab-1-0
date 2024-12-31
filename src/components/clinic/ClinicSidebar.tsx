@@ -1,13 +1,10 @@
 import { Link } from "react-router-dom";
 import {
   LayoutDashboard,
-  FolderClosed,
-  ArrowLeftRight,
   Users,
-  LineChart,
-  FileText,
+  PlusCircle,
+  ClipboardList,
   Settings,
-  HelpCircle,
   LogOut,
 } from "lucide-react";
 import {
@@ -28,39 +25,24 @@ const menuItems = [
     active: true,
   },
   {
-    title: "Projects",
-    icon: FolderClosed,
-    path: "/clinic/projects",
-  },
-  {
-    title: "Transaction",
-    icon: ArrowLeftRight,
-    path: "/clinic/transactions",
-  },
-  {
-    title: "My Team",
+    title: "Patients",
     icon: Users,
-    path: "/clinic/team",
+    path: "/clinic/patients",
   },
   {
-    title: "Research Data",
-    icon: LineChart,
-    path: "/clinic/research",
+    title: "Add Lab Request",
+    icon: PlusCircle,
+    path: "/clinic/lab-request/new",
   },
   {
-    title: "Reports",
-    icon: FileText,
-    path: "/clinic/reports",
+    title: "My Orders",
+    icon: ClipboardList,
+    path: "/clinic/orders",
   },
   {
     title: "Settings",
     icon: Settings,
     path: "/clinic/settings",
-  },
-  {
-    title: "Help",
-    icon: HelpCircle,
-    path: "/clinic/help",
   },
 ];
 
