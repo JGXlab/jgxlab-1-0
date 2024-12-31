@@ -26,11 +26,19 @@ export const LoginForm = () => {
       });
 
       if (error) {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: error.message,
-        });
+        if (error.message === "Email not confirmed") {
+          toast({
+            variant: "destructive",
+            title: "Email Not Verified",
+            description: "Please check your email and verify your account before logging in.",
+          });
+        } else {
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: error.message,
+          });
+        }
       } else {
         toast({
           title: "Welcome to JGX Design Lab",
