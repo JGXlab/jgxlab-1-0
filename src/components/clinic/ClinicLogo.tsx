@@ -38,7 +38,6 @@ export const ClinicLogo = () => {
       </div>
       <div className="flex flex-col">
         <span className="text-2xl font-bold tracking-tight text-primary">JGX</span>
-        <span className="text-sm font-medium text-gray-600">Xenityhealth</span>
       </div>
     </Link>
   );
