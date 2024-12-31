@@ -9,6 +9,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { UserPlus } from "lucide-react";
+import { CreatePatientForm } from "@/components/patients/CreatePatientForm";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 const mockPatients = [
   {
@@ -31,17 +39,29 @@ const PatientsPage = () => {
   return (
     <div className="flex h-screen w-full">
       <ClinicSidebar />
-      <div className="flex-1">
+      <div className="flex-1 bg-gray-50">
         <div className="p-6">
           <div className="mb-6 flex items-center justify-between">
             <h1 className="text-3xl font-bold text-gray-900">Patients</h1>
-            <Button>
-              <UserPlus className="mr-2 h-4 w-4" />
-              Add New Patient
-            </Button>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button className="bg-primary hover:bg-primary-hover">
+                  <UserPlus className="mr-2 h-4 w-4" />
+                  Add New Patient
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[500px]">
+                <DialogHeader>
+                  <DialogTitle className="text-2xl font-semibold text-gray-900">
+                    Add New Patient
+                  </DialogTitle>
+                </DialogHeader>
+                <CreatePatientForm />
+              </DialogContent>
+            </Dialog>
           </div>
 
-          <div className="rounded-lg border bg-white">
+          <div className="rounded-lg border bg-white shadow-sm">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -60,7 +80,11 @@ const PatientsPage = () => {
                     <TableCell>{patient.phone}</TableCell>
                     <TableCell>{patient.lastVisit}</TableCell>
                     <TableCell className="text-right">
-                      <Button variant="outline" size="sm">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="border-primary/20 hover:bg-primary/5"
+                      >
                         View Details
                       </Button>
                     </TableCell>

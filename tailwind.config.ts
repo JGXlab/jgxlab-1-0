@@ -25,17 +25,17 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "#2C5282",
+          DEFAULT: "#375bdc",
           foreground: "#FFFFFF",
-          hover: "#2B6CB0",
+          hover: "#0e1f8d",
         },
         secondary: {
-          DEFAULT: "#4299E1",
+          DEFAULT: "#0e1f8d",
           foreground: "#FFFFFF",
         },
         accent: {
-          DEFAULT: "#4FD1C5",
-          foreground: "#1A202C",
+          DEFAULT: "#375bdc",
+          foreground: "#FFFFFF",
         },
         destructive: {
           DEFAULT: "#E53E3E",
@@ -49,6 +49,9 @@ export default {
           DEFAULT: "#FFFFFF",
           foreground: "#1A202C",
         },
+      },
+      fontFamily: {
+        sans: ["Fira Sans", "sans-serif"],
       },
       borderRadius: {
         lg: "var(--radius)",
