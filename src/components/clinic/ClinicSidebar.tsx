@@ -1,13 +1,13 @@
 import { Link } from "react-router-dom";
 import {
   LayoutDashboard,
+  FolderClosed,
+  ArrowLeftRight,
   Users,
-  MessageSquare,
-  Calendar,
+  LineChart,
   FileText,
-  BarChart2,
-  Receipt,
   Settings,
+  HelpCircle,
   LogOut,
 } from "lucide-react";
 import {
@@ -25,53 +25,58 @@ const menuItems = [
     title: "Dashboard",
     icon: LayoutDashboard,
     path: "/clinic/dashboard",
+    active: true,
   },
   {
-    title: "Patient",
+    title: "Projects",
+    icon: FolderClosed,
+    path: "/clinic/projects",
+  },
+  {
+    title: "Transaction",
+    icon: ArrowLeftRight,
+    path: "/clinic/transactions",
+  },
+  {
+    title: "My Team",
     icon: Users,
-    path: "/clinic/patients",
+    path: "/clinic/team",
   },
   {
-    title: "Message",
-    icon: MessageSquare,
-    path: "/clinic/messages",
-    badge: "120",
+    title: "Research Data",
+    icon: LineChart,
+    path: "/clinic/research",
   },
   {
-    title: "Appointment",
-    icon: Calendar,
-    path: "/clinic/appointments",
-  },
-  {
-    title: "Medical Record",
+    title: "Reports",
     icon: FileText,
-    path: "/clinic/records",
-  },
-  {
-    title: "Analytics",
-    icon: BarChart2,
-    path: "/clinic/analytics",
-  },
-  {
-    title: "Billing",
-    icon: Receipt,
-    path: "/clinic/billing",
+    path: "/clinic/reports",
   },
   {
     title: "Settings",
     icon: Settings,
     path: "/clinic/settings",
   },
+  {
+    title: "Help",
+    icon: HelpCircle,
+    path: "/clinic/help",
+  },
 ];
 
 export const ClinicSidebar = () => {
   return (
-    <Sidebar>
+    <Sidebar className="border-r border-gray-100">
       <SidebarHeader className="p-4">
-        <div className="flex items-center gap-2">
-          <div className="text-2xl font-bold text-primary">
-            <span className="text-blue-600">Xenity</span>
-            <span className="text-gray-900">health</span>
+        <div className="flex items-center gap-3">
+          <img
+            src="/lovable-uploads/f7b0a4d1-3f84-40bd-b1a8-2844b36a34f7.png"
+            alt="Profile"
+            className="w-10 h-10 rounded-full"
+          />
+          <div className="text-left">
+            <h3 className="text-sm font-medium">John Smith</h3>
+            <p className="text-xs text-gray-500">CEO, Oxish</p>
           </div>
         </div>
       </SidebarHeader>
@@ -81,19 +86,17 @@ export const ClinicSidebar = () => {
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton
                 asChild
-                tooltip={item.title}
-                className="transition-all duration-300 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                className={`transition-all duration-300 ${
+                  item.active
+                    ? "bg-blue-500 text-white hover:bg-blue-600"
+                    : "hover:bg-gray-50"
+                }`}
               >
-                <Link to={item.path} className="flex items-center gap-2">
-                  <item.icon className="h-5 w-5 text-gray-500" />
-                  <span className="text-gray-700 dark:text-gray-200">
+                <Link to={item.path} className="flex items-center gap-3 px-4 py-2">
+                  <item.icon className={`h-5 w-5 ${item.active ? "text-white" : "text-gray-500"}`} />
+                  <span className={item.active ? "text-white" : "text-gray-700"}>
                     {item.title}
                   </span>
-                  {item.badge && (
-                    <span className="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
-                      {item.badge}
-                    </span>
-                  )}
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -103,12 +106,11 @@ export const ClinicSidebar = () => {
       <SidebarFooter className="p-4">
         <SidebarMenuButton
           asChild
-          variant="outline"
-          className="w-full justify-start transition-colors duration-300 hover:bg-red-50 hover:text-red-600"
+          className="w-full justify-start hover:bg-gray-50"
         >
-          <Link to="/logout" className="flex items-center gap-2 text-red-500">
-            <LogOut className="h-5 w-5" />
-            <span>Log out</span>
+          <Link to="/logout" className="flex items-center gap-3 px-4 py-2 text-gray-700">
+            <LogOut className="h-5 w-5 text-gray-500" />
+            <span>Log Out</span>
           </Link>
         </SidebarMenuButton>
       </SidebarFooter>
