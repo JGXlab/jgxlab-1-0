@@ -11,6 +11,11 @@ import PatientsPage from "./pages/clinic/Patients";
 import NewLabRequest from "./pages/clinic/NewLabRequest";
 import AdminLogin from "./pages/admin/Login";
 import AdminDashboard from "./pages/admin/Dashboard";
+import Notifications from "./pages/admin/Notifications";
+import Clinics from "./pages/admin/Clinics";
+import LabScripts from "./pages/admin/LabScripts";
+import Settings from "./pages/admin/Settings";
+import Profile from "./pages/admin/Profile";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +35,11 @@ const App = () => (
               <Route path="/register" element={<Register />} />
               <Route path="/admin/login" element={<AdminLogin />} />
               <Route path="/admin/dashboard" element={<AdminDashboard />} />
+              <Route path="/admin/notifications" element={<Notifications />} />
+              <Route path="/admin/clinics" element={<Clinics />} />
+              <Route path="/admin/lab-scripts" element={<LabScripts />} />
+              <Route path="/admin/settings" element={<Settings />} />
+              <Route path="/admin/profile" element={<Profile />} />
             </Routes>
           </div>
         </SidebarProvider>
