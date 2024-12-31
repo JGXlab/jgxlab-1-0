@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import ClinicDashboard from "./pages/clinic/Dashboard";
 import Register from "./pages/Register";
 import PatientsPage from "./pages/clinic/Patients";
+import NewLabRequest from "./pages/clinic/NewLabRequest";
 
 const queryClient = new QueryClient();
 
@@ -23,6 +24,7 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/clinic/dashboard" element={<ClinicDashboard />} />
               <Route path="/clinic/patients" element={<PatientsPage />} />
+              <Route path="/clinic/lab-request/new" element={<NewLabRequest />} />
               <Route path="/register" element={<Register />} />
             </Routes>
           </div>
