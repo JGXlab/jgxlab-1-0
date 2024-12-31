@@ -1,14 +1,12 @@
 import { Link, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
+  Bell,
+  Building2,
   Users,
-  MessageSquare,
-  Calendar,
   FileText,
-  BarChart3,
-  CreditCard,
   Settings,
-  LogOut,
+  UserCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -26,40 +24,34 @@ const sidebarButtons: SidebarButton[] = [
     path: "/admin/dashboard",
   },
   {
+    icon: Bell,
+    label: "Notifications",
+    path: "/admin/notifications",
+  },
+  {
+    icon: Building2,
+    label: "Clinics",
+    path: "/admin/clinics",
+  },
+  {
     icon: Users,
-    label: "Patient",
+    label: "Patients",
     path: "/admin/patients",
   },
   {
-    icon: MessageSquare,
-    label: "Message",
-    path: "/admin/messages",
-    badge: 120,
-  },
-  {
-    icon: Calendar,
-    label: "Appointment",
-    path: "/admin/appointments",
-  },
-  {
     icon: FileText,
-    label: "Medical Record",
-    path: "/admin/records",
-  },
-  {
-    icon: BarChart3,
-    label: "Analytics",
-    path: "/admin/analytics",
-  },
-  {
-    icon: CreditCard,
-    label: "Billing",
-    path: "/admin/billing",
+    label: "Lab Scripts",
+    path: "/admin/lab-scripts",
   },
   {
     icon: Settings,
     label: "Settings",
     path: "/admin/settings",
+  },
+  {
+    icon: UserCircle,
+    label: "Profile",
+    path: "/admin/profile",
   },
 ];
 
@@ -103,13 +95,6 @@ export const ClinicSidebarButtons = () => {
           );
         })}
       </div>
-      <Link
-        to="/logout"
-        className="flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors text-red-500 hover:text-red-600 group mb-4"
-      >
-        <LogOut className="h-5 w-5" />
-        <span className="font-medium">Log out</span>
-      </Link>
     </div>
   );
 };
