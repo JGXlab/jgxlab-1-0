@@ -6,6 +6,8 @@ import { Form } from "@/components/ui/form";
 import { toast } from "sonner";
 import { PatientNameFields } from "./PatientNameFields";
 import { PatientGenderField } from "./PatientGenderField";
+import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
 
 const formSchema = z.object({
   firstName: z.string().min(2, {
@@ -19,7 +21,9 @@ const formSchema = z.object({
   }),
 });
 
-export function CreatePatientForm() {
+export function CreatePatientForm({ onSuccess }: { onSuccess?: () => void }) {
+  const queryClient = useQueryClient();
+  
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -29,9 +33,25 @@ export function CreatePatientForm() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    toast.success("Patient created successfully!");
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      const { error } = await supabase.from('patients').insert({
+        first_name: values.firstName,
+        last_name: values.lastName,
+        gender: values.gender,
+        user_id: (await supabase.auth.getUser()).data.user?.id
+      });
+
+      if (error) throw error;
+
+      toast.success("Patient created successfully!");
+      queryClient.invalidateQueries({ queryKey: ['patients'] });
+      form.reset();
+      onSuccess?.();
+    } catch (error) {
+      console.error('Error creating patient:', error);
+      toast.error("Failed to create patient. Please try again.");
+    }
   }
 
   return (

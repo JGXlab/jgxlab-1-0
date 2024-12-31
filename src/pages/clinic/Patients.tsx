@@ -17,25 +17,26 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-
-const mockPatients = [
-  {
-    id: 1,
-    name: "John Doe",
-    email: "john@example.com",
-    phone: "+1 234 567 890",
-    lastVisit: "2024-03-15",
-  },
-  {
-    id: 2,
-    name: "Jane Smith",
-    email: "jane@example.com",
-    phone: "+1 234 567 891",
-    lastVisit: "2024-03-14",
-  },
-];
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useState } from "react";
 
 const PatientsPage = () => {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const { data: patients, isLoading } = useQuery({
+    queryKey: ['patients'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('patients')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      return data;
+    }
+  });
+
   return (
     <div className="flex h-screen w-full">
       <ClinicSidebar />
@@ -43,7 +44,7 @@ const PatientsPage = () => {
         <div className="p-6">
           <div className="mb-6 flex items-center justify-between">
             <h1 className="text-3xl font-bold text-gray-900">Patients</h1>
-            <Dialog>
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
                 <Button className="bg-primary hover:bg-primary-hover">
                   <UserPlus className="mr-2 h-4 w-4" />
@@ -56,7 +57,7 @@ const PatientsPage = () => {
                     Add New Patient
                   </DialogTitle>
                 </DialogHeader>
-                <CreatePatientForm />
+                <CreatePatientForm onSuccess={() => setIsDialogOpen(false)} />
               </DialogContent>
             </Dialog>
           </div>
@@ -66,30 +67,46 @@ const PatientsPage = () => {
               <TableHeader>
                 <TableRow>
                   <TableHead>Name</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Phone</TableHead>
-                  <TableHead>Last Visit</TableHead>
+                  <TableHead>Gender</TableHead>
+                  <TableHead>Created At</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {mockPatients.map((patient) => (
-                  <TableRow key={patient.id}>
-                    <TableCell className="font-medium">{patient.name}</TableCell>
-                    <TableCell>{patient.email}</TableCell>
-                    <TableCell>{patient.phone}</TableCell>
-                    <TableCell>{patient.lastVisit}</TableCell>
-                    <TableCell className="text-right">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="border-primary/20 hover:bg-primary/5"
-                      >
-                        View Details
-                      </Button>
+                {isLoading ? (
+                  <TableRow>
+                    <TableCell colSpan={4} className="text-center py-4">
+                      Loading patients...
                     </TableCell>
                   </TableRow>
-                ))}
+                ) : patients?.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={4} className="text-center py-4">
+                      No patients found. Add your first patient!
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  patients?.map((patient) => (
+                    <TableRow key={patient.id}>
+                      <TableCell className="font-medium">
+                        {patient.first_name} {patient.last_name}
+                      </TableCell>
+                      <TableCell className="capitalize">{patient.gender}</TableCell>
+                      <TableCell>
+                        {new Date(patient.created_at).toLocaleDateString()}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="border-primary/20 hover:bg-primary/5"
+                        >
+                          View Details
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
               </TableBody>
             </Table>
           </div>
