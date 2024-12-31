@@ -29,11 +29,11 @@ const mockPatients = [
 
 const PatientsPage = () => {
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen w-full">
       <ClinicSidebar />
-      <div className="flex-1 overflow-auto">
-        <div className="p-8">
-          <div className="mb-8 flex items-center justify-between">
+      <div className="flex-1">
+        <div className="p-6">
+          <div className="mb-6 flex items-center justify-between">
             <h1 className="text-3xl font-bold text-gray-900">Patients</h1>
             <Button>
               <UserPlus className="mr-2 h-4 w-4" />
@@ -41,7 +41,7 @@ const PatientsPage = () => {
             </Button>
           </div>
 
-          <div className="rounded-lg border bg-white shadow">
+          <div className="rounded-lg border bg-white">
             <Table>
               <TableHeader>
                 <TableRow>
