@@ -1,5 +1,13 @@
-import { ClinicSidebar } from "@/components/clinic/ClinicSidebar";
-import { Button } from "@/components/ui/button";
+import { ClinicSidebar } from "@/components/clinic/ClinicSidebar"
+import { CreatePatientForm } from "@/components/clinic/CreatePatientForm"
+import { Button } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import {
   Table,
   TableBody,
@@ -7,8 +15,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { UserPlus } from "lucide-react";
+} from "@/components/ui/table"
+import { UserPlus } from "lucide-react"
 
 const mockPatients = [
   {
@@ -35,10 +43,20 @@ const PatientsPage = () => {
         <div className="p-6">
           <div className="mb-6 flex items-center justify-between">
             <h1 className="text-3xl font-bold text-gray-900">Patients</h1>
-            <Button>
-              <UserPlus className="mr-2 h-4 w-4" />
-              Add New Patient
-            </Button>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button>
+                  <UserPlus className="mr-2 h-4 w-4" />
+                  Add New Patient
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>Add New Patient</DialogTitle>
+                </DialogHeader>
+                <CreatePatientForm />
+              </DialogContent>
+            </Dialog>
           </div>
 
           <div className="rounded-lg border bg-white">
@@ -72,7 +90,7 @@ const PatientsPage = () => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default PatientsPage;
+export default PatientsPage
