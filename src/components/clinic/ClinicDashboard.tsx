@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { StatsCard } from "./dashboard/StatsCard";
 import { OverviewChart } from "./dashboard/OverviewChart";
 import { DiagnoseChart } from "./dashboard/DiagnoseChart";
