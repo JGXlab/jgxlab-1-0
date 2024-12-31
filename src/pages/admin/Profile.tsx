@@ -1,26 +1,54 @@
 import { ClinicSidebar } from "@/components/clinic/ClinicSidebar";
-import { Card, CardContent } from "@/components/ui/card";
-import { UserCircle } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { UserCircle, Search, Bell } from "lucide-react";
 
 const Profile = () => {
   return (
-    <div className="flex h-screen w-full">
+    <div className="flex min-h-screen w-full bg-gray-50">
       <ClinicSidebar />
-      <div className="flex-1 p-8 bg-gray-50">
-        <div className="mb-8">
-          <h1 className="text-2xl font-semibold text-gray-900">Profile</h1>
-          <p className="text-gray-500">Manage your profile information</p>
-        </div>
-        <Card>
-          <CardContent className="p-6">
+      <div className="flex-1 ml-64">
+        <div className="p-8">
+          <div className="flex justify-between items-center mb-8">
+            <h1 className="text-2xl font-semibold">Profile</h1>
+            <div className="flex items-center gap-4">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                <input
+                  type="text"
+                  placeholder="Search profile..."
+                  className="pl-10 pr-4 py-2 rounded-lg border border-gray-200 w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <button className="p-2 relative">
+                <Bell size={20} />
+                <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
+              </button>
+              <img src="/placeholder.svg" alt="Profile" className="w-10 h-10 rounded-full" />
+            </div>
+          </div>
+
+          <div className="flex gap-4 mb-6">
+            <button className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg">
+              <span className="w-2 h-2 bg-blue-600 rounded-full"></span>
+              Personal Info
+            </button>
+            <button className="flex items-center gap-2 px-4 py-2 text-gray-600">
+              Password
+            </button>
+            <button className="flex items-center gap-2 px-4 py-2 text-gray-600">
+              Preferences
+            </button>
+          </div>
+
+          <Card className="p-6">
             <div className="flex items-center justify-center h-40 text-gray-400">
               <div className="text-center">
                 <UserCircle className="w-12 h-12 mx-auto mb-4" />
                 <p>Profile page under construction</p>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </Card>
+        </div>
       </div>
     </div>
   );
