@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Search, Sun, Moon, RotateCcw } from "lucide-react";
+import { Search, Sun, Moon, RotateCcw, LayoutDashboard, FolderClosed, ArrowLeftRight } from "lucide-react";
 import {
   BarChart,
   Bar,
