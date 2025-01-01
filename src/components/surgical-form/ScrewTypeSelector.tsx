@@ -27,7 +27,7 @@ export const ScrewTypeSelector = ({ value, onChange, otherValue, onOtherValueCha
 
   return (
     <div className="space-y-3">
-      <div className="flex flex-wrap gap-3">
+      <div className="grid grid-cols-4 gap-3">
         {screwTypeOptions.map((option) => {
           const isSelected = value === option.id;
           return (
