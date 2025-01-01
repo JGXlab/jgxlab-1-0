@@ -101,7 +101,7 @@ export const LabScriptsTable = ({ labScripts, onPreview, onStatusUpdate }: LabSc
               </TableCell>
               <TableCell>
                 <ContextMenu>
-                  <ContextMenuTrigger>
+                  <ContextMenuTrigger asChild>
                     <Button
                       variant="ghost"
                       size="icon"
@@ -110,17 +110,12 @@ export const LabScriptsTable = ({ labScripts, onPreview, onStatusUpdate }: LabSc
                       <MoreVertical className="h-4 w-4" />
                     </Button>
                   </ContextMenuTrigger>
-                  <ContextMenuContent className="w-[160px]">
-                    <ContextMenuItem
-                      className="cursor-pointer"
-                      onClick={(e) => onPreview(script, e)}
-                    >
-                      <span>Edit</span>
+                  <ContextMenuContent>
+                    <ContextMenuItem onClick={(e) => onPreview(script, e)}>
+                      Edit
                     </ContextMenuItem>
-                    <ContextMenuItem
-                      className="cursor-pointer text-destructive focus:text-destructive"
-                    >
-                      <span>Delete</span>
+                    <ContextMenuItem className="text-destructive">
+                      Delete
                     </ContextMenuItem>
                   </ContextMenuContent>
                 </ContextMenu>
