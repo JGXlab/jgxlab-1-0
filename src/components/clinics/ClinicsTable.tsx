@@ -38,33 +38,54 @@ export function ClinicsTable() {
 
   const handleInvite = async (email: string, clinicName: string) => {
     try {
-      console.log('Attempting to send invitation to:', email);
+      console.log('Creating user and sending invitation to:', email);
       
-      const { data, error } = await supabase.auth.signInWithOtp({
+      // First, create the user with the default password
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
         email,
+        password: 'password1',
         options: {
-          emailRedirectTo: `${window.location.origin}/admin/login`,
           data: {
             clinic_name: clinicName,
           },
-        },
+        }
       });
       
-      console.log('Invitation response:', { data, error });
+      console.log('User creation response:', { signUpData, signUpError });
       
-      if (error) {
-        console.error('Error sending invitation:', error);
+      if (signUpError) {
+        console.error('Error creating user:', signUpError);
         toast({
           variant: "destructive",
-          title: "Error Sending Invitation",
-          description: `Failed to send invitation: ${error.message}`,
+          title: "Error Creating User",
+          description: `Failed to create user: ${signUpError.message}`,
+        });
+        return;
+      }
+
+      // Then send a magic link for password reset
+      const { data: resetData, error: resetError } = await supabase.auth.resetPasswordForEmail(
+        email,
+        {
+          redirectTo: `${window.location.origin}/admin/login`,
+        }
+      );
+
+      console.log('Password reset email response:', { resetData, resetError });
+
+      if (resetError) {
+        console.error('Error sending reset email:', resetError);
+        toast({
+          variant: "destructive",
+          title: "Error Sending Reset Email",
+          description: `Failed to send reset email: ${resetError.message}`,
         });
         return;
       }
 
       toast({
-        title: "Invitation Sent",
-        description: `An invitation has been sent to ${email}. Please check spam folder if not received.`,
+        title: "User Created and Invited",
+        description: `An account has been created for ${email} and a password reset link has been sent. Please check spam folder if not received.`,
       });
     } catch (error) {
       console.error('Unexpected error in invite handler:', error);
