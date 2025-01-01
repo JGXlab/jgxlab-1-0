@@ -14,33 +14,63 @@ interface TreatmentTypeSelectorProps {
 }
 
 export const TreatmentTypeSelector = ({ value, onChange, selectedArch }: TreatmentTypeSelectorProps) => {
-  const getTreatmentOptions = () => {
-    if (selectedArch.includes('upper')) {
-      return [{ value: 'upper-treatment', label: 'Upper Treatment' }];
+  const hasUpperArch = selectedArch.includes('upper');
+  const hasLowerArch = selectedArch.includes('lower');
+  const hasDualArch = selectedArch.includes('dual');
+
+  // Parse the combined value into upper and lower parts
+  const [upperValue, lowerValue] = value.split('|');
+
+  const handleChange = (newValue: string, position: 'upper' | 'lower') => {
+    if (position === 'upper') {
+      onChange(`${newValue}|${lowerValue || ''}`);
+    } else {
+      onChange(`${upperValue || ''}|${newValue}`);
     }
-    if (selectedArch.includes('lower')) {
-      return [{ value: 'lower-treatment', label: 'Lower Treatment' }];
-    }
-    if (selectedArch.includes('dual')) {
-      return [{ value: 'dual-treatment', label: 'Upper and Lower Treatment' }];
-    }
-    return [];
   };
 
-  const options = getTreatmentOptions();
+  if (hasDualArch) {
+    return (
+      <Select onValueChange={onChange} value={value}>
+        <SelectTrigger className="bg-white">
+          <SelectValue placeholder="Select treatment type" />
+        </SelectTrigger>
+        <SelectContent className="bg-white z-50">
+          <SelectItem value="dual-treatment">Upper and Lower Treatment</SelectItem>
+        </SelectContent>
+      </Select>
+    );
+  }
 
   return (
-    <Select onValueChange={onChange} value={value}>
-      <SelectTrigger className="bg-white">
-        <SelectValue placeholder="Select treatment type" />
-      </SelectTrigger>
-      <SelectContent className="bg-white z-50">
-        {options.map((option) => (
-          <SelectItem key={option.value} value={option.value}>
-            {option.label}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
+    <div className="space-y-4">
+      {hasUpperArch && (
+        <div className="space-y-2">
+          <FormLabel>Upper Treatment Type</FormLabel>
+          <Select onValueChange={(v) => handleChange(v, 'upper')} value={upperValue}>
+            <SelectTrigger className="bg-white">
+              <SelectValue placeholder="Select upper treatment type" />
+            </SelectTrigger>
+            <SelectContent className="bg-white z-50">
+              <SelectItem value="upper-treatment">Upper Treatment</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      )}
+      
+      {hasLowerArch && (
+        <div className="space-y-2">
+          <FormLabel>Lower Treatment Type</FormLabel>
+          <Select onValueChange={(v) => handleChange(v, 'lower')} value={lowerValue}>
+            <SelectTrigger className="bg-white">
+              <SelectValue placeholder="Select lower treatment type" />
+            </SelectTrigger>
+            <SelectContent className="bg-white z-50">
+              <SelectItem value="lower-treatment">Lower Treatment</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      )}
+    </div>
   );
 };
