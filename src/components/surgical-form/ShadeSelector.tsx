@@ -5,7 +5,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { FormControl, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 
 interface ShadeSelectorProps {
   value: string;
@@ -13,33 +12,20 @@ interface ShadeSelectorProps {
 }
 
 const shadeOptions = [
-  // Purples
-  { id: "primary_purple", label: "Primary Purple", value: "#9b87f5" },
-  { id: "secondary_purple", label: "Secondary Purple", value: "#7E69AB" },
-  { id: "tertiary_purple", label: "Tertiary Purple", value: "#6E59A5" },
-  { id: "dark_purple", label: "Dark Purple", value: "#1A1F2C" },
-  { id: "light_purple", label: "Light Purple", value: "#D6BCFA" },
-  { id: "soft_purple", label: "Soft Purple", value: "#E5DEFF" },
-  { id: "vivid_purple", label: "Vivid Purple", value: "#8B5CF6" },
-  
-  // Other Colors
-  { id: "soft_green", label: "Soft Green", value: "#F2FCE2" },
-  { id: "soft_yellow", label: "Soft Yellow", value: "#FEF7CD" },
-  { id: "soft_orange", label: "Soft Orange", value: "#FEC6A1" },
-  { id: "soft_pink", label: "Soft Pink", value: "#FFDEE2" },
-  { id: "soft_peach", label: "Soft Peach", value: "#FDE1D3" },
-  { id: "soft_blue", label: "Soft Blue", value: "#D3E4FD" },
-  { id: "magenta_pink", label: "Magenta Pink", value: "#D946EF" },
-  { id: "bright_orange", label: "Bright Orange", value: "#F97316" },
-  { id: "ocean_blue", label: "Ocean Blue", value: "#0EA5E9" },
-  
-  // Neutrals
-  { id: "neutral_gray", label: "Neutral Gray", value: "#8E9196" },
-  { id: "soft_gray", label: "Soft Gray", value: "#F1F0FB" },
-  { id: "light_gray", label: "Light Gray", value: "#C8C8C9" },
-  { id: "dark_gray", label: "Dark Gray", value: "#222222" },
-  { id: "medium_gray", label: "Medium Gray", value: "#8A898C" },
-  { id: "pure_white", label: "Pure White", value: "#FFFFFF" },
+  { id: "a1", label: "A1" },
+  { id: "a2", label: "A2" },
+  { id: "a3", label: "A3" },
+  { id: "a3_5", label: "A3.5" },
+  { id: "a4", label: "A4" },
+  { id: "b1", label: "B1" },
+  { id: "b2", label: "B2" },
+  { id: "b3", label: "B3" },
+  { id: "c1", label: "C1" },
+  { id: "c2", label: "C2" },
+  { id: "c3", label: "C3" },
+  { id: "d2", label: "D2" },
+  { id: "d3", label: "D3" },
+  { id: "nw", label: "NW" },
 ];
 
 export const ShadeSelector = ({ value, onChange }: ShadeSelectorProps) => {
@@ -56,10 +42,6 @@ export const ShadeSelector = ({ value, onChange }: ShadeSelectorProps) => {
               value={shade.id}
               className="flex items-center gap-2"
             >
-              <div
-                className="w-4 h-4 rounded-full border border-gray-200"
-                style={{ backgroundColor: shade.value }}
-              />
               {shade.label}
             </SelectItem>
           ))}
