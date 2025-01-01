@@ -55,7 +55,7 @@ export function ClinicSidebar() {
     <div className="fixed left-0 top-0 flex flex-col w-64 h-screen bg-white border-r border-gray-100">
       <div className="flex items-center h-16 px-6 border-b border-gray-100">
         <Link to="/clinic/dashboard" className="flex items-center gap-2">
-          <span className="text-xl font-semibold text-primary">Clinic Portal</span>
+          <span className="text-xl font-semibold text-primary">JGX Digital Lab</span>
         </Link>
       </div>
       <div className="flex-1 overflow-y-auto py-4">
