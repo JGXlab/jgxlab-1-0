@@ -59,36 +59,49 @@ export const DesignersTable = () => {
   }
 
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Name</TableHead>
-          <TableHead>Email</TableHead>
-          <TableHead>Phone</TableHead>
-          <TableHead>Created At</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {designers.map((designer) => (
-          <TableRow key={designer.id}>
-            <TableCell className="flex items-center gap-2">
-              <User className="h-4 w-4 text-gray-500" />
-              {designer.first_name} {designer.last_name}
-            </TableCell>
-            <TableCell className="flex items-center gap-2">
-              <Mail className="h-4 w-4 text-gray-500" />
-              {designer.email}
-            </TableCell>
-            <TableCell className="flex items-center gap-2">
-              <Phone className="h-4 w-4 text-gray-500" />
-              {designer.phone}
-            </TableCell>
-            <TableCell>
-              {new Date(designer.created_at).toLocaleDateString()}
-            </TableCell>
+    <div className="space-y-4">
+      <Table>
+        <TableHeader>
+          <TableRow className="bg-gray-50 hover:bg-gray-50">
+            <TableHead className="font-semibold text-gray-600">Name</TableHead>
+            <TableHead className="font-semibold text-gray-600">Email</TableHead>
+            <TableHead className="font-semibold text-gray-600">Phone</TableHead>
+            <TableHead className="font-semibold text-gray-600">Created At</TableHead>
           </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+        </TableHeader>
+        <TableBody>
+          {designers.map((designer) => (
+            <TableRow 
+              key={designer.id}
+              className="hover:bg-gray-50 transition-colors duration-200"
+            >
+              <TableCell className="flex items-center gap-3 py-4">
+                <div className="bg-primary/10 p-2 rounded-full">
+                  <User className="h-5 w-5 text-primary" />
+                </div>
+                <span className="font-medium">
+                  {designer.first_name} {designer.last_name}
+                </span>
+              </TableCell>
+              <TableCell className="flex items-center gap-3 py-4">
+                <div className="bg-primary/10 p-2 rounded-full">
+                  <Mail className="h-5 w-5 text-primary" />
+                </div>
+                <span>{designer.email}</span>
+              </TableCell>
+              <TableCell className="flex items-center gap-3 py-4">
+                <div className="bg-primary/10 p-2 rounded-full">
+                  <Phone className="h-5 w-5 text-primary" />
+                </div>
+                <span>{designer.phone}</span>
+              </TableCell>
+              <TableCell className="text-gray-600">
+                {new Date(designer.created_at).toLocaleDateString()}
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
   );
 };
