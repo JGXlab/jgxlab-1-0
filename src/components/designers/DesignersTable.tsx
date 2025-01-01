@@ -64,8 +64,7 @@ export const DesignersTable = () => {
         <TableHeader>
           <TableRow className="bg-gray-50 hover:bg-gray-50">
             <TableHead className="font-semibold text-gray-600">Name</TableHead>
-            <TableHead className="font-semibold text-gray-600">Email</TableHead>
-            <TableHead className="font-semibold text-gray-600">Phone</TableHead>
+            <TableHead className="font-semibold text-gray-600">Contact Information</TableHead>
             <TableHead className="font-semibold text-gray-600">Created At</TableHead>
           </TableRow>
         </TableHeader>
@@ -83,17 +82,21 @@ export const DesignersTable = () => {
                   {designer.first_name} {designer.last_name}
                 </span>
               </TableCell>
-              <TableCell className="flex items-center gap-3 py-4">
-                <div className="bg-primary/10 p-2 rounded-full">
-                  <Mail className="h-5 w-5 text-primary" />
+              <TableCell>
+                <div className="flex items-center gap-6">
+                  <div className="flex items-center gap-3">
+                    <div className="bg-primary/10 p-2 rounded-full">
+                      <Mail className="h-5 w-5 text-primary" />
+                    </div>
+                    <span>{designer.email}</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="bg-primary/10 p-2 rounded-full">
+                      <Phone className="h-5 w-5 text-primary" />
+                    </div>
+                    <span>{designer.phone}</span>
+                  </div>
                 </div>
-                <span>{designer.email}</span>
-              </TableCell>
-              <TableCell className="flex items-center gap-3 py-4">
-                <div className="bg-primary/10 p-2 rounded-full">
-                  <Phone className="h-5 w-5 text-primary" />
-                </div>
-                <span>{designer.phone}</span>
               </TableCell>
               <TableCell className="text-gray-600">
                 {new Date(designer.created_at).toLocaleDateString()}
