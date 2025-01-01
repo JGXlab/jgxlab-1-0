@@ -49,13 +49,16 @@ const AdminLogin = () => {
       }
 
       console.log("User signed in successfully, checking admin status...");
+      console.log("User ID:", signInData.user.id);
 
-      // Check admin status
+      // Fetch the user's profile to check admin status
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
-        .select('is_admin')
+        .select('is_admin, email')
         .eq('id', signInData.user.id)
         .single();
+
+      console.log("Profile query result:", { profileData, profileError });
 
       if (profileError) {
         console.error("Error fetching profile:", profileError);
@@ -67,6 +70,8 @@ const AdminLogin = () => {
         });
         return;
       }
+
+      console.log("Profile data:", profileData);
 
       if (!profileData?.is_admin) {
         console.log("Non-admin user attempted to login");
