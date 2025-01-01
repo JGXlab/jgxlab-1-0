@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronRight, Plus } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface ProductCardProps {
@@ -13,31 +13,25 @@ export const ProductCard = ({ title, description, imagePath }: ProductCardProps)
   const navigate = useNavigate();
 
   return (
-    <Card className="group overflow-hidden hover:shadow-lg transition-all duration-300 border-gray-100">
-      <CardHeader className="p-0">
-        <div className="relative w-full h-48 overflow-hidden">
+    <Card className="w-full max-w-sm hover:shadow-lg transition-shadow duration-300">
+      <CardHeader className="space-y-1">
+        <div className="w-full h-48 overflow-hidden rounded-t-lg">
           <img
             src={imagePath}
             alt={title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
         </div>
+        <CardTitle className="text-2xl font-bold text-primary">{title}</CardTitle>
+        <CardDescription className="text-muted">{description}</CardDescription>
       </CardHeader>
-      <CardContent className="p-6">
-        <CardTitle className="text-xl font-semibold text-gray-900 mb-2">
-          {title}
-        </CardTitle>
-        <CardDescription className="text-sm text-gray-600 mb-6">
-          {description}
-        </CardDescription>
+      <CardContent>
         <Button 
           onClick={() => navigate(`/clinic/addnewlabscript/surgical-day-appliance`)}
-          className="w-full group/btn flex items-center justify-center gap-2"
+          className="w-full group"
         >
-          <Plus className="h-4 w-4" />
-          Create New Design
-          <ChevronRight className="h-4 w-4 group-hover/btn:translate-x-1 transition-transform" />
+          Select Design
+          <ChevronRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
         </Button>
       </CardContent>
     </Card>
