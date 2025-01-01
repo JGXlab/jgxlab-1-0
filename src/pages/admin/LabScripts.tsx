@@ -42,16 +42,22 @@ const LabScripts = () => {
     }
   });
 
-  const filteredLabScripts = selectedStatus
-    ? labScripts?.filter(script => script.status === selectedStatus)
-    : labScripts;
+  const filteredLabScripts = selectedStatus === 'incomplete'
+    ? labScripts?.filter(script => 
+        ['pending', 'in_progress', 'paused', 'on_hold'].includes(script.status)
+      )
+    : selectedStatus
+      ? labScripts?.filter(script => script.status === selectedStatus)
+      : labScripts;
 
   const statusCounts = {
     new: labScripts?.filter(script => script.status === 'pending')?.length || 0,
     inProcess: labScripts?.filter(script => script.status === 'in_progress')?.length || 0,
     paused: labScripts?.filter(script => script.status === 'paused')?.length || 0,
     onHold: labScripts?.filter(script => script.status === 'on_hold')?.length || 0,
-    incomplete: labScripts?.filter(script => script.status === 'incomplete')?.length || 0,
+    incomplete: labScripts?.filter(script => 
+      ['pending', 'in_progress', 'paused', 'on_hold'].includes(script.status)
+    )?.length || 0,
     completed: labScripts?.filter(script => script.status === 'completed')?.length || 0,
     all: labScripts?.length || 0,
   };
@@ -94,8 +100,17 @@ const LabScripts = () => {
 
   const handleStatusSelect = (status: string | null) => {
     setSelectedStatus(status);
+    let toastMessage = "";
+    if (status === 'incomplete') {
+      toastMessage = "Showing all incomplete lab scripts (New, In Process, Paused, and On Hold)";
+    } else if (status) {
+      toastMessage = `Filtered by ${status.replace('_', ' ')}`;
+    } else {
+      toastMessage = "Showing all lab scripts";
+    }
+    
     toast({
-      title: status ? `Filtered by ${status.replace('_', ' ')}` : "Showing all lab scripts",
+      title: toastMessage,
       description: "Click 'All Scripts' to clear filter",
     });
   };
