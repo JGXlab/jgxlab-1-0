@@ -16,7 +16,6 @@ import Settings from "./pages/admin/Settings";
 import Clinics from "./pages/admin/Clinics";
 import ClinicDashboard from "./pages/clinic/Dashboard";
 import ClinicPatients from "./pages/clinic/Patients";
-import AddNewLabScript from "./pages/clinic/AddNewLabScript";
 import NewLabScriptForm from "./pages/clinic/NewLabScriptForm";
 import SubmittedLabScripts from "./pages/clinic/SubmittedLabScripts";
 import MyAccount from "./pages/clinic/MyAccount";
@@ -44,8 +43,7 @@ const App = () => (
               {/* Clinic Routes */}
               <Route path="/clinic/dashboard" element={<ClinicGuard><ClinicDashboard /></ClinicGuard>} />
               <Route path="/clinic/patients" element={<ClinicGuard><ClinicPatients /></ClinicGuard>} />
-              <Route path="/clinic/addnewlabscript" element={<ClinicGuard><AddNewLabScript /></ClinicGuard>} />
-              <Route path="/clinic/addnewlabscript/new" element={<ClinicGuard><NewLabScriptForm /></ClinicGuard>} />
+              <Route path="/clinic/new-lab-script" element={<ClinicGuard><NewLabScriptForm /></ClinicGuard>} />
               <Route path="/clinic/submittedlabscripts" element={<ClinicGuard><SubmittedLabScripts /></ClinicGuard>} />
               <Route path="/clinic/myaccount" element={<ClinicGuard><MyAccount /></ClinicGuard>} />
             </Routes>
