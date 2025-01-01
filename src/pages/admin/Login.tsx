@@ -20,7 +20,7 @@ const AdminLogin = () => {
     setIsLoading(true);
     
     try {
-      console.log("Attempting admin login with email:", email);
+      console.log("Starting admin login process...");
       
       // First attempt to sign in
       const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
@@ -50,18 +50,17 @@ const AdminLogin = () => {
 
       console.log("User signed in successfully, checking admin status...");
 
-      // Check if user is an admin with the updated policy
-      const { data: adminCheck, error: adminError } = await supabase
+      // Check if user is an admin with a simple query
+      const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('is_admin')
         .eq('id', signInData.user.id)
         .single();
 
-      console.log("Admin check response:", { adminCheck, adminError });
+      console.log("Admin check response:", { profile, profileError });
 
-      if (adminError) {
-        console.error("Error checking admin status:", adminError);
-        // Sign out if we can't verify admin status
+      if (profileError) {
+        console.error("Error checking admin status:", profileError);
         await supabase.auth.signOut();
         toast({
           variant: "destructive",
@@ -71,9 +70,8 @@ const AdminLogin = () => {
         return;
       }
 
-      if (!adminCheck?.is_admin) {
+      if (!profile?.is_admin) {
         console.log("Non-admin user attempted to login");
-        // Sign out non-admin users
         await supabase.auth.signOut();
         toast({
           variant: "destructive",
