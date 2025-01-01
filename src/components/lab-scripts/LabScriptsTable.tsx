@@ -1,9 +1,15 @@
 import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Pencil, Trash2 } from "lucide-react";
+import { MoreVertical } from "lucide-react";
 import { format } from "date-fns";
 import { StatusUpdateButtons } from "./StatusUpdateButtons";
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from "@/components/ui/context-menu";
+import { Button } from "@/components/ui/button";
 
 interface LabScript {
   id: string;
@@ -63,7 +69,7 @@ export const LabScriptsTable = ({ labScripts, onPreview, onStatusUpdate }: LabSc
             <TableHead>Treatments</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Update Status</TableHead>
-            <TableHead>Actions</TableHead>
+            <TableHead className="w-[50px]"></TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -105,23 +111,30 @@ export const LabScriptsTable = ({ labScripts, onPreview, onStatusUpdate }: LabSc
                 />
               </TableCell>
               <TableCell>
-                <div className="flex gap-2">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="text-primary hover:text-primary/80"
-                    onClick={(e) => onPreview(script, e)}
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="text-destructive hover:text-destructive/80"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
+                <ContextMenu>
+                  <ContextMenuTrigger>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 p-0"
+                    >
+                      <MoreVertical className="h-4 w-4" />
+                    </Button>
+                  </ContextMenuTrigger>
+                  <ContextMenuContent align="end" className="w-[160px]">
+                    <ContextMenuItem
+                      className="cursor-pointer"
+                      onClick={(e) => onPreview(script, e)}
+                    >
+                      <span>Edit</span>
+                    </ContextMenuItem>
+                    <ContextMenuItem
+                      className="cursor-pointer text-destructive focus:text-destructive"
+                    >
+                      <span>Delete</span>
+                    </ContextMenuItem>
+                  </ContextMenuContent>
+                </ContextMenu>
               </TableCell>
             </TableRow>
           ))}
