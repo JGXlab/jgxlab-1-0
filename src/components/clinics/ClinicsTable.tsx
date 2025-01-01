@@ -47,34 +47,40 @@ export function ClinicsTable() {
 
   const handleInvite = async (email: string, clinicName: string) => {
     try {
-      console.log('Sending invitation to:', email);
-      const { error } = await supabase.auth.signInWithOtp({
+      console.log('Attempting to send invitation to:', email);
+      
+      const { data, error } = await supabase.auth.signInWithOtp({
         email,
         options: {
           emailRedirectTo: `${window.location.origin}/admin/login`,
+          data: {
+            clinic_name: clinicName,
+          },
         },
       });
+      
+      console.log('Invitation response:', { data, error });
       
       if (error) {
         console.error('Error sending invitation:', error);
         toast({
           variant: "destructive",
-          title: "Error",
-          description: "Failed to send invitation. Please try again.",
+          title: "Error Sending Invitation",
+          description: `Failed to send invitation: ${error.message}`,
         });
         return;
       }
 
       toast({
         title: "Invitation Sent",
-        description: `An invitation has been sent to ${email}`,
+        description: `An invitation has been sent to ${email}. Please check spam folder if not received.`,
       });
     } catch (error) {
-      console.error('Error in invite handler:', error);
+      console.error('Unexpected error in invite handler:', error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to send invitation. Please try again.",
+        description: "An unexpected error occurred. Please try again.",
       });
     }
   };
