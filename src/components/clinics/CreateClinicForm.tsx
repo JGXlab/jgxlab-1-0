@@ -58,7 +58,9 @@ export function CreateClinicForm() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       console.log("Creating clinic with values:", values);
-      const { error } = await supabase.from('clinics').insert({
+      
+      // Create clinic in database
+      const { error: clinicError } = await supabase.from('clinics').insert({
         name: values.name,
         email: values.email,
         phone: values.phone,
@@ -69,9 +71,26 @@ export function CreateClinicForm() {
         user_id: (await supabase.auth.getUser()).data.user?.id
       });
 
-      if (error) throw error;
+      if (clinicError) throw clinicError;
 
-      toast.success("Clinic created successfully!");
+      // Send invitation email
+      const response = await fetch('/functions/v1/send-clinic-invitation', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${process.env.SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify({
+          email: values.email,
+          clinicName: values.name,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to send invitation');
+      }
+
+      toast.success("Clinic created and invitation sent successfully!");
       queryClient.invalidateQueries({ queryKey: ['clinics'] });
       form.reset();
     } catch (error) {
