@@ -28,6 +28,9 @@ const LabScripts = () => {
           patients (
             first_name,
             last_name
+          ),
+          clinics:profiles (
+            name
           )
         `)
         .order('created_at', { ascending: false });

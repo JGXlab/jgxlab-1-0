@@ -11,6 +11,9 @@ interface LabScript {
     first_name: string;
     last_name: string;
   };
+  clinics: {
+    name: string;
+  };
   treatment_type: string;
   appliance_type: string;
   due_date: string;
@@ -51,6 +54,7 @@ export const LabScriptsTable = ({ labScripts, onPreview, onStatusUpdate }: LabSc
         <TableHeader>
           <TableRow>
             <TableHead>Patient Name</TableHead>
+            <TableHead>Clinic</TableHead>
             <TableHead>Appliance Type</TableHead>
             <TableHead>Request Date</TableHead>
             <TableHead>Due Date</TableHead>
@@ -65,6 +69,9 @@ export const LabScriptsTable = ({ labScripts, onPreview, onStatusUpdate }: LabSc
             <TableRow key={script.id} className="hover:bg-gray-50">
               <TableCell className="font-medium text-primary">
                 {script.patients?.first_name} {script.patients?.last_name}
+              </TableCell>
+              <TableCell className="text-gray-600">
+                {script.clinics?.name}
               </TableCell>
               <TableCell className="text-primary">{script.appliance_type}</TableCell>
               <TableCell>{format(new Date(script.created_at), 'MMM dd, yyyy')}</TableCell>
