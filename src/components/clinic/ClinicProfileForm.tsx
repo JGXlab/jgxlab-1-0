@@ -63,7 +63,8 @@ export function ClinicProfileForm() {
             contact_person: "",
             contact_phone: "",
             address: "",
-            user_id: user.id
+            auth_user_id: user.id,  // Include both auth_user_id
+            user_id: user.id        // and user_id
           })
           .select()
           .single();
