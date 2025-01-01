@@ -22,25 +22,36 @@ const AdminLogin = () => {
     try {
       console.log("Attempting admin login with email:", email);
       
-      // First sign in the user
+      // First attempt to sign in
       const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (signInError) {
-        console.error("Admin login error:", signInError);
+        console.error("Sign in error:", signInError);
         toast({
           variant: "destructive",
           title: "Login Failed",
-          description: signInError.message,
+          description: "Invalid email or password",
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      if (!signInData.user) {
+        console.error("No user data returned after sign in");
+        toast({
+          variant: "destructive",
+          title: "Login Failed",
+          description: "Unable to retrieve user information",
         });
         setIsLoading(false);
         return;
       }
 
       // Then check if they are an admin
-      const { data: profiles, error: profileError } = await supabase
+      const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('is_admin')
         .eq('id', signInData.user.id)
@@ -48,7 +59,6 @@ const AdminLogin = () => {
 
       if (profileError) {
         console.error("Error checking admin status:", profileError);
-        // Sign out the user since they're not confirmed as admin
         await supabase.auth.signOut();
         toast({
           variant: "destructive",
@@ -59,9 +69,8 @@ const AdminLogin = () => {
         return;
       }
 
-      if (!profiles?.is_admin) {
+      if (!profile?.is_admin) {
         console.log("Non-admin user attempted to login");
-        // Sign out the user since they're not an admin
         await supabase.auth.signOut();
         toast({
           variant: "destructive",
@@ -86,9 +95,8 @@ const AdminLogin = () => {
         title: "Error",
         description: "An unexpected error occurred. Please try again.",
       });
+      setIsLoading(false);
     }
-    
-    setIsLoading(false);
   };
 
   return (
