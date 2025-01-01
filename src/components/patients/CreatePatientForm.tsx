@@ -7,7 +7,6 @@ import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { PatientNameFields } from "./PatientNameFields";
 import { PatientGenderField } from "./PatientGenderField";
-import { PatientDateOfBirthField } from "./PatientDateOfBirthField";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
@@ -21,9 +20,6 @@ const formSchema = z.object({
   }),
   gender: z.enum(["male", "female", "other"], {
     required_error: "Please select a gender.",
-  }),
-  date_of_birth: z.string().min(1, {
-    message: "Date of birth is required.",
   }),
 });
 
@@ -39,7 +35,6 @@ export function CreatePatientForm({ onSuccess }: { onSuccess: () => void }) {
       first_name: "",
       last_name: "",
       gender: undefined,
-      date_of_birth: "",
     },
   });
 
@@ -49,12 +44,10 @@ export function CreatePatientForm({ onSuccess }: { onSuccess: () => void }) {
       const { data: userData, error: userError } = await supabase.auth.getUser();
       if (userError) throw userError;
 
-      // Ensure all required fields are present and properly typed for Supabase
       const patientData = {
         first_name: values.first_name,
         last_name: values.last_name,
         gender: values.gender as string,
-        date_of_birth: values.date_of_birth,
         user_id: userData.user.id,
       };
 
@@ -85,7 +78,6 @@ export function CreatePatientForm({ onSuccess }: { onSuccess: () => void }) {
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <PatientNameFields form={form} />
         <PatientGenderField form={form} />
-        <PatientDateOfBirthField form={form} />
         <Button type="submit" className="w-full">
           Create Patient
         </Button>
