@@ -1,8 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
-  Bell,
-  Building2,
   Users,
   FileText,
   Settings,
@@ -24,37 +22,27 @@ const sidebarButtons: SidebarButton[] = [
   {
     icon: LayoutDashboard,
     label: "Dashboard",
-    path: "/admin/dashboard",
-  },
-  {
-    icon: Bell,
-    label: "Notifications",
-    path: "/admin/notifications",
-  },
-  {
-    icon: Building2,
-    label: "Clinics",
-    path: "/admin/clinics",
+    path: "/clinic/dashboard",
   },
   {
     icon: Users,
     label: "Patients",
-    path: "/admin/patients",
+    path: "/clinic/patients",
   },
   {
     icon: FileText,
-    label: "Lab Scripts",
-    path: "/admin/lab-scripts",
+    label: "Lab Requests",
+    path: "/clinic/lab-request/new",
   },
   {
     icon: Settings,
     label: "Settings",
-    path: "/admin/settings",
+    path: "/clinic/settings",
   },
   {
     icon: UserCircle,
     label: "Profile",
-    path: "/admin/profile",
+    path: "/clinic/profile",
   },
 ];
 
@@ -71,7 +59,7 @@ export const ClinicSidebarButtons = () => {
         title: "Logged out successfully",
         description: "You have been logged out of your account.",
       });
-      navigate("/admin/login");
+      navigate("/");
     } catch (error) {
       console.error("Error logging out:", error);
       toast({
@@ -123,7 +111,7 @@ export const ClinicSidebarButtons = () => {
       <div className="px-3 pb-4">
         <button
           onClick={handleLogout}
-          className="flex items-center gap-3 px-3 py-2 w-full rounded-lg transition-colors text-gray-500 hover:bg-gray-50 hover:text-gray-900"
+          className="flex items-center gap-3 px-3 py-2 w-full rounded-lg transition-colors text-[#ea384c] hover:bg-red-50"
         >
           <LogOut className="h-5 w-5" />
           <span className="font-medium text-sm">Logout</span>

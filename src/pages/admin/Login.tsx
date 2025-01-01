@@ -21,55 +21,73 @@ const AdminLogin = () => {
     
     try {
       console.log("Attempting admin login with email:", email);
-      const { data: { user }, error: signInError } = await supabase.auth.signInWithPassword({
+      
+      // First attempt to sign in
+      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (signInError) {
-        console.error("Admin login error:", signInError);
+        console.error("Sign in error:", signInError);
         toast({
           variant: "destructive",
           title: "Login Failed",
-          description: signInError.message,
+          description: "Invalid email or password",
         });
         setIsLoading(false);
         return;
       }
 
-      // Check if the user is an admin
-      const { data: profileData, error: profileError } = await supabase
+      if (!signInData.user) {
+        console.error("No user data returned after sign in");
+        toast({
+          variant: "destructive",
+          title: "Login Failed",
+          description: "Unable to retrieve user information",
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      // Check admin status in a separate query
+      const adminCheck = await supabase
         .from('profiles')
         .select('is_admin')
-        .eq('id', user?.id)
+        .eq('id', signInData.user.id)
         .single();
 
-      if (profileError) {
-        console.error("Error fetching admin status:", profileError);
+      if (adminCheck.error) {
+        console.error("Error checking admin status:", adminCheck.error);
+        await supabase.auth.signOut();
         toast({
           variant: "destructive",
           title: "Authentication Error",
-          description: "Could not verify admin status.",
+          description: "Could not verify admin status",
         });
-        // Sign out the user since they're not verified as admin
+        setIsLoading(false);
+        return;
+      }
+
+      if (!adminCheck.data?.is_admin) {
+        console.log("Non-admin user attempted to login");
         await supabase.auth.signOut();
-      } else if (!profileData?.is_admin) {
-        console.log("Non-admin user attempted to login to admin panel");
         toast({
           variant: "destructive",
           title: "Access Denied",
-          description: "This account does not have admin privileges.",
+          description: "This account does not have admin privileges",
         });
-        // Sign out the user since they're not an admin
-        await supabase.auth.signOut();
-      } else {
-        console.log("Admin login successful");
-        toast({
-          title: "Welcome Admin",
-          description: "Successfully logged in to admin panel.",
-        });
-        navigate("/admin/dashboard");
+        setIsLoading(false);
+        return;
       }
+
+      console.log("Admin login successful, redirecting...");
+      toast({
+        title: "Welcome Admin",
+        description: "Successfully logged in to admin panel",
+      });
+      navigate("/admin/dashboard");
+      
     } catch (error) {
       console.error("Unexpected admin login error:", error);
       toast({
@@ -77,9 +95,8 @@ const AdminLogin = () => {
         title: "Error",
         description: "An unexpected error occurred. Please try again.",
       });
+      setIsLoading(false);
     }
-    
-    setIsLoading(false);
   };
 
   return (
