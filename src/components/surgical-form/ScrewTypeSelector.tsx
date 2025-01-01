@@ -40,9 +40,9 @@ export const ScrewTypeSelector = ({ value, onChange, otherValue, onOtherValueCha
           );
         })}
         {value === "others" && (
-          <div className="col-start-3 col-span-2">
+          <div className="col-start-4 w-40">
             <Input
-              placeholder="Please specify the screw type"
+              placeholder="Please specify"
               value={otherValue}
               onChange={(e) => onOtherValueChange?.(e.target.value)}
             />
