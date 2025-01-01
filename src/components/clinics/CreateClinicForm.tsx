@@ -59,12 +59,16 @@ export function CreateClinicForm() {
     try {
       console.log("Creating clinic with values:", values);
       
-      // Send invitation using Supabase Auth
-      const { error: inviteError } = await supabase.auth.admin.inviteUserByEmail(values.email);
-      
-      if (inviteError) {
-        console.error('Error sending invitation:', inviteError);
-        throw inviteError;
+      // First check if a clinic with this email already exists
+      const { data: existingClinic } = await supabase
+        .from('clinics')
+        .select('id')
+        .eq('email', values.email)
+        .maybeSingle();
+
+      if (existingClinic) {
+        toast.error("A clinic with this email already exists.");
+        return;
       }
 
       // Create clinic in database
@@ -79,9 +83,15 @@ export function CreateClinicForm() {
         user_id: (await supabase.auth.getUser()).data.user?.id
       });
 
-      if (clinicError) throw clinicError;
+      if (clinicError) {
+        if (clinicError.code === '23505') {
+          toast.error("A clinic with this email already exists.");
+          return;
+        }
+        throw clinicError;
+      }
 
-      toast.success("Clinic created and invitation sent successfully!");
+      toast.success("Clinic created successfully!");
       queryClient.invalidateQueries({ queryKey: ['clinics'] });
       form.reset();
     } catch (error) {
