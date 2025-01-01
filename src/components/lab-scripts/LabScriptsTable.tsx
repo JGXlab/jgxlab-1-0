@@ -66,7 +66,6 @@ export const LabScriptsTable = ({ labScripts, onPreview, onStatusUpdate }: LabSc
             <TableHead>Appliance Type</TableHead>
             <TableHead>Request Date</TableHead>
             <TableHead>Due Date</TableHead>
-            <TableHead>Treatments</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Update Status</TableHead>
             <TableHead className="w-[50px]"></TableHead>
@@ -90,16 +89,6 @@ export const LabScriptsTable = ({ labScripts, onPreview, onStatusUpdate }: LabSc
               <TableCell>{format(new Date(script.created_at), 'MMM dd, yyyy')}</TableCell>
               <TableCell>{script.due_date}</TableCell>
               <TableCell>
-                <div className="space-y-1">
-                  <div>
-                    <span className="font-medium">Upper:</span> {script.arch}
-                  </div>
-                  <div>
-                    <span className="font-medium">Lower:</span> {script.arch}
-                  </div>
-                </div>
-              </TableCell>
-              <TableCell>
                 <Badge className={getStatusColor(script.status)}>
                   {script.status}
                 </Badge>
@@ -121,7 +110,7 @@ export const LabScriptsTable = ({ labScripts, onPreview, onStatusUpdate }: LabSc
                       <MoreVertical className="h-4 w-4" />
                     </Button>
                   </ContextMenuTrigger>
-                  <ContextMenuContent align="end" className="w-[160px]">
+                  <ContextMenuContent className="w-[160px]">
                     <ContextMenuItem
                       className="cursor-pointer"
                       onClick={(e) => onPreview(script, e)}
