@@ -1,5 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { UserPlus } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 import {
   Table,
   TableBody,
@@ -8,6 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
 
 type Clinic = {
   id: string;
@@ -21,6 +24,8 @@ type Clinic = {
 };
 
 export function ClinicsTable() {
+  const { toast } = useToast();
+  
   const { data: clinics, isLoading } = useQuery({
     queryKey: ['clinics'],
     queryFn: async () => {
@@ -39,6 +44,35 @@ export function ClinicsTable() {
       return data as Clinic[];
     },
   });
+
+  const handleInvite = async (email: string, clinicName: string) => {
+    try {
+      console.log('Sending invitation to:', email);
+      const { error } = await supabase.auth.admin.inviteUserByEmail(email);
+      
+      if (error) {
+        console.error('Error sending invitation:', error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to send invitation. Please try again.",
+        });
+        return;
+      }
+
+      toast({
+        title: "Invitation Sent",
+        description: `An invitation has been sent to ${email}`,
+      });
+    } catch (error) {
+      console.error('Error in invite handler:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to send invitation. Please try again.",
+      });
+    }
+  };
 
   if (isLoading) {
     return (
@@ -59,6 +93,7 @@ export function ClinicsTable() {
             <TableHead className="text-foreground font-semibold">Email</TableHead>
             <TableHead className="text-foreground font-semibold">Phone</TableHead>
             <TableHead className="text-foreground font-semibold">Address</TableHead>
+            <TableHead className="text-foreground font-semibold">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -70,11 +105,21 @@ export function ClinicsTable() {
               <TableCell>{clinic.email}</TableCell>
               <TableCell>{clinic.phone}</TableCell>
               <TableCell>{clinic.address}</TableCell>
+              <TableCell>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleInvite(clinic.email, clinic.name)}
+                >
+                  <UserPlus className="w-4 h-4 mr-2" />
+                  Invite
+                </Button>
+              </TableCell>
             </TableRow>
           ))}
           {!clinics?.length && (
             <TableRow>
-              <TableCell colSpan={6} className="text-center text-muted-foreground h-24">
+              <TableCell colSpan={7} className="text-center text-muted-foreground h-24">
                 No clinics found
               </TableCell>
             </TableRow>
