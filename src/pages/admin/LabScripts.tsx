@@ -11,18 +11,21 @@ import {
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Search, Bell, Eye } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { Search, Bell, Eye, Play, Pause, StopCircle, Loader } from "lucide-react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { LoadingLabScripts } from "@/components/lab-scripts/LoadingLabScripts";
 import { EmptyLabScripts } from "@/components/lab-scripts/EmptyLabScripts";
 import { format } from "date-fns";
 import { PreviewLabScriptModal } from "@/components/surgical-form/PreviewLabScriptModal";
 import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 const LabScripts = () => {
   const [selectedScript, setSelectedScript] = useState<any>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const { data: labScripts, isLoading } = useQuery({
     queryKey: ['admin-lab-scripts'],
@@ -49,12 +52,44 @@ const LabScripts = () => {
     }
   });
 
+  const updateStatusMutation = useMutation({
+    mutationFn: async ({ id, status }: { id: string; status: string }) => {
+      const { error } = await supabase
+        .from('lab_scripts')
+        .update({ status })
+        .eq('id', id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-lab-scripts'] });
+      toast({
+        title: "Status Updated",
+        description: "Lab script status has been updated successfully.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Failed to update status. Please try again.",
+        variant: "destructive",
+      });
+      console.error('Error updating status:', error);
+    },
+  });
+
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case 'pending':
         return 'bg-yellow-100 text-yellow-800';
       case 'completed':
         return 'bg-green-100 text-green-800';
+      case 'in_progress':
+        return 'bg-blue-100 text-blue-800';
+      case 'paused':
+        return 'bg-orange-100 text-orange-800';
+      case 'on_hold':
+        return 'bg-purple-100 text-purple-800';
       case 'rejected':
         return 'bg-red-100 text-red-800';
       default:
@@ -62,10 +97,72 @@ const LabScripts = () => {
     }
   };
 
+  const handleStatusUpdate = (id: string, newStatus: string) => {
+    updateStatusMutation.mutate({ id, newStatus });
+  };
+
   const handlePreview = (script: any, e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent row click when clicking preview button
+    e.stopPropagation();
     setSelectedScript(script);
     setIsPreviewOpen(true);
+  };
+
+  const renderStatusButtons = (script: any) => {
+    const status = script.status.toLowerCase();
+
+    if (status === 'completed') {
+      return (
+        <Badge className="bg-green-100 text-green-800">
+          Design Completed
+        </Badge>
+      );
+    }
+
+    if (status === 'paused' || status === 'on_hold') {
+      return (
+        <Button
+          variant="outline"
+          size="sm"
+          className="w-full flex items-center justify-center gap-2"
+          onClick={() => handleStatusUpdate(script.id, 'in_progress')}
+        >
+          <Play className="h-4 w-4" />
+          Resume
+        </Button>
+      );
+    }
+
+    return (
+      <div className="flex flex-col gap-2">
+        <Button
+          variant="outline"
+          size="sm"
+          className="w-full flex items-center justify-center gap-2"
+          onClick={() => handleStatusUpdate(script.id, 'paused')}
+        >
+          <Pause className="h-4 w-4" />
+          Pause
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          className="w-full flex items-center justify-center gap-2"
+          onClick={() => handleStatusUpdate(script.id, 'on_hold')}
+        >
+          <Loader className="h-4 w-4" />
+          Hold
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          className="w-full flex items-center justify-center gap-2"
+          onClick={() => handleStatusUpdate(script.id, 'completed')}
+        >
+          <StopCircle className="h-4 w-4" />
+          Complete
+        </Button>
+      </div>
+    );
   };
 
   return (
@@ -112,6 +209,7 @@ const LabScripts = () => {
                 <TableHead>Status</TableHead>
                 <TableHead>Created At</TableHead>
                 <TableHead>Actions</TableHead>
+                <TableHead>Status Update</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -141,6 +239,9 @@ const LabScripts = () => {
                       <Eye className="h-4 w-4" />
                       <span>Preview</span>
                     </Button>
+                  </TableCell>
+                  <TableCell>
+                    {renderStatusButtons(script)}
                   </TableCell>
                 </TableRow>
               ))}
