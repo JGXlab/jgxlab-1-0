@@ -18,8 +18,8 @@ export const TreatmentTypeSelector = ({ value, onChange, selectedArch }: Treatme
   const hasLowerArch = selectedArch.includes('lower');
   const hasDualArch = selectedArch.includes('dual');
 
-  // Parse the combined value into upper and lower parts
-  const [upperValue, lowerValue] = value.split('|');
+  // Parse the combined value into upper and lower parts, with proper initialization
+  const [upperValue, lowerValue] = (value || '|').split('|');
 
   const handleChange = (newValue: string, position: 'upper' | 'lower') => {
     if (position === 'upper') {
