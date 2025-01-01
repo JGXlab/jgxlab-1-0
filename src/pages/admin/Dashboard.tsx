@@ -2,11 +2,11 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { StatsCard } from "@/components/clinic/dashboard/StatsCard";
-import { OverviewChart } from "@/components/clinic/dashboard/OverviewChart";
-import { DiagnoseChart } from "@/components/clinic/dashboard/DiagnoseChart";
-import { TodaySchedule } from "@/components/clinic/dashboard/TodaySchedule";
-import { LatestVisits } from "@/components/clinic/dashboard/LatestVisits";
+import { StatsCard } from "@/components/admin/dashboard/StatsCard";
+import { OverviewChart } from "@/components/admin/dashboard/OverviewChart";
+import { DiagnoseChart } from "@/components/admin/dashboard/DiagnoseChart";
+import { TodaySchedule } from "@/components/admin/dashboard/TodaySchedule";
+import { LatestVisits } from "@/components/admin/dashboard/LatestVisits";
 import { Search, Bell } from "lucide-react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 
