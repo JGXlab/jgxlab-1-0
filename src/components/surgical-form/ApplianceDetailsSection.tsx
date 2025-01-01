@@ -16,6 +16,20 @@ interface ApplianceDetailsSectionProps {
 }
 
 export const ApplianceDetailsSection = ({ form }: ApplianceDetailsSectionProps) => {
+  const applianceType = form.watch('applianceType');
+  const isNightguard = applianceType === 'nightguard';
+
+  // Reset fields when switching to nightguard
+  React.useEffect(() => {
+    if (isNightguard) {
+      form.setValue('treatmentType', '');
+      form.setValue('screwType', '');
+      form.setValue('vdoDetails', '');
+      form.setValue('needsNightguard', '');
+      form.setValue('shade', '');
+    }
+  }, [isNightguard, form]);
+
   return (
     <FormSection title="Appliance Details" className="pt-6 border-t">
       <FormField
@@ -52,69 +66,73 @@ export const ApplianceDetailsSection = ({ form }: ApplianceDetailsSectionProps) 
         )}
       />
 
-      <FormField
-        control={form.control}
-        name="treatmentType"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Treatment Type</FormLabel>
-            <TreatmentTypeSelector 
-              value={field.value} 
-              onChange={field.onChange}
-              selectedArch={[form.watch('arch')]}
-            />
-          </FormItem>
-        )}
-      />
+      {!isNightguard && (
+        <>
+          <FormField
+            control={form.control}
+            name="treatmentType"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Treatment Type</FormLabel>
+                <TreatmentTypeSelector 
+                  value={field.value} 
+                  onChange={field.onChange}
+                  selectedArch={[form.watch('arch')]}
+                />
+              </FormItem>
+            )}
+          />
 
-      <FormField
-        control={form.control}
-        name="screwType"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Screw Type</FormLabel>
-            <ScrewTypeSelector 
-              value={field.value} 
-              onChange={field.onChange}
-              otherValue={form.watch('otherScrewType')}
-              onOtherValueChange={(value) => form.setValue('otherScrewType', value)}
-            />
-          </FormItem>
-        )}
-      />
+          <FormField
+            control={form.control}
+            name="screwType"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Screw Type</FormLabel>
+                <ScrewTypeSelector 
+                  value={field.value} 
+                  onChange={field.onChange}
+                  otherValue={form.watch('otherScrewType')}
+                  onOtherValueChange={(value) => form.setValue('otherScrewType', value)}
+                />
+              </FormItem>
+            )}
+          />
 
-      <FormField
-        control={form.control}
-        name="vdoDetails"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>VDO Details</FormLabel>
-            <VDODetailsSelector value={field.value} onChange={field.onChange} />
-          </FormItem>
-        )}
-      />
+          <FormField
+            control={form.control}
+            name="vdoDetails"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>VDO Details</FormLabel>
+                <VDODetailsSelector value={field.value} onChange={field.onChange} />
+              </FormItem>
+            )}
+          />
 
-      <FormField
-        control={form.control}
-        name="needsNightguard"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Do you need Nightguard?</FormLabel>
-            <NightguardSelector value={field.value} onChange={field.onChange} />
-          </FormItem>
-        )}
-      />
+          <FormField
+            control={form.control}
+            name="needsNightguard"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Do you need Nightguard?</FormLabel>
+                <NightguardSelector value={field.value} onChange={field.onChange} />
+              </FormItem>
+            )}
+          />
 
-      <FormField
-        control={form.control}
-        name="shade"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Shade</FormLabel>
-            <ShadeSelector value={field.value} onChange={field.onChange} />
-          </FormItem>
-        )}
-      />
+          <FormField
+            control={form.control}
+            name="shade"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Shade</FormLabel>
+                <ShadeSelector value={field.value} onChange={field.onChange} />
+              </FormItem>
+            )}
+          />
+        </>
+      )}
     </FormSection>
   );
 };
