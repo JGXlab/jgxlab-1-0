@@ -11,10 +11,12 @@ interface LabScript {
     first_name: string;
     last_name: string;
     user_id: string;
+  };
+  clinics: {
     clinics: {
       name: string;
       doctor_name: string;
-    };
+    } | null;
   };
   treatment_type: string;
   appliance_type: string;
@@ -70,7 +72,7 @@ export const LabScriptsTable = ({ labScripts, onPreview, onStatusUpdate }: LabSc
         <TableBody>
           {labScripts.map((script) => {
             console.log('Rendering script:', script);
-            console.log('Clinic info:', script.patients?.clinics);
+            console.log('Clinic info:', script.clinics);
             
             return (
               <TableRow key={script.id} className="hover:bg-gray-50">
@@ -78,12 +80,12 @@ export const LabScriptsTable = ({ labScripts, onPreview, onStatusUpdate }: LabSc
                   {script.patients?.first_name} {script.patients?.last_name}
                 </TableCell>
                 <TableCell>
-                  {script.patients?.clinics ? (
+                  {script.clinics?.clinics ? (
                     <div>
-                      <div className="text-gray-900">{script.patients.clinics.name}</div>
-                      {script.patients.clinics.doctor_name && (
+                      <div className="text-gray-900">{script.clinics.clinics.name}</div>
+                      {script.clinics.clinics.doctor_name && (
                         <div className="text-sm text-gray-500">
-                          Dr. {script.patients.clinics.doctor_name}
+                          Dr. {script.clinics.clinics.doctor_name}
                         </div>
                       )}
                     </div>
