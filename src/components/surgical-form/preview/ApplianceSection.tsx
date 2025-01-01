@@ -44,9 +44,19 @@ export const ApplianceSection = ({
     
     const [upper, lower] = value.split('|');
     if (!upper && !lower) return 'Not specified';
-    if (upper && lower) return `Upper: ${upper.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}, Lower: ${lower.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}`;
-    if (upper) return `Upper: ${upper.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}`;
-    return `Lower: ${lower.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}`;
+    
+    const formatArch = (arch: string) => arch.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+    
+    if (upper && lower) {
+      return (
+        <div className="space-y-1">
+          <div>Upper: {formatArch(upper)}</div>
+          <div>Lower: {formatArch(lower)}</div>
+        </div>
+      );
+    }
+    if (upper) return `Upper: ${formatArch(upper)}`;
+    return `Lower: ${formatArch(lower)}`;
   };
 
   const formatApplianceType = (type: string) => {
