@@ -60,6 +60,7 @@ export const LabScriptsTable = ({ labScripts, onPreview, onStatusUpdate }: LabSc
         <TableHeader>
           <TableRow>
             <TableHead>Patient Name</TableHead>
+            <TableHead>Clinic Name</TableHead>
             <TableHead>Appliance Type</TableHead>
             <TableHead>Request Date</TableHead>
             <TableHead>Due Date</TableHead>
@@ -71,11 +72,15 @@ export const LabScriptsTable = ({ labScripts, onPreview, onStatusUpdate }: LabSc
         <TableBody>
           {labScripts.map((script) => {
             console.log('Rendering script:', script);
+            console.log('Clinic info:', script.clinics);
             
             return (
               <TableRow key={script.id} className="hover:bg-gray-50">
                 <TableCell className="font-medium text-gray-900">
                   {script.patients?.first_name} {script.patients?.last_name}
+                </TableCell>
+                <TableCell className="text-gray-900">
+                  {script.clinics?.clinics?.name || 'No clinic assigned'}
                 </TableCell>
                 <TableCell className="text-gray-900">{script.appliance_type}</TableCell>
                 <TableCell className="text-gray-900">{format(new Date(script.created_at), 'MMM dd, yyyy')}</TableCell>
