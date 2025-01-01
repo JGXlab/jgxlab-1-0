@@ -40,14 +40,14 @@ export function ClinicsTable() {
     try {
       console.log('Sending invitation to:', email);
       
-      // First, check if the user already exists
+      // First, check if the user already exists using maybeSingle() instead of single()
       const { data: existingUser, error: userCheckError } = await supabase
         .from('profiles')
         .select('id')
         .eq('email', email)
-        .single();
+        .maybeSingle();
 
-      if (userCheckError && userCheckError.code !== 'PGRST116') { // PGRST116 means no rows returned
+      if (userCheckError) {
         console.error('Error checking existing user:', userCheckError);
         throw userCheckError;
       }
@@ -76,7 +76,7 @@ export function ClinicsTable() {
         // If user doesn't exist, create them and send invitation
         const { error: signUpError } = await supabase.auth.signUp({
           email,
-          password: 'Password1', // Updated to use Password1 instead of password1
+          password: 'Password1',
           options: {
             data: {
               clinic_name: clinicName,
