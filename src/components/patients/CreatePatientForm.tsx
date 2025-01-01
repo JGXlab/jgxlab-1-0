@@ -23,11 +23,13 @@ const formSchema = z.object({
   }),
 });
 
+type PatientFormValues = z.infer<typeof formSchema>;
+
 export function CreatePatientForm({ onSuccess }: { onSuccess: () => void }) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<PatientFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       first_name: "",
@@ -36,16 +38,21 @@ export function CreatePatientForm({ onSuccess }: { onSuccess: () => void }) {
     },
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: PatientFormValues) {
     console.log("Submitting form with values:", values);
     try {
       const { data: userData, error: userError } = await supabase.auth.getUser();
       if (userError) throw userError;
 
-      const { error } = await supabase.from("patients").insert({
-        ...values,
+      // Ensure all required fields are present and properly typed for Supabase
+      const patientData = {
+        first_name: values.first_name,
+        last_name: values.last_name,
+        gender: values.gender as string,
         user_id: userData.user.id,
-      });
+      };
+
+      const { error } = await supabase.from("patients").insert(patientData);
 
       if (error) throw error;
 
