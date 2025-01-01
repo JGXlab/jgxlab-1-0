@@ -1,6 +1,5 @@
 import { AdminLayout } from "@/components/admin/AdminLayout";
-import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { CreateClinicDialog } from "@/components/clinics/CreateClinicDialog";
 
 const Clinics = () => {
   return (
@@ -13,13 +12,10 @@ const Clinics = () => {
               Manage your clinic locations and details
             </p>
           </div>
-          <Button className="gap-2">
-            <Plus className="h-4 w-4" />
-            Create Clinic
-          </Button>
+          <CreateClinicDialog />
         </div>
         
-        {/* Placeholder for clinics content - to be implemented */}
+        {/* Placeholder for clinics list - to be implemented */}
         <div className="rounded-lg border p-8 text-center text-muted-foreground">
           Clinics management functionality will be implemented here
         </div>
