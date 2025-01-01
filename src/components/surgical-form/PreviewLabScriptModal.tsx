@@ -12,19 +12,48 @@ import { PatientSection } from "./preview/PatientSection";
 import { ApplianceSection } from "./preview/ApplianceSection";
 import { InstructionsSection } from "./preview/InstructionsSection";
 import { Tables } from "@/integrations/supabase/types";
+import { z } from "zod";
+import { formSchema } from "./formSchema";
 
 interface PreviewLabScriptModalProps {
   isOpen: boolean;
   onClose: () => void;
   labScriptId?: string;
+  formData?: z.infer<typeof formSchema>;
 }
 
 export const PreviewLabScriptModal = ({
   isOpen,
   onClose,
   labScriptId,
+  formData,
 }: PreviewLabScriptModalProps) => {
   const [labScript, setLabScript] = useState<Tables<"lab_scripts"> | null>(null);
+
+  // If we have formData, transform it to match lab_scripts table structure
+  useEffect(() => {
+    if (formData && !labScriptId) {
+      const transformedData = {
+        id: 'preview',
+        patient_id: formData.patientId,
+        appliance_type: formData.applianceType,
+        arch: formData.arch,
+        treatment_type: formData.treatmentType,
+        screw_type: formData.screwType,
+        other_screw_type: formData.otherScrewType,
+        vdo_details: formData.vdoDetails,
+        needs_nightguard: formData.needsNightguard,
+        shade: formData.shade,
+        due_date: formData.dueDate,
+        specific_instructions: formData.specificInstructions,
+        created_at: new Date().toISOString(),
+        status: 'preview',
+        user_id: 'preview'
+      } as Tables<"lab_scripts">;
+      
+      setLabScript(transformedData);
+    }
+  }, [formData]);
 
   // Fetch patient details
   const { data: patient } = useQuery({
@@ -48,7 +77,7 @@ export const PreviewLabScriptModal = ({
     enabled: !!labScript?.patient_id
   });
 
-  // Set up real-time subscription
+  // Set up real-time subscription for existing lab scripts
   useEffect(() => {
     if (!labScriptId) return;
     
@@ -73,7 +102,7 @@ export const PreviewLabScriptModal = ({
       )
       .subscribe();
 
-    // Initial fetch
+    // Initial fetch for existing lab script
     const fetchLabScript = async () => {
       const { data, error } = await supabase
         .from('lab_scripts')
