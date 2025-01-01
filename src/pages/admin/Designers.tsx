@@ -1,6 +1,6 @@
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Card } from "@/components/ui/card";
-import { Bell, Search, Users, UserPlus } from "lucide-react";
+import { Bell, Search, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -10,6 +10,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { CreateDesignerForm } from "@/components/designers/CreateDesignerForm";
+import { DesignersTable } from "@/components/designers/DesignersTable";
 import { useState } from "react";
 
 const Designers = () => {
@@ -51,12 +52,7 @@ const Designers = () => {
       </div>
 
       <Card className="p-6">
-        <div className="flex items-center justify-center h-40 text-gray-400">
-          <div className="text-center">
-            <Users className="w-12 h-12 mx-auto mb-4" />
-            <p>No designers found</p>
-          </div>
-        </div>
+        <DesignersTable />
       </Card>
     </AdminLayout>
   );
