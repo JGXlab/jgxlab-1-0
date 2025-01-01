@@ -1,5 +1,5 @@
 import { ClinicLayout } from "@/components/clinic/ClinicLayout";
-import { Calendar, User, FileText, CheckCircle2, Clock, Info, Database } from "lucide-react";
+import { Calendar, User, FileText, CheckCircle2, Clock, Info, Database, Eye } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -16,6 +16,9 @@ import { useNavigate } from "react-router-dom";
 import { EmptyLabScripts } from "@/components/lab-scripts/EmptyLabScripts";
 import { LoadingLabScripts } from "@/components/lab-scripts/LoadingLabScripts";
 import { LabScriptsHeader } from "@/components/lab-scripts/LabScriptsHeader";
+import { Button } from "@/components/ui/button";
+import { PreviewLabScriptModal } from "@/components/surgical-form/PreviewLabScriptModal";
+import { useState } from "react";
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -51,6 +54,8 @@ const getApplianceTypeDisplay = (type: string) => {
 
 export default function SubmittedLabScripts() {
   const navigate = useNavigate();
+  const [selectedScript, setSelectedScript] = useState<any>(null);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
   const { data: labScripts = [], isLoading } = useQuery({
     queryKey: ['labScripts'],
@@ -79,6 +84,12 @@ export default function SubmittedLabScripts() {
       return data || [];
     },
   });
+
+  const handlePreview = (script: any, e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent row click when clicking preview button
+    setSelectedScript(script);
+    setIsPreviewOpen(true);
+  };
 
   return (
     <ClinicLayout>
@@ -119,18 +130,21 @@ export default function SubmittedLabScripts() {
                     <span>Created</span>
                   </div>
                 </TableHead>
+                <TableHead className="w-[100px]">
+                  <span className="sr-only">Actions</span>
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={5}>
+                  <TableCell colSpan={6}>
                     <LoadingLabScripts />
                   </TableCell>
                 </TableRow>
               ) : labScripts.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={5}>
+                  <TableCell colSpan={6}>
                     <EmptyLabScripts />
                   </TableCell>
                 </TableRow>
@@ -186,12 +200,34 @@ export default function SubmittedLabScripts() {
                         {format(new Date(script.created_at), 'MMM d, yyyy')}
                       </div>
                     </TableCell>
+                    <TableCell>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="w-full flex items-center justify-center gap-2"
+                        onClick={(e) => handlePreview(script, e)}
+                      >
+                        <Eye className="h-4 w-4" />
+                        <span>Preview</span>
+                      </Button>
+                    </TableCell>
                   </TableRow>
                 ))
               )}
             </TableBody>
           </Table>
         </div>
+
+        {selectedScript && (
+          <PreviewLabScriptModal
+            isOpen={isPreviewOpen}
+            onClose={() => {
+              setIsPreviewOpen(false);
+              setSelectedScript(null);
+            }}
+            formData={selectedScript}
+          />
+        )}
       </div>
     </ClinicLayout>
   );
