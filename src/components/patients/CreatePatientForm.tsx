@@ -21,11 +21,14 @@ const formSchema = z.object({
   gender: z.enum(["male", "female", "other"], {
     required_error: "Please select a gender.",
   }),
+  clinic_id: z.string().min(1, {
+    message: "Please select a clinic.",
+  }),
 });
 
 type PatientFormValues = z.infer<typeof formSchema>;
 
-export function CreatePatientForm({ onSuccess }: { onSuccess: () => void }) {
+export function CreatePatientForm({ onSuccess, clinicId }: { onSuccess: () => void; clinicId?: string }) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -35,6 +38,7 @@ export function CreatePatientForm({ onSuccess }: { onSuccess: () => void }) {
       first_name: "",
       last_name: "",
       gender: undefined,
+      clinic_id: clinicId || "",
     },
   });
 
@@ -49,8 +53,10 @@ export function CreatePatientForm({ onSuccess }: { onSuccess: () => void }) {
         last_name: values.last_name,
         gender: values.gender as string,
         user_id: userData.user.id,
+        clinic_id: values.clinic_id,
       };
 
+      console.log("Creating patient with data:", patientData);
       const { error } = await supabase.from("patients").insert(patientData);
 
       if (error) throw error;

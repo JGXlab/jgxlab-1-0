@@ -13,20 +13,27 @@ import { useState } from "react";
 interface PatientSelectorProps {
   value: string;
   onChange: (value: string) => void;
+  clinicId?: string;
 }
 
-export function PatientSelector({ value, onChange }: PatientSelectorProps) {
+export function PatientSelector({ value, onChange, clinicId }: PatientSelectorProps) {
   const [open, setOpen] = useState(false);
   const [createPatientOpen, setCreatePatientOpen] = useState(false);
 
   const { data: patients = [], isLoading } = useQuery({
-    queryKey: ['patients'],
+    queryKey: ['patients', clinicId],
     queryFn: async () => {
-      console.log('Fetching patients...');
-      const { data, error } = await supabase
+      console.log('Fetching patients for clinic:', clinicId);
+      const query = supabase
         .from('patients')
         .select('*')
         .order('created_at', { ascending: false });
+
+      if (clinicId) {
+        query.eq('clinic_id', clinicId);
+      }
+
+      const { data, error } = await query;
 
       if (error) {
         console.error('Error fetching patients:', error);
@@ -115,7 +122,10 @@ export function PatientSelector({ value, onChange }: PatientSelectorProps) {
           <DialogHeader>
             <DialogTitle>Create New Patient</DialogTitle>
           </DialogHeader>
-          <CreatePatientForm onSuccess={() => setCreatePatientOpen(false)} />
+          <CreatePatientForm 
+            onSuccess={() => setCreatePatientOpen(false)} 
+            clinicId={clinicId}
+          />
         </DialogContent>
       </Dialog>
     </div>
