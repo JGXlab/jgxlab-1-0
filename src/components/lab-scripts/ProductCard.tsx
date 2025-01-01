@@ -15,13 +15,6 @@ export const ProductCard = ({ title, description, imagePath }: ProductCardProps)
   return (
     <Card className="w-full max-w-sm hover:shadow-lg transition-shadow duration-300">
       <CardHeader className="space-y-1">
-        <div className="w-full h-48 overflow-hidden rounded-t-lg">
-          <img
-            src="https://images.unsplash.com/photo-1606811841689-23dfddce3e95?q=80&w=1974&auto=format&fit=crop"
-            alt={title}
-            className="w-full h-full object-cover"
-          />
-        </div>
         <CardTitle className="text-2xl font-bold text-primary">{title}</CardTitle>
         <CardDescription className="text-muted">{description}</CardDescription>
       </CardHeader>
