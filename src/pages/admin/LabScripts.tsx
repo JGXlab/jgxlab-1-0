@@ -27,10 +27,9 @@ const LabScripts = () => {
           *,
           patients (
             first_name,
-            last_name
-          ),
-          profiles:profiles!lab_scripts_user_id_fkey (
-            clinics!clinics_user_id_fkey (
+            last_name,
+            clinic_id,
+            clinics (
               name,
               doctor_name
             )
@@ -43,14 +42,8 @@ const LabScripts = () => {
         throw error;
       }
 
-      // Transform the data to match the expected interface
-      const transformedData = data.map(script => ({
-        ...script,
-        clinics: script.profiles?.clinics?.[0] || null
-      }));
-
-      console.log('Fetched lab scripts:', transformedData);
-      return transformedData;
+      console.log('Fetched lab scripts:', data);
+      return data;
     }
   });
 
