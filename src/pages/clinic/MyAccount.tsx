@@ -34,19 +34,27 @@ export default function MyAccount() {
 
       console.log("Authenticated user ID:", user.id);
       
-      const { data: clinicData, error } = await supabase
+      // First check if the clinic exists
+      const { data: clinicData, error: clinicError } = await supabase
         .from("clinics")
         .select("*")
         .eq("user_id", user.id)
         .maybeSingle();
 
-      if (error) {
-        console.error("Error fetching clinic:", error);
-        throw error;
+      if (clinicError) {
+        console.error("Error fetching clinic:", clinicError);
+        throw clinicError;
       }
 
-      console.log("Fetched clinic data:", clinicData);
-      return clinicData as Clinic | null;
+      // Log the raw response for debugging
+      console.log("Raw clinic data response:", clinicData);
+
+      if (!clinicData) {
+        console.log("No clinic found for user:", user.id);
+        return null;
+      }
+
+      return clinicData as Clinic;
     },
   });
 
@@ -107,7 +115,21 @@ export default function MyAccount() {
     );
   }
 
-  if (error || !clinic) {
+  if (error) {
+    return (
+      <ClinicLayout>
+        <div className="p-6">
+          <Alert variant="destructive">
+            <AlertDescription>
+              Error loading clinic profile. Please try again later.
+            </AlertDescription>
+          </Alert>
+        </div>
+      </ClinicLayout>
+    );
+  }
+
+  if (!clinic) {
     return (
       <ClinicLayout>
         <div className="p-6">
