@@ -35,6 +35,7 @@ const AdminLogin = () => {
           title: "Login Failed",
           description: "Invalid email or password",
         });
+        setIsLoading(false);
         return;
       }
 
@@ -45,12 +46,13 @@ const AdminLogin = () => {
           title: "Login Failed",
           description: "Unable to retrieve user information",
         });
+        setIsLoading(false);
         return;
       }
 
       console.log("User signed in successfully, checking admin status...");
 
-      // Check if user is an admin with the updated policy
+      // Check if user is an admin
       const { data: adminCheck, error: adminError } = await supabase
         .from('profiles')
         .select('is_admin')
@@ -61,25 +63,25 @@ const AdminLogin = () => {
 
       if (adminError) {
         console.error("Error checking admin status:", adminError);
-        // Sign out if we can't verify admin status
         await supabase.auth.signOut();
         toast({
           variant: "destructive",
           title: "Access Denied",
           description: "Could not verify admin status",
         });
+        setIsLoading(false);
         return;
       }
 
       if (!adminCheck?.is_admin) {
         console.log("Non-admin user attempted to login");
-        // Sign out non-admin users
         await supabase.auth.signOut();
         toast({
           variant: "destructive",
           title: "Access Denied",
           description: "This account does not have admin privileges",
         });
+        setIsLoading(false);
         return;
       }
 
