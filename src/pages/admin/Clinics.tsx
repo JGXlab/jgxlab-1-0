@@ -27,8 +27,7 @@ const Clinics = () => {
       const { data, error } = await supabase
         .from("profiles")
         .select("*")
-        .eq("is_admin", false)
-        .throwOnError();
+        .eq("is_admin", false);
 
       if (error) {
         console.error("Error fetching clinics:", error);
@@ -36,7 +35,7 @@ const Clinics = () => {
       }
 
       console.log("Fetched clinics:", data);
-      return data;
+      return data as Profile[];
     },
   });
 
