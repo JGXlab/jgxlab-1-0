@@ -14,6 +14,11 @@ import { InstructionsSection } from "./preview/InstructionsSection";
 import { Tables } from "@/integrations/supabase/types";
 import { z } from "zod";
 import { formSchema } from "./formSchema";
+import { Button } from "@/components/ui/button";
+import { Download } from "lucide-react";
+import { pdf } from '@react-pdf/renderer';
+import { LabScriptPDF } from "./preview/LabScriptPDF";
+import { useToast } from "@/components/ui/use-toast";
 
 interface PreviewLabScriptModalProps {
   isOpen: boolean;
@@ -28,6 +33,7 @@ export const PreviewLabScriptModal = ({
   labScriptId,
   formData,
 }: PreviewLabScriptModalProps) => {
+  const { toast } = useToast();
   const [labScript, setLabScript] = useState<Tables<"lab_scripts"> | null>(null);
 
   // If we have formData, transform it to match lab_scripts table structure
@@ -126,13 +132,55 @@ export const PreviewLabScriptModal = ({
     };
   }, [labScriptId]);
 
+  const handleDownload = async () => {
+    if (!labScript || !patient) {
+      toast({
+        title: "Error",
+        description: "Cannot generate PDF: missing lab script or patient data",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const blob = await pdf(<LabScriptPDF labScript={labScript} patient={patient} />).toBlob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `lab-script-${labScript.id}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      toast({
+        title: "Success",
+        description: "Lab script PDF has been downloaded",
+      });
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      toast({
+        title: "Error",
+        description: "Failed to generate PDF",
+        variant: "destructive",
+      });
+    }
+  };
+
   if (!labScript) return null;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-3xl">
-        <DialogHeader>
+        <DialogHeader className="flex flex-row items-center justify-between">
           <DialogTitle className="text-2xl font-semibold text-gray-900">Lab Script Preview</DialogTitle>
+          <Button
+            onClick={handleDownload}
+            className="gap-2"
+          >
+            <Download className="h-4 w-4" />
+            Save as PDF
+          </Button>
         </DialogHeader>
         <ScrollArea className="max-h-[80vh] pr-6">
           <div className="space-y-8 py-4">
