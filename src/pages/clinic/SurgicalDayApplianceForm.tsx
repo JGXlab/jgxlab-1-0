@@ -1,6 +1,6 @@
 import { ClinicLayout } from "@/components/clinic/ClinicLayout";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Check } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Form, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -24,12 +24,6 @@ const formSchema = z.object({
   dueDate: z.string().min(1, "Due date is required"),
   specificInstructions: z.string().optional(),
 });
-
-const steps = [
-  { id: 1, name: "Patient Details" },
-  { id: 2, name: "Appliance Details" },
-  { id: 3, name: "Additional Info" }
-];
 
 export default function SurgicalDayApplianceForm() {
   const navigate = useNavigate();
@@ -69,31 +63,6 @@ export default function SurgicalDayApplianceForm() {
                 </div>
               </div>
               <PriceTableDropdown />
-            </div>
-
-            {/* Progress Steps */}
-            <div className="py-4 flex items-center justify-center gap-4">
-              {steps.map((step, index) => (
-                <div key={step.id} className="flex items-center">
-                  {index > 0 && (
-                    <div className="h-0.5 w-16 bg-gray-200 mx-2" />
-                  )}
-                  <div className="flex items-center gap-2">
-                    <div className={cn(
-                      "w-8 h-8 rounded-full flex items-center justify-center text-sm",
-                      step.id === 1 ? "bg-primary text-white" : "bg-gray-100 text-gray-500"
-                    )}>
-                      {step.id === 1 ? <Check className="h-4 w-4" /> : step.id}
-                    </div>
-                    <span className={cn(
-                      "text-sm",
-                      step.id === 1 ? "text-primary font-medium" : "text-gray-500"
-                    )}>
-                      {step.name}
-                    </span>
-                  </div>
-                </div>
-              ))}
             </div>
           </div>
         </div>
