@@ -11,9 +11,10 @@ interface LabScript {
     first_name: string;
     last_name: string;
   };
+  user_id: string;
   clinics: {
-    name: string;
-  };
+    name: string | null;
+  } | null;
   treatment_type: string;
   appliance_type: string;
   due_date: string;
@@ -71,7 +72,7 @@ export const LabScriptsTable = ({ labScripts, onPreview, onStatusUpdate }: LabSc
                 {script.patients?.first_name} {script.patients?.last_name}
               </TableCell>
               <TableCell className="text-gray-600">
-                {script.clinics?.name}
+                {script.clinics?.name || 'N/A'}
               </TableCell>
               <TableCell className="text-primary">{script.appliance_type}</TableCell>
               <TableCell>{format(new Date(script.created_at), 'MMM dd, yyyy')}</TableCell>

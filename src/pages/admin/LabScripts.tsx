@@ -29,7 +29,7 @@ const LabScripts = () => {
             first_name,
             last_name
           ),
-          clinics:profiles (
+          clinics:profiles!lab_scripts_user_id_fkey (
             name
           )
         `)
