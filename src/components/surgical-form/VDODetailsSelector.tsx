@@ -20,7 +20,7 @@ export const VDODetailsSelector = ({ value, onChange }: VDODetailsSelectorProps)
 
   return (
     <div className="space-y-2">
-      <div className="flex flex-wrap gap-3">
+      <div className="grid grid-cols-2 gap-3">
         {vdoDetailsOptions.map((option) => {
           const isSelected = value === option.id;
           return (
