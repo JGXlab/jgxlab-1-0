@@ -8,7 +8,6 @@ import { format } from "date-fns";
 import { z } from "zod";
 import { formSchema } from "./formSchema";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -85,6 +84,14 @@ export const PreviewLabScriptModal = ({
                   label="Gender" 
                   value={patient?.gender ? patient.gender.charAt(0).toUpperCase() + patient.gender.slice(1) : 'Loading...'} 
                 />
+                <PreviewField 
+                  label="Submitted Date" 
+                  value={format(new Date(), 'MMM d, yyyy')} 
+                />
+                <PreviewField 
+                  label="Due Date" 
+                  value={formData.dueDate || 'Not specified'} 
+                />
               </div>
             </div>
 
@@ -104,32 +111,26 @@ export const PreviewLabScriptModal = ({
                   label="Treatment Type" 
                   value={formatTreatmentType(formData.treatmentType)} 
                 />
-                {formData.screwType && (
-                  <PreviewField 
-                    label="Screw Type" 
-                    value={formData.otherScrewType && formData.screwType === 'others' 
-                      ? formData.otherScrewType 
-                      : formData.screwType} 
-                  />
-                )}
-                {formData.vdoDetails && (
-                  <PreviewField 
-                    label="VDO Details" 
-                    value={formData.vdoDetails} 
-                  />
-                )}
-                {formData.needsNightguard && (
-                  <PreviewField 
-                    label="Needs Nightguard" 
-                    value={formData.needsNightguard} 
-                  />
-                )}
-                {formData.shade && (
-                  <PreviewField 
-                    label="Shade" 
-                    value={formData.shade.toUpperCase()} 
-                  />
-                )}
+                <PreviewField 
+                  label="Screw Type" 
+                  value={formData.screwType === 'others' && formData.otherScrewType 
+                    ? formData.otherScrewType 
+                    : formData.screwType || 'Not specified'} 
+                />
+                <PreviewField 
+                  label="VDO Details" 
+                  value={formData.vdoDetails || 'Not specified'} 
+                />
+                <PreviewField 
+                  label="Needs Nightguard" 
+                  value={formData.needsNightguard 
+                    ? formData.needsNightguard.charAt(0).toUpperCase() + formData.needsNightguard.slice(1)
+                    : 'Not specified'} 
+                />
+                <PreviewField 
+                  label="Shade" 
+                  value={formData.shade ? formData.shade.toUpperCase() : 'Not specified'} 
+                />
               </div>
             </div>
 
@@ -137,10 +138,6 @@ export const PreviewLabScriptModal = ({
             <div>
               <h3 className="text-lg font-medium mb-4">Additional Information</h3>
               <div className="space-y-4 bg-muted/50 p-4 rounded-lg">
-                <PreviewField 
-                  label="Due Date" 
-                  value={formData.dueDate} 
-                />
                 {formData.specificInstructions && (
                   <div className="space-y-1.5">
                     <p className="text-sm font-medium text-muted-foreground">Specific Instructions</p>
