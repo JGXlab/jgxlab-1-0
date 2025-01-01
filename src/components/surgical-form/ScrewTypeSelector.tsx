@@ -1,9 +1,13 @@
 import { FormControl, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { SelectionButton } from "./SelectionButton";
+import { Input } from "@/components/ui/input";
+import { useState } from "react";
 
 interface ScrewTypeSelectorProps {
-  value: string[];
-  onChange: (value: string[]) => void;
+  value: string;
+  onChange: (value: string, otherValue?: string) => void;
+  otherValue?: string;
+  onOtherValueChange?: (value: string) => void;
 }
 
 const screwTypeOptions = [
@@ -16,30 +20,34 @@ const screwTypeOptions = [
   { id: "others", label: "Others" },
 ];
 
-export const ScrewTypeSelector = ({ value, onChange }: ScrewTypeSelectorProps) => {
-  const toggleOption = (optionId: string) => {
-    if (value.includes(optionId)) {
-      onChange(value.filter((id) => id !== optionId));
-    } else {
-      onChange([...value, optionId]);
-    }
+export const ScrewTypeSelector = ({ value, onChange, otherValue, onOtherValueChange }: ScrewTypeSelectorProps) => {
+  const handleOptionClick = (optionId: string) => {
+    onChange(optionId);
   };
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
       <div className="flex flex-wrap gap-3">
         {screwTypeOptions.map((option) => {
-          const isSelected = value.includes(option.id);
+          const isSelected = value === option.id;
           return (
             <SelectionButton
               key={option.id}
               label={option.label}
               isSelected={isSelected}
-              onClick={() => toggleOption(option.id)}
+              onClick={() => handleOptionClick(option.id)}
             />
           );
         })}
       </div>
+      {value === "others" && (
+        <Input
+          placeholder="Please specify the screw type"
+          value={otherValue}
+          onChange={(e) => onOtherValueChange?.(e.target.value)}
+          className="max-w-md"
+        />
+      )}
       <FormMessage />
     </div>
   );

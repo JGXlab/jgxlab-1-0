@@ -27,7 +27,8 @@ const formSchema = z.object({
   applianceType: z.string().min(1, "Appliance type is required"),
   arch: z.string().min(1, "Arch type must be selected"),
   treatmentType: z.string().min(1, "Treatment type is required"),
-  screwType: z.array(z.string()).min(1, "At least one screw type must be selected"),
+  screwType: z.string().min(1, "Screw type must be selected"),
+  otherScrewType: z.string().optional(),
   vdoDetails: z.array(z.string()).min(1, "At least one VDO detail must be selected"),
   dueDate: z.string().min(1, "Due date is required"),
   specificInstructions: z.string().optional(),
@@ -42,7 +43,8 @@ export default function NewLabScriptForm() {
       applianceType: "",
       arch: "",
       treatmentType: "",
-      screwType: [],
+      screwType: "",
+      otherScrewType: "",
       vdoDetails: [],
       dueDate: "",
       specificInstructions: "",
@@ -150,7 +152,12 @@ export default function NewLabScriptForm() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Screw Type</FormLabel>
-                        <ScrewTypeSelector value={field.value} onChange={field.onChange} />
+                        <ScrewTypeSelector 
+                          value={field.value} 
+                          onChange={field.onChange}
+                          otherValue={form.watch('otherScrewType')}
+                          onOtherValueChange={(value) => form.setValue('otherScrewType', value)}
+                        />
                       </FormItem>
                     )}
                   />
