@@ -31,6 +31,9 @@ const formSchema = z.object({
   contactPerson: z.string().min(2, {
     message: "Contact person name must be at least 2 characters.",
   }),
+  contactPhone: z.string().min(10, {
+    message: "Please enter a valid contact phone number.",
+  }),
   address: z.string().min(5, {
     message: "Address must be at least 5 characters.",
   }),
@@ -47,6 +50,7 @@ export function CreateClinicForm() {
       phone: "",
       doctorName: "",
       contactPerson: "",
+      contactPhone: "",
       address: "",
     },
   });
@@ -60,6 +64,7 @@ export function CreateClinicForm() {
         phone: values.phone,
         doctor_name: values.doctorName,
         contact_person: values.contactPerson,
+        contact_phone: values.contactPhone,
         address: values.address,
         user_id: (await supabase.auth.getUser()).data.user?.id
       });
@@ -141,7 +146,21 @@ export function CreateClinicForm() {
             <FormItem>
               <FormLabel>Point of Contact</FormLabel>
               <FormControl>
-                <Input placeholder="Enter point of contact" {...field} />
+                <Input placeholder="Enter point of contact name" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="contactPhone"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>POC Phone</FormLabel>
+              <FormControl>
+                <Input placeholder="Enter point of contact phone" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
