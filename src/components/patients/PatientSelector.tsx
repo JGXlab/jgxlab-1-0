@@ -19,7 +19,7 @@ export function PatientSelector({ value, onChange }: PatientSelectorProps) {
   const [open, setOpen] = useState(false);
   const [createPatientOpen, setCreatePatientOpen] = useState(false);
 
-  const { data: patients, isLoading } = useQuery({
+  const { data: patients = [], isLoading } = useQuery({
     queryKey: ['patients'],
     queryFn: async () => {
       console.log('Fetching patients...');
@@ -28,19 +28,17 @@ export function PatientSelector({ value, onChange }: PatientSelectorProps) {
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      return data || []; // Ensure we always return an array
+      if (error) {
+        console.error('Error fetching patients:', error);
+        throw error;
+      }
+
+      console.log('Fetched patients:', data);
+      return data || [];
     }
   });
 
-  if (isLoading) {
-    return (
-      <Button variant="outline" className="w-full justify-between" disabled>
-        Loading patients...
-        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-      </Button>
-    );
-  }
+  const selectedPatient = patients.find((patient) => patient.id === value);
 
   return (
     <div className="flex gap-2">
@@ -52,14 +50,15 @@ export function PatientSelector({ value, onChange }: PatientSelectorProps) {
               role="combobox"
               aria-expanded={open}
               className="justify-between w-full"
+              disabled={isLoading}
             >
-              {value
-                ? patients?.find((patient) => patient.id === value)
-                  ? `${patients.find((patient) => patient.id === value)?.first_name} ${
-                      patients?.find((patient) => patient.id === value)?.last_name
-                    }`
-                : "Select patient"
-                : "Select patient"}
+              {isLoading ? (
+                "Loading patients..."
+              ) : (
+                selectedPatient
+                  ? `${selectedPatient.first_name} ${selectedPatient.last_name}`
+                  : "Select patient"
+              )}
               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
           </FormControl>
@@ -82,7 +81,7 @@ export function PatientSelector({ value, onChange }: PatientSelectorProps) {
               </Button>
             </CommandEmpty>
             <CommandGroup>
-              {patients?.map((patient) => (
+              {patients.map((patient) => (
                 <CommandItem
                   key={patient.id}
                   value={patient.id}
