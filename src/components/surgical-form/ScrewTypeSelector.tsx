@@ -42,10 +42,10 @@ export const ScrewTypeSelector = ({ value, onChange, otherValue, onOtherValueCha
         {value === "others" && (
           <div className="col-start-4 w-40">
             <Input
-              placeholder="Please specify"
+              placeholder="Specify please"
               value={otherValue}
               onChange={(e) => onOtherValueChange?.(e.target.value)}
-              className="bg-white text-gray-900"
+              className="bg-white text-gray-900 placeholder:text-gray-500"
             />
           </div>
         )}
