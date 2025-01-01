@@ -42,7 +42,7 @@ export function PatientDateOfBirthField({ form }) {
                 }}
                 disabled={(date) => date > new Date()}
                 initialFocus
-                className="rounded-md border shadow-sm bg-white"
+                className="rounded-lg border shadow-md bg-white"
               />
             </PopoverContent>
           </Popover>
