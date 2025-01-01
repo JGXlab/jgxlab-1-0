@@ -13,6 +13,7 @@ import { ArchSelector } from "@/components/surgical-form/ArchSelector";
 import { ScrewTypeSelector } from "@/components/surgical-form/ScrewTypeSelector";
 import { VDODetailsSelector } from "@/components/surgical-form/VDODetailsSelector";
 import { FormSection } from "@/components/surgical-form/FormSection";
+import { TreatmentTypeSelector } from "@/components/surgical-form/TreatmentTypeSelector";
 import {
   Select,
   SelectContent,
@@ -25,6 +26,7 @@ const formSchema = z.object({
   patientId: z.string().min(1, "Patient selection is required"),
   applianceType: z.string().min(1, "Appliance type is required"),
   arch: z.array(z.string()).min(1, "At least one arch must be selected"),
+  treatmentType: z.string().min(1, "Treatment type is required"),
   screwType: z.array(z.string()).min(1, "At least one screw type must be selected"),
   vdoDetails: z.array(z.string()).min(1, "At least one VDO detail must be selected"),
   dueDate: z.string().min(1, "Due date is required"),
@@ -39,6 +41,7 @@ export default function NewLabScriptForm() {
       patientId: "",
       applianceType: "",
       arch: [],
+      treatmentType: "",
       screwType: [],
       vdoDetails: [],
       dueDate: "",
@@ -122,6 +125,21 @@ export default function NewLabScriptForm() {
                       <FormItem>
                         <FormLabel>Arch Type</FormLabel>
                         <ArchSelector value={field.value} onChange={field.onChange} />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="treatmentType"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Treatment Type</FormLabel>
+                        <TreatmentTypeSelector 
+                          value={field.value} 
+                          onChange={field.onChange}
+                          selectedArch={form.watch('arch')}
+                        />
                       </FormItem>
                     )}
                   />
