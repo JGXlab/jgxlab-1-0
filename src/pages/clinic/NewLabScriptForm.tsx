@@ -1,6 +1,6 @@
 import { ClinicLayout } from "@/components/clinic/ClinicLayout";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Eye } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Form } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
@@ -9,14 +9,17 @@ import { formSchema } from "@/components/surgical-form/formSchema";
 import { PatientInformationSection } from "@/components/surgical-form/PatientInformationSection";
 import { ApplianceDetailsSection } from "@/components/surgical-form/ApplianceDetailsSection";
 import { AdditionalInformationSection } from "@/components/surgical-form/AdditionalInformationSection";
+import { PreviewLabScriptModal } from "@/components/surgical-form/PreviewLabScriptModal";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useMutation } from "@tanstack/react-query";
+import { useState } from "react";
 
 export default function NewLabScriptForm() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [showPreview, setShowPreview] = useState(false);
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -115,8 +118,17 @@ export default function NewLabScriptForm() {
                 <ApplianceDetailsSection form={form} />
                 <AdditionalInformationSection form={form} />
 
-                <div className="pt-6 border-t">
-                  <Button type="submit" className="w-full" disabled={isPending}>
+                <div className="pt-6 border-t flex gap-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="flex items-center gap-2"
+                    onClick={() => setShowPreview(true)}
+                  >
+                    <Eye className="h-4 w-4" />
+                    Preview
+                  </Button>
+                  <Button type="submit" className="flex-1" disabled={isPending}>
                     {isPending ? "Submitting..." : "Submit Lab Script"}
                   </Button>
                 </div>
@@ -125,6 +137,12 @@ export default function NewLabScriptForm() {
           </div>
         </div>
       </div>
+
+      <PreviewLabScriptModal
+        isOpen={showPreview}
+        onClose={() => setShowPreview(false)}
+        formData={form.getValues()}
+      />
     </ClinicLayout>
   );
 }
