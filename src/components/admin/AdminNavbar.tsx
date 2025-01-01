@@ -1,4 +1,4 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   Users,
@@ -16,7 +16,6 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom";
 
 interface AdminNavbarProps {
   isCollapsed: boolean;
@@ -88,22 +87,26 @@ export const AdminNavbar = ({ isCollapsed, setIsCollapsed }: AdminNavbarProps) =
   ];
 
   return (
-    <div className={cn(
-      "fixed left-0 top-0 h-full flex transition-all duration-300 z-50",
-      isCollapsed ? "w-[60px]" : "w-full sm:w-64"
-    )}>
-      <nav className="w-full bg-white p-4 relative">
+    <div 
+      className={cn(
+        "fixed left-0 top-0 h-full flex transition-all duration-300 ease-spring z-50",
+        isCollapsed ? "w-[60px]" : "w-full sm:w-64"
+      )}
+    >
+      <nav className="w-full bg-white p-4 relative shadow-sm">
         <div className={cn(
-          "mb-8 flex items-center",
+          "mb-8 flex items-center transition-all duration-300 ease-spring",
           isCollapsed ? "justify-center" : "justify-between"
         )}>
           {!isCollapsed && (
-            <h1 className="text-2xl font-bold text-primary">Admin Portal</h1>
+            <h1 className="text-2xl font-bold text-primary animate-fade-in">
+              Admin Portal
+            </h1>
           )}
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8"
+            className="h-8 w-8 transition-transform duration-300 ease-spring hover:bg-accent"
             onClick={() => setIsCollapsed(!isCollapsed)}
           >
             {isCollapsed ? (
@@ -114,7 +117,7 @@ export const AdminNavbar = ({ isCollapsed, setIsCollapsed }: AdminNavbarProps) =
           </Button>
         </div>
         
-        <div className="space-y-2">
+        <div className="space-y-1">
           {navItems.map((item) => {
             const Icon = item.icon;
             return (
@@ -122,15 +125,20 @@ export const AdminNavbar = ({ isCollapsed, setIsCollapsed }: AdminNavbarProps) =
                 key={item.path}
                 to={item.path}
                 className={cn(
-                  "flex items-center p-3 rounded-lg transition-colors",
+                  "flex items-center p-3 rounded-lg transition-all duration-200 ease-spring group",
                   isCollapsed ? "justify-center" : "space-x-3",
                   isActive(item.path) 
-                    ? "bg-primary/10 text-primary" 
-                    : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
+                    ? "bg-accent text-primary shadow-sm" 
+                    : "text-secondary hover:bg-accent/50 hover:text-primary"
                 )}
               >
-                <Icon className="h-5 w-5 flex-shrink-0" />
-                {!isCollapsed && <span>{item.label}</span>}
+                <Icon className={cn(
+                  "h-5 w-5 flex-shrink-0 transition-transform duration-200 ease-spring",
+                  !isActive(item.path) && "group-hover:scale-110"
+                )} />
+                {!isCollapsed && (
+                  <span className="font-medium text-sm">{item.label}</span>
+                )}
               </Link>
             );
           })}
@@ -140,7 +148,8 @@ export const AdminNavbar = ({ isCollapsed, setIsCollapsed }: AdminNavbarProps) =
           <Button
             variant="ghost"
             className={cn(
-              "w-full text-red-500 hover:text-red-600 hover:bg-red-50",
+              "w-full transition-colors duration-200 ease-spring",
+              "text-destructive hover:text-destructive/90 hover:bg-destructive/10",
               isCollapsed ? "justify-center p-3" : "justify-start space-x-3 p-3"
             )}
             onClick={handleLogout}

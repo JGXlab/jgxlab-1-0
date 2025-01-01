@@ -27,36 +27,37 @@ export default {
         primary: {
           DEFAULT: "#375bdc",
           foreground: "#FFFFFF",
-          hover: "#0e1f8d",
+          hover: "#2847b3",
         },
         secondary: {
-          DEFAULT: "#0e1f8d",
+          DEFAULT: "#64748b",
+          foreground: "#FFFFFF",
+          hover: "#475569",
+        },
+        success: {
+          DEFAULT: "#22c55e",
           foreground: "#FFFFFF",
         },
-        accent: {
-          DEFAULT: "#375bdc",
+        warning: {
+          DEFAULT: "#f59e0b",
           foreground: "#FFFFFF",
         },
         destructive: {
-          DEFAULT: "#E53E3E",
+          DEFAULT: "#ef4444",
           foreground: "#FFFFFF",
         },
         muted: {
-          DEFAULT: "#718096",
-          foreground: "#FFFFFF",
+          DEFAULT: "#64748b",
+          foreground: "#94a3b8",
+        },
+        accent: {
+          DEFAULT: "#f8fafc",
+          foreground: "#0f172a",
         },
         card: {
           DEFAULT: "#FFFFFF",
-          foreground: "#1A202C",
+          foreground: "#0f172a",
         },
-      },
-      fontFamily: {
-        sans: ["Fira Sans", "sans-serif"],
-      },
-      borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
       },
       keyframes: {
         "accordion-down": {
@@ -67,22 +68,35 @@ export default {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
+        "fade-in": {
+          "0%": { opacity: "0", transform: "translateY(10px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
+        },
+        "fade-out": {
+          "0%": { opacity: "1", transform: "translateY(0)" },
+          "100%": { opacity: "0", transform: "translateY(10px)" },
+        },
+        "slide-in": {
+          "0%": { transform: "translateX(-100%)" },
+          "100%": { transform: "translateX(0)" },
+        },
+        "slide-out": {
+          "0%": { transform: "translateX(0)" },
+          "100%": { transform: "translateX(-100%)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "fade-in": "fade-in 0.3s ease-out",
+        "fade-out": "fade-out 0.3s ease-out",
+        "slide-in": "slide-in 0.3s ease-out",
+        "slide-out": "slide-out 0.3s ease-out",
+      },
+      transitionTimingFunction: {
+        "ease-spring": "cubic-bezier(0.25, 0.1, 0.25, 1.0)",
       },
     },
   },
-  plugins: [
-    require("tailwindcss-animate"),
-    function({ addUtilities }) {
-      const newUtilities = {
-        '.filter-primary': {
-          'filter': 'invert(32%) sepia(74%) saturate(1095%) hue-rotate(214deg) brightness(92%) contrast(91%)'
-        },
-      }
-      addUtilities(newUtilities)
-    }
-  ],
+  plugins: [require("tailwindcss-animate")],
 } satisfies Config;
