@@ -10,9 +10,14 @@ import { PatientInformationSection } from "@/components/surgical-form/PatientInf
 import { ApplianceDetailsSection } from "@/components/surgical-form/ApplianceDetailsSection";
 import { AdditionalInformationSection } from "@/components/surgical-form/AdditionalInformationSection";
 import { z } from "zod";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
+import { useMutation } from "@tanstack/react-query";
 
 export default function NewLabScriptForm() {
   const navigate = useNavigate();
+  const { toast } = useToast();
+  
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -30,8 +35,54 @@ export default function NewLabScriptForm() {
     },
   });
 
+  const { mutate: submitLabScript, isLoading } = useMutation({
+    mutationFn: async (values: z.infer<typeof formSchema>) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("No user found");
+
+      const { data, error } = await supabase
+        .from('lab_scripts')
+        .insert([
+          {
+            patient_id: values.patientId,
+            appliance_type: values.applianceType,
+            arch: values.arch,
+            treatment_type: values.treatmentType,
+            screw_type: values.screwType,
+            other_screw_type: values.otherScrewType,
+            vdo_details: values.vdoDetails,
+            needs_nightguard: values.needsNightguard,
+            shade: values.shade,
+            due_date: values.dueDate,
+            specific_instructions: values.specificInstructions,
+            user_id: user.id,
+          }
+        ])
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Lab script has been submitted successfully",
+      });
+      navigate("/clinic/submittedlabscripts");
+    },
+    onError: (error) => {
+      console.error('Error submitting lab script:', error);
+      toast({
+        title: "Error",
+        description: "Failed to submit lab script. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log("Form submitted:", values);
+    submitLabScript(values);
   };
 
   return (
@@ -43,7 +94,7 @@ export default function NewLabScriptForm() {
               <div className="flex items-center gap-4">
                 <Button
                   variant="ghost"
-                  onClick={() => navigate("/clinic/addnewlabscript")}
+                  onClick={() => navigate("/clinic/submittedlabscripts")}
                 >
                   <ArrowLeft className="h-4 w-4" />
                 </Button>
@@ -65,8 +116,8 @@ export default function NewLabScriptForm() {
                 <AdditionalInformationSection form={form} />
 
                 <div className="pt-6 border-t">
-                  <Button type="submit" className="w-full">
-                    Pay and Complete
+                  <Button type="submit" className="w-full" disabled={isLoading}>
+                    {isLoading ? "Submitting..." : "Submit Lab Script"}
                   </Button>
                 </div>
               </form>

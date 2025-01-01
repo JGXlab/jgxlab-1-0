@@ -56,6 +56,82 @@ export type Database = {
           },
         ]
       }
+      lab_scripts: {
+        Row: {
+          appliance_type: string
+          arch: string
+          created_at: string
+          due_date: string
+          id: string
+          needs_nightguard: string | null
+          other_screw_type: string | null
+          patient_id: string
+          screw_type: string | null
+          shade: string | null
+          specific_instructions: string | null
+          status: string
+          treatment_type: string
+          user_id: string
+          vdo_details: string | null
+        }
+        Insert: {
+          appliance_type: string
+          arch: string
+          created_at?: string
+          due_date: string
+          id?: string
+          needs_nightguard?: string | null
+          other_screw_type?: string | null
+          patient_id: string
+          screw_type?: string | null
+          shade?: string | null
+          specific_instructions?: string | null
+          status?: string
+          treatment_type: string
+          user_id: string
+          vdo_details?: string | null
+        }
+        Update: {
+          appliance_type?: string
+          arch?: string
+          created_at?: string
+          due_date?: string
+          id?: string
+          needs_nightguard?: string | null
+          other_screw_type?: string | null
+          patient_id?: string
+          screw_type?: string | null
+          shade?: string | null
+          specific_instructions?: string | null
+          status?: string
+          treatment_type?: string
+          user_id?: string
+          vdo_details?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_user"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lab_scripts_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lab_scripts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       orders: {
         Row: {
           created_at: string
