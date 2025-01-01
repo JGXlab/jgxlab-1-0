@@ -20,8 +20,7 @@ const AdminLogin = () => {
     setIsLoading(true);
     
     try {
-      // Step 1: Sign in the user
-      console.log("Attempting to sign in with email:", email);
+      console.log("Attempting admin login with email:", email);
       const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -47,16 +46,17 @@ const AdminLogin = () => {
         return;
       }
 
-      // Step 2: Check admin status
-      console.log("Checking admin status for user:", signInData.user.id);
-      const { data: profileData, error: profileError } = await supabase
+      // Verify admin status using a direct query
+      console.log("Verifying admin status for user:", signInData.user.id);
+      const { data: adminCheck, error: adminCheckError } = await supabase
         .from('profiles')
         .select('is_admin')
         .eq('id', signInData.user.id)
+        .limit(1)
         .single();
 
-      if (profileError) {
-        console.error("Profile fetch error:", profileError);
+      if (adminCheckError) {
+        console.error("Admin verification failed:", adminCheckError);
         await supabase.auth.signOut();
         toast({
           variant: "destructive",
@@ -66,8 +66,8 @@ const AdminLogin = () => {
         return;
       }
 
-      if (!profileData?.is_admin) {
-        console.log("User is not an admin:", profileData);
+      if (!adminCheck?.is_admin) {
+        console.log("Non-admin user attempted login:", adminCheck);
         await supabase.auth.signOut();
         toast({
           variant: "destructive",
@@ -77,7 +77,6 @@ const AdminLogin = () => {
         return;
       }
 
-      // Step 3: Success - redirect to admin dashboard
       console.log("Admin login successful, redirecting to dashboard");
       toast({
         title: "Welcome Admin",
