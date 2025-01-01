@@ -11,7 +11,7 @@ export default function SubmittedLabScripts() {
       <div className="p-6">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold">Lab Scripts</h1>
-          <Button onClick={() => navigate("/clinic/newlabscript")}>
+          <Button onClick={() => navigate("/clinic/new-lab-script")}>
             <FilePlus className="mr-2" />
             New Lab Script
           </Button>
