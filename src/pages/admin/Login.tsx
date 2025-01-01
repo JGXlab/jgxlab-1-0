@@ -21,7 +21,9 @@ const AdminLogin = () => {
     
     try {
       console.log("Attempting admin login with email:", email);
-      const { data: { user }, error: signInError } = await supabase.auth.signInWithPassword({
+      
+      // First, attempt to sign in
+      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
@@ -37,36 +39,47 @@ const AdminLogin = () => {
         return;
       }
 
-      // Check if the user is an admin
+      if (!signInData.user) {
+        console.error("No user data returned after login");
+        toast({
+          variant: "destructive",
+          title: "Login Failed",
+          description: "Unable to retrieve user data",
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      // Then, check if the user is an admin
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('is_admin')
-        .eq('id', user?.id)
+        .eq('id', signInData.user.id)
         .single();
 
       if (profileError) {
         console.error("Error fetching admin status:", profileError);
+        // Sign out the user since we couldn't verify admin status
+        await supabase.auth.signOut();
         toast({
           variant: "destructive",
           title: "Authentication Error",
-          description: "Could not verify admin status.",
+          description: "Could not verify admin status",
         });
-        // Sign out the user since they're not verified as admin
-        await supabase.auth.signOut();
       } else if (!profileData?.is_admin) {
         console.log("Non-admin user attempted to login to admin panel");
+        // Sign out the user since they're not an admin
+        await supabase.auth.signOut();
         toast({
           variant: "destructive",
           title: "Access Denied",
-          description: "This account does not have admin privileges.",
+          description: "This account does not have admin privileges",
         });
-        // Sign out the user since they're not an admin
-        await supabase.auth.signOut();
       } else {
-        console.log("Admin login successful");
+        console.log("Admin login successful, redirecting...");
         toast({
           title: "Welcome Admin",
-          description: "Successfully logged in to admin panel.",
+          description: "Successfully logged in to admin panel",
         });
         navigate("/admin/dashboard");
       }
