@@ -1,6 +1,6 @@
 import { DesignLayout } from "@/components/design/DesignLayout";
 import { Card } from "@/components/ui/card";
-import { Bell, Search } from "lucide-react";
+import { Bell, Search, LayoutDashboard } from "lucide-react";
 
 export default function DesignDashboard() {
   return (
