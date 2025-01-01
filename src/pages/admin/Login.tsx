@@ -52,12 +52,13 @@ const AdminLogin = () => {
 
       console.log("User signed in successfully, checking admin status...");
 
-      // Check if user is an admin
+      // Simplified admin check query
       const { data: adminCheck, error: adminError } = await supabase
         .from('profiles')
         .select('is_admin')
         .eq('id', signInData.user.id)
-        .single();
+        .limit(1)
+        .maybeSingle();
 
       console.log("Admin check response:", { adminCheck, adminError });
 
