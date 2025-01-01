@@ -1,17 +1,9 @@
 import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { MoreVertical, Pencil, Trash2 } from "lucide-react";
+import { Eye } from "lucide-react";
 import { format } from "date-fns";
 import { StatusUpdateButtons } from "./StatusUpdateButtons";
-import {
-  ContextMenu,
-  ContextMenuContent,
-  ContextMenuItem,
-  ContextMenuTrigger,
-} from "@/components/ui/context-menu";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 
 interface LabScript {
   id: string;
@@ -39,8 +31,6 @@ interface LabScriptsTableProps {
 }
 
 export const LabScriptsTable = ({ labScripts, onPreview, onStatusUpdate }: LabScriptsTableProps) => {
-  const { toast } = useToast();
-
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case 'pending':
@@ -57,32 +47,6 @@ export const LabScriptsTable = ({ labScripts, onPreview, onStatusUpdate }: LabSc
         return 'bg-pink-100 text-pink-800';
       default:
         return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  const handleDelete = async (scriptId: string) => {
-    try {
-      const { error } = await supabase
-        .from('lab_scripts')
-        .delete()
-        .eq('id', scriptId);
-
-      if (error) throw error;
-
-      toast({
-        title: "Lab script deleted",
-        description: "The lab script has been successfully deleted.",
-      });
-
-      // Refresh the page to show updated data
-      window.location.reload();
-    } catch (error) {
-      console.error('Error deleting lab script:', error);
-      toast({
-        title: "Error",
-        description: "Failed to delete the lab script. Please try again.",
-        variant: "destructive",
-      });
     }
   };
 
@@ -130,48 +94,16 @@ export const LabScriptsTable = ({ labScripts, onPreview, onStatusUpdate }: LabSc
                 />
               </TableCell>
               <TableCell>
-                <div className="flex justify-end gap-2">
+                <div className="flex justify-end">
                   <Button
                     variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 p-0 hover:bg-gray-100"
+                    size="sm"
+                    className="flex items-center gap-2 hover:bg-gray-100"
                     onClick={(e) => onPreview(script, e)}
                   >
-                    <Pencil className="h-4 w-4" />
+                    <Eye className="h-4 w-4" />
+                    View
                   </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 p-0 hover:bg-red-100 hover:text-red-600"
-                    onClick={() => handleDelete(script.id)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                  <ContextMenu>
-                    <ContextMenuTrigger>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 p-0 hover:bg-gray-100"
-                      >
-                        <MoreVertical className="h-4 w-4" />
-                      </Button>
-                    </ContextMenuTrigger>
-                    <ContextMenuContent className="w-40">
-                      <ContextMenuItem 
-                        className="cursor-pointer"
-                        onClick={(e) => onPreview(script, e)}
-                      >
-                        Edit
-                      </ContextMenuItem>
-                      <ContextMenuItem 
-                        className="cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50"
-                        onClick={() => handleDelete(script.id)}
-                      >
-                        Delete
-                      </ContextMenuItem>
-                    </ContextMenuContent>
-                  </ContextMenu>
                 </div>
               </TableCell>
             </TableRow>
