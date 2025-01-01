@@ -22,7 +22,8 @@ const AdminLogin = () => {
     try {
       console.log("Attempting admin login with email:", email);
       
-      const { data: authData, error: signInError } = await supabase.auth.signInWithPassword({
+      // First attempt to sign in
+      const { data: { user }, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
@@ -37,7 +38,7 @@ const AdminLogin = () => {
         return;
       }
 
-      if (!authData.user) {
+      if (!user) {
         console.error("No user data returned after sign in");
         toast({
           variant: "destructive",
@@ -47,16 +48,15 @@ const AdminLogin = () => {
         return;
       }
 
-      console.log("User authenticated, checking admin role for user:", authData.user.id);
-      
-      const { data: profileData, error: profileError } = await supabase
+      // Check if user is admin
+      const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('role')
-        .eq('id', authData.user.id)
-        .maybeSingle();
+        .eq('id', user.id)
+        .single();
 
       if (profileError) {
-        console.error("Error fetching user role:", profileError);
+        console.error("Error fetching profile:", profileError);
         await supabase.auth.signOut();
         toast({
           variant: "destructive",
@@ -66,21 +66,8 @@ const AdminLogin = () => {
         return;
       }
 
-      if (!profileData) {
-        console.error("No profile found for user");
-        await supabase.auth.signOut();
-        toast({
-          variant: "destructive",
-          title: "Profile Not Found",
-          description: "No user profile found. Please contact support.",
-        });
-        return;
-      }
-
-      console.log("Profile data received:", profileData);
-
-      if (profileData.role !== 'admin') {
-        console.error("User is not an admin. Role:", profileData.role);
+      if (!profile || profile.role !== 'admin') {
+        console.error("User is not an admin");
         await supabase.auth.signOut();
         toast({
           variant: "destructive",
