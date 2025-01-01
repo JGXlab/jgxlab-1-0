@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,7 +16,6 @@ import { toast } from "sonner";
 import type { Clinic } from "@/components/clinics/types";
 
 export function ClinicProfileForm() {
-  const queryClient = useQueryClient();
   const form = useForm<Clinic>();
 
   const { data: clinic, isLoading } = useQuery({
@@ -46,28 +45,8 @@ export function ClinicProfileForm() {
       console.log("Raw clinic data response:", clinicData);
 
       if (!clinicData) {
-        console.log("No clinic found, creating new clinic for user:", user.id);
-        const { data: newClinic, error: createError } = await supabase
-          .from("clinics")
-          .insert({
-            user_id: user.id,
-            name: "",
-            email: "",
-            phone: "",
-            doctor_name: "",
-            contact_person: "",
-            contact_phone: "",
-            address: "",
-          })
-          .select()
-          .single();
-
-        if (createError) {
-          console.error("Error creating clinic:", createError);
-          throw createError;
-        }
-
-        return newClinic as Clinic;
+        console.log("No clinic found for user:", user.id);
+        return null;
       }
 
       return clinicData as Clinic;
@@ -104,7 +83,6 @@ export function ClinicProfileForm() {
       if (error) throw error;
 
       toast.success("Profile updated successfully");
-      queryClient.invalidateQueries({ queryKey: ['clinic-profile'] });
     } catch (error) {
       console.error("Error updating clinic:", error);
       toast.error("Failed to update profile");
@@ -202,7 +180,6 @@ export function ClinicProfileForm() {
               </FormItem>
             )}
           />
-
         </div>
 
         <FormField
