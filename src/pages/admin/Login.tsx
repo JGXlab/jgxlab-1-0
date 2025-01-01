@@ -33,7 +33,7 @@ const AdminLogin = () => {
         toast({
           variant: "destructive",
           title: "Login Failed",
-          description: "Invalid email or password",
+          description: signInError.message,
         });
         return;
       }
@@ -50,17 +50,18 @@ const AdminLogin = () => {
 
       console.log("User signed in successfully, checking admin status...");
 
-      // Check if user is an admin with a simple query
-      const { data: profile, error: profileError } = await supabase
+      // Check if user is an admin
+      const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('is_admin')
         .eq('id', signInData.user.id)
         .single();
 
-      console.log("Admin check response:", { profile, profileError });
+      console.log("Admin check response:", { profileData, profileError });
 
       if (profileError) {
         console.error("Error checking admin status:", profileError);
+        // Sign out the user if we can't verify admin status
         await supabase.auth.signOut();
         toast({
           variant: "destructive",
@@ -70,8 +71,9 @@ const AdminLogin = () => {
         return;
       }
 
-      if (!profile?.is_admin) {
+      if (!profileData?.is_admin) {
         console.log("Non-admin user attempted to login");
+        // Sign out non-admin users
         await supabase.auth.signOut();
         toast({
           variant: "destructive",
@@ -148,7 +150,7 @@ const AdminLogin = () => {
 
             <Button
               type="submit"
-              className="w-full h-12 bg-primary hover:bg-primary-hover text-white rounded-xl font-medium"
+              className="w-full h-12 bg-primary hover:bg-primary/90 text-white rounded-xl font-medium"
               disabled={isLoading}
             >
               {isLoading ? "Signing in..." : "Sign in"}
