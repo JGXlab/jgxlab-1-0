@@ -7,7 +7,7 @@ export function PatientNameFields({ form }) {
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <FormField
         control={form.control}
-        name="firstName"
+        name="first_name"
         render={({ field }) => (
           <FormItem>
             <FormLabel className="flex items-center gap-2 text-foreground font-medium">
@@ -28,7 +28,7 @@ export function PatientNameFields({ form }) {
 
       <FormField
         control={form.control}
-        name="lastName"
+        name="last_name"
         render={({ field }) => (
           <FormItem>
             <FormLabel className="flex items-center gap-2 text-foreground font-medium">
