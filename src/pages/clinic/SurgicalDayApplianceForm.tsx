@@ -2,7 +2,6 @@ import { ClinicLayout } from "@/components/clinic/ClinicLayout";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { TeethArch } from "@/components/clinic/TeethArch";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -54,130 +53,120 @@ export default function SurgicalDayApplianceForm() {
         </div>
 
         {/* Main Content */}
-        <div className="p-6">
-          <div className="grid grid-cols-2 gap-8">
-            {/* Left side - Teeth Arch */}
-            <div>
-              <TeethArch />
-            </div>
-            
-            {/* Right side - Form */}
-            <div>
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                  <FormField
-                    control={form.control}
-                    name="patientName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Patient Name</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter patient name" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+        <div className="p-6 max-w-3xl mx-auto">
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <FormField
+                control={form.control}
+                name="patientName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Patient Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter patient name" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-                  <FormField
-                    control={form.control}
-                    name="arch"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Arch</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select arch type" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="upper">Upper</SelectItem>
-                            <SelectItem value="lower">Lower</SelectItem>
-                            <SelectItem value="both">Both</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+              <FormField
+                control={form.control}
+                name="arch"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Arch</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select arch type" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="upper">Upper</SelectItem>
+                        <SelectItem value="lower">Lower</SelectItem>
+                        <SelectItem value="both">Both</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-                  <FormField
-                    control={form.control}
-                    name="screwType"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Screw Type</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select screw type" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="type1">Type 1</SelectItem>
-                            <SelectItem value="type2">Type 2</SelectItem>
-                            <SelectItem value="type3">Type 3</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+              <FormField
+                control={form.control}
+                name="screwType"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Screw Type</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select screw type" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="type1">Type 1</SelectItem>
+                        <SelectItem value="type2">Type 2</SelectItem>
+                        <SelectItem value="type3">Type 3</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-                  <FormField
-                    control={form.control}
-                    name="vdoDetails"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>VDO Details</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter VDO details" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+              <FormField
+                control={form.control}
+                name="vdoDetails"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>VDO Details</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter VDO details" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-                  <FormField
-                    control={form.control}
-                    name="dueDate"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Due Date</FormLabel>
-                        <FormControl>
-                          <Input type="date" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+              <FormField
+                control={form.control}
+                name="dueDate"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Due Date</FormLabel>
+                    <FormControl>
+                      <Input type="date" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-                  <FormField
-                    control={form.control}
-                    name="specificInstructions"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Specific Instructions</FormLabel>
-                        <FormControl>
-                          <Textarea 
-                            placeholder="Enter any specific instructions or notes"
-                            className="min-h-[100px]"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+              <FormField
+                control={form.control}
+                name="specificInstructions"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Specific Instructions</FormLabel>
+                    <FormControl>
+                      <Textarea 
+                        placeholder="Enter any specific instructions or notes"
+                        className="min-h-[100px]"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-                  <Button type="submit" className="w-full">
-                    Pay and Complete
-                  </Button>
-                </form>
-              </Form>
-            </div>
-          </div>
+              <Button type="submit" className="w-full">
+                Pay and Complete
+              </Button>
+            </form>
+          </Form>
         </div>
       </div>
     </ClinicLayout>
