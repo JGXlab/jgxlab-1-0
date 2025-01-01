@@ -118,17 +118,8 @@ export default function NewLabScriptForm() {
                 <ApplianceDetailsSection form={form} />
                 <AdditionalInformationSection form={form} />
 
-                <div className="pt-6 border-t flex gap-4">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="flex items-center gap-2"
-                    onClick={() => setShowPreview(true)}
-                  >
-                    <Eye className="h-4 w-4" />
-                    Preview
-                  </Button>
-                  <Button type="submit" className="flex-1" disabled={isPending}>
+                <div className="pt-6 border-t">
+                  <Button type="submit" className="w-full" disabled={isPending}>
                     {isPending ? "Submitting..." : "Submit Lab Script"}
                   </Button>
                 </div>
