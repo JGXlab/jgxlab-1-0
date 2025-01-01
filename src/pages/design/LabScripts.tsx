@@ -21,7 +21,7 @@ const DesignLabScripts = () => {
   const { data: labScripts, isLoading } = useQuery({
     queryKey: ['design-lab-scripts'],
     queryFn: async () => {
-      console.log('Fetching all lab scripts for designer...');
+      console.log('Fetching all clinic lab scripts...');
       const { data, error } = await supabase
         .from('lab_scripts')
         .select(`
@@ -31,6 +31,7 @@ const DesignLabScripts = () => {
             last_name
           ),
           profiles:profiles!lab_scripts_user_id_fkey (
+            email,
             clinics!clinics_user_id_fkey (
               name,
               doctor_name
