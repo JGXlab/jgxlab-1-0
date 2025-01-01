@@ -17,7 +17,7 @@ const sidebarButtons = [
   },
   {
     icon: FileCheck,
-    label: "Submitted Lab Scripts",
+    label: "Lab Script",
     path: "/clinic/submittedlabscripts",
   },
   {
