@@ -15,12 +15,13 @@ import {
 } from "@/components/ui/form";
 import { toast } from "sonner";
 import type { Clinic } from "@/components/clinics/types";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function MyAccount() {
   const [isEditing, setIsEditing] = useState(false);
 
   // Fetch clinic data based on the authenticated user's ID
-  const { data: clinic, isLoading } = useQuery({
+  const { data: clinic, isLoading, error } = useQuery({
     queryKey: ["clinic-profile"],
     queryFn: async () => {
       console.log("Fetching clinic profile...");
@@ -37,7 +38,7 @@ export default function MyAccount() {
         .from("clinics")
         .select("*")
         .eq("user_id", user.id)
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error("Error fetching clinic:", error);
@@ -45,7 +46,7 @@ export default function MyAccount() {
       }
 
       console.log("Fetched clinic data:", clinicData);
-      return clinicData as Clinic;
+      return clinicData as Clinic | null;
     },
   });
 
@@ -102,6 +103,20 @@ export default function MyAccount() {
     return (
       <ClinicLayout>
         <div className="p-6">Loading...</div>
+      </ClinicLayout>
+    );
+  }
+
+  if (error || !clinic) {
+    return (
+      <ClinicLayout>
+        <div className="p-6">
+          <Alert variant="destructive">
+            <AlertDescription>
+              No clinic profile found. Please contact support for assistance.
+            </AlertDescription>
+          </Alert>
+        </div>
       </ClinicLayout>
     );
   }
