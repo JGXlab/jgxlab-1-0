@@ -20,20 +20,20 @@ export function PatientDateOfBirthField({ form }: { form: any }) {
                 <Button
                   variant={"outline"}
                   className={cn(
-                    "w-full pl-3 text-left font-normal",
+                    "w-full pl-3 text-left font-normal bg-background border-input",
                     !field.value && "text-muted-foreground"
                   )}
                 >
                   {field.value ? (
-                    format(field.value, "PPP")
+                    <span className="text-foreground">{format(field.value, "PPP")}</span>
                   ) : (
-                    "Pick a date"
+                    <span className="text-muted-foreground">Pick a date</span>
                   )}
-                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                  <CalendarIcon className="ml-auto h-4 w-4 text-muted-foreground" />
                 </Button>
               </FormControl>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
+            <PopoverContent className="w-auto p-0 bg-card border-input" align="start">
               <Calendar
                 mode="single"
                 selected={field.value}
@@ -42,11 +42,11 @@ export function PatientDateOfBirthField({ form }: { form: any }) {
                   date > new Date() || date < new Date("1900-01-01")
                 }
                 initialFocus
-                className="rounded-md border"
+                className="rounded-md border bg-card"
               />
             </PopoverContent>
           </Popover>
-          <FormMessage />
+          <FormMessage className="text-destructive" />
         </FormItem>
       )}
     />
