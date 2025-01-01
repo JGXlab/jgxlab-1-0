@@ -29,7 +29,7 @@ const formSchema = z.object({
   treatmentType: z.string().min(1, "Treatment type is required"),
   screwType: z.string().min(1, "Screw type must be selected"),
   otherScrewType: z.string().optional(),
-  vdoDetails: z.array(z.string()).min(1, "At least one VDO detail must be selected"),
+  vdoDetails: z.string().min(1, "VDO detail must be selected"),
   dueDate: z.string().min(1, "Due date is required"),
   specificInstructions: z.string().optional(),
 });
@@ -45,7 +45,7 @@ export default function NewLabScriptForm() {
       treatmentType: "",
       screwType: "",
       otherScrewType: "",
-      vdoDetails: [],
+      vdoDetails: "",
       dueDate: "",
       specificInstructions: "",
     },

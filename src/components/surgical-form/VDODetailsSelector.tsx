@@ -2,8 +2,8 @@ import { FormControl, FormItem, FormLabel, FormMessage } from "@/components/ui/f
 import { SelectionButton } from "./SelectionButton";
 
 interface VDODetailsSelectorProps {
-  value: string[];
-  onChange: (value: string[]) => void;
+  value: string;
+  onChange: (value: string) => void;
 }
 
 const vdoDetailsOptions = [
@@ -14,25 +14,21 @@ const vdoDetailsOptions = [
 ];
 
 export const VDODetailsSelector = ({ value, onChange }: VDODetailsSelectorProps) => {
-  const toggleOption = (optionId: string) => {
-    if (value.includes(optionId)) {
-      onChange(value.filter((id) => id !== optionId));
-    } else {
-      onChange([...value, optionId]);
-    }
+  const handleOptionClick = (optionId: string) => {
+    onChange(optionId);
   };
 
   return (
     <div className="space-y-2">
       <div className="flex flex-wrap gap-3">
         {vdoDetailsOptions.map((option) => {
-          const isSelected = value.includes(option.id);
+          const isSelected = value === option.id;
           return (
             <SelectionButton
               key={option.id}
               label={option.label}
               isSelected={isSelected}
-              onClick={() => toggleOption(option.id)}
+              onClick={() => handleOptionClick(option.id)}
             />
           );
         })}
