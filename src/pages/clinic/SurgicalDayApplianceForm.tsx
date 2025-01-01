@@ -22,7 +22,7 @@ export default function SurgicalDayApplianceForm() {
 
   return (
     <ClinicLayout>
-      <div className="p-6 max-w-4xl mx-auto">
+      <div className="w-full">
         <Button
           variant="ghost"
           className="mb-6"
@@ -32,7 +32,7 @@ export default function SurgicalDayApplianceForm() {
           Back to Products
         </Button>
 
-        <Card>
+        <Card className="w-full">
           <CardHeader>
             <CardTitle className="text-2xl">Surgical Day Appliance Design Order</CardTitle>
           </CardHeader>
