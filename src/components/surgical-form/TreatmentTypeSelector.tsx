@@ -14,9 +14,9 @@ interface TreatmentTypeSelectorProps {
 }
 
 export const TreatmentTypeSelector = ({ value, onChange, selectedArch }: TreatmentTypeSelectorProps) => {
-  const hasUpperArch = selectedArch.includes('upper');
-  const hasLowerArch = selectedArch.includes('lower');
-  const hasDualArch = selectedArch.includes('dual');
+  const isDualArch = selectedArch[0] === 'dual';
+  const isUpperArch = selectedArch[0] === 'upper';
+  const isLowerArch = selectedArch[0] === 'lower';
 
   // Parse the combined value into upper and lower parts, with proper initialization
   const [upperValue, lowerValue] = (value || '|').split('|');
@@ -29,22 +29,9 @@ export const TreatmentTypeSelector = ({ value, onChange, selectedArch }: Treatme
     }
   };
 
-  if (hasDualArch) {
+  if (isDualArch) {
     return (
-      <Select onValueChange={onChange} value={value}>
-        <SelectTrigger className="bg-white">
-          <SelectValue placeholder="Select treatment type" />
-        </SelectTrigger>
-        <SelectContent className="bg-white z-50">
-          <SelectItem value="dual-treatment">Upper and Lower Treatment</SelectItem>
-        </SelectContent>
-      </Select>
-    );
-  }
-
-  return (
-    <div className="space-y-4">
-      {hasUpperArch && (
+      <div className="space-y-4">
         <div className="space-y-2">
           <FormLabel>Upper Treatment Type</FormLabel>
           <Select onValueChange={(v) => handleChange(v, 'upper')} value={upperValue}>
@@ -56,9 +43,7 @@ export const TreatmentTypeSelector = ({ value, onChange, selectedArch }: Treatme
             </SelectContent>
           </Select>
         </div>
-      )}
-      
-      {hasLowerArch && (
+        
         <div className="space-y-2">
           <FormLabel>Lower Treatment Type</FormLabel>
           <Select onValueChange={(v) => handleChange(v, 'lower')} value={lowerValue}>
@@ -70,7 +55,41 @@ export const TreatmentTypeSelector = ({ value, onChange, selectedArch }: Treatme
             </SelectContent>
           </Select>
         </div>
-      )}
-    </div>
-  );
+      </div>
+    );
+  }
+
+  if (isUpperArch) {
+    return (
+      <div className="space-y-2">
+        <FormLabel>Upper Treatment Type</FormLabel>
+        <Select onValueChange={(v) => handleChange(v, 'upper')} value={upperValue}>
+          <SelectTrigger className="bg-white">
+            <SelectValue placeholder="Select upper treatment type" />
+          </SelectTrigger>
+          <SelectContent className="bg-white z-50">
+            <SelectItem value="upper-treatment">Upper Treatment</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+    );
+  }
+
+  if (isLowerArch) {
+    return (
+      <div className="space-y-2">
+        <FormLabel>Lower Treatment Type</FormLabel>
+        <Select onValueChange={(v) => handleChange(v, 'lower')} value={lowerValue}>
+          <SelectTrigger className="bg-white">
+            <SelectValue placeholder="Select lower treatment type" />
+          </SelectTrigger>
+          <SelectContent className="bg-white z-50">
+            <SelectItem value="lower-treatment">Lower Treatment</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+    );
+  }
+
+  return null;
 };
