@@ -28,22 +28,19 @@ export const ScrewTypeSelector = ({ value, onChange, otherValue, onOtherValueCha
   return (
     <div className="space-y-3">
       <div className="grid grid-cols-4 gap-3 relative">
-        {screwTypeOptions.map((option, index) => {
+        {screwTypeOptions.map((option) => {
           const isSelected = value === option.id;
-          // Place "Others" button in the 7th position (2nd row, 3rd column)
-          const position = option.id === "others" ? 7 : index;
           return (
-            <div key={option.id} className={`col-start-${(position % 4) + 1} row-start-${Math.floor(position / 4) + 1}`}>
-              <SelectionButton
-                label={option.label}
-                isSelected={isSelected}
-                onClick={() => handleOptionClick(option.id)}
-              />
-            </div>
+            <SelectionButton
+              key={option.id}
+              label={option.label}
+              isSelected={isSelected}
+              onClick={() => handleOptionClick(option.id)}
+            />
           );
         })}
         {value === "others" && (
-          <div className="col-start-4 row-start-2">
+          <div className="col-start-3 col-span-2">
             <Input
               placeholder="Please specify the screw type"
               value={otherValue}
