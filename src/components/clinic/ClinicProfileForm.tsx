@@ -25,11 +25,11 @@ export function ClinicProfileForm() {
 
       console.log("Authenticated user ID:", user.id);
       
-      // First try to find clinic by user_id
+      // First try to find clinic by auth_user_id
       const { data: clinicData, error: clinicError } = await supabase
         .from("clinics")
         .select("*")
-        .eq("user_id", user.id)
+        .eq("auth_user_id", user.id)
         .maybeSingle();
 
       if (clinicError) {
@@ -41,18 +41,19 @@ export function ClinicProfileForm() {
 
       if (!clinicData) {
         console.log("No clinic found for user:", user.id);
-        // Check if email already exists before creating new clinic
-        const { data: existingClinic } = await supabase
-          .from("clinics")
-          .select("id")
-          .eq("email", user.email)
-          .maybeSingle();
+        
+        // Get user profile to ensure we have the correct user_id
+        const { data: profileData } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", user.id)
+          .single();
 
-        if (existingClinic) {
-          throw new Error("A clinic with this email already exists");
+        if (!profileData) {
+          throw new Error("No profile found for user");
         }
 
-        // Create a new clinic entry for this user
+        // Create a new clinic entry with both IDs
         const { data: newClinic, error: createError } = await supabase
           .from("clinics")
           .insert({
@@ -63,8 +64,8 @@ export function ClinicProfileForm() {
             contact_person: "",
             contact_phone: "",
             address: "",
-            auth_user_id: user.id,  // Include both auth_user_id
-            user_id: user.id        // and user_id
+            auth_user_id: user.id,    // Auth user ID
+            user_id: profileData.id    // Profile ID
           })
           .select()
           .single();
@@ -101,7 +102,7 @@ export function ClinicProfileForm() {
           .from("clinics")
           .select("id")
           .eq("email", data.email)
-          .neq("user_id", user.id)
+          .neq("auth_user_id", user.id)
           .maybeSingle();
 
         if (existingClinic) {
@@ -121,7 +122,7 @@ export function ClinicProfileForm() {
           contact_phone: data.contact_phone,
           address: data.address,
         })
-        .eq("user_id", user.id);
+        .eq("auth_user_id", user.id);
 
       if (error) throw error;
 
