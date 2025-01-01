@@ -29,7 +29,7 @@ export function PatientDateOfBirthField({ form }) {
           <FormControl>
             <Input
               placeholder="MM/DD/YYYY"
-              className="bg-background text-foreground border-input"
+              className="bg-background text-[#C8C8C9] placeholder:text-[#C8C8C9] border-input"
               {...field}
               onChange={handleDateInput}
               maxLength={10}
