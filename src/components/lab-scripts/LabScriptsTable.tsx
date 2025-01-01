@@ -32,6 +32,8 @@ interface LabScriptsTableProps {
 }
 
 export const LabScriptsTable = ({ labScripts, onPreview, onStatusUpdate }: LabScriptsTableProps) => {
+  console.log('Rendering LabScriptsTable with scripts:', labScripts);
+
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case 'pending':
@@ -67,54 +69,59 @@ export const LabScriptsTable = ({ labScripts, onPreview, onStatusUpdate }: LabSc
           </TableRow>
         </TableHeader>
         <TableBody>
-          {labScripts.map((script) => (
-            <TableRow key={script.id} className="hover:bg-gray-50">
-              <TableCell className="font-medium text-primary">
-                {script.patients?.first_name} {script.patients?.last_name}
-              </TableCell>
-              <TableCell>
-                {script.patients?.clinics ? (
-                  <div>
-                    <div className="text-gray-900">{script.patients.clinics.name}</div>
-                    {script.patients.clinics.doctor_name && (
-                      <div className="text-sm text-gray-500">
-                        Dr. {script.patients.clinics.doctor_name}
-                      </div>
-                    )}
+          {labScripts.map((script) => {
+            console.log('Rendering script:', script);
+            console.log('Clinic info:', script.patients?.clinics);
+            
+            return (
+              <TableRow key={script.id} className="hover:bg-gray-50">
+                <TableCell className="font-medium text-gray-900">
+                  {script.patients?.first_name} {script.patients?.last_name}
+                </TableCell>
+                <TableCell>
+                  {script.patients?.clinics ? (
+                    <div>
+                      <div className="text-gray-900">{script.patients.clinics.name}</div>
+                      {script.patients.clinics.doctor_name && (
+                        <div className="text-sm text-gray-500">
+                          Dr. {script.patients.clinics.doctor_name}
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <span className="text-gray-500">No clinic assigned</span>
+                  )}
+                </TableCell>
+                <TableCell className="text-gray-900">{script.appliance_type}</TableCell>
+                <TableCell className="text-gray-900">{format(new Date(script.created_at), 'MMM dd, yyyy')}</TableCell>
+                <TableCell className="text-gray-900">{script.due_date}</TableCell>
+                <TableCell>
+                  <Badge className={getStatusColor(script.status)}>
+                    {script.status}
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  <StatusUpdateButtons 
+                    script={script}
+                    onStatusUpdate={onStatusUpdate}
+                  />
+                </TableCell>
+                <TableCell>
+                  <div className="flex justify-end">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="flex items-center gap-2 hover:bg-gray-100"
+                      onClick={(e) => onPreview(script, e)}
+                    >
+                      <Eye className="h-4 w-4" />
+                      View
+                    </Button>
                   </div>
-                ) : (
-                  <span className="text-gray-500">No clinic assigned</span>
-                )}
-              </TableCell>
-              <TableCell className="text-primary">{script.appliance_type}</TableCell>
-              <TableCell>{format(new Date(script.created_at), 'MMM dd, yyyy')}</TableCell>
-              <TableCell>{script.due_date}</TableCell>
-              <TableCell>
-                <Badge className={getStatusColor(script.status)}>
-                  {script.status}
-                </Badge>
-              </TableCell>
-              <TableCell>
-                <StatusUpdateButtons 
-                  script={script}
-                  onStatusUpdate={onStatusUpdate}
-                />
-              </TableCell>
-              <TableCell>
-                <div className="flex justify-end">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="flex items-center gap-2 hover:bg-gray-100"
-                    onClick={(e) => onPreview(script, e)}
-                  >
-                    <Eye className="h-4 w-4" />
-                    View
-                  </Button>
-                </div>
-              </TableCell>
-            </TableRow>
-          ))}
+                </TableCell>
+              </TableRow>
+            );
+          })}
         </TableBody>
       </Table>
     </div>
