@@ -27,7 +27,7 @@ export const ScrewTypeSelector = ({ value, onChange, otherValue, onOtherValueCha
 
   return (
     <div className="space-y-3">
-      <div className="grid grid-cols-4 gap-3">
+      <div className="grid grid-cols-4 gap-3 relative">
         {screwTypeOptions.map((option) => {
           const isSelected = value === option.id;
           return (
@@ -39,15 +39,16 @@ export const ScrewTypeSelector = ({ value, onChange, otherValue, onOtherValueCha
             />
           );
         })}
+        {value === "others" && (
+          <div className="col-start-3 col-span-2">
+            <Input
+              placeholder="Please specify the screw type"
+              value={otherValue}
+              onChange={(e) => onOtherValueChange?.(e.target.value)}
+            />
+          </div>
+        )}
       </div>
-      {value === "others" && (
-        <Input
-          placeholder="Please specify the screw type"
-          value={otherValue}
-          onChange={(e) => onOtherValueChange?.(e.target.value)}
-          className="max-w-md"
-        />
-      )}
       <FormMessage />
     </div>
   );
