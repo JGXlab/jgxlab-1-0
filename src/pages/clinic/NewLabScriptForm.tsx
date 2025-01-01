@@ -12,6 +12,7 @@ import { PatientSelector } from "@/components/patients/PatientSelector";
 import { ArchSelector } from "@/components/surgical-form/ArchSelector";
 import { ScrewTypeSelector } from "@/components/surgical-form/ScrewTypeSelector";
 import { VDODetailsSelector } from "@/components/surgical-form/VDODetailsSelector";
+import { NightguardSelector } from "@/components/surgical-form/NightguardSelector";
 import { FormSection } from "@/components/surgical-form/FormSection";
 import { TreatmentTypeSelector } from "@/components/surgical-form/TreatmentTypeSelector";
 import {
@@ -30,6 +31,7 @@ const formSchema = z.object({
   screwType: z.string().min(1, "Screw type must be selected"),
   otherScrewType: z.string().optional(),
   vdoDetails: z.string().min(1, "VDO detail must be selected"),
+  needsNightguard: z.string().min(1, "Please specify if nightguard is needed"),
   dueDate: z.string().min(1, "Due date is required"),
   specificInstructions: z.string().optional(),
 });
@@ -46,6 +48,7 @@ export default function NewLabScriptForm() {
       screwType: "",
       otherScrewType: "",
       vdoDetails: "",
+      needsNightguard: "",
       dueDate: "",
       specificInstructions: "",
     },
@@ -169,6 +172,17 @@ export default function NewLabScriptForm() {
                       <FormItem>
                         <FormLabel>VDO Details</FormLabel>
                         <VDODetailsSelector value={field.value} onChange={field.onChange} />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="needsNightguard"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Do you need Nightguard?</FormLabel>
+                        <NightguardSelector value={field.value} onChange={field.onChange} />
                       </FormItem>
                     )}
                   />
