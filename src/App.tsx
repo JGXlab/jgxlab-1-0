@@ -16,7 +16,6 @@ import Clinics from "./pages/admin/Clinics";
 import AdminPatients from "./pages/admin/Patients";
 import LabScripts from "./pages/admin/LabScripts";
 import Settings from "./pages/admin/Settings";
-import Profile from "./pages/admin/Profile";
 
 const queryClient = new QueryClient();
 
@@ -41,7 +40,6 @@ const App = () => (
               <Route path="/admin/patients" element={<AdminPatients />} />
               <Route path="/admin/lab-scripts" element={<LabScripts />} />
               <Route path="/admin/settings" element={<Settings />} />
-              <Route path="/admin/profile" element={<Profile />} />
             </Routes>
           </div>
         </SidebarProvider>

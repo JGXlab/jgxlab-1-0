@@ -6,7 +6,6 @@ import {
   Bell,
   FileText,
   Settings,
-  UserCircle,
   LogOut,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -44,12 +43,7 @@ const sidebarButtons = [
     icon: Settings,
     label: "Settings",
     path: "/admin/settings",
-  },
-  {
-    icon: UserCircle,
-    label: "Profile",
-    path: "/admin/profile",
-  },
+  }
 ];
 
 export const AdminSidebar = () => {
