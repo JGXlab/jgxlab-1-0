@@ -13,9 +13,17 @@ import { ArchSelector } from "@/components/surgical-form/ArchSelector";
 import { ScrewTypeSelector } from "@/components/surgical-form/ScrewTypeSelector";
 import { VDODetailsSelector } from "@/components/surgical-form/VDODetailsSelector";
 import { FormSection } from "@/components/surgical-form/FormSection";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const formSchema = z.object({
   patientId: z.string().min(1, "Patient selection is required"),
+  applianceType: z.string().min(1, "Appliance type is required"),
   arch: z.array(z.string()).min(1, "At least one arch must be selected"),
   screwType: z.array(z.string()).min(1, "At least one screw type must be selected"),
   vdoDetails: z.array(z.string()).min(1, "At least one VDO detail must be selected"),
@@ -29,6 +37,7 @@ export default function NewLabScriptForm() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       patientId: "",
+      applianceType: "",
       arch: [],
       screwType: [],
       vdoDetails: [],
@@ -83,6 +92,29 @@ export default function NewLabScriptForm() {
                 </FormSection>
 
                 <FormSection title="Appliance Details" className="pt-6 border-t">
+                  <FormField
+                    control={form.control}
+                    name="applianceType"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Appliance Type</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select appliance type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="surgical-day">Surgical Day Appliance</SelectItem>
+                            <SelectItem value="printed-try-in">Printed Try-in</SelectItem>
+                            <SelectItem value="nightguard">Nightguard</SelectItem>
+                            <SelectItem value="direct-load-pmma">Direct Load PMMA</SelectItem>
+                            <SelectItem value="direct-load-zirconia">Direct Load Zirconia</SelectItem>
+                            <SelectItem value="ti-bar">Ti-bar and Super Structure</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </FormItem>
+                    )}
+                  />
+
                   <FormField
                     control={form.control}
                     name="arch"
