@@ -14,6 +14,7 @@ import AdminPatients from "./pages/admin/Patients";
 import LabScripts from "./pages/admin/LabScripts";
 import Settings from "./pages/admin/Settings";
 import Clinics from "./pages/admin/Clinics";
+import Designers from "./pages/admin/Designers";
 import ClinicDashboard from "./pages/clinic/Dashboard";
 import ClinicPatients from "./pages/clinic/Patients";
 import NewLabScriptForm from "./pages/clinic/NewLabScriptForm";
@@ -39,6 +40,7 @@ const App = () => (
               <Route path="/admin/lab-scripts" element={<AdminGuard><LabScripts /></AdminGuard>} />
               <Route path="/admin/settings" element={<AdminGuard><Settings /></AdminGuard>} />
               <Route path="/admin/clinics" element={<AdminGuard><Clinics /></AdminGuard>} />
+              <Route path="/admin/designers" element={<AdminGuard><Designers /></AdminGuard>} />
               
               {/* Clinic Routes */}
               <Route path="/clinic/dashboard" element={<ClinicGuard><ClinicDashboard /></ClinicGuard>} />

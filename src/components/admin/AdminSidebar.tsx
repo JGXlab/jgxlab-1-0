@@ -7,6 +7,7 @@ import {
   Settings,
   LogOut,
   Building,
+  Palette,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
@@ -28,6 +29,11 @@ const sidebarButtons = [
     icon: Building,
     label: "Clinics",
     path: "/admin/clinics",
+  },
+  {
+    icon: Palette,
+    label: "Designers",
+    path: "/admin/designers",
   },
   {
     icon: Bell,
