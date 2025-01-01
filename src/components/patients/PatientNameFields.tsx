@@ -17,7 +17,7 @@ export function PatientNameFields({ form }) {
             <FormControl>
               <Input
                 placeholder="Enter first name"
-                className="bg-background text-[#C8C8C9] placeholder:text-[#C8C8C9] border-input"
+                className="bg-background text-foreground placeholder:text-muted-foreground border-input"
                 {...field}
               />
             </FormControl>
@@ -38,7 +38,7 @@ export function PatientNameFields({ form }) {
             <FormControl>
               <Input
                 placeholder="Enter last name"
-                className="bg-background text-[#C8C8C9] placeholder:text-[#C8C8C9] border-input"
+                className="bg-background text-foreground placeholder:text-muted-foreground border-input"
                 {...field}
               />
             </FormControl>
