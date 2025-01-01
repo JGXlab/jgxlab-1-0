@@ -1,5 +1,4 @@
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -24,7 +23,7 @@ export function PatientDateOfBirthField({ form }) {
                   }`}
                 >
                   {field.value ? (
-                    format(new Date(field.value), "PPP")
+                    format(new Date(field.value), "MMMM d, yyyy")
                   ) : (
                     <span>Pick a date</span>
                   )}
@@ -43,6 +42,7 @@ export function PatientDateOfBirthField({ form }) {
                 }}
                 disabled={(date) => date > new Date()}
                 initialFocus
+                className="rounded-md border shadow-sm bg-white"
               />
             </PopoverContent>
           </Popover>
