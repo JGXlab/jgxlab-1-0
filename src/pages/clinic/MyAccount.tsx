@@ -19,23 +19,32 @@ import type { Clinic } from "@/components/clinics/types";
 export default function MyAccount() {
   const [isEditing, setIsEditing] = useState(false);
 
+  // Fetch clinic data based on the authenticated user's ID
   const { data: clinic, isLoading } = useQuery({
     queryKey: ["clinic-profile"],
     queryFn: async () => {
+      console.log("Fetching clinic profile...");
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return null;
+      
+      if (!user) {
+        console.error("No authenticated user found");
+        throw new Error("No authenticated user found");
+      }
 
+      console.log("Authenticated user ID:", user.id);
+      
       const { data: clinicData, error } = await supabase
         .from("clinics")
         .select("*")
         .eq("user_id", user.id)
-        .maybeSingle();
+        .single();
 
       if (error) {
         console.error("Error fetching clinic:", error);
         throw error;
       }
 
+      console.log("Fetched clinic data:", clinicData);
       return clinicData as Clinic;
     },
   });
@@ -54,12 +63,18 @@ export default function MyAccount() {
 
   useEffect(() => {
     if (clinic) {
+      console.log("Setting form values with clinic data:", clinic);
       form.reset(clinic);
     }
   }, [clinic, form]);
 
   const onSubmit = async (data: Clinic) => {
     try {
+      console.log("Updating clinic with data:", data);
+      
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("No authenticated user found");
+
       const { error } = await supabase
         .from("clinics")
         .update({
@@ -71,7 +86,7 @@ export default function MyAccount() {
           contact_phone: data.contact_phone,
           address: data.address,
         })
-        .eq("id", clinic?.id);
+        .eq("user_id", user.id);
 
       if (error) throw error;
 
