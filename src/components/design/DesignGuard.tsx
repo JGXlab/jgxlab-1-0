@@ -8,21 +8,34 @@ export const DesignGuard = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     const checkDesignerRole = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (!session) {
+          console.log("No active session found");
+          setLoading(false);
+          return;
+        }
+
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', session.user.id)
+          .single();
+
+        if (profileError) {
+          console.error("Error fetching profile:", profileError);
+          setLoading(false);
+          return;
+        }
+
+        console.log("User profile:", profile);
+        setIsDesigner(profile?.role === 'designer');
         setLoading(false);
-        return;
+      } catch (error) {
+        console.error("Error in checkDesignerRole:", error);
+        setLoading(false);
       }
-
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', user.id)
-        .single();
-
-      setIsDesigner(profile?.role === 'designer');
-      setLoading(false);
     };
 
     checkDesignerRole();

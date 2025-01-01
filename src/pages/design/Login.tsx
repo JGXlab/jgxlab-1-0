@@ -17,17 +17,24 @@ const DesignLogin = () => {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', user.id)
-          .single();
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (session?.user) {
+          console.log("Active session found, checking role");
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', session.user.id)
+            .single();
 
-        if (profile?.role === 'designer') {
-          navigate('/design/dashboard');
+          console.log("User profile:", profile);
+          if (profile?.role === 'designer') {
+            navigate('/design/dashboard');
+          }
         }
+      } catch (error) {
+        console.error("Error checking auth:", error);
       }
     };
 
@@ -39,6 +46,7 @@ const DesignLogin = () => {
     setIsLoading(true);
     
     try {
+      console.log("Attempting to sign in");
       const { data: { user }, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -64,6 +72,7 @@ const DesignLogin = () => {
         return;
       }
 
+      console.log("User signed in, checking role");
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('role')
@@ -81,6 +90,7 @@ const DesignLogin = () => {
         return;
       }
 
+      console.log("User profile:", profile);
       if (!profile || profile.role !== 'designer') {
         console.error("User is not a designer");
         await supabase.auth.signOut();
