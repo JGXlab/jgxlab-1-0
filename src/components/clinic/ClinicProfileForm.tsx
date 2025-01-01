@@ -40,7 +40,29 @@ export function ClinicProfileForm() {
 
       if (!clinicData) {
         console.log("No clinic found for user:", user.id);
-        return null;
+        // Create a new clinic entry for this user
+        const { data: newClinic, error: createError } = await supabase
+          .from("clinics")
+          .insert({
+            name: "",
+            email: user.email || "",
+            phone: "",
+            doctor_name: "",
+            contact_person: "",
+            contact_phone: "",
+            address: "",
+            auth_user_id: user.id,
+            user_id: user.id
+          })
+          .select()
+          .single();
+
+        if (createError) {
+          console.error("Error creating clinic:", createError);
+          throw createError;
+        }
+
+        return newClinic as Clinic;
       }
 
       return clinicData as Clinic;
@@ -71,7 +93,6 @@ export function ClinicProfileForm() {
           contact_person: data.contact_person,
           contact_phone: data.contact_phone,
           address: data.address,
-          auth_user_id: user.id
         })
         .eq("auth_user_id", user.id);
 
