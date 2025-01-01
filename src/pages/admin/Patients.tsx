@@ -1,8 +1,35 @@
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Card } from "@/components/ui/card";
 import { Bell, Search, Users } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 const Patients = () => {
+  const { data: patients, isLoading } = useQuery({
+    queryKey: ['admin-patients'],
+    queryFn: async () => {
+      console.log('Fetching patients with clinic information...');
+      const { data, error } = await supabase
+        .from('patients')
+        .select(`
+          *,
+          clinics (
+            name
+          )
+        `)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching patients:', error);
+        throw error;
+      }
+
+      console.log('Fetched patients:', data);
+      return data;
+    }
+  });
+
   return (
     <AdminLayout>
       <div className="flex justify-between items-center mb-8">
@@ -38,12 +65,39 @@ const Patients = () => {
       </div>
 
       <Card className="p-6">
-        <div className="flex items-center justify-center h-40 text-gray-400">
-          <div className="text-center">
-            <Users className="w-12 h-12 mx-auto mb-4" />
-            <p>No patients found</p>
+        {isLoading ? (
+          <div className="flex items-center justify-center h-40">
+            <p className="text-gray-500">Loading patients...</p>
           </div>
-        </div>
+        ) : !patients?.length ? (
+          <div className="flex items-center justify-center h-40 text-gray-400">
+            <div className="text-center">
+              <Users className="w-12 h-12 mx-auto mb-4" />
+              <p>No patients found</p>
+            </div>
+          </div>
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Gender</TableHead>
+                <TableHead>Clinic</TableHead>
+                <TableHead>Created At</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {patients.map((patient) => (
+                <TableRow key={patient.id}>
+                  <TableCell>{patient.first_name} {patient.last_name}</TableCell>
+                  <TableCell className="capitalize">{patient.gender}</TableCell>
+                  <TableCell>{patient.clinics?.name || 'No clinic assigned'}</TableCell>
+                  <TableCell>{new Date(patient.created_at).toLocaleDateString()}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
       </Card>
     </AdminLayout>
   );

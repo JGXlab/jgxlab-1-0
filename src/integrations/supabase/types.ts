@@ -223,6 +223,7 @@ export type Database = {
       }
       patients: {
         Row: {
+          clinic_id: string | null
           created_at: string
           date_of_birth: string | null
           first_name: string
@@ -232,6 +233,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          clinic_id?: string | null
           created_at?: string
           date_of_birth?: string | null
           first_name: string
@@ -241,6 +243,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          clinic_id?: string | null
           created_at?: string
           date_of_birth?: string | null
           first_name?: string
@@ -250,6 +253,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "patients_clinic_id_fkey"
+            columns: ["clinic_id"]
+            isOneToOne: false
+            referencedRelation: "clinics"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "patients_user_id_fkey"
             columns: ["user_id"]
