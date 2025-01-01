@@ -10,13 +10,12 @@ interface LabScript {
   patients: {
     first_name: string;
     last_name: string;
-    clinic_id: string | null;
+    user_id: string;
     clinics: {
       name: string;
       doctor_name: string;
-    } | null;
+    };
   };
-  user_id: string;
   treatment_type: string;
   appliance_type: string;
   due_date: string;

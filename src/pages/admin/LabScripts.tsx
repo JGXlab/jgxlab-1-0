@@ -28,7 +28,9 @@ const LabScripts = () => {
           patients (
             first_name,
             last_name,
-            clinic_id,
+            user_id
+          ),
+          clinics:patients!inner(
             clinics (
               name,
               doctor_name
