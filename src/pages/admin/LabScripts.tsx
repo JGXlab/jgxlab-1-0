@@ -43,7 +43,18 @@ const LabScripts = () => {
       }
 
       console.log('Fetched lab scripts:', data);
-      return data;
+      
+      // Transform the data to match the expected structure
+      const transformedData = data.map((script) => ({
+        ...script,
+        patients: {
+          ...script.patients,
+          clinics: script.patients?.clinics || null
+        }
+      }));
+
+      console.log('Transformed lab scripts:', transformedData);
+      return transformedData;
     }
   });
 
