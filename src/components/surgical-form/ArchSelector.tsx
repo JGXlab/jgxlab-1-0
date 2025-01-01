@@ -1,7 +1,5 @@
 import { FormControl, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Button } from "@/components/ui/button";
-import { Check } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { SelectionButton } from "./SelectionButton";
 
 interface ArchSelectorProps {
   value: string[];
@@ -25,23 +23,16 @@ export const ArchSelector = ({ value, onChange }: ArchSelectorProps) => {
 
   return (
     <div className="space-y-2">
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-3">
         {archOptions.map((option) => {
           const isSelected = value.includes(option.id);
           return (
-            <Button
+            <SelectionButton
               key={option.id}
-              type="button"
-              variant={isSelected ? "default" : "outline"}
-              className={cn(
-                "flex items-center gap-2",
-                isSelected && "bg-primary text-primary-foreground"
-              )}
+              label={option.label}
+              isSelected={isSelected}
               onClick={() => toggleOption(option.id)}
-            >
-              {isSelected && <Check className="h-4 w-4" />}
-              {option.label}
-            </Button>
+            />
           );
         })}
       </div>

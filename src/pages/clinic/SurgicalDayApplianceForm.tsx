@@ -2,7 +2,7 @@ import { ClinicLayout } from "@/components/clinic/ClinicLayout";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Check } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useForm } from "react-hook-form";
@@ -13,6 +13,7 @@ import { ArchSelector } from "@/components/surgical-form/ArchSelector";
 import { ScrewTypeSelector } from "@/components/surgical-form/ScrewTypeSelector";
 import { VDODetailsSelector } from "@/components/surgical-form/VDODetailsSelector";
 import { PriceTableDropdown } from "@/components/surgical-form/PriceTableDropdown";
+import { FormSection } from "@/components/surgical-form/FormSection";
 import { cn } from "@/lib/utils";
 
 const formSchema = z.object({
@@ -32,7 +33,6 @@ const steps = [
 
 export default function SurgicalDayApplianceForm() {
   const navigate = useNavigate();
-
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -100,32 +100,30 @@ export default function SurgicalDayApplianceForm() {
 
         {/* Form Content */}
         <div className="max-w-3xl mx-auto px-4 py-8">
-          <div className="bg-white rounded-lg shadow-sm p-6 space-y-8">
+          <div className="bg-white rounded-lg shadow-sm p-8 space-y-8">
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                <FormField
-                  control={form.control}
-                  name="patientId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-base font-medium">Patient</FormLabel>
-                      <PatientSelector value={field.value} onChange={field.onChange} />
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <FormSection title="Patient Information">
+                  <FormField
+                    control={form.control}
+                    name="patientId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Patient</FormLabel>
+                        <PatientSelector value={field.value} onChange={field.onChange} />
+                      </FormItem>
+                    )}
+                  />
+                </FormSection>
 
-                <div className="space-y-8 pt-6 border-t">
+                <FormSection title="Appliance Details" className="pt-6 border-t">
                   <FormField
                     control={form.control}
                     name="arch"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-base font-medium">Arch Type</FormLabel>
-                        <FormControl>
-                          <ArchSelector value={field.value} onChange={field.onChange} />
-                        </FormControl>
-                        <FormMessage />
+                        <FormLabel>Arch Type</FormLabel>
+                        <ArchSelector value={field.value} onChange={field.onChange} />
                       </FormItem>
                     )}
                   />
@@ -135,11 +133,8 @@ export default function SurgicalDayApplianceForm() {
                     name="screwType"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-base font-medium">Screw Type</FormLabel>
-                        <FormControl>
-                          <ScrewTypeSelector value={field.value} onChange={field.onChange} />
-                        </FormControl>
-                        <FormMessage />
+                        <FormLabel>Screw Type</FormLabel>
+                        <ScrewTypeSelector value={field.value} onChange={field.onChange} />
                       </FormItem>
                     )}
                   />
@@ -149,27 +144,21 @@ export default function SurgicalDayApplianceForm() {
                     name="vdoDetails"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-base font-medium">VDO Details</FormLabel>
-                        <FormControl>
-                          <VDODetailsSelector value={field.value} onChange={field.onChange} />
-                        </FormControl>
-                        <FormMessage />
+                        <FormLabel>VDO Details</FormLabel>
+                        <VDODetailsSelector value={field.value} onChange={field.onChange} />
                       </FormItem>
                     )}
                   />
-                </div>
+                </FormSection>
 
-                <div className="space-y-8 pt-6 border-t">
+                <FormSection title="Additional Information" className="pt-6 border-t">
                   <FormField
                     control={form.control}
                     name="dueDate"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-base font-medium">Due Date</FormLabel>
-                        <FormControl>
-                          <Input type="date" className="max-w-xs" {...field} />
-                        </FormControl>
-                        <FormMessage />
+                        <FormLabel>Due Date</FormLabel>
+                        <Input type="date" className="max-w-xs" {...field} />
                       </FormItem>
                     )}
                   />
@@ -179,19 +168,16 @@ export default function SurgicalDayApplianceForm() {
                     name="specificInstructions"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-base font-medium">Specific Instructions</FormLabel>
-                        <FormControl>
-                          <Textarea 
-                            placeholder="Enter any specific instructions or notes"
-                            className="min-h-[100px] resize-none"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
+                        <FormLabel>Specific Instructions</FormLabel>
+                        <Textarea 
+                          placeholder="Enter any specific instructions or notes"
+                          className="min-h-[100px] resize-none"
+                          {...field}
+                        />
                       </FormItem>
                     )}
                   />
-                </div>
+                </FormSection>
 
                 <div className="pt-6 border-t">
                   <Button type="submit" className="w-full">
