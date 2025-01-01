@@ -25,7 +25,7 @@ export default function SurgicalDayApplianceForm() {
         <div className="p-6">
           <div className="grid grid-cols-2 gap-8">
             {/* Left side - Teeth Arch */}
-            <div className="max-w-xl">
+            <div>
               <TeethArch />
             </div>
             
