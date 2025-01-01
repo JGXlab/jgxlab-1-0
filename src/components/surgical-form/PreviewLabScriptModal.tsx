@@ -36,6 +36,13 @@ export const PreviewLabScriptModal = ({
     return `Lower: ${lower}`;
   };
 
+  const formatApplianceType = (type: string | undefined) => {
+    if (!type) return 'Not specified';
+    return type.split('-').map(word => 
+      word.charAt(0).toUpperCase() + word.slice(1)
+    ).join(' ');
+  };
+
   // Fetch patient details
   const { data: patient } = useQuery({
     queryKey: ['patient', formData.patientId],
@@ -57,12 +64,6 @@ export const PreviewLabScriptModal = ({
     },
     enabled: !!formData.patientId
   });
-
-  const formatApplianceType = (type: string) => {
-    return type.split('-').map(word => 
-      word.charAt(0).toUpperCase() + word.slice(1)
-    ).join(' ');
-  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -97,7 +98,7 @@ export const PreviewLabScriptModal = ({
                 />
                 <PreviewField 
                   label="Arch Type" 
-                  value={formData.arch.charAt(0).toUpperCase() + formData.arch.slice(1)} 
+                  value={formData.arch ? formData.arch.charAt(0).toUpperCase() + formData.arch.slice(1) : 'Not specified'} 
                 />
                 <PreviewField 
                   label="Treatment Type" 
