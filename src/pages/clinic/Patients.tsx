@@ -71,9 +71,9 @@ export default function ClinicPatients() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Gender</TableHead>
-                  <TableHead>Created At</TableHead>
+                  <TableHead className="text-foreground font-semibold">Name</TableHead>
+                  <TableHead className="text-foreground font-semibold">Gender</TableHead>
+                  <TableHead className="text-foreground font-semibold">Created At</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
