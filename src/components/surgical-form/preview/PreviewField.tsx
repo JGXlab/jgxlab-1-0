@@ -4,8 +4,8 @@ interface PreviewFieldProps {
 }
 
 export const PreviewField = ({ label, value }: PreviewFieldProps) => (
-  <div className="space-y-1.5">
-    <p className="text-sm font-medium text-muted-foreground">{label}</p>
-    <p className="text-sm text-foreground">{value}</p>
+  <div className="space-y-1">
+    <p className="text-sm font-medium text-gray-500">{label}</p>
+    <p className="text-sm font-semibold text-gray-900">{value}</p>
   </div>
 );

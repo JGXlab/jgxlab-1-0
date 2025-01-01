@@ -3,17 +3,17 @@ interface InstructionsSectionProps {
 }
 
 export const InstructionsSection = ({ instructions }: InstructionsSectionProps) => (
-  <div>
-    <h3 className="text-lg font-medium mb-4">Additional Information</h3>
-    <div className="space-y-4 bg-muted/50 p-4 rounded-lg">
-      {instructions && (
-        <div className="space-y-1.5">
-          <p className="text-sm font-medium text-muted-foreground">Specific Instructions</p>
-          <p className="text-sm text-foreground whitespace-pre-wrap">
-            {instructions}
-          </p>
-        </div>
-      )}
+  <div className="space-y-4">
+    <h3 className="text-lg font-semibold text-gray-900">Additional Information</h3>
+    <div className="p-6 bg-gray-50 rounded-lg border border-gray-100">
+      <div className="space-y-2">
+        <p className="text-sm font-medium text-gray-500">Specific Instructions</p>
+        {instructions ? (
+          <p className="text-sm text-gray-900 whitespace-pre-wrap">{instructions}</p>
+        ) : (
+          <p className="text-sm text-gray-500 italic">No specific instructions provided</p>
+        )}
+      </div>
     </div>
   </div>
 );

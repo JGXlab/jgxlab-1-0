@@ -101,12 +101,12 @@ export const PreviewLabScriptModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-3xl">
         <DialogHeader>
-          <DialogTitle className="text-xl font-semibold">Lab Script Preview</DialogTitle>
+          <DialogTitle className="text-2xl font-semibold text-gray-900">Lab Script Preview</DialogTitle>
         </DialogHeader>
-        <ScrollArea className="max-h-[80vh] pr-4">
-          <div className="space-y-6">
+        <ScrollArea className="max-h-[80vh] pr-6">
+          <div className="space-y-8 py-4">
             <PatientSection 
               patient={patient}
               createdAt={labScript.created_at}

@@ -40,9 +40,9 @@ export const ApplianceSection = ({
   };
 
   return (
-    <div>
-      <h3 className="text-lg font-medium mb-4">Appliance Details</h3>
-      <div className="grid grid-cols-2 gap-4 bg-muted/50 p-4 rounded-lg">
+    <div className="space-y-4">
+      <h3 className="text-lg font-semibold text-gray-900">Appliance Details</h3>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 bg-gray-50 rounded-lg border border-gray-100">
         <PreviewField 
           label="Appliance Type" 
           value={formatApplianceType(applianceType)} 
