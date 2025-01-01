@@ -1,49 +1,20 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import * as z from "zod";
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
-
-const formSchema = z.object({
-  name: z.string().min(2, {
-    message: "Clinic name must be at least 2 characters.",
-  }),
-  email: z.string().email({
-    message: "Please enter a valid email address.",
-  }),
-  phone: z.string().min(10, {
-    message: "Please enter a valid phone number.",
-  }),
-  doctorName: z.string().min(2, {
-    message: "Doctor name must be at least 2 characters.",
-  }),
-  contactPerson: z.string().min(2, {
-    message: "Contact person name must be at least 2 characters.",
-  }),
-  contactPhone: z.string().min(10, {
-    message: "Please enter a valid contact phone number.",
-  }),
-  address: z.string().min(5, {
-    message: "Address must be at least 5 characters.",
-  }),
-});
+import { ClinicBasicInfoFields } from "./form/ClinicBasicInfoFields";
+import { ClinicContactFields } from "./form/ClinicContactFields";
+import { clinicFormSchema, type CreateClinicFormValues } from "./types/clinic-form";
 
 export function CreateClinicForm() {
   const queryClient = useQueryClient();
   
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<CreateClinicFormValues>({
+    resolver: zodResolver(clinicFormSchema),
     defaultValues: {
       name: "",
       email: "",
@@ -55,7 +26,7 @@ export function CreateClinicForm() {
     },
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: CreateClinicFormValues) {
     try {
       console.log("Creating clinic with values:", values);
       
@@ -71,6 +42,31 @@ export function CreateClinicForm() {
         return;
       }
 
+      // Create auth account for the clinic
+      console.log("Creating auth account for clinic");
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: values.email,
+        password: 'Password123!', // Default password
+        options: {
+          data: {
+            clinic_name: values.name,
+          },
+        }
+      });
+
+      if (authError) {
+        console.error('Error creating auth account:', authError);
+        toast.error("Failed to create clinic account. Please try again.");
+        return;
+      }
+
+      if (!authData.user) {
+        toast.error("Failed to create clinic account. Please try again.");
+        return;
+      }
+
+      console.log("Auth account created, creating clinic record");
+
       // Create clinic in database
       const { error: clinicError } = await supabase.from('clinics').insert({
         name: values.name,
@@ -80,15 +76,14 @@ export function CreateClinicForm() {
         contact_person: values.contactPerson,
         contact_phone: values.contactPhone,
         address: values.address,
-        user_id: (await supabase.auth.getUser()).data.user?.id
+        user_id: (await supabase.auth.getUser()).data.user?.id,
+        auth_user_id: authData.user.id
       });
 
       if (clinicError) {
-        if (clinicError.code === '23505') {
-          toast.error("A clinic with this email already exists.");
-          return;
-        }
-        throw clinicError;
+        console.error('Error creating clinic:', clinicError);
+        toast.error("Failed to create clinic. Please try again.");
+        return;
       }
 
       toast.success("Clinic created successfully!");
@@ -104,114 +99,8 @@ export function CreateClinicForm() {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-sm font-medium text-gray-700">Clinic Name</FormLabel>
-                <FormControl>
-                  <Input 
-                    placeholder="Enter clinic name" 
-                    {...field}
-                    className="h-11 bg-gray-50 border-gray-200 focus:border-primary focus:ring-primary"
-                  />
-                </FormControl>
-                <FormMessage className="text-xs" />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-sm font-medium text-gray-700">Email</FormLabel>
-                <FormControl>
-                  <Input 
-                    type="email" 
-                    placeholder="Enter email" 
-                    {...field}
-                    className="h-11 bg-gray-50 border-gray-200 focus:border-primary focus:ring-primary"
-                  />
-                </FormControl>
-                <FormMessage className="text-xs" />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="phone"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-sm font-medium text-gray-700">Phone</FormLabel>
-                <FormControl>
-                  <Input 
-                    placeholder="Enter phone number" 
-                    {...field}
-                    className="h-11 bg-gray-50 border-gray-200 focus:border-primary focus:ring-primary"
-                  />
-                </FormControl>
-                <FormMessage className="text-xs" />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="doctorName"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-sm font-medium text-gray-700">Doctor Name</FormLabel>
-                <FormControl>
-                  <Input 
-                    placeholder="Enter doctor name" 
-                    {...field}
-                    className="h-11 bg-gray-50 border-gray-200 focus:border-primary focus:ring-primary"
-                  />
-                </FormControl>
-                <FormMessage className="text-xs" />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="contactPerson"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-sm font-medium text-gray-700">Point of Contact</FormLabel>
-                <FormControl>
-                  <Input 
-                    placeholder="Enter point of contact name" 
-                    {...field}
-                    className="h-11 bg-gray-50 border-gray-200 focus:border-primary focus:ring-primary"
-                  />
-                </FormControl>
-                <FormMessage className="text-xs" />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="contactPhone"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-sm font-medium text-gray-700">POC Phone</FormLabel>
-                <FormControl>
-                  <Input 
-                    placeholder="Enter point of contact phone" 
-                    {...field}
-                    className="h-11 bg-gray-50 border-gray-200 focus:border-primary focus:ring-primary"
-                  />
-                </FormControl>
-                <FormMessage className="text-xs" />
-              </FormItem>
-            )}
-          />
+          <ClinicBasicInfoFields form={form} />
+          <ClinicContactFields form={form} />
         </div>
 
         <FormField
