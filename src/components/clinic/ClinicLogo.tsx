@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 export const ClinicLogo = () => {
   return (
     <Link 
-      to="/admin/dashboard" 
+      to="/clinic/dashboard" 
       className="flex items-center gap-2 p-4 transition-opacity hover:opacity-80"
     >
       <div className="flex items-center justify-center w-8 h-8 bg-primary rounded-lg">
@@ -38,6 +38,7 @@ export const ClinicLogo = () => {
       </div>
       <div className="flex flex-col">
         <span className="text-2xl font-bold tracking-tight text-primary">JGX</span>
+        <span className="text-sm text-gray-500">Clinic Portal</span>
       </div>
     </Link>
   );
