@@ -20,7 +20,7 @@ export const ProductCard = ({ title, description, imagePath }: ProductCardProps)
       </CardHeader>
       <CardContent>
         <Button 
-          onClick={() => navigate(`/clinic/addnewlabscript/surgical-day-appliance`)}
+          onClick={() => navigate(`/clinic/addnewlabscript/new`)}
           className="w-full group"
         >
           Add Request

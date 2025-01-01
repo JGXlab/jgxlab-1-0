@@ -14,7 +14,6 @@ import { ScrewTypeSelector } from "@/components/surgical-form/ScrewTypeSelector"
 import { VDODetailsSelector } from "@/components/surgical-form/VDODetailsSelector";
 import { PriceTableDropdown } from "@/components/surgical-form/PriceTableDropdown";
 import { FormSection } from "@/components/surgical-form/FormSection";
-import { cn } from "@/lib/utils";
 
 const formSchema = z.object({
   patientId: z.string().min(1, "Patient selection is required"),
@@ -25,7 +24,7 @@ const formSchema = z.object({
   specificInstructions: z.string().optional(),
 });
 
-export default function SurgicalDayApplianceForm() {
+export default function NewLabScriptForm() {
   const navigate = useNavigate();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -46,7 +45,7 @@ export default function SurgicalDayApplianceForm() {
   return (
     <ClinicLayout>
       <div className="min-h-screen bg-gray-50">
-        {/* Sticky Header */}
+        {/* Header */}
         <div className="sticky top-0 z-10 bg-white border-b">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16">
@@ -58,8 +57,8 @@ export default function SurgicalDayApplianceForm() {
                   <ArrowLeft className="h-4 w-4" />
                 </Button>
                 <div>
-                  <h1 className="text-xl font-semibold text-gray-900">Surgical Day Appliance</h1>
-                  <p className="text-sm text-gray-500">Create a new surgical day appliance request</p>
+                  <h1 className="text-xl font-semibold text-gray-900">New Lab Script</h1>
+                  <p className="text-sm text-gray-500">Create a new lab script request</p>
                 </div>
               </div>
               <PriceTableDropdown />
