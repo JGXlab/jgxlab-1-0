@@ -45,16 +45,7 @@ export function CreateDesignerForm({ onSuccess }: { onSuccess: () => void }) {
     try {
       console.log("Creating designer with values:", values);
       
-      // First check if a designer exists in auth system
-      const { data: { users }, error: usersError } = await supabase.auth.admin.listUsers();
-      const existingUser = users?.find(user => user.email === values.email);
-      
-      if (existingUser) {
-        toast.error("A user with this email already exists.");
-        return;
-      }
-
-      // Then check if a designer with this email already exists in our table
+      // Check if a designer with this email already exists in our table
       const { data: existingDesigner } = await supabase
         .from('designers')
         .select('id')
@@ -66,7 +57,7 @@ export function CreateDesignerForm({ onSuccess }: { onSuccess: () => void }) {
         return;
       }
 
-      // Create auth account for the designer
+      // Create auth account for the designer with role set to 'designer'
       console.log("Creating auth account for designer");
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: values.email,
