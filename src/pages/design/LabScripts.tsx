@@ -27,16 +27,10 @@ const DesignLabScripts = () => {
         .select(`
           *,
           patients (
-            id,
             first_name,
             last_name,
-            clinic_id
-          ),
-          profiles:profiles!lab_scripts_user_id_fkey (
-            id,
-            email,
-            clinics!clinics_user_id_fkey (
-              id,
+            clinic_id,
+            clinics (
               name,
               doctor_name
             )
@@ -52,8 +46,8 @@ const DesignLabScripts = () => {
       // Transform the data to match the expected interface
       const transformedData = data.map(script => ({
         ...script,
-        clinics: script.profiles?.clinics?.[0] || null,
-        patient_name: script.patients ? `${script.patients.first_name} ${script.patients.last_name}` : 'Unknown Patient'
+        patients: script.patients,
+        clinics: script.patients?.clinics || null
       }));
 
       console.log('Fetched lab scripts:', transformedData);
