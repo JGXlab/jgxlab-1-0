@@ -9,6 +9,7 @@ import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { LabScriptsTable } from "@/components/lab-scripts/LabScriptsTable";
 import { StatusCardsGrid } from "@/components/lab-scripts/StatusCardsGrid";
+import { LabScriptsHeader } from "@/components/lab-scripts/LabScriptsHeader";
 
 const DesignLabScripts = () => {
   const [selectedScript, setSelectedScript] = useState<any>(null);
@@ -130,6 +131,8 @@ const DesignLabScripts = () => {
   return (
     <DesignLayout>
       <div className="space-y-8 p-8 animate-fade-in">
+        <LabScriptsHeader />
+        
         <StatusCardsGrid 
           statusCounts={statusCounts} 
           selectedStatus={selectedStatus}
