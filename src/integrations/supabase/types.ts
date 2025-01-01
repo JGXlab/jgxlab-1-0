@@ -13,6 +13,7 @@ export type Database = {
         Row: {
           address: string
           contact_person: string
+          contact_phone: string
           created_at: string
           doctor_name: string
           email: string
@@ -24,6 +25,7 @@ export type Database = {
         Insert: {
           address: string
           contact_person: string
+          contact_phone: string
           created_at?: string
           doctor_name: string
           email: string
@@ -35,6 +37,7 @@ export type Database = {
         Update: {
           address?: string
           contact_person?: string
+          contact_phone?: string
           created_at?: string
           doctor_name?: string
           email?: string
