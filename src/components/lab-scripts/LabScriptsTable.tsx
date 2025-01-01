@@ -13,7 +13,8 @@ interface LabScript {
   };
   user_id: string;
   clinics: {
-    name: string | null;
+    name: string;
+    doctor_name: string;
   } | null;
   treatment_type: string;
   appliance_type: string;

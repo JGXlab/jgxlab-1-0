@@ -29,8 +29,9 @@ const LabScripts = () => {
             first_name,
             last_name
           ),
-          clinics:profiles!lab_scripts_user_id_fkey (
-            name
+          clinics:clinics (
+            name,
+            doctor_name
           )
         `)
         .order('created_at', { ascending: false });
