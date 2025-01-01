@@ -5,47 +5,126 @@ interface ToothProps {
   position: { x: number; y: number };
   isSelected: boolean;
   onClick: () => void;
+  type: 'molar' | 'premolar' | 'canine' | 'incisor';
 }
 
-const Tooth: React.FC<ToothProps> = ({ number, position, isSelected, onClick }) => (
-  <div
-    className={`absolute cursor-pointer transition-colors ${
-      isSelected ? 'text-primary' : 'text-gray-400 hover:text-gray-600'
-    }`}
-    style={{ left: `${position.x}%`, top: `${position.y}%` }}
-    onClick={onClick}
-  >
-    <div className="w-8 h-8 border-2 rounded-md flex items-center justify-center font-medium">
-      {number}
-    </div>
-  </div>
-);
+const ToothShape: React.FC<{ type: ToothProps['type'] }> = ({ type }) => {
+  switch (type) {
+    case 'molar':
+      return (
+        <path
+          d="M1 1C1 1 3 2 5 2C7 2 9 1 9 1C9 1 9 3 9 5C9 7 8 9 5 9C2 9 1 7 1 5C1 3 1 1 1 1Z"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          fill="none"
+        />
+      );
+    case 'premolar':
+      return (
+        <path
+          d="M2 1C2 1 3.5 2 5 2C6.5 2 8 1 8 1C8 1 8 3 8 5C8 7 7 8 5 8C3 8 2 7 2 5C2 3 2 1 2 1Z"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          fill="none"
+        />
+      );
+    case 'canine':
+      return (
+        <path
+          d="M3 1C3 1 4 1.5 5 1.5C6 1.5 7 1 7 1C7 1 7 3 7 4.5C7 6 6 7 5 7C4 7 3 6 3 4.5C3 3 3 1 3 1Z"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          fill="none"
+        />
+      );
+    case 'incisor':
+      return (
+        <path
+          d="M3.5 1C3.5 1 4.25 1.5 5 1.5C5.75 1.5 6.5 1 6.5 1C6.5 1 6.5 3 6.5 4C6.5 5 6 6 5 6C4 6 3.5 5 3.5 4C3.5 3 3.5 1 3.5 1Z"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          fill="none"
+        />
+      );
+  }
+};
+
+const Tooth: React.FC<ToothProps> = ({ number, position, isSelected, onClick, type }) => {
+  const numberPosition = {
+    x: position.x < 50 ? position.x - 8 : position.x + 8,
+    y: position.y
+  };
+
+  return (
+    <>
+      <div
+        className="absolute transform -translate-x-1/2 -translate-y-1/2 cursor-pointer"
+        style={{ left: `${position.x}%`, top: `${position.y}%` }}
+        onClick={onClick}
+      >
+        <svg
+          width="30"
+          height="30"
+          viewBox="0 0 10 10"
+          className={`transition-colors ${
+            isSelected ? 'stroke-primary fill-primary/20' : 'stroke-gray-400 hover:stroke-gray-600'
+          }`}
+          strokeWidth="0.5"
+        >
+          <ToothShape type={type} />
+        </svg>
+      </div>
+      <div
+        className={`absolute text-sm ${
+          position.x < 50 ? 'text-right -translate-x-full pr-2' : 'text-left translate-x-0 pl-2'
+        } transform -translate-y-1/2`}
+        style={{ left: `${numberPosition.x}%`, top: `${numberPosition.y}%` }}
+      >
+        <span className={`${isSelected ? 'text-primary' : 'text-gray-400'}`}>{number}</span>
+      </div>
+    </>
+  );
+};
 
 export const TeethArch = () => {
   const [selectedTeeth, setSelectedTeeth] = useState<number[]>([]);
 
   const upperTeeth = [
-    { number: 18, x: 10, y: 10 },
-    { number: 17, x: 20, y: 8 },
-    { number: 16, x: 30, y: 6 },
-    { number: 15, x: 40, y: 5 },
-    { number: 14, x: 50, y: 4 },
-    { number: 13, x: 60, y: 5 },
-    { number: 12, x: 70, y: 6 },
-    { number: 11, x: 80, y: 8 },
-    { number: 21, x: 90, y: 10 },
+    { number: 18, x: 15, y: 25, type: 'molar' as const },
+    { number: 17, x: 20, y: 20, type: 'molar' as const },
+    { number: 16, x: 25, y: 15, type: 'molar' as const },
+    { number: 15, x: 30, y: 12, type: 'premolar' as const },
+    { number: 14, x: 35, y: 10, type: 'premolar' as const },
+    { number: 13, x: 40, y: 8, type: 'canine' as const },
+    { number: 12, x: 45, y: 7, type: 'incisor' as const },
+    { number: 11, x: 48, y: 6, type: 'incisor' as const },
+    { number: 21, x: 52, y: 6, type: 'incisor' as const },
+    { number: 22, x: 55, y: 7, type: 'incisor' as const },
+    { number: 23, x: 60, y: 8, type: 'canine' as const },
+    { number: 24, x: 65, y: 10, type: 'premolar' as const },
+    { number: 25, x: 70, y: 12, type: 'premolar' as const },
+    { number: 26, x: 75, y: 15, type: 'molar' as const },
+    { number: 27, x: 80, y: 20, type: 'molar' as const },
+    { number: 28, x: 85, y: 25, type: 'molar' as const },
   ];
 
   const lowerTeeth = [
-    { number: 48, x: 10, y: 80 },
-    { number: 47, x: 20, y: 82 },
-    { number: 46, x: 30, y: 84 },
-    { number: 45, x: 40, y: 85 },
-    { number: 44, x: 50, y: 86 },
-    { number: 43, x: 60, y: 85 },
-    { number: 42, x: 70, y: 84 },
-    { number: 41, x: 80, y: 82 },
-    { number: 31, x: 90, y: 80 },
+    { number: 48, x: 15, y: 75, type: 'molar' as const },
+    { number: 47, x: 20, y: 80, type: 'molar' as const },
+    { number: 46, x: 25, y: 85, type: 'molar' as const },
+    { number: 45, x: 30, y: 88, type: 'premolar' as const },
+    { number: 44, x: 35, y: 90, type: 'premolar' as const },
+    { number: 43, x: 40, y: 92, type: 'canine' as const },
+    { number: 42, x: 45, y: 93, type: 'incisor' as const },
+    { number: 41, x: 48, y: 94, type: 'incisor' as const },
+    { number: 31, x: 52, y: 94, type: 'incisor' as const },
+    { number: 32, x: 55, y: 93, type: 'incisor' as const },
+    { number: 33, x: 60, y: 92, type: 'canine' as const },
+    { number: 34, x: 65, y: 90, type: 'premolar' as const },
+    { number: 35, x: 70, y: 88, type: 'premolar' as const },
+    { number: 36, x: 75, y: 85, type: 'molar' as const },
+    { number: 37, x: 80, y: 80, type: 'molar' as const },
+    { number: 38, x: 85, y: 75, type: 'molar' as const },
   ];
 
   const toggleTooth = (toothNumber: number) => {
@@ -62,8 +141,7 @@ export const TeethArch = () => {
         {upperTeeth.map(tooth => (
           <Tooth
             key={tooth.number}
-            number={tooth.number}
-            position={{ x: tooth.x, y: tooth.y }}
+            {...tooth}
             isSelected={selectedTeeth.includes(tooth.number)}
             onClick={() => toggleTooth(tooth.number)}
           />
@@ -71,8 +149,7 @@ export const TeethArch = () => {
         {lowerTeeth.map(tooth => (
           <Tooth
             key={tooth.number}
-            number={tooth.number}
-            position={{ x: tooth.x, y: tooth.y }}
+            {...tooth}
             isSelected={selectedTeeth.includes(tooth.number)}
             onClick={() => toggleTooth(tooth.number)}
           />
