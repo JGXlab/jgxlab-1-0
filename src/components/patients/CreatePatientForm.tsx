@@ -8,6 +8,7 @@ import { PatientNameFields } from "./PatientNameFields";
 import { PatientGenderField } from "./PatientGenderField";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
+import { PatientDateOfBirthField } from "./PatientDateOfBirthField";
 
 const formSchema = z.object({
   firstName: z.string().min(2, {
@@ -18,6 +19,9 @@ const formSchema = z.object({
   }),
   gender: z.string({
     required_error: "Please select a gender.",
+  }),
+  dateOfBirth: z.date({
+    required_error: "Please select a date of birth.",
   }),
 });
 
@@ -39,6 +43,7 @@ export function CreatePatientForm({ onSuccess }: { onSuccess?: () => void }) {
         first_name: values.firstName,
         last_name: values.lastName,
         gender: values.gender,
+        date_of_birth: values.dateOfBirth.toISOString().split('T')[0],
         user_id: (await supabase.auth.getUser()).data.user?.id
       });
 
@@ -59,6 +64,7 @@ export function CreatePatientForm({ onSuccess }: { onSuccess?: () => void }) {
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <PatientNameFields form={form} />
         <PatientGenderField form={form} />
+        <PatientDateOfBirthField form={form} />
 
         <Button
           type="submit"
