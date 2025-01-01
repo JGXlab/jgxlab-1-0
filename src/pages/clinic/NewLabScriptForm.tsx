@@ -12,7 +12,6 @@ import { PatientSelector } from "@/components/patients/PatientSelector";
 import { ArchSelector } from "@/components/surgical-form/ArchSelector";
 import { ScrewTypeSelector } from "@/components/surgical-form/ScrewTypeSelector";
 import { VDODetailsSelector } from "@/components/surgical-form/VDODetailsSelector";
-import { PriceTableDropdown } from "@/components/surgical-form/PriceTableDropdown";
 import { FormSection } from "@/components/surgical-form/FormSection";
 
 const formSchema = z.object({
@@ -61,7 +60,6 @@ export default function NewLabScriptForm() {
                   <p className="text-sm text-gray-500">Create a new lab script request</p>
                 </div>
               </div>
-              <PriceTableDropdown />
             </div>
           </div>
         </div>
