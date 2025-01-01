@@ -13,7 +13,7 @@ const ToothShape: React.FC<{ type: ToothProps['type'] }> = ({ type }) => {
     case 'molar':
       return (
         <path
-          d="M1 1C1 1 3 2 5 2C7 2 9 1 9 1C9 1 9 3 9 5C9 7 8 9 5 9C2 9 1 7 1 5C1 3 1 1 1 1Z"
+          d="M2 1C2 1 3.5 1.5 5 1.5C6.5 1.5 8 1 8 1C8 1 8.5 3 8.5 5C8.5 8 7 9.5 5 9.5C3 9.5 1.5 8 1.5 5C1.5 3 2 1 2 1Z"
           strokeLinecap="round"
           strokeLinejoin="round"
           fill="none"
@@ -22,7 +22,7 @@ const ToothShape: React.FC<{ type: ToothProps['type'] }> = ({ type }) => {
     case 'premolar':
       return (
         <path
-          d="M2 1C2 1 3.5 2 5 2C6.5 2 8 1 8 1C8 1 8 3 8 5C8 7 7 8 5 8C3 8 2 7 2 5C2 3 2 1 2 1Z"
+          d="M3 1C3 1 4 1.5 5 1.5C6 1.5 7 1 7 1C7 1 7.5 3 7.5 4.5C7.5 7 6.5 8 5 8C3.5 8 2.5 7 2.5 4.5C2.5 3 3 1 3 1Z"
           strokeLinecap="round"
           strokeLinejoin="round"
           fill="none"
@@ -31,7 +31,7 @@ const ToothShape: React.FC<{ type: ToothProps['type'] }> = ({ type }) => {
     case 'canine':
       return (
         <path
-          d="M3 1C3 1 4 1.5 5 1.5C6 1.5 7 1 7 1C7 1 7 3 7 4.5C7 6 6 7 5 7C4 7 3 6 3 4.5C3 3 3 1 3 1Z"
+          d="M3.5 1C3.5 1 4.25 1.25 5 1.25C5.75 1.25 6.5 1 6.5 1C6.5 1 7 3 7 4.5C7 6.5 6 7.5 5 7.5C4 7.5 3 6.5 3 4.5C3 3 3.5 1 3.5 1Z"
           strokeLinecap="round"
           strokeLinejoin="round"
           fill="none"
@@ -40,7 +40,7 @@ const ToothShape: React.FC<{ type: ToothProps['type'] }> = ({ type }) => {
     case 'incisor':
       return (
         <path
-          d="M3.5 1C3.5 1 4.25 1.5 5 1.5C5.75 1.5 6.5 1 6.5 1C6.5 1 6.5 3 6.5 4C6.5 5 6 6 5 6C4 6 3.5 5 3.5 4C3.5 3 3.5 1 3.5 1Z"
+          d="M4 1C4 1 4.5 1.25 5 1.25C5.5 1.25 6 1 6 1C6 1 6.25 2.5 6.25 3.5C6.25 5 5.75 6 5 6C4.25 6 3.75 5 3.75 3.5C3.75 2.5 4 1 4 1Z"
           strokeLinecap="round"
           strokeLinejoin="round"
           fill="none"
