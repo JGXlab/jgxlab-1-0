@@ -10,6 +10,7 @@ import { formSchema } from "./formSchema";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useEffect, useState } from "react";
 
 interface PreviewLabScriptModalProps {
   isOpen: boolean;
@@ -22,10 +23,11 @@ export const PreviewLabScriptModal = ({
   onClose,
   formData,
 }: PreviewLabScriptModalProps) => {
+  const [labScript, setLabScript] = useState<any>(formData);
+
   const formatTreatmentType = (value: string | undefined) => {
     if (!value) return 'Not specified';
     
-    // Handle cases where the value might not contain the separator
     if (!value.includes('|')) return value;
     
     const [upper, lower] = value.split('|');
@@ -44,13 +46,13 @@ export const PreviewLabScriptModal = ({
 
   // Fetch patient details
   const { data: patient } = useQuery({
-    queryKey: ['patient', formData.patientId],
+    queryKey: ['patient', labScript.patient_id],
     queryFn: async () => {
       console.log('Fetching patient details for preview...');
       const { data, error } = await supabase
         .from('patients')
         .select('*')
-        .eq('id', formData.patientId)
+        .eq('id', labScript.patient_id)
         .single();
 
       if (error) {
@@ -61,8 +63,57 @@ export const PreviewLabScriptModal = ({
       console.log('Fetched patient:', data);
       return data;
     },
-    enabled: !!formData.patientId
+    enabled: !!labScript.patient_id
   });
+
+  // Set up real-time subscription
+  useEffect(() => {
+    console.log('Setting up real-time subscription for lab script:', formData.id);
+    
+    const channel = supabase
+      .channel('lab_script_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'lab_scripts',
+          filter: `id=eq.${formData.id}`
+        },
+        (payload) => {
+          console.log('Received real-time update:', payload);
+          if (payload.new) {
+            setLabScript(payload.new);
+          }
+        }
+      )
+      .subscribe();
+
+    // Initial fetch
+    const fetchLabScript = async () => {
+      const { data, error } = await supabase
+        .from('lab_scripts')
+        .select('*')
+        .eq('id', formData.id)
+        .single();
+
+      if (error) {
+        console.error('Error fetching lab script:', error);
+        return;
+      }
+
+      console.log('Initial lab script fetch:', data);
+      setLabScript(data);
+    };
+
+    if (formData.id) {
+      fetchLabScript();
+    }
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [formData.id]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -86,11 +137,11 @@ export const PreviewLabScriptModal = ({
                 />
                 <PreviewField 
                   label="Submitted Date" 
-                  value={format(new Date(), 'MMM d, yyyy')} 
+                  value={format(new Date(labScript.created_at || new Date()), 'MMM d, yyyy')} 
                 />
                 <PreviewField 
                   label="Due Date" 
-                  value={formData.dueDate || 'Not specified'} 
+                  value={labScript.due_date || 'Not specified'} 
                 />
               </div>
             </div>
@@ -101,35 +152,35 @@ export const PreviewLabScriptModal = ({
               <div className="grid grid-cols-2 gap-4 bg-muted/50 p-4 rounded-lg">
                 <PreviewField 
                   label="Appliance Type" 
-                  value={formatApplianceType(formData.applianceType)} 
+                  value={formatApplianceType(labScript.appliance_type)} 
                 />
                 <PreviewField 
                   label="Arch Type" 
-                  value={formData.arch ? formData.arch.charAt(0).toUpperCase() + formData.arch.slice(1) : 'Not specified'} 
+                  value={labScript.arch ? labScript.arch.charAt(0).toUpperCase() + labScript.arch.slice(1) : 'Not specified'} 
                 />
                 <PreviewField 
                   label="Treatment Type" 
-                  value={formatTreatmentType(formData.treatmentType)} 
+                  value={formatTreatmentType(labScript.treatment_type)} 
                 />
                 <PreviewField 
                   label="Screw Type" 
-                  value={formData.screwType === 'others' && formData.otherScrewType 
-                    ? formData.otherScrewType 
-                    : formData.screwType || 'Not specified'} 
+                  value={labScript.screw_type === 'others' && labScript.other_screw_type 
+                    ? labScript.other_screw_type 
+                    : labScript.screw_type || 'Not specified'} 
                 />
                 <PreviewField 
                   label="VDO Details" 
-                  value={formData.vdoDetails || 'Not specified'} 
+                  value={labScript.vdo_details || 'Not specified'} 
                 />
                 <PreviewField 
                   label="Needs Nightguard" 
-                  value={formData.needsNightguard 
-                    ? formData.needsNightguard.charAt(0).toUpperCase() + formData.needsNightguard.slice(1)
+                  value={labScript.needs_nightguard 
+                    ? labScript.needs_nightguard.charAt(0).toUpperCase() + labScript.needs_nightguard.slice(1)
                     : 'Not specified'} 
                 />
                 <PreviewField 
                   label="Shade" 
-                  value={formData.shade ? formData.shade.toUpperCase() : 'Not specified'} 
+                  value={labScript.shade ? labScript.shade.toUpperCase() : 'Not specified'} 
                 />
               </div>
             </div>
@@ -138,11 +189,11 @@ export const PreviewLabScriptModal = ({
             <div>
               <h3 className="text-lg font-medium mb-4">Additional Information</h3>
               <div className="space-y-4 bg-muted/50 p-4 rounded-lg">
-                {formData.specificInstructions && (
+                {labScript.specific_instructions && (
                   <div className="space-y-1.5">
                     <p className="text-sm font-medium text-muted-foreground">Specific Instructions</p>
                     <p className="text-sm text-foreground whitespace-pre-wrap">
-                      {formData.specificInstructions}
+                      {labScript.specific_instructions}
                     </p>
                   </div>
                 )}
