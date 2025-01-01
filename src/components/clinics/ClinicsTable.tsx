@@ -11,17 +11,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-
-type Clinic = {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  doctor_name: string;
-  contact_person: string;
-  contact_phone: string;
-  address: string;
-};
+import { EditClinicDialog } from "./EditClinicDialog";
+import { Clinic } from "./types";
 
 export function ClinicsTable() {
   const { toast } = useToast();
@@ -116,7 +107,8 @@ export function ClinicsTable() {
               <TableCell>{clinic.email}</TableCell>
               <TableCell>{clinic.phone}</TableCell>
               <TableCell>{clinic.address}</TableCell>
-              <TableCell>
+              <TableCell className="flex items-center">
+                <EditClinicDialog clinic={clinic} />
                 <Button
                   variant="outline"
                   size="sm"
