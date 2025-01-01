@@ -4,7 +4,7 @@ import { ProductCard } from "@/components/lab-scripts/ProductCard";
 export default function AddNewLabScript() {
   return (
     <ClinicLayout>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="w-full">
         <div className="space-y-8">
           <div className="text-left">
             <h1 className="text-3xl font-bold text-gray-900">Add New Lab Script</h1>
