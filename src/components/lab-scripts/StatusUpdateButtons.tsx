@@ -21,7 +21,7 @@ export const StatusUpdateButtons = ({ script, onStatusUpdate }: StatusUpdateButt
 
   if (status === 'completed') {
     return (
-      <Badge className="bg-green-100 text-green-800 w-8 h-8 flex items-center justify-center p-0">
+      <Badge className="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-100 w-8 h-8 flex items-center justify-center p-0">
         <CheckCircle className="w-4 h-4" />
       </Badge>
     );
@@ -35,7 +35,7 @@ export const StatusUpdateButtons = ({ script, onStatusUpdate }: StatusUpdateButt
             <Button
               variant="outline"
               size="icon"
-              className="w-8 h-8"
+              className="w-8 h-8 dark:border-muted-foreground/50 dark:hover:bg-muted/20"
               onClick={() => onStatusUpdate(script.id, 'in_progress')}
             >
               <Play className="h-4 w-4" />
@@ -57,7 +57,7 @@ export const StatusUpdateButtons = ({ script, onStatusUpdate }: StatusUpdateButt
             <Button
               variant="outline"
               size="icon"
-              className="w-8 h-8"
+              className="w-8 h-8 dark:border-muted-foreground/50 dark:hover:bg-muted/20"
               onClick={() => onStatusUpdate(script.id, 'in_progress')}
             >
               <Play className="h-4 w-4" />
@@ -79,7 +79,7 @@ export const StatusUpdateButtons = ({ script, onStatusUpdate }: StatusUpdateButt
             <Button
               variant="outline"
               size="icon"
-              className="w-8 h-8"
+              className="w-8 h-8 dark:border-muted-foreground/50 dark:hover:bg-muted/20"
               onClick={() => onStatusUpdate(script.id, 'paused')}
             >
               <Pause className="h-4 w-4" />
@@ -97,7 +97,7 @@ export const StatusUpdateButtons = ({ script, onStatusUpdate }: StatusUpdateButt
             <Button
               variant="outline"
               size="icon"
-              className="w-8 h-8"
+              className="w-8 h-8 dark:border-muted-foreground/50 dark:hover:bg-muted/20"
               onClick={() => onStatusUpdate(script.id, 'on_hold')}
             >
               <StopCircle className="h-4 w-4" />
@@ -115,7 +115,7 @@ export const StatusUpdateButtons = ({ script, onStatusUpdate }: StatusUpdateButt
             <Button
               variant="outline"
               size="icon"
-              className="w-8 h-8"
+              className="w-8 h-8 dark:border-muted-foreground/50 dark:hover:bg-muted/20"
               onClick={() => onStatusUpdate(script.id, 'completed')}
             >
               <CheckCircle className="h-4 w-4" />
