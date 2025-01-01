@@ -1,26 +1,14 @@
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Card } from "@/components/ui/card";
-import { Building2, Search, Bell, Plus } from "lucide-react";
+import { Building2, Search, Bell } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { Tables } from "@/integrations/supabase/types";
-import { Button } from "@/components/ui/button";
-import { useState } from "react";
-import { CreateClinicForm } from "@/components/admin/CreateClinicForm";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 
 type Profile = Tables<"profiles">;
 
 const Clinics = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  
-  const { data: clinics, isLoading, refetch } = useQuery({
+  const { data: clinics, isLoading } = useQuery({
     queryKey: ["clinics"],
     queryFn: async () => {
       console.log("Fetching clinic profiles...");
@@ -39,30 +27,11 @@ const Clinics = () => {
     },
   });
 
-  const handleSuccess = async () => {
-    setIsOpen(false);
-    await refetch();
-  };
-
   return (
     <AdminLayout>
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-2xl font-semibold">Clinics</h1>
         <div className="flex items-center gap-4">
-          <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <DialogTrigger asChild>
-              <Button className="gap-2">
-                <Plus className="h-4 w-4" />
-                Add Clinic
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Create New Clinic</DialogTitle>
-              </DialogHeader>
-              <CreateClinicForm onSuccess={handleSuccess} />
-            </DialogContent>
-          </Dialog>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
             <input
