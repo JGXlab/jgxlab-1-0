@@ -76,7 +76,7 @@ export function ClinicsTable() {
         // If user doesn't exist, create them and send invitation
         const { error: signUpError } = await supabase.auth.signUp({
           email,
-          password: 'password1',
+          password: 'Password1', // Updated to use Password1 instead of password1
           options: {
             data: {
               clinic_name: clinicName,
