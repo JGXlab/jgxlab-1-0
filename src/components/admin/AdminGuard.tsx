@@ -17,18 +17,36 @@ export const AdminGuard = ({ children }: { children: React.ReactNode }) => {
           return;
         }
 
+        console.log("Checking admin role for user:", user.id);
+
         const { data: profile, error } = await supabase
           .from('profiles')
-          .select('role')
+          .select('*')
           .eq('id', user.id)
           .single();
 
-        if (error || profile?.role !== 'admin') {
-          console.log("User is not an admin, redirecting to admin login");
+        console.log("Profile data:", profile);
+        console.log("Profile error:", error);
+
+        if (error) {
+          console.error("Error fetching profile:", error);
           navigate("/admin/login");
           return;
         }
 
+        if (!profile) {
+          console.error("No profile found for user:", user.id);
+          navigate("/admin/login");
+          return;
+        }
+
+        if (profile.role !== 'admin') {
+          console.log("User is not an admin. Role:", profile.role);
+          navigate("/admin/login");
+          return;
+        }
+
+        console.log("Admin access granted for user:", user.id);
         setIsLoading(false);
       } catch (error) {
         console.error("Error checking admin access:", error);
