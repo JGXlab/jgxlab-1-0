@@ -1,7 +1,5 @@
 import { ClinicLayout } from "@/components/clinic/ClinicLayout";
-import { Button } from "@/components/ui/button";
-import { FilePlus, Calendar, User, FileText, CheckCircle2, Clock, Info, Database } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Calendar, User, FileText, CheckCircle2, Clock, Info, Database } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -14,6 +12,10 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
+import { useNavigate } from "react-router-dom";
+import { EmptyLabScripts } from "@/components/lab-scripts/EmptyLabScripts";
+import { LoadingLabScripts } from "@/components/lab-scripts/LoadingLabScripts";
+import { LabScriptsHeader } from "@/components/lab-scripts/LabScriptsHeader";
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -81,53 +83,39 @@ export default function SubmittedLabScripts() {
   return (
     <ClinicLayout>
       <div className="p-6 space-y-6">
-        <div className="flex items-center justify-between">
-          <div className="space-y-1">
-            <h1 className="text-2xl font-bold tracking-tight">Lab Scripts</h1>
-            <p className="text-sm text-muted-foreground">
-              Manage and track your submitted lab scripts
-            </p>
-          </div>
-          <Button 
-            onClick={() => navigate("/clinic/new-lab-script")}
-            className="bg-primary hover:bg-primary-hover transition-colors"
-          >
-            <FilePlus className="mr-2 h-4 w-4" />
-            New Lab Script
-          </Button>
-        </div>
+        <LabScriptsHeader />
 
         <div className="bg-white rounded-lg shadow-sm border">
           <Table>
             <TableHeader>
               <TableRow className="bg-gray-50/50">
                 <TableHead className="w-[250px]">
-                  <div className="flex items-center space-x-2">
-                    <User className="h-4 w-4 text-muted-foreground" />
+                  <div className="flex items-center space-x-2 text-gray-700">
+                    <User className="h-4 w-4" />
                     <span>Patient</span>
                   </div>
                 </TableHead>
                 <TableHead>
-                  <div className="flex items-center space-x-2">
-                    <FileText className="h-4 w-4 text-muted-foreground" />
+                  <div className="flex items-center space-x-2 text-gray-700">
+                    <FileText className="h-4 w-4" />
                     <span>Appliance Details</span>
                   </div>
                 </TableHead>
                 <TableHead>
-                  <div className="flex items-center space-x-2">
-                    <Calendar className="h-4 w-4 text-muted-foreground" />
+                  <div className="flex items-center space-x-2 text-gray-700">
+                    <Calendar className="h-4 w-4" />
                     <span>Due Date</span>
                   </div>
                 </TableHead>
                 <TableHead>
-                  <div className="flex items-center space-x-2">
-                    <Database className="h-4 w-4 text-muted-foreground" />
+                  <div className="flex items-center space-x-2 text-gray-700">
+                    <Database className="h-4 w-4" />
                     <span>Status</span>
                   </div>
                 </TableHead>
                 <TableHead>
-                  <div className="flex items-center space-x-2">
-                    <Clock className="h-4 w-4 text-muted-foreground" />
+                  <div className="flex items-center space-x-2 text-gray-700">
+                    <Clock className="h-4 w-4" />
                     <span>Created</span>
                   </div>
                 </TableHead>
@@ -136,28 +124,14 @@ export default function SubmittedLabScripts() {
             <TableBody>
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center py-8">
-                    <div className="flex items-center justify-center space-x-2 text-muted-foreground">
-                      <Clock className="h-5 w-5 animate-spin" />
-                      <span>Loading lab scripts...</span>
-                    </div>
+                  <TableCell colSpan={5}>
+                    <LoadingLabScripts />
                   </TableCell>
                 </TableRow>
               ) : labScripts.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center py-8">
-                    <div className="flex flex-col items-center justify-center space-y-2 text-muted-foreground">
-                      <FileText className="h-8 w-8" />
-                      <p>No lab scripts found. Create your first one!</p>
-                      <Button 
-                        variant="outline" 
-                        onClick={() => navigate("/clinic/new-lab-script")}
-                        className="mt-2"
-                      >
-                        <FilePlus className="mr-2 h-4 w-4" />
-                        Create Lab Script
-                      </Button>
-                    </div>
+                  <TableCell colSpan={5}>
+                    <EmptyLabScripts />
                   </TableCell>
                 </TableRow>
               ) : (
@@ -173,10 +147,10 @@ export default function SubmittedLabScripts() {
                           <User className="h-4 w-4 text-gray-600" />
                         </div>
                         <div>
-                          <p className="font-medium">
+                          <p className="font-medium text-gray-900">
                             {script.patients?.first_name} {script.patients?.last_name}
                           </p>
-                          <p className="text-sm text-muted-foreground">
+                          <p className="text-sm text-gray-600">
                             ID: {script.patient_id.slice(0, 8)}
                           </p>
                         </div>
@@ -184,17 +158,17 @@ export default function SubmittedLabScripts() {
                     </TableCell>
                     <TableCell>
                       <div className="space-y-1">
-                        <p className="font-medium">
+                        <p className="font-medium text-gray-900">
                           {getApplianceTypeDisplay(script.appliance_type)}
                         </p>
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-sm text-gray-600">
                           {script.arch.charAt(0).toUpperCase() + script.arch.slice(1)} Arch
                         </p>
                       </div>
                     </TableCell>
                     <TableCell>
-                      <div className="flex items-center space-x-2">
-                        <Calendar className="h-4 w-4 text-muted-foreground" />
+                      <div className="flex items-center space-x-2 text-gray-700">
+                        <Calendar className="h-4 w-4" />
                         <span>{script.due_date}</span>
                       </div>
                     </TableCell>
@@ -208,7 +182,7 @@ export default function SubmittedLabScripts() {
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      <div className="text-sm text-muted-foreground">
+                      <div className="text-sm text-gray-600">
                         {format(new Date(script.created_at), 'MMM d, yyyy')}
                       </div>
                     </TableCell>
