@@ -1,6 +1,5 @@
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Search, Clock, Loader2, Pause, StopCircle, AlertTriangle, CheckCircle, FileText } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,25 +10,28 @@ import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { LabScriptsTable } from "@/components/lab-scripts/LabScriptsTable";
 
-const StatusCard = ({ icon: Icon, label, count, color }: { 
+const StatusCard = ({ icon: Icon, label, count, color, gradient }: { 
   icon: any; 
   label: string; 
   count: number;
   color: string;
+  gradient: string;
 }) => (
-  <Card className={`p-4 relative overflow-hidden transition-all hover:shadow-md ${
+  <Card className={`group relative overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 ${
     label === 'All Scripts' ? 'border-2 border-primary' : ''
   }`}>
-    <div className="flex items-center gap-4">
-      <div className={`p-2 rounded-lg ${color}`}>
-        <Icon className="w-5 h-5 text-white" />
-      </div>
-      <div>
-        <span className="text-3xl font-semibold">{count}</span>
-        <p className="text-sm text-gray-600">{label}</p>
+    <div className={`absolute inset-0 opacity-10 transition-opacity duration-300 group-hover:opacity-20 ${gradient}`} />
+    <div className="p-4 relative z-10">
+      <div className="flex items-center gap-4">
+        <div className={`p-3 rounded-xl ${color} transition-transform duration-300 group-hover:scale-110`}>
+          <Icon className="w-6 h-6 text-white" />
+        </div>
+        <div className="flex flex-col">
+          <span className="text-3xl font-bold tracking-tight animate-fade-in">{count}</span>
+          <p className="text-sm text-gray-600">{label}</p>
+        </div>
       </div>
     </div>
-    <div className={`h-1 absolute bottom-0 left-0 right-0 ${color.replace('bg-', 'bg-opacity-20 bg-')}`} />
   </Card>
 );
 
@@ -75,13 +77,55 @@ const LabScripts = () => {
   };
 
   const statusCards = [
-    { icon: Clock, label: 'New Lab Scripts', count: statusCounts.new, color: 'bg-amber-500' },
-    { icon: Loader2, label: 'In Process', count: statusCounts.inProcess, color: 'bg-blue-500' },
-    { icon: Pause, label: 'Paused', count: statusCounts.paused, color: 'bg-orange-500' },
-    { icon: StopCircle, label: 'On Hold', count: statusCounts.onHold, color: 'bg-red-500' },
-    { icon: AlertTriangle, label: 'Incomplete', count: statusCounts.incomplete, color: 'bg-pink-500' },
-    { icon: CheckCircle, label: 'Completed', count: statusCounts.completed, color: 'bg-green-500' },
-    { icon: FileText, label: 'All Scripts', count: statusCounts.all, color: 'bg-violet-500' },
+    { 
+      icon: Clock, 
+      label: 'New Lab Scripts', 
+      count: statusCounts.new, 
+      color: 'bg-amber-500',
+      gradient: 'bg-gradient-to-br from-amber-500/20 to-orange-500/20'
+    },
+    { 
+      icon: Loader2, 
+      label: 'In Process', 
+      count: statusCounts.inProcess, 
+      color: 'bg-blue-500',
+      gradient: 'bg-gradient-to-br from-blue-500/20 to-indigo-500/20'
+    },
+    { 
+      icon: Pause, 
+      label: 'Paused', 
+      count: statusCounts.paused, 
+      color: 'bg-orange-500',
+      gradient: 'bg-gradient-to-br from-orange-500/20 to-red-500/20'
+    },
+    { 
+      icon: StopCircle, 
+      label: 'On Hold', 
+      count: statusCounts.onHold, 
+      color: 'bg-red-500',
+      gradient: 'bg-gradient-to-br from-red-500/20 to-pink-500/20'
+    },
+    { 
+      icon: AlertTriangle, 
+      label: 'Incomplete', 
+      count: statusCounts.incomplete, 
+      color: 'bg-pink-500',
+      gradient: 'bg-gradient-to-br from-pink-500/20 to-rose-500/20'
+    },
+    { 
+      icon: CheckCircle, 
+      label: 'Completed', 
+      count: statusCounts.completed, 
+      color: 'bg-green-500',
+      gradient: 'bg-gradient-to-br from-green-500/20 to-emerald-500/20'
+    },
+    { 
+      icon: FileText, 
+      label: 'All Scripts', 
+      count: statusCounts.all, 
+      color: 'bg-violet-500',
+      gradient: 'bg-gradient-to-br from-violet-500/20 to-purple-500/20'
+    },
   ];
 
   const updateStatusMutation = useMutation({
@@ -122,7 +166,7 @@ const LabScripts = () => {
 
   return (
     <AdminLayout>
-      <div className="space-y-8 p-8">
+      <div className="space-y-8 p-8 animate-fade-in">
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-4">
           {statusCards.map((card) => (
             <StatusCard
@@ -131,11 +175,12 @@ const LabScripts = () => {
               label={card.label}
               count={card.count}
               color={card.color}
+              gradient={card.gradient}
             />
           ))}
         </div>
 
-        <Card className="p-6">
+        <Card className="p-6 backdrop-blur-sm bg-white/50 shadow-lg">
           {isLoading ? (
             <LoadingLabScripts />
           ) : !labScripts?.length ? (
