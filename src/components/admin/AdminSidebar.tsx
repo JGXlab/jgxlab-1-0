@@ -2,7 +2,6 @@ import { Link, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
   Users,
-  Building2,
   Bell,
   FileText,
   Settings,
@@ -18,11 +17,6 @@ const sidebarButtons = [
     icon: LayoutDashboard,
     label: "Dashboard",
     path: "/admin/dashboard",
-  },
-  {
-    icon: Building2,
-    label: "Clinics",
-    path: "/admin/clinics",
   },
   {
     icon: Users,
