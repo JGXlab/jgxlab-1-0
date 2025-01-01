@@ -1,4 +1,4 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   FileText,
@@ -11,6 +11,8 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface DesignNavbarProps {
   isCollapsed: boolean;
@@ -19,7 +21,40 @@ interface DesignNavbarProps {
 
 export const DesignNavbar = ({ isCollapsed, setIsCollapsed }: DesignNavbarProps) => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { toast } = useToast();
   const isActive = (path: string) => location.pathname === path;
+
+  const handleLogout = async () => {
+    try {
+      console.log("Attempting to sign out");
+      const { error } = await supabase.auth.signOut();
+      
+      if (error) {
+        console.error("Error signing out:", error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to sign out. Please try again.",
+        });
+        return;
+      }
+
+      console.log("Successfully signed out");
+      toast({
+        title: "Signed out",
+        description: "You have been successfully signed out.",
+      });
+      navigate("/design/login");
+    } catch (error) {
+      console.error("Unexpected error during sign out:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
+      });
+    }
+  };
 
   const navItems = [
     {
@@ -105,6 +140,7 @@ export const DesignNavbar = ({ isCollapsed, setIsCollapsed }: DesignNavbarProps)
         <div className="absolute bottom-4 left-0 right-0 px-4">
           <Button
             variant="ghost"
+            onClick={handleLogout}
             className={cn(
               "w-full transition-colors duration-200 ease-spring",
               "text-destructive hover:text-destructive/90 hover:bg-destructive/10",
