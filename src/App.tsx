@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { SidebarProvider } from "@/components/ui/sidebar";
+import { AdminGuard } from "@/components/admin/AdminGuard";
 import Index from "./pages/Index";
 import AdminLogin from "./pages/admin/Login";
 import AdminDashboard from "./pages/admin/Dashboard";
@@ -26,12 +27,12 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/admin/login" element={<AdminLogin />} />
-              <Route path="/admin/dashboard" element={<AdminDashboard />} />
-              <Route path="/admin/notifications" element={<Notifications />} />
-              <Route path="/admin/patients" element={<AdminPatients />} />
-              <Route path="/admin/lab-scripts" element={<LabScripts />} />
-              <Route path="/admin/settings" element={<Settings />} />
-              <Route path="/admin/clinics" element={<Clinics />} />
+              <Route path="/admin/dashboard" element={<AdminGuard><AdminDashboard /></AdminGuard>} />
+              <Route path="/admin/notifications" element={<AdminGuard><Notifications /></AdminGuard>} />
+              <Route path="/admin/patients" element={<AdminGuard><AdminPatients /></AdminGuard>} />
+              <Route path="/admin/lab-scripts" element={<AdminGuard><LabScripts /></AdminGuard>} />
+              <Route path="/admin/settings" element={<AdminGuard><Settings /></AdminGuard>} />
+              <Route path="/admin/clinics" element={<AdminGuard><Clinics /></AdminGuard>} />
             </Routes>
           </div>
         </SidebarProvider>

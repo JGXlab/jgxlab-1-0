@@ -20,8 +20,8 @@ const AdminLogin = () => {
     setIsLoading(true);
     
     try {
-      console.log("Attempting login with email:", email);
-      const { error: signInError } = await supabase.auth.signInWithPassword({
+      console.log("Attempting admin login with email:", email);
+      const { data: { user }, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
@@ -36,10 +36,39 @@ const AdminLogin = () => {
         return;
       }
 
-      console.log("Login successful, redirecting to dashboard");
+      // Check if the user has admin role
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user?.id)
+        .single();
+
+      if (profileError) {
+        console.error("Error fetching user role:", profileError);
+        toast({
+          variant: "destructive",
+          title: "Authentication Error",
+          description: "Failed to verify admin access.",
+        });
+        return;
+      }
+
+      if (profileData?.role !== 'admin') {
+        console.error("User is not an admin");
+        toast({
+          variant: "destructive",
+          title: "Access Denied",
+          description: "You do not have admin privileges.",
+        });
+        // Sign out the non-admin user
+        await supabase.auth.signOut();
+        return;
+      }
+
+      console.log("Admin login successful, redirecting to dashboard");
       toast({
-        title: "Welcome",
-        description: "Successfully logged in",
+        title: "Welcome Admin",
+        description: "Successfully logged in to admin panel",
       });
       navigate("/admin/dashboard");
       
@@ -63,8 +92,8 @@ const AdminLogin = () => {
             <div className="flex justify-center">
               <Shield className="h-12 w-12 text-primary" />
             </div>
-            <h1 className="text-2xl font-semibold text-gray-900">Login</h1>
-            <p className="text-gray-500">Enter your credentials to access the dashboard</p>
+            <h1 className="text-2xl font-semibold text-gray-900">Admin Login</h1>
+            <p className="text-gray-500">Enter your credentials to access the admin panel</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
