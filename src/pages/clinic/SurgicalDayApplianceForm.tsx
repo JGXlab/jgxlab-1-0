@@ -2,6 +2,7 @@ import { ClinicLayout } from "@/components/clinic/ClinicLayout";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { TeethArch } from "@/components/clinic/TeethArch";
 
 export default function SurgicalDayApplianceForm() {
   const navigate = useNavigate();
@@ -22,8 +23,15 @@ export default function SurgicalDayApplianceForm() {
 
         {/* Main Content */}
         <div className="p-6">
-          <div className="space-y-8">
-            {/* Content will be added here */}
+          <div className="grid grid-cols-2 gap-8">
+            {/* Left side - Teeth Arch */}
+            <div>
+              <TeethArch />
+            </div>
+            
+            {/* Right side - Content will be added here */}
+            <div>
+            </div>
           </div>
         </div>
       </div>
