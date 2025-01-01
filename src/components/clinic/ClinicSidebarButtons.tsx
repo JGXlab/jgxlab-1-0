@@ -1,6 +1,8 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
+  Bell,
+  Building2,
   Users,
   FileText,
   Settings,
@@ -22,27 +24,37 @@ const sidebarButtons: SidebarButton[] = [
   {
     icon: LayoutDashboard,
     label: "Dashboard",
-    path: "/clinic/dashboard",
+    path: "/admin/dashboard",
+  },
+  {
+    icon: Bell,
+    label: "Notifications",
+    path: "/admin/notifications",
+  },
+  {
+    icon: Building2,
+    label: "Clinics",
+    path: "/admin/clinics",
   },
   {
     icon: Users,
     label: "Patients",
-    path: "/clinic/patients",
+    path: "/admin/patients",
   },
   {
     icon: FileText,
-    label: "Lab Requests",
-    path: "/clinic/lab-request/new",
+    label: "Lab Scripts",
+    path: "/admin/lab-scripts",
   },
   {
     icon: Settings,
     label: "Settings",
-    path: "/clinic/settings",
+    path: "/admin/settings",
   },
   {
     icon: UserCircle,
     label: "Profile",
-    path: "/clinic/profile",
+    path: "/admin/profile",
   },
 ];
 
@@ -59,7 +71,7 @@ export const ClinicSidebarButtons = () => {
         title: "Logged out successfully",
         description: "You have been logged out of your account.",
       });
-      navigate("/");
+      navigate("/admin/login");
     } catch (error) {
       console.error("Error logging out:", error);
       toast({
