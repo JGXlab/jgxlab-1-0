@@ -23,7 +23,7 @@ export const ProductCard = ({ title, description, imagePath }: ProductCardProps)
           onClick={() => navigate(`/clinic/addnewlabscript/surgical-day-appliance`)}
           className="w-full group"
         >
-          Select Design
+          Add Request
           <ChevronRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
         </Button>
       </CardContent>
