@@ -15,7 +15,7 @@ export const SelectionButton = ({ label, isSelected, onClick, icon }: SelectionB
       type="button"
       variant={isSelected ? "default" : "outline"}
       className={cn(
-        "flex items-center gap-3 px-4 py-6 h-auto border rounded-lg w-full sm:w-auto",
+        "flex items-center gap-3 px-4 py-2 h-auto border rounded-lg w-full sm:w-auto",
         isSelected ? "bg-primary/10 border-primary text-primary hover:bg-primary/20" : "hover:border-primary/50",
       )}
       onClick={onClick}
