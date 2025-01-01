@@ -50,27 +50,29 @@ const AdminLogin = () => {
         return;
       }
 
-      // Check admin status in a separate query
-      const adminCheck = await supabase
+      // Check if user is an admin
+      const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('is_admin')
         .eq('id', signInData.user.id)
         .single();
 
-      if (adminCheck.error) {
-        console.error("Error checking admin status:", adminCheck.error);
+      if (profileError) {
+        console.error("Error checking admin status:", profileError);
+        // Sign out the user if we can't verify their admin status
         await supabase.auth.signOut();
         toast({
           variant: "destructive",
-          title: "Authentication Error",
+          title: "Access Denied",
           description: "Could not verify admin status",
         });
         setIsLoading(false);
         return;
       }
 
-      if (!adminCheck.data?.is_admin) {
+      if (!profileData?.is_admin) {
         console.log("Non-admin user attempted to login");
+        // Sign out non-admin users
         await supabase.auth.signOut();
         toast({
           variant: "destructive",
@@ -95,6 +97,7 @@ const AdminLogin = () => {
         title: "Error",
         description: "An unexpected error occurred. Please try again.",
       });
+    } finally {
       setIsLoading(false);
     }
   };
