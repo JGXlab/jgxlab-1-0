@@ -57,8 +57,8 @@ export function CreateDesignerForm({ onSuccess }: { onSuccess: () => void }) {
         return;
       }
 
-      // Create auth account for the designer with role set to 'designer'
-      console.log("Creating auth account for designer");
+      // Create auth account for the designer with role explicitly set to 'designer'
+      console.log("Creating auth account for designer with role metadata");
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: values.email,
         password: 'Password123!', // Default password
@@ -66,7 +66,7 @@ export function CreateDesignerForm({ onSuccess }: { onSuccess: () => void }) {
           data: {
             first_name: values.first_name,
             last_name: values.last_name,
-            role: 'designer',
+            role: 'designer', // Explicitly set the role to 'designer'
           },
         }
       });
@@ -82,7 +82,7 @@ export function CreateDesignerForm({ onSuccess }: { onSuccess: () => void }) {
         return;
       }
 
-      console.log("Auth account created, creating designer record");
+      console.log("Auth account created with designer role, creating designer record");
 
       // Create designer in database
       const { error: designerError } = await supabase.from('designers').insert({
