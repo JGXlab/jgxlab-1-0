@@ -9,7 +9,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { PatientSelector } from "@/components/patients/PatientSelector";
-import { Checkbox } from "@/components/ui/checkbox";
+import { ArchSelector } from "@/components/surgical-form/ArchSelector";
+import { ScrewTypeSelector } from "@/components/surgical-form/ScrewTypeSelector";
+import { VDODetailsSelector } from "@/components/surgical-form/VDODetailsSelector";
 
 const formSchema = z.object({
   patientId: z.string().min(1, "Patient selection is required"),
@@ -19,24 +21,6 @@ const formSchema = z.object({
   dueDate: z.string().min(1, "Due date is required"),
   specificInstructions: z.string().optional(),
 });
-
-const archOptions = [
-  { id: "upper", label: "Upper" },
-  { id: "lower", label: "Lower" },
-  { id: "both", label: "Both" },
-];
-
-const screwTypeOptions = [
-  { id: "type1", label: "Type 1" },
-  { id: "type2", label: "Type 2" },
-  { id: "type3", label: "Type 3" },
-];
-
-const vdoDetailsOptions = [
-  { id: "detail1", label: "Detail 1" },
-  { id: "detail2", label: "Detail 2" },
-  { id: "detail3", label: "Detail 3" },
-];
 
 export default function SurgicalDayApplianceForm() {
   const navigate = useNavigate();
@@ -89,44 +73,12 @@ export default function SurgicalDayApplianceForm() {
               <FormField
                 control={form.control}
                 name="arch"
-                render={() => (
+                render={({ field }) => (
                   <FormItem>
                     <FormLabel>Arch</FormLabel>
-                    <div className="space-y-2">
-                      {archOptions.map((option) => (
-                        <FormField
-                          key={option.id}
-                          control={form.control}
-                          name="arch"
-                          render={({ field }) => {
-                            return (
-                              <FormItem
-                                key={option.id}
-                                className="flex flex-row items-start space-x-3 space-y-0"
-                              >
-                                <FormControl>
-                                  <Checkbox
-                                    checked={field.value?.includes(option.id)}
-                                    onCheckedChange={(checked) => {
-                                      return checked
-                                        ? field.onChange([...field.value, option.id])
-                                        : field.onChange(
-                                            field.value?.filter(
-                                              (value) => value !== option.id
-                                            )
-                                          )
-                                    }}
-                                  />
-                                </FormControl>
-                                <FormLabel className="font-normal">
-                                  {option.label}
-                                </FormLabel>
-                              </FormItem>
-                            )
-                          }}
-                        />
-                      ))}
-                    </div>
+                    <FormControl>
+                      <ArchSelector value={field.value} onChange={field.onChange} />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -135,44 +87,12 @@ export default function SurgicalDayApplianceForm() {
               <FormField
                 control={form.control}
                 name="screwType"
-                render={() => (
+                render={({ field }) => (
                   <FormItem>
                     <FormLabel>Screw Type</FormLabel>
-                    <div className="space-y-2">
-                      {screwTypeOptions.map((option) => (
-                        <FormField
-                          key={option.id}
-                          control={form.control}
-                          name="screwType"
-                          render={({ field }) => {
-                            return (
-                              <FormItem
-                                key={option.id}
-                                className="flex flex-row items-start space-x-3 space-y-0"
-                              >
-                                <FormControl>
-                                  <Checkbox
-                                    checked={field.value?.includes(option.id)}
-                                    onCheckedChange={(checked) => {
-                                      return checked
-                                        ? field.onChange([...field.value, option.id])
-                                        : field.onChange(
-                                            field.value?.filter(
-                                              (value) => value !== option.id
-                                            )
-                                          )
-                                    }}
-                                  />
-                                </FormControl>
-                                <FormLabel className="font-normal">
-                                  {option.label}
-                                </FormLabel>
-                              </FormItem>
-                            )
-                          }}
-                        />
-                      ))}
-                    </div>
+                    <FormControl>
+                      <ScrewTypeSelector value={field.value} onChange={field.onChange} />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -181,44 +101,12 @@ export default function SurgicalDayApplianceForm() {
               <FormField
                 control={form.control}
                 name="vdoDetails"
-                render={() => (
+                render={({ field }) => (
                   <FormItem>
                     <FormLabel>VDO Details</FormLabel>
-                    <div className="space-y-2">
-                      {vdoDetailsOptions.map((option) => (
-                        <FormField
-                          key={option.id}
-                          control={form.control}
-                          name="vdoDetails"
-                          render={({ field }) => {
-                            return (
-                              <FormItem
-                                key={option.id}
-                                className="flex flex-row items-start space-x-3 space-y-0"
-                              >
-                                <FormControl>
-                                  <Checkbox
-                                    checked={field.value?.includes(option.id)}
-                                    onCheckedChange={(checked) => {
-                                      return checked
-                                        ? field.onChange([...field.value, option.id])
-                                        : field.onChange(
-                                            field.value?.filter(
-                                              (value) => value !== option.id
-                                            )
-                                          )
-                                    }}
-                                  />
-                                </FormControl>
-                                <FormLabel className="font-normal">
-                                  {option.label}
-                                </FormLabel>
-                              </FormItem>
-                            )
-                          }}
-                        />
-                      ))}
-                    </div>
+                    <FormControl>
+                      <VDODetailsSelector value={field.value} onChange={field.onChange} />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
