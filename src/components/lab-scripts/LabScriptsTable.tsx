@@ -34,19 +34,19 @@ export const LabScriptsTable = ({ labScripts, onPreview, onStatusUpdate }: LabSc
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case 'pending':
-        return 'bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-100';
+        return 'bg-amber-100/10 dark:bg-amber-900/20 text-amber-800 dark:text-amber-200';
       case 'completed':
-        return 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-100';
+        return 'bg-green-100/10 dark:bg-green-900/20 text-green-800 dark:text-green-200';
       case 'in_progress':
-        return 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100';
+        return 'bg-blue-100/10 dark:bg-blue-900/20 text-blue-800 dark:text-blue-200';
       case 'paused':
-        return 'bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-100';
+        return 'bg-orange-100/10 dark:bg-orange-900/20 text-orange-800 dark:text-orange-200';
       case 'on_hold':
-        return 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-100';
+        return 'bg-red-100/10 dark:bg-red-900/20 text-red-800 dark:text-red-200';
       case 'incomplete':
-        return 'bg-pink-100 dark:bg-pink-900 text-pink-800 dark:text-pink-100';
+        return 'bg-pink-100/10 dark:bg-pink-900/20 text-pink-800 dark:text-pink-200';
       default:
-        return 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100';
+        return 'bg-gray-100/10 dark:bg-gray-800/20 text-gray-800 dark:text-gray-200';
     }
   };
 
@@ -54,36 +54,36 @@ export const LabScriptsTable = ({ labScripts, onPreview, onStatusUpdate }: LabSc
     <div className="overflow-x-auto">
       <Table>
         <TableHeader>
-          <TableRow>
-            <TableHead>Patient Name</TableHead>
-            <TableHead>Clinic</TableHead>
-            <TableHead>Appliance Type</TableHead>
-            <TableHead>Request Date</TableHead>
-            <TableHead>Due Date</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Update Status</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
+          <TableRow className="border-border/50">
+            <TableHead className="text-foreground/70">Patient Name</TableHead>
+            <TableHead className="text-foreground/70">Clinic</TableHead>
+            <TableHead className="text-foreground/70">Appliance Type</TableHead>
+            <TableHead className="text-foreground/70">Request Date</TableHead>
+            <TableHead className="text-foreground/70">Due Date</TableHead>
+            <TableHead className="text-foreground/70">Status</TableHead>
+            <TableHead className="text-foreground/70">Update Status</TableHead>
+            <TableHead className="text-right text-foreground/70">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {labScripts.map((script) => (
-            <TableRow key={script.id} className="hover:bg-muted/50 dark:hover:bg-muted/20">
+            <TableRow key={script.id} className="hover:bg-muted/50 dark:hover:bg-muted/10 border-border/50">
               <TableCell className="font-medium text-primary dark:text-primary-foreground">
                 {script.patients?.first_name} {script.patients?.last_name}
               </TableCell>
               <TableCell>
-                <div className="text-foreground">
+                <div className="text-foreground/90 dark:text-foreground/80">
                   {script.clinics?.name || 'N/A'}
                 </div>
                 {script.clinics?.doctor_name && (
-                  <div className="text-sm text-muted-foreground">
+                  <div className="text-sm text-muted-foreground dark:text-muted-foreground/70">
                     Dr. {script.clinics.doctor_name}
                   </div>
                 )}
               </TableCell>
-              <TableCell className="text-primary dark:text-primary-foreground">{script.appliance_type}</TableCell>
-              <TableCell className="text-foreground">{format(new Date(script.created_at), 'MMM dd, yyyy')}</TableCell>
-              <TableCell className="text-foreground">{script.due_date}</TableCell>
+              <TableCell className="text-primary/90 dark:text-primary-foreground/90">{script.appliance_type}</TableCell>
+              <TableCell className="text-foreground/90 dark:text-foreground/80">{format(new Date(script.created_at), 'MMM dd, yyyy')}</TableCell>
+              <TableCell className="text-foreground/90 dark:text-foreground/80">{script.due_date}</TableCell>
               <TableCell>
                 <Badge className={getStatusColor(script.status)}>
                   {script.status}
@@ -100,7 +100,7 @@ export const LabScriptsTable = ({ labScripts, onPreview, onStatusUpdate }: LabSc
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="flex items-center gap-2 hover:bg-muted/50 dark:hover:bg-muted/20"
+                    className="flex items-center gap-2 hover:bg-muted/50 dark:hover:bg-muted/20 text-foreground/90 dark:text-foreground/80"
                     onClick={(e) => onPreview(script, e)}
                   >
                     <Eye className="h-4 w-4" />
