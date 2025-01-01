@@ -33,8 +33,9 @@ const AdminLogin = () => {
         toast({
           variant: "destructive",
           title: "Login Failed",
-          description: "Invalid email or password",
+          description: signInError.message,
         });
+        setIsLoading(false);
         return;
       }
 
@@ -45,39 +46,42 @@ const AdminLogin = () => {
           title: "Login Failed",
           description: "Unable to retrieve user information",
         });
+        setIsLoading(false);
         return;
       }
 
       console.log("User signed in successfully, checking admin status...");
 
-      // Check if user is an admin with a simple query
-      const { data: profile, error: profileError } = await supabase
+      // Check if user is an admin
+      const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('is_admin')
         .eq('id', signInData.user.id)
         .single();
 
-      console.log("Admin check response:", { profile, profileError });
-
       if (profileError) {
         console.error("Error checking admin status:", profileError);
+        // Sign out the user since they're not verified as admin
         await supabase.auth.signOut();
         toast({
           variant: "destructive",
           title: "Access Denied",
           description: "Could not verify admin status",
         });
+        setIsLoading(false);
         return;
       }
 
-      if (!profile?.is_admin) {
+      if (!profileData?.is_admin) {
         console.log("Non-admin user attempted to login");
+        // Sign out the user since they're not an admin
         await supabase.auth.signOut();
         toast({
           variant: "destructive",
           title: "Access Denied",
           description: "This account does not have admin privileges",
         });
+        setIsLoading(false);
         return;
       }
 
@@ -148,7 +152,7 @@ const AdminLogin = () => {
 
             <Button
               type="submit"
-              className="w-full h-12 bg-primary hover:bg-primary-hover text-white rounded-xl font-medium"
+              className="w-full h-12 bg-primary hover:bg-primary/90 text-white rounded-xl font-medium"
               disabled={isLoading}
             >
               {isLoading ? "Signing in..." : "Sign in"}
