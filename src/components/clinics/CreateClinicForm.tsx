@@ -59,6 +59,14 @@ export function CreateClinicForm() {
     try {
       console.log("Creating clinic with values:", values);
       
+      // Send invitation using Supabase Auth
+      const { error: inviteError } = await supabase.auth.admin.inviteUserByEmail(values.email);
+      
+      if (inviteError) {
+        console.error('Error sending invitation:', inviteError);
+        throw inviteError;
+      }
+
       // Create clinic in database
       const { error: clinicError } = await supabase.from('clinics').insert({
         name: values.name,
@@ -72,23 +80,6 @@ export function CreateClinicForm() {
       });
 
       if (clinicError) throw clinicError;
-
-      // Send invitation email
-      const response = await fetch('/functions/v1/send-clinic-invitation', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${process.env.SUPABASE_ANON_KEY}`,
-        },
-        body: JSON.stringify({
-          email: values.email,
-          clinicName: values.name,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to send invitation');
-      }
 
       toast.success("Clinic created and invitation sent successfully!");
       queryClient.invalidateQueries({ queryKey: ['clinics'] });
