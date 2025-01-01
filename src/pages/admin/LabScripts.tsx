@@ -11,14 +11,19 @@ import {
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Search, Bell, FileText } from "lucide-react";
+import { Search, Bell, Eye } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { LoadingLabScripts } from "@/components/lab-scripts/LoadingLabScripts";
 import { EmptyLabScripts } from "@/components/lab-scripts/EmptyLabScripts";
 import { format } from "date-fns";
+import { PreviewLabScriptModal } from "@/components/surgical-form/PreviewLabScriptModal";
+import { useState } from "react";
 
 const LabScripts = () => {
+  const [selectedScript, setSelectedScript] = useState<any>(null);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+
   const { data: labScripts, isLoading } = useQuery({
     queryKey: ['admin-lab-scripts'],
     queryFn: async () => {
@@ -55,6 +60,12 @@ const LabScripts = () => {
       default:
         return 'bg-gray-100 text-gray-800';
     }
+  };
+
+  const handlePreview = (script: any, e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent row click when clicking preview button
+    setSelectedScript(script);
+    setIsPreviewOpen(true);
   };
 
   return (
@@ -100,6 +111,7 @@ const LabScripts = () => {
                 <TableHead>Due Date</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Created At</TableHead>
+                <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -119,12 +131,34 @@ const LabScripts = () => {
                   <TableCell className="text-gray-500">
                     {format(new Date(script.created_at), 'MMM d, yyyy')}
                   </TableCell>
+                  <TableCell>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="w-full flex items-center justify-center gap-2"
+                      onClick={(e) => handlePreview(script, e)}
+                    >
+                      <Eye className="h-4 w-4" />
+                      <span>Preview</span>
+                    </Button>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         )}
       </Card>
+
+      {selectedScript && (
+        <PreviewLabScriptModal
+          isOpen={isPreviewOpen}
+          onClose={() => {
+            setIsPreviewOpen(false);
+            setSelectedScript(null);
+          }}
+          labScriptId={selectedScript.id}
+        />
+      )}
     </AdminLayout>
   );
 };
