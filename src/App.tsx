@@ -3,7 +3,6 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { ThemeProvider } from "next-themes";
 import { AdminGuard } from "@/components/admin/AdminGuard";
 import { ClinicGuard } from "@/components/clinic/ClinicGuard";
 import { DesignGuard } from "@/components/design/DesignGuard";
@@ -31,13 +30,12 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <div className="flex min-h-screen w-full">
-            <Routes>
+    <TooltipProvider>
+      <Toaster />
+      <Sonner />
+      <BrowserRouter>
+        <div className="flex min-h-screen w-full">
+          <Routes>
             <Route path="/" element={<Index />} />
             
             {/* Admin Routes */}
@@ -63,11 +61,10 @@ const App = () => (
             <Route path="/design/labscripts" element={<DesignGuard><DesignLabScripts /></DesignGuard>} />
             <Route path="/design/settings" element={<DesignGuard><DesignSettings /></DesignGuard>} />
             <Route path="/design/myprofile" element={<DesignGuard><DesignMyProfile /></DesignGuard>} />
-            </Routes>
-          </div>
-        </BrowserRouter>
-      </TooltipProvider>
-    </ThemeProvider>
+          </Routes>
+        </div>
+      </BrowserRouter>
+    </TooltipProvider>
   </QueryClientProvider>
 );
 

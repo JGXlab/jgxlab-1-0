@@ -51,7 +51,7 @@ export const DesignNavbar = ({ isCollapsed, setIsCollapsed }: DesignNavbarProps)
         isCollapsed ? "w-[60px]" : "w-full sm:w-64"
       )}
     >
-      <nav className="w-full bg-card p-4 relative shadow-sm">
+      <nav className="w-full bg-white p-4 relative shadow-sm">
         <div className={cn(
           "mb-8 flex items-center transition-all duration-300 ease-spring",
           isCollapsed ? "justify-center" : "justify-between"
