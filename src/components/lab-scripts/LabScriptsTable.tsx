@@ -10,6 +10,8 @@ import {
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface LabScript {
   id: string;
@@ -37,6 +39,8 @@ interface LabScriptsTableProps {
 }
 
 export const LabScriptsTable = ({ labScripts, onPreview, onStatusUpdate }: LabScriptsTableProps) => {
+  const { toast } = useToast();
+
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case 'pending':
@@ -53,6 +57,32 @@ export const LabScriptsTable = ({ labScripts, onPreview, onStatusUpdate }: LabSc
         return 'bg-pink-100 text-pink-800';
       default:
         return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const handleDelete = async (scriptId: string) => {
+    try {
+      const { error } = await supabase
+        .from('lab_scripts')
+        .delete()
+        .eq('id', scriptId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Lab script deleted",
+        description: "The lab script has been successfully deleted.",
+      });
+
+      // Refresh the page to show updated data
+      window.location.reload();
+    } catch (error) {
+      console.error('Error deleting lab script:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete the lab script. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -114,7 +144,10 @@ export const LabScriptsTable = ({ labScripts, onPreview, onStatusUpdate }: LabSc
                     <ContextMenuItem onClick={(e) => onPreview(script, e)}>
                       Edit
                     </ContextMenuItem>
-                    <ContextMenuItem className="text-destructive">
+                    <ContextMenuItem 
+                      className="text-destructive"
+                      onClick={() => handleDelete(script.id)}
+                    >
                       Delete
                     </ContextMenuItem>
                   </ContextMenuContent>
