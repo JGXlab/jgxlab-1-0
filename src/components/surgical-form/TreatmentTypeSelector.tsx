@@ -29,29 +29,41 @@ export const TreatmentTypeSelector = ({ value, onChange, selectedArch }: Treatme
     }
   };
 
+  const treatmentOptions = [
+    { value: "full-arch-fixed", label: "Full Arch Fixed" },
+    { value: "denture", label: "Denture" },
+    { value: "one-piece-implant", label: "One Piece Implant" },
+  ];
+
   if (isDualArch) {
     return (
       <div className="flex gap-4">
-        <div className="flex-1 space-y-2">
-          <FormLabel>Upper Treatment Type</FormLabel>
+        <div className="flex-1">
           <Select onValueChange={(v) => handleChange(v, 'upper')} value={upperValue}>
             <SelectTrigger className="bg-white">
-              <SelectValue placeholder="Select upper treatment type" />
+              <SelectValue placeholder="Select upper treatment" />
             </SelectTrigger>
             <SelectContent className="bg-white z-50">
-              <SelectItem value="upper-treatment">Upper Treatment</SelectItem>
+              {treatmentOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
         
-        <div className="flex-1 space-y-2">
-          <FormLabel>Lower Treatment Type</FormLabel>
+        <div className="flex-1">
           <Select onValueChange={(v) => handleChange(v, 'lower')} value={lowerValue}>
             <SelectTrigger className="bg-white">
-              <SelectValue placeholder="Select lower treatment type" />
+              <SelectValue placeholder="Select lower treatment" />
             </SelectTrigger>
             <SelectContent className="bg-white z-50">
-              <SelectItem value="lower-treatment">Lower Treatment</SelectItem>
+              {treatmentOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
@@ -61,14 +73,17 @@ export const TreatmentTypeSelector = ({ value, onChange, selectedArch }: Treatme
 
   if (isUpperArch) {
     return (
-      <div className="space-y-2">
-        <FormLabel>Upper Treatment Type</FormLabel>
+      <div>
         <Select onValueChange={(v) => handleChange(v, 'upper')} value={upperValue}>
           <SelectTrigger className="bg-white">
-            <SelectValue placeholder="Select upper treatment type" />
+            <SelectValue placeholder="Select upper treatment" />
           </SelectTrigger>
           <SelectContent className="bg-white z-50">
-            <SelectItem value="upper-treatment">Upper Treatment</SelectItem>
+            {treatmentOptions.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </div>
@@ -77,14 +92,17 @@ export const TreatmentTypeSelector = ({ value, onChange, selectedArch }: Treatme
 
   if (isLowerArch) {
     return (
-      <div className="space-y-2">
-        <FormLabel>Lower Treatment Type</FormLabel>
+      <div>
         <Select onValueChange={(v) => handleChange(v, 'lower')} value={lowerValue}>
           <SelectTrigger className="bg-white">
-            <SelectValue placeholder="Select lower treatment type" />
+            <SelectValue placeholder="Select lower treatment" />
           </SelectTrigger>
           <SelectContent className="bg-white z-50">
-            <SelectItem value="lower-treatment">Lower Treatment</SelectItem>
+            {treatmentOptions.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </div>
