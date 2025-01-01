@@ -50,15 +50,15 @@ const AdminLogin = () => {
         return;
       }
 
-      // Then check if they are an admin
-      const { data: profile, error: profileError } = await supabase
+      // Check admin status in a separate query
+      const adminCheck = await supabase
         .from('profiles')
         .select('is_admin')
         .eq('id', signInData.user.id)
         .single();
 
-      if (profileError) {
-        console.error("Error checking admin status:", profileError);
+      if (adminCheck.error) {
+        console.error("Error checking admin status:", adminCheck.error);
         await supabase.auth.signOut();
         toast({
           variant: "destructive",
@@ -69,7 +69,7 @@ const AdminLogin = () => {
         return;
       }
 
-      if (!profile?.is_admin) {
+      if (!adminCheck.data?.is_admin) {
         console.log("Non-admin user attempted to login");
         await supabase.auth.signOut();
         toast({
