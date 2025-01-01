@@ -225,7 +225,7 @@ export default function SubmittedLabScripts() {
               setIsPreviewOpen(false);
               setSelectedScript(null);
             }}
-            formData={selectedScript}
+            labScriptId={selectedScript.id}
           />
         )}
       </div>
