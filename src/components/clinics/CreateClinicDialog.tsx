@@ -18,9 +18,9 @@ export function CreateClinicDialog() {
           Create Clinic
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[600px] p-6">
         <DialogHeader>
-          <DialogTitle>Create New Clinic</DialogTitle>
+          <DialogTitle className="text-2xl font-semibold text-gray-900">Create New Clinic</DialogTitle>
         </DialogHeader>
         <CreateClinicForm />
       </DialogContent>

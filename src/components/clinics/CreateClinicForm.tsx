@@ -82,106 +82,142 @@ export function CreateClinicForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Clinic Name</FormLabel>
-              <FormControl>
-                <Input placeholder="Enter clinic name" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm font-medium text-gray-700">Clinic Name</FormLabel>
+                <FormControl>
+                  <Input 
+                    placeholder="Enter clinic name" 
+                    {...field}
+                    className="h-11 bg-gray-50 border-gray-200 focus:border-primary focus:ring-primary"
+                  />
+                </FormControl>
+                <FormMessage className="text-xs" />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <FormControl>
-                <Input type="email" placeholder="Enter email" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm font-medium text-gray-700">Email</FormLabel>
+                <FormControl>
+                  <Input 
+                    type="email" 
+                    placeholder="Enter email" 
+                    {...field}
+                    className="h-11 bg-gray-50 border-gray-200 focus:border-primary focus:ring-primary"
+                  />
+                </FormControl>
+                <FormMessage className="text-xs" />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="phone"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Phone</FormLabel>
-              <FormControl>
-                <Input placeholder="Enter phone number" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="phone"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm font-medium text-gray-700">Phone</FormLabel>
+                <FormControl>
+                  <Input 
+                    placeholder="Enter phone number" 
+                    {...field}
+                    className="h-11 bg-gray-50 border-gray-200 focus:border-primary focus:ring-primary"
+                  />
+                </FormControl>
+                <FormMessage className="text-xs" />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="doctorName"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Doctor Name</FormLabel>
-              <FormControl>
-                <Input placeholder="Enter doctor name" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="doctorName"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm font-medium text-gray-700">Doctor Name</FormLabel>
+                <FormControl>
+                  <Input 
+                    placeholder="Enter doctor name" 
+                    {...field}
+                    className="h-11 bg-gray-50 border-gray-200 focus:border-primary focus:ring-primary"
+                  />
+                </FormControl>
+                <FormMessage className="text-xs" />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="contactPerson"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Point of Contact</FormLabel>
-              <FormControl>
-                <Input placeholder="Enter point of contact name" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="contactPerson"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm font-medium text-gray-700">Point of Contact</FormLabel>
+                <FormControl>
+                  <Input 
+                    placeholder="Enter point of contact name" 
+                    {...field}
+                    className="h-11 bg-gray-50 border-gray-200 focus:border-primary focus:ring-primary"
+                  />
+                </FormControl>
+                <FormMessage className="text-xs" />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="contactPhone"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>POC Phone</FormLabel>
-              <FormControl>
-                <Input placeholder="Enter point of contact phone" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="contactPhone"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm font-medium text-gray-700">POC Phone</FormLabel>
+                <FormControl>
+                  <Input 
+                    placeholder="Enter point of contact phone" 
+                    {...field}
+                    className="h-11 bg-gray-50 border-gray-200 focus:border-primary focus:ring-primary"
+                  />
+                </FormControl>
+                <FormMessage className="text-xs" />
+              </FormItem>
+            )}
+          />
+        </div>
 
         <FormField
           control={form.control}
           name="address"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Address</FormLabel>
+              <FormLabel className="text-sm font-medium text-gray-700">Address</FormLabel>
               <FormControl>
-                <Input placeholder="Enter clinic address" {...field} />
+                <Input 
+                  placeholder="Enter clinic address" 
+                  {...field}
+                  className="h-11 bg-gray-50 border-gray-200 focus:border-primary focus:ring-primary"
+                />
               </FormControl>
-              <FormMessage />
+              <FormMessage className="text-xs" />
             </FormItem>
           )}
         />
 
-        <Button type="submit" className="w-full">Create Clinic</Button>
+        <Button 
+          type="submit" 
+          className="w-full h-11 bg-primary hover:bg-primary-hover transition-colors duration-200"
+        >
+          Create Clinic
+        </Button>
       </form>
     </Form>
   );
