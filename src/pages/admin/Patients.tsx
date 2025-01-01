@@ -14,7 +14,7 @@ const Patients = () => {
         .from('patients')
         .select(`
           *,
-          clinics (
+          clinics!inner (
             name
           )
         `)
