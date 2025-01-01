@@ -38,61 +38,81 @@ export function ClinicsTable() {
 
   const handleInvite = async (email: string, clinicName: string) => {
     try {
-      console.log('Creating user and sending invitation to:', email);
+      console.log('Sending invitation to:', email);
       
-      // First, create the user with the default password
-      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-        email,
-        password: 'password1',
-        options: {
-          data: {
-            clinic_name: clinicName,
-          },
-        }
-      });
-      
-      console.log('User creation response:', { signUpData, signUpError });
-      
-      if (signUpError) {
-        console.error('Error creating user:', signUpError);
-        toast({
-          variant: "destructive",
-          title: "Error Creating User",
-          description: `Failed to create user: ${signUpError.message}`,
-        });
-        return;
+      // First, check if the user already exists
+      const { data: existingUser, error: userCheckError } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('email', email)
+        .single();
+
+      if (userCheckError && userCheckError.code !== 'PGRST116') { // PGRST116 means no rows returned
+        console.error('Error checking existing user:', userCheckError);
+        throw userCheckError;
       }
 
-      // Then send a magic link for password reset
-      const { data: resetData, error: resetError } = await supabase.auth.resetPasswordForEmail(
-        email,
-        {
-          redirectTo: `${window.location.origin}/admin/login`,
+      if (existingUser) {
+        console.log('User already exists, sending password reset email');
+        // If user exists, just send a password reset email
+        const { error: resetError } = await supabase.auth.resetPasswordForEmail(
+          email,
+          {
+            redirectTo: `${window.location.origin}/admin/login`,
+          }
+        );
+
+        if (resetError) {
+          console.error('Error sending reset email:', resetError);
+          throw resetError;
         }
-      );
 
-      console.log('Password reset email response:', { resetData, resetError });
-
-      if (resetError) {
-        console.error('Error sending reset email:', resetError);
         toast({
-          variant: "destructive",
-          title: "Error Sending Reset Email",
-          description: `Failed to send reset email: ${resetError.message}`,
+          title: "Invitation Sent",
+          description: `A password reset link has been sent to ${email}. Please check spam folder if not received.`,
         });
-        return;
-      }
+      } else {
+        console.log('Creating new user and sending invitation');
+        // If user doesn't exist, create them and send invitation
+        const { error: signUpError } = await supabase.auth.signUp({
+          email,
+          password: 'password1',
+          options: {
+            data: {
+              clinic_name: clinicName,
+            },
+          }
+        });
 
-      toast({
-        title: "User Created and Invited",
-        description: `An account has been created for ${email} and a password reset link has been sent. Please check spam folder if not received.`,
-      });
+        if (signUpError) {
+          console.error('Error creating user:', signUpError);
+          throw signUpError;
+        }
+
+        // Send password reset email to new user
+        const { error: resetError } = await supabase.auth.resetPasswordForEmail(
+          email,
+          {
+            redirectTo: `${window.location.origin}/admin/login`,
+          }
+        );
+
+        if (resetError) {
+          console.error('Error sending reset email:', resetError);
+          throw resetError;
+        }
+
+        toast({
+          title: "User Created and Invited",
+          description: `An account has been created for ${email} and a password reset link has been sent. Please check spam folder if not received.`,
+        });
+      }
     } catch (error) {
-      console.error('Unexpected error in invite handler:', error);
+      console.error('Error in invite handler:', error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "An unexpected error occurred. Please try again.",
+        description: error instanceof Error ? error.message : "An unexpected error occurred. Please try again.",
       });
     }
   };
