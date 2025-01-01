@@ -19,7 +19,12 @@ export const PreviewLabScriptModal = ({
   onClose,
   formData,
 }: PreviewLabScriptModalProps) => {
-  const formatTreatmentType = (value: string) => {
+  const formatTreatmentType = (value: string | undefined) => {
+    if (!value) return 'Not specified';
+    
+    // Handle cases where the value might not contain the separator
+    if (!value.includes('|')) return value;
+    
     const [upper, lower] = value.split('|');
     if (!upper && !lower) return 'Not specified';
     if (upper && lower) return `Upper: ${upper}, Lower: ${lower}`;
