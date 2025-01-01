@@ -31,7 +31,7 @@ const shadeOptions = [
 export const ShadeSelector = ({ value, onChange }: ShadeSelectorProps) => {
   return (
     <Select onValueChange={onChange} value={value}>
-      <SelectTrigger className="w-full bg-white">
+      <SelectTrigger className="w-full bg-white max-w-[240px]">
         <SelectValue placeholder="Select a shade" />
       </SelectTrigger>
       <SelectContent>
