@@ -123,7 +123,7 @@ export const ClinicSidebarButtons = () => {
       <div className="px-3 pb-4">
         <button
           onClick={handleLogout}
-          className="flex items-center gap-3 px-3 py-2 w-full rounded-lg transition-colors text-gray-500 hover:bg-gray-50 hover:text-gray-900"
+          className="flex items-center gap-3 px-3 py-2 w-full rounded-lg transition-colors text-[#ea384c] hover:bg-red-50"
         >
           <LogOut className="h-5 w-5" />
           <span className="font-medium text-sm">Logout</span>
