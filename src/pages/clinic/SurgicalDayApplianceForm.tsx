@@ -12,6 +12,7 @@ import { PatientSelector } from "@/components/patients/PatientSelector";
 import { ArchSelector } from "@/components/surgical-form/ArchSelector";
 import { ScrewTypeSelector } from "@/components/surgical-form/ScrewTypeSelector";
 import { VDODetailsSelector } from "@/components/surgical-form/VDODetailsSelector";
+import { PriceTableDropdown } from "@/components/surgical-form/PriceTableDropdown";
 
 const formSchema = z.object({
   patientId: z.string().min(1, "Patient selection is required"),
@@ -45,14 +46,17 @@ export default function SurgicalDayApplianceForm() {
   return (
     <ClinicLayout>
       <div className="bg-white rounded-lg shadow-sm">
-        <div className="flex items-center gap-4 p-6 border-b">
-          <Button
-            variant="ghost"
-            onClick={() => navigate("/clinic/addnewlabscript")}
-          >
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-          <h2 className="text-xl font-semibold">Surgical Day Appliance</h2>
+        <div className="flex items-center justify-between p-6 border-b">
+          <div className="flex items-center gap-4">
+            <Button
+              variant="ghost"
+              onClick={() => navigate("/clinic/addnewlabscript")}
+            >
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+            <h2 className="text-xl font-semibold">Surgical Day Appliance</h2>
+          </div>
+          <PriceTableDropdown />
         </div>
 
         <div className="p-6 max-w-3xl mx-auto">
