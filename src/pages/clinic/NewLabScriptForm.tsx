@@ -25,7 +25,7 @@ import {
 const formSchema = z.object({
   patientId: z.string().min(1, "Patient selection is required"),
   applianceType: z.string().min(1, "Appliance type is required"),
-  arch: z.array(z.string()).min(1, "At least one arch must be selected"),
+  arch: z.string().min(1, "Arch type must be selected"),
   treatmentType: z.string().min(1, "Treatment type is required"),
   screwType: z.array(z.string()).min(1, "At least one screw type must be selected"),
   vdoDetails: z.array(z.string()).min(1, "At least one VDO detail must be selected"),
@@ -40,7 +40,7 @@ export default function NewLabScriptForm() {
     defaultValues: {
       patientId: "",
       applianceType: "",
-      arch: [],
+      arch: "",
       treatmentType: "",
       screwType: [],
       vdoDetails: [],
@@ -138,7 +138,7 @@ export default function NewLabScriptForm() {
                         <TreatmentTypeSelector 
                           value={field.value} 
                           onChange={field.onChange}
-                          selectedArch={form.watch('arch')}
+                          selectedArch={[form.watch('arch')]}
                         />
                       </FormItem>
                     )}
