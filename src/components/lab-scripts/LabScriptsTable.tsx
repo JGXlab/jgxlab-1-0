@@ -74,6 +74,11 @@ export const LabScriptsTable = ({ labScripts, onPreview, onStatusUpdate }: LabSc
               </TableCell>
               <TableCell className="text-gray-600">
                 {script.clinics?.name || 'N/A'}
+                {script.clinics?.doctor_name && (
+                  <div className="text-sm text-gray-500">
+                    Dr. {script.clinics.doctor_name}
+                  </div>
+                )}
               </TableCell>
               <TableCell className="text-primary">{script.appliance_type}</TableCell>
               <TableCell>{format(new Date(script.created_at), 'MMM dd, yyyy')}</TableCell>

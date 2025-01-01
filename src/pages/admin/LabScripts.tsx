@@ -29,9 +29,11 @@ const LabScripts = () => {
             first_name,
             last_name
           ),
-          clinics:clinics (
-            name,
-            doctor_name
+          profiles:profiles!lab_scripts_user_id_fkey (
+            clinics!clinics_user_id_fkey (
+              name,
+              doctor_name
+            )
           )
         `)
         .order('created_at', { ascending: false });
@@ -41,8 +43,14 @@ const LabScripts = () => {
         throw error;
       }
 
-      console.log('Fetched lab scripts:', data);
-      return data;
+      // Transform the data to match the expected interface
+      const transformedData = data.map(script => ({
+        ...script,
+        clinics: script.profiles?.clinics?.[0] || null
+      }));
+
+      console.log('Fetched lab scripts:', transformedData);
+      return transformedData;
     }
   });
 
