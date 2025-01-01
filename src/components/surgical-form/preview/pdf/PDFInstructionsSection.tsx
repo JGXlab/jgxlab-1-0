@@ -15,15 +15,15 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 4,
   },
-  label: {
-    fontSize: 10,
-    color: '#6B7280',
-    marginBottom: 4,
-  },
   value: {
     fontSize: 12,
     color: '#111827',
     lineHeight: 1.5,
+  },
+  placeholder: {
+    fontSize: 12,
+    color: '#6B7280',
+    fontStyle: 'italic',
   },
 });
 
@@ -33,12 +33,13 @@ interface PDFInstructionsSectionProps {
 
 export const PDFInstructionsSection = ({ instructions }: PDFInstructionsSectionProps) => (
   <View style={styles.section}>
-    <Text style={styles.sectionTitle}>Additional Information</Text>
+    <Text style={styles.sectionTitle}>Specific Instructions</Text>
     <View style={styles.contentBox}>
-      <Text style={styles.label}>Specific Instructions</Text>
-      <Text style={styles.value}>
-        {instructions || 'No specific instructions provided'}
-      </Text>
+      {instructions ? (
+        <Text style={styles.value}>{instructions}</Text>
+      ) : (
+        <Text style={styles.placeholder}>No specific instructions provided</Text>
+      )}
     </View>
   </View>
 );

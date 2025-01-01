@@ -23,6 +23,7 @@ const styles = StyleSheet.create({
   },
   column: {
     width: '50%',
+    marginBottom: 8,
   },
 });
 
@@ -81,6 +82,13 @@ export const PDFApplianceSection = ({
     return result;
   };
 
+  const formatApplianceType = (type: string) => {
+    if (!type) return 'Not specified';
+    return type.split('-').map(word => 
+      word.charAt(0).toUpperCase() + word.slice(1)
+    ).join(' ');
+  };
+
   return (
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>Appliance Details</Text>
@@ -89,15 +97,13 @@ export const PDFApplianceSection = ({
           <View style={styles.column}>
             <PDFPreviewField 
               label="Appliance Type"
-              value={applianceType.split('-').map(word => 
-                word.charAt(0).toUpperCase() + word.slice(1)
-              ).join(' ')}
+              value={formatApplianceType(applianceType)}
             />
           </View>
           <View style={styles.column}>
             <PDFPreviewField 
               label="Arch Type"
-              value={arch.charAt(0).toUpperCase() + arch.slice(1)}
+              value={arch ? arch.charAt(0).toUpperCase() + arch.slice(1) : 'Not specified'}
             />
           </View>
           <View style={styles.column}>
@@ -111,13 +117,13 @@ export const PDFApplianceSection = ({
               label="Screw Type"
               value={screwType === 'others' && otherScrewType
                 ? otherScrewType
-                : screwTypeMap[screwType as keyof typeof screwTypeMap] || screwType}
+                : screwTypeMap[screwType as keyof typeof screwTypeMap] || 'Not specified'}
             />
           </View>
           <View style={styles.column}>
             <PDFPreviewField 
               label="VDO Details"
-              value={vdoDetailsMap[vdoDetails as keyof typeof vdoDetailsMap] || vdoDetails}
+              value={vdoDetailsMap[vdoDetails as keyof typeof vdoDetailsMap] || 'Not specified'}
             />
           </View>
           <View style={styles.column}>

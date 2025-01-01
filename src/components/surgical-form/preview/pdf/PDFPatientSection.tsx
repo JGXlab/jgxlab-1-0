@@ -25,6 +25,7 @@ const styles = StyleSheet.create({
   },
   column: {
     width: '50%',
+    marginBottom: 8,
   },
 });
 
@@ -60,7 +61,7 @@ export const PDFPatientSection = ({ patient, createdAt, dueDate }: PDFPatientSec
         <View style={styles.column}>
           <PDFPreviewField 
             label="Due Date"
-            value={dueDate}
+            value={dueDate || 'Not specified'}
           />
         </View>
       </View>
