@@ -17,7 +17,7 @@ export default function AddNewLabScript() {
             <ProductCard
               title="Surgical Day Appliance"
               description="Custom-designed surgical appliances for optimal patient comfort and functionality"
-              imagePath="https://images.unsplash.com/photo-1609840114035-3c981b782dfe?q=80&w=1000&auto=format&fit=crop"
+              imagePath="https://images.unsplash.com/photo-1628177142898-93e36e4e3a50?q=80&w=2070&auto=format&fit=crop"
             />
           </div>
         </div>
