@@ -11,6 +11,7 @@ import Notifications from "./pages/admin/Notifications";
 import AdminPatients from "./pages/admin/Patients";
 import LabScripts from "./pages/admin/LabScripts";
 import Settings from "./pages/admin/Settings";
+import Clinics from "./pages/admin/Clinics";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +31,7 @@ const App = () => (
               <Route path="/admin/patients" element={<AdminPatients />} />
               <Route path="/admin/lab-scripts" element={<LabScripts />} />
               <Route path="/admin/settings" element={<Settings />} />
+              <Route path="/admin/clinics" element={<Clinics />} />
             </Routes>
           </div>
         </SidebarProvider>
