@@ -4,9 +4,9 @@ import { UserCircle, Search, Bell } from "lucide-react";
 
 const Profile = () => {
   return (
-    <div className="flex min-h-screen w-full bg-gray-50">
+    <div className="flex min-h-screen w-full">
       <ClinicSidebar />
-      <div className="flex-1 ml-64">
+      <main className="flex-1 pl-64">
         <div className="p-8">
           <div className="flex justify-between items-center mb-8">
             <h1 className="text-2xl font-semibold">Profile</h1>
@@ -49,7 +49,7 @@ const Profile = () => {
             </div>
           </Card>
         </div>
-      </div>
+      </main>
     </div>
   );
 };

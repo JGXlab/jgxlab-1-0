@@ -20,8 +20,9 @@ const AdminLogin = () => {
     setIsLoading(true);
     
     try {
-      console.log("Attempting admin login with email:", email);
+      console.log("Starting admin login process...");
       
+      // First attempt to sign in
       const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -34,7 +35,6 @@ const AdminLogin = () => {
           title: "Login Failed",
           description: "Invalid email or password",
         });
-        setIsLoading(false);
         return;
       }
 
@@ -45,11 +45,43 @@ const AdminLogin = () => {
           title: "Login Failed",
           description: "Unable to retrieve user information",
         });
-        setIsLoading(false);
         return;
       }
 
-      console.log("Login successful, redirecting to admin dashboard...");
+      console.log("User signed in successfully, checking admin status...");
+
+      // Check if user is an admin with a simple query
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('is_admin')
+        .eq('id', signInData.user.id)
+        .single();
+
+      console.log("Admin check response:", { profile, profileError });
+
+      if (profileError) {
+        console.error("Error checking admin status:", profileError);
+        await supabase.auth.signOut();
+        toast({
+          variant: "destructive",
+          title: "Access Denied",
+          description: "Could not verify admin status",
+        });
+        return;
+      }
+
+      if (!profile?.is_admin) {
+        console.log("Non-admin user attempted to login");
+        await supabase.auth.signOut();
+        toast({
+          variant: "destructive",
+          title: "Access Denied",
+          description: "This account does not have admin privileges",
+        });
+        return;
+      }
+
+      console.log("Admin login successful, redirecting...");
       toast({
         title: "Welcome Admin",
         description: "Successfully logged in to admin panel",
