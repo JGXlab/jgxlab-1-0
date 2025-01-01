@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { StatsCard } from "@/components/clinic/dashboard/StatsCard";
 import { OverviewChart } from "@/components/clinic/dashboard/OverviewChart";
@@ -8,40 +8,27 @@ import { DiagnoseChart } from "@/components/clinic/dashboard/DiagnoseChart";
 import { TodaySchedule } from "@/components/clinic/dashboard/TodaySchedule";
 import { LatestVisits } from "@/components/clinic/dashboard/LatestVisits";
 import { Search, Bell } from "lucide-react";
-import { ClinicSidebar } from "@/components/clinic/ClinicSidebar";
+import { AdminLayout } from "@/components/admin/AdminLayout";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
-    const checkAdminStatus = async () => {
+    const checkAuth = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
+        console.log("No user found, redirecting to login");
         navigate("/admin/login");
         return;
       }
 
-      const { data: profile, error } = await supabase
-        .from('profiles')
-        .select('is_admin')
-        .eq('id', user.id)
-        .single();
-
-      if (error || !profile?.is_admin) {
-        console.error("Admin access check failed:", error);
-        toast({
-          variant: "destructive",
-          title: "Access Denied",
-          description: "You don't have permission to access this page.",
-        });
-        navigate("/admin/login");
-      }
+      console.log("User authenticated:", user.id);
     };
 
-    checkAdminStatus();
-  }, [navigate, toast]);
+    checkAuth();
+  }, [navigate]);
 
   const statsData = [
     {
@@ -131,86 +118,81 @@ const AdminDashboard = () => {
   ];
 
   return (
-    <div className="flex min-h-screen w-full bg-gray-50">
-      <ClinicSidebar />
-      <div className="flex-1 ml-64">
-        <div className="p-8">
-          <div className="flex justify-between items-center mb-8">
-            <h1 className="text-2xl font-semibold">Dashboard</h1>
-            <div className="flex items-center gap-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-                <input
-                  type="text"
-                  placeholder="Search anything here ..."
-                  className="pl-10 pr-4 py-2 rounded-lg border border-gray-200 w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <button className="p-2 relative">
-                <Bell size={20} />
-                <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
-              </button>
-              <img src="/placeholder.svg" alt="Profile" className="w-10 h-10 rounded-full" />
-            </div>
+    <AdminLayout>
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-2xl font-semibold">Dashboard</h1>
+        <div className="flex items-center gap-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+            <input
+              type="text"
+              placeholder="Search anything here ..."
+              className="pl-10 pr-4 py-2 rounded-lg border border-gray-200 w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
           </div>
-
-          <div className="flex gap-4 mb-6">
-            <button className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg">
-              <span className="w-2 h-2 bg-blue-600 rounded-full"></span>
-              Overview
-            </button>
-            <button className="flex items-center gap-2 px-4 py-2 text-gray-600">
-              Medical Reports
-            </button>
-            <button className="flex items-center gap-2 px-4 py-2 text-gray-600">
-              Patients Overview
-            </button>
-            <button className="flex items-center gap-2 px-4 py-2 text-gray-600">
-              Diagnose
-            </button>
-          </div>
-
-          <div className="grid grid-cols-4 gap-6 mb-8">
-            {statsData.map((stat, index) => (
-              <StatsCard key={index} {...stat} />
-            ))}
-          </div>
-
-          <div className="grid grid-cols-3 gap-6">
-            <div className="col-span-2 bg-white rounded-xl p-6">
-              <div className="flex justify-between items-center mb-6">
-                <div>
-                  <h3 className="text-lg font-semibold mb-1">Overview</h3>
-                  <div className="flex items-center gap-2">
-                    <p className="text-2xl font-bold">$138,500</p>
-                    <span className="text-green-500 text-sm">+13.45%</span>
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  <button className="px-4 py-1 bg-blue-600 text-white rounded-lg text-sm">1 Year</button>
-                  <button className="px-4 py-1 text-gray-600 text-sm">6 Months</button>
-                  <button className="px-4 py-1 text-gray-600 text-sm">3 Months</button>
-                  <button className="px-4 py-1 text-gray-600 text-sm">1 Month</button>
-                </div>
-              </div>
-              <OverviewChart data={overviewData} />
-            </div>
-            <div className="bg-white rounded-xl p-6">
-              <DiagnoseChart data={diagnoseData} />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-3 gap-6 mt-6">
-            <div className="col-span-2">
-              <TodaySchedule />
-            </div>
-            <div>
-              <LatestVisits appointments={appointments} />
-            </div>
-          </div>
+          <button className="p-2 relative">
+            <Bell size={20} />
+            <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
+          </button>
+          <img src="/placeholder.svg" alt="Profile" className="w-10 h-10 rounded-full" />
         </div>
       </div>
-    </div>
+
+      <div className="flex gap-4 mb-6">
+        <button className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg">
+          <span className="w-2 h-2 bg-blue-600 rounded-full"></span>
+          Overview
+        </button>
+        <button className="flex items-center gap-2 px-4 py-2 text-gray-600">
+          Medical Reports
+        </button>
+        <button className="flex items-center gap-2 px-4 py-2 text-gray-600">
+          Patients Overview
+        </button>
+        <button className="flex items-center gap-2 px-4 py-2 text-gray-600">
+          Diagnose
+        </button>
+      </div>
+
+      <div className="grid grid-cols-4 gap-6 mb-8">
+        {statsData.map((stat, index) => (
+          <StatsCard key={index} {...stat} />
+        ))}
+      </div>
+
+      <div className="grid grid-cols-3 gap-6">
+        <div className="col-span-2 bg-white rounded-xl p-6">
+          <div className="flex justify-between items-center mb-6">
+            <div>
+              <h3 className="text-lg font-semibold mb-1">Overview</h3>
+              <div className="flex items-center gap-2">
+                <p className="text-2xl font-bold">$138,500</p>
+                <span className="text-green-500 text-sm">+13.45%</span>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <button className="px-4 py-1 bg-blue-600 text-white rounded-lg text-sm">1 Year</button>
+              <button className="px-4 py-1 text-gray-600 text-sm">6 Months</button>
+              <button className="px-4 py-1 text-gray-600 text-sm">3 Months</button>
+              <button className="px-4 py-1 text-gray-600 text-sm">1 Month</button>
+            </div>
+          </div>
+          <OverviewChart data={overviewData} />
+        </div>
+        <div className="bg-white rounded-xl p-6">
+          <DiagnoseChart data={diagnoseData} />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-3 gap-6 mt-6">
+        <div className="col-span-2">
+          <TodaySchedule />
+        </div>
+        <div>
+          <LatestVisits appointments={appointments} />
+        </div>
+      </div>
+    </AdminLayout>
   );
 };
 
