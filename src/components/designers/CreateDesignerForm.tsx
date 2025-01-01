@@ -7,8 +7,9 @@ import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
 
 const formSchema = z.object({
   first_name: z.string().min(2, {
@@ -28,7 +29,7 @@ const formSchema = z.object({
 type DesignerFormValues = z.infer<typeof formSchema>;
 
 export function CreateDesignerForm({ onSuccess }: { onSuccess: () => void }) {
-  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const form = useForm<DesignerFormValues>({
     resolver: zodResolver(formSchema),
@@ -41,22 +42,71 @@ export function CreateDesignerForm({ onSuccess }: { onSuccess: () => void }) {
   });
 
   async function onSubmit(values: DesignerFormValues) {
-    console.log("Submitting form with values:", values);
     try {
-      // For now, we'll just show a success message
-      // We'll implement the actual designer creation later when we set up the database
-      toast({
-        title: "Success",
-        description: "Designer created successfully",
+      console.log("Creating designer with values:", values);
+      
+      // First check if a designer with this email already exists
+      const { data: existingDesigner } = await supabase
+        .from('designers')
+        .select('id')
+        .eq('email', values.email)
+        .maybeSingle();
+
+      if (existingDesigner) {
+        toast.error("A designer with this email already exists.");
+        return;
+      }
+
+      // Create auth account for the designer
+      console.log("Creating auth account for designer");
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: values.email,
+        password: 'Password123!', // Default password
+        options: {
+          data: {
+            first_name: values.first_name,
+            last_name: values.last_name,
+            role: 'designer',
+          },
+        }
       });
+
+      if (authError) {
+        console.error('Error creating auth account:', authError);
+        toast.error("Failed to create designer account. Please try again.");
+        return;
+      }
+
+      if (!authData.user) {
+        toast.error("Failed to create designer account. Please try again.");
+        return;
+      }
+
+      console.log("Auth account created, creating designer record");
+
+      // Create designer in database
+      const { error: designerError } = await supabase.from('designers').insert({
+        first_name: values.first_name,
+        last_name: values.last_name,
+        email: values.email,
+        phone: values.phone,
+        user_id: (await supabase.auth.getUser()).data.user?.id,
+        auth_user_id: authData.user.id
+      });
+
+      if (designerError) {
+        console.error('Error creating designer:', designerError);
+        toast.error("Failed to create designer. Please try again.");
+        return;
+      }
+
+      toast.success("Designer created successfully!");
+      queryClient.invalidateQueries({ queryKey: ['designers'] });
+      form.reset();
       onSuccess();
     } catch (error) {
-      console.error("Error creating designer:", error);
-      toast({
-        title: "Error",
-        description: "Failed to create designer",
-        variant: "destructive",
-      });
+      console.error('Error creating designer:', error);
+      toast.error("Failed to create designer. Please try again.");
     }
   }
 
