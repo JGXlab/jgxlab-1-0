@@ -1,6 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Play, Pause, Loader2, StopCircle, CheckCircle } from "lucide-react";
+import { Play, Pause, StopCircle, CheckCircle } from "lucide-react";
+import { Tooltip } from "@/components/ui/tooltip";
+import {
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface StatusUpdateButtonsProps {
   script: {
@@ -15,70 +21,111 @@ export const StatusUpdateButtons = ({ script, onStatusUpdate }: StatusUpdateButt
 
   if (status === 'completed') {
     return (
-      <Badge className="bg-green-100 text-green-800 w-full flex items-center justify-center py-1">
-        <CheckCircle className="w-4 h-4 mr-1" />
-        Completed
+      <Badge className="bg-green-100 text-green-800 w-8 h-8 flex items-center justify-center p-0">
+        <CheckCircle className="w-4 h-4" />
       </Badge>
     );
   }
 
   if (status === 'paused' || status === 'on_hold') {
     return (
-      <Button
-        variant="outline"
-        size="sm"
-        className="w-full flex items-center justify-center gap-2"
-        onClick={() => onStatusUpdate(script.id, 'in_progress')}
-      >
-        <Play className="h-4 w-4" />
-        Resume
-      </Button>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="outline"
+              size="icon"
+              className="w-8 h-8"
+              onClick={() => onStatusUpdate(script.id, 'in_progress')}
+            >
+              <Play className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Resume</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
     );
   }
 
   if (status === 'pending') {
     return (
-      <Button
-        variant="outline"
-        size="sm"
-        className="w-full flex items-center justify-center gap-2"
-        onClick={() => onStatusUpdate(script.id, 'in_progress')}
-      >
-        <Play className="h-4 w-4" />
-        Start Design
-      </Button>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="outline"
+              size="icon"
+              className="w-8 h-8"
+              onClick={() => onStatusUpdate(script.id, 'in_progress')}
+            >
+              <Play className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Start Design</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
     );
   }
 
   return (
-    <div className="flex flex-col gap-2">
-      <Button
-        variant="outline"
-        size="sm"
-        className="w-full flex items-center justify-center gap-2"
-        onClick={() => onStatusUpdate(script.id, 'paused')}
-      >
-        <Pause className="h-4 w-4" />
-        Pause
-      </Button>
-      <Button
-        variant="outline"
-        size="sm"
-        className="w-full flex items-center justify-center gap-2"
-        onClick={() => onStatusUpdate(script.id, 'on_hold')}
-      >
-        <StopCircle className="h-4 w-4" />
-        Hold
-      </Button>
-      <Button
-        variant="outline"
-        size="sm"
-        className="w-full flex items-center justify-center gap-2"
-        onClick={() => onStatusUpdate(script.id, 'completed')}
-      >
-        <CheckCircle className="h-4 w-4" />
-        Complete
-      </Button>
+    <div className="flex gap-1">
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="outline"
+              size="icon"
+              className="w-8 h-8"
+              onClick={() => onStatusUpdate(script.id, 'paused')}
+            >
+              <Pause className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Pause</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="outline"
+              size="icon"
+              className="w-8 h-8"
+              onClick={() => onStatusUpdate(script.id, 'on_hold')}
+            >
+              <StopCircle className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Hold</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="outline"
+              size="icon"
+              className="w-8 h-8"
+              onClick={() => onStatusUpdate(script.id, 'completed')}
+            >
+              <CheckCircle className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Complete</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
     </div>
   );
 };
