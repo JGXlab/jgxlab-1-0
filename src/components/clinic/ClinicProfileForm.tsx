@@ -1,21 +1,15 @@
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { Form } from "@/components/ui/form";
 import { toast } from "sonner";
 import type { Clinic } from "@/components/clinics/types";
+import { ClinicFormFields } from "./ClinicFormFields";
 
 export function ClinicProfileForm() {
+  const queryClient = useQueryClient();
   const form = useForm<Clinic>();
 
   const { data: clinic, isLoading } = useQuery({
@@ -34,7 +28,7 @@ export function ClinicProfileForm() {
       const { data: clinicData, error: clinicError } = await supabase
         .from("clinics")
         .select("*")
-        .eq("user_id", user.id)
+        .eq("auth_user_id", user.id)
         .maybeSingle();
 
       if (clinicError) {
@@ -77,12 +71,14 @@ export function ClinicProfileForm() {
           contact_person: data.contact_person,
           contact_phone: data.contact_phone,
           address: data.address,
+          auth_user_id: user.id
         })
-        .eq("user_id", user.id);
+        .eq("auth_user_id", user.id);
 
       if (error) throw error;
 
       toast.success("Profile updated successfully");
+      queryClient.invalidateQueries({ queryKey: ['clinic-profile'] });
     } catch (error) {
       console.error("Error updating clinic:", error);
       toast.error("Failed to update profile");
@@ -96,106 +92,7 @@ export function ClinicProfileForm() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <div className="grid gap-6 md:grid-cols-2">
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Clinic Name</FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input {...field} type="email" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="phone"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Phone</FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="doctor_name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Doctor Name</FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="contact_person"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Contact Person</FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="contact_phone"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Contact Phone</FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        <FormField
-          control={form.control}
-          name="address"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Address</FormLabel>
-              <FormControl>
-                <Input {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
+        <ClinicFormFields form={form} />
         <Button type="submit">Save Changes</Button>
       </form>
     </Form>
