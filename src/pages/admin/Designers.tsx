@@ -1,6 +1,7 @@
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Card } from "@/components/ui/card";
-import { Bell, Search, Users } from "lucide-react";
+import { Bell, Search, Users, UserPlus } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const Designers = () => {
   return (
@@ -8,6 +9,10 @@ const Designers = () => {
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-2xl font-semibold">Designers</h1>
         <div className="flex items-center gap-4">
+          <Button className="flex items-center gap-2">
+            <UserPlus className="h-4 w-4" />
+            Add Designer
+          </Button>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
             <input
