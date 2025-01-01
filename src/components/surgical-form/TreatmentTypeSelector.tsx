@@ -31,8 +31,8 @@ export const TreatmentTypeSelector = ({ value, onChange, selectedArch }: Treatme
 
   if (isDualArch) {
     return (
-      <div className="space-y-4">
-        <div className="space-y-2">
+      <div className="flex gap-4">
+        <div className="flex-1 space-y-2">
           <FormLabel>Upper Treatment Type</FormLabel>
           <Select onValueChange={(v) => handleChange(v, 'upper')} value={upperValue}>
             <SelectTrigger className="bg-white">
@@ -44,7 +44,7 @@ export const TreatmentTypeSelector = ({ value, onChange, selectedArch }: Treatme
           </Select>
         </div>
         
-        <div className="space-y-2">
+        <div className="flex-1 space-y-2">
           <FormLabel>Lower Treatment Type</FormLabel>
           <Select onValueChange={(v) => handleChange(v, 'lower')} value={lowerValue}>
             <SelectTrigger className="bg-white">
