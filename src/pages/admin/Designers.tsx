@@ -18,12 +18,12 @@ const Designers = () => {
 
   return (
     <AdminLayout>
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-2xl font-semibold">Designers</h1>
-        <div className="flex items-center gap-4">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-xl font-semibold">Designers</h1>
+        <div className="flex items-center gap-3">
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="flex items-center gap-2">
+              <Button size="sm" className="flex items-center gap-2">
                 <UserPlus className="h-4 w-4" />
                 Add Designer
               </Button>
@@ -36,22 +36,22 @@ const Designers = () => {
             </DialogContent>
           </Dialog>
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+            <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <input
               type="text"
               placeholder="Search designers..."
-              className="pl-10 pr-4 py-2 rounded-lg border border-gray-200 w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="pl-8 pr-3 py-1.5 rounded-lg border border-gray-200 w-48 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
             />
           </div>
-          <button className="p-2 relative">
-            <Bell size={20} />
+          <button className="p-1.5 relative">
+            <Bell className="h-4 w-4" />
             <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
           </button>
-          <img src="/placeholder.svg" alt="Profile" className="w-10 h-10 rounded-full" />
+          <img src="/placeholder.svg" alt="Profile" className="w-8 h-8 rounded-full" />
         </div>
       </div>
 
-      <Card className="p-6">
+      <Card className="p-4">
         <DesignersTable />
       </Card>
     </AdminLayout>
