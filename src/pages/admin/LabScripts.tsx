@@ -13,6 +13,7 @@ import { StatusCardsGrid } from "@/components/lab-scripts/StatusCardsGrid";
 const LabScripts = () => {
   const [selectedScript, setSelectedScript] = useState<any>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -40,6 +41,10 @@ const LabScripts = () => {
       return data;
     }
   });
+
+  const filteredLabScripts = selectedStatus
+    ? labScripts?.filter(script => script.status === selectedStatus)
+    : labScripts;
 
   const statusCounts = {
     new: labScripts?.filter(script => script.status === 'pending')?.length || 0,
@@ -87,19 +92,31 @@ const LabScripts = () => {
     setIsPreviewOpen(true);
   };
 
+  const handleStatusSelect = (status: string | null) => {
+    setSelectedStatus(status);
+    toast({
+      title: status ? `Filtered by ${status.replace('_', ' ')}` : "Showing all lab scripts",
+      description: "Click 'All Scripts' to clear filter",
+    });
+  };
+
   return (
     <AdminLayout>
       <div className="space-y-8 p-8 animate-fade-in">
-        <StatusCardsGrid statusCounts={statusCounts} />
+        <StatusCardsGrid 
+          statusCounts={statusCounts} 
+          selectedStatus={selectedStatus}
+          onStatusSelect={handleStatusSelect}
+        />
 
         <Card className="p-6 backdrop-blur-sm bg-white/50 shadow-lg">
           {isLoading ? (
             <LoadingLabScripts />
-          ) : !labScripts?.length ? (
+          ) : !filteredLabScripts?.length ? (
             <EmptyLabScripts />
           ) : (
             <LabScriptsTable
-              labScripts={labScripts}
+              labScripts={filteredLabScripts}
               onPreview={handlePreview}
               onStatusUpdate={handleStatusUpdate}
             />
