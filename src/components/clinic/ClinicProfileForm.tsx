@@ -25,10 +25,11 @@ export function ClinicProfileForm() {
 
       console.log("Authenticated user ID:", user.id);
       
+      // First try to find clinic by user_id
       const { data: clinicData, error: clinicError } = await supabase
         .from("clinics")
         .select("*")
-        .eq("auth_user_id", user.id)
+        .eq("user_id", user.id)
         .maybeSingle();
 
       if (clinicError) {
@@ -40,6 +41,17 @@ export function ClinicProfileForm() {
 
       if (!clinicData) {
         console.log("No clinic found for user:", user.id);
+        // Check if email already exists before creating new clinic
+        const { data: existingClinic } = await supabase
+          .from("clinics")
+          .select("id")
+          .eq("email", user.email)
+          .maybeSingle();
+
+        if (existingClinic) {
+          throw new Error("A clinic with this email already exists");
+        }
+
         // Create a new clinic entry for this user
         const { data: newClinic, error: createError } = await supabase
           .from("clinics")
@@ -51,7 +63,6 @@ export function ClinicProfileForm() {
             contact_person: "",
             contact_phone: "",
             address: "",
-            auth_user_id: user.id,
             user_id: user.id
           })
           .select()
@@ -83,6 +94,21 @@ export function ClinicProfileForm() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("No authenticated user found");
 
+      // Check if email is being changed and if it's already in use
+      if (data.email !== clinic?.email) {
+        const { data: existingClinic } = await supabase
+          .from("clinics")
+          .select("id")
+          .eq("email", data.email)
+          .neq("user_id", user.id)
+          .maybeSingle();
+
+        if (existingClinic) {
+          toast.error("This email is already in use by another clinic");
+          return;
+        }
+      }
+
       const { error } = await supabase
         .from("clinics")
         .update({
@@ -94,7 +120,7 @@ export function ClinicProfileForm() {
           contact_phone: data.contact_phone,
           address: data.address,
         })
-        .eq("auth_user_id", user.id);
+        .eq("user_id", user.id);
 
       if (error) throw error;
 
