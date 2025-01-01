@@ -8,20 +8,20 @@ export function PatientGenderField({ form }) {
       name="gender"
       render={({ field }) => (
         <FormItem>
-          <FormLabel>Gender</FormLabel>
+          <FormLabel className="text-foreground font-medium">Gender</FormLabel>
           <Select onValueChange={field.onChange} defaultValue={field.value}>
             <FormControl>
-              <SelectTrigger className="bg-white border-primary/20 focus:border-primary">
-                <SelectValue placeholder="Select gender" />
+              <SelectTrigger className="bg-background border-input text-foreground">
+                <SelectValue placeholder="Select gender" className="text-foreground" />
               </SelectTrigger>
             </FormControl>
-            <SelectContent className="bg-white border shadow-md z-50">
-              <SelectItem value="male">Male</SelectItem>
-              <SelectItem value="female">Female</SelectItem>
-              <SelectItem value="other">Other</SelectItem>
+            <SelectContent className="bg-background border-input shadow-md z-50">
+              <SelectItem value="male" className="text-foreground">Male</SelectItem>
+              <SelectItem value="female" className="text-foreground">Female</SelectItem>
+              <SelectItem value="other" className="text-foreground">Other</SelectItem>
             </SelectContent>
           </Select>
-          <FormMessage />
+          <FormMessage className="text-destructive" />
         </FormItem>
       )}
     />

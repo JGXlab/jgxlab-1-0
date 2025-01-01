@@ -10,18 +10,18 @@ export function PatientNameFields({ form }) {
         name="firstName"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="flex items-center gap-2">
+            <FormLabel className="flex items-center gap-2 text-foreground font-medium">
               <User className="h-4 w-4 text-primary" />
               First Name
             </FormLabel>
             <FormControl>
               <Input
                 placeholder="Enter first name"
-                className="bg-white/50 border-primary/20 focus:border-primary"
+                className="bg-background text-foreground border-input"
                 {...field}
               />
             </FormControl>
-            <FormMessage />
+            <FormMessage className="text-destructive" />
           </FormItem>
         )}
       />
@@ -31,18 +31,18 @@ export function PatientNameFields({ form }) {
         name="lastName"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="flex items-center gap-2">
+            <FormLabel className="flex items-center gap-2 text-foreground font-medium">
               <Users className="h-4 w-4 text-primary" />
               Last Name
             </FormLabel>
             <FormControl>
               <Input
                 placeholder="Enter last name"
-                className="bg-white/50 border-primary/20 focus:border-primary"
+                className="bg-background text-foreground border-input"
                 {...field}
               />
             </FormControl>
-            <FormMessage />
+            <FormMessage className="text-destructive" />
           </FormItem>
         )}
       />

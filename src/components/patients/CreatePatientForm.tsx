@@ -61,7 +61,7 @@ export function CreatePatientForm({ onSuccess }: { onSuccess?: () => void }) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 text-foreground">
         <PatientNameFields form={form} />
         <PatientGenderField form={form} />
         <PatientDateOfBirthField form={form} />
