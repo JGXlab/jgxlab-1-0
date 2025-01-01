@@ -8,48 +8,7 @@ interface ToothProps {
   type: 'molar' | 'premolar' | 'canine' | 'incisor';
 }
 
-const ToothShape: React.FC<{ type: ToothProps['type'] }> = ({ type }) => {
-  switch (type) {
-    case 'molar':
-      return (
-        <path
-          d="M2 1C2 1 3.5 1.5 5 1.5C6.5 1.5 8 1 8 1C8 1 8.5 3 8.5 5C8.5 8 7 9.5 5 9.5C3 9.5 1.5 8 1.5 5C1.5 3 2 1 2 1Z"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          fill="none"
-        />
-      );
-    case 'premolar':
-      return (
-        <path
-          d="M3 1C3 1 4 1.5 5 1.5C6 1.5 7 1 7 1C7 1 7.5 3 7.5 4.5C7.5 7 6.5 8 5 8C3.5 8 2.5 7 2.5 4.5C2.5 3 3 1 3 1Z"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          fill="none"
-        />
-      );
-    case 'canine':
-      return (
-        <path
-          d="M3.5 1C3.5 1 4.25 1.25 5 1.25C5.75 1.25 6.5 1 6.5 1C6.5 1 7 3 7 4.5C7 6.5 6 7.5 5 7.5C4 7.5 3 6.5 3 4.5C3 3 3.5 1 3.5 1Z"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          fill="none"
-        />
-      );
-    case 'incisor':
-      return (
-        <path
-          d="M4 1C4 1 4.5 1.25 5 1.25C5.5 1.25 6 1 6 1C6 1 6.25 2.5 6.25 3.5C6.25 5 5.75 6 5 6C4.25 6 3.75 5 3.75 3.5C3.75 2.5 4 1 4 1Z"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          fill="none"
-        />
-      );
-  }
-};
-
-const Tooth: React.FC<ToothProps> = ({ number, position, isSelected, onClick, type }) => {
+const Tooth: React.FC<ToothProps> = ({ number, position, isSelected, onClick }) => {
   const numberPosition = {
     x: position.x < 50 ? position.x - 8 : position.x + 8,
     y: position.y
@@ -62,17 +21,15 @@ const Tooth: React.FC<ToothProps> = ({ number, position, isSelected, onClick, ty
         style={{ left: `${position.x}%`, top: `${position.y}%` }}
         onClick={onClick}
       >
-        <svg
-          width="30"
-          height="30"
-          viewBox="0 0 10 10"
-          className={`transition-colors ${
-            isSelected ? 'stroke-primary fill-primary/20' : 'stroke-gray-400 hover:stroke-gray-600'
-          }`}
-          strokeWidth="0.5"
-        >
-          <ToothShape type={type} />
-        </svg>
+        <div className={`w-8 h-8 transition-colors ${
+          isSelected ? 'text-primary fill-primary/20' : 'text-gray-400 hover:text-gray-600'
+        }`}>
+          <img 
+            src="/teeth.svg" 
+            alt={`Tooth ${number}`}
+            className={`w-full h-full ${isSelected ? 'filter-primary' : ''}`}
+          />
+        </div>
       </div>
       <div
         className={`absolute text-sm ${

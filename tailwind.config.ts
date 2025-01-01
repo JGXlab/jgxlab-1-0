@@ -74,5 +74,15 @@ export default {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [
+    require("tailwindcss-animate"),
+    function({ addUtilities }) {
+      const newUtilities = {
+        '.filter-primary': {
+          'filter': 'invert(32%) sepia(74%) saturate(1095%) hue-rotate(214deg) brightness(92%) contrast(91%)'
+        },
+      }
+      addUtilities(newUtilities)
+    }
+  ],
 } satisfies Config;
