@@ -4,23 +4,9 @@ import { Calendar as CalendarIcon } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 
 export function PatientDateOfBirthField({ form }) {
-  const handleDateInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let value = e.target.value.replace(/\D/g, '');
-    if (value.length > 8) {
-      value = value.slice(0, 8);
-    }
-    if (value.length >= 4) {
-      value = value.slice(0, 2) + '/' + value.slice(2, 4) + '/' + value.slice(4);
-    } else if (value.length >= 2) {
-      value = value.slice(0, 2) + '/' + value.slice(2);
-    }
-    form.setValue('date_of_birth', value);
-  };
-
   return (
     <FormField
       control={form.control}
@@ -31,22 +17,19 @@ export function PatientDateOfBirthField({ form }) {
           <Popover>
             <PopoverTrigger asChild>
               <FormControl>
-                <div className="relative">
-                  <Input
-                    placeholder="MM/DD/YYYY"
-                    className="bg-background text-[#C8C8C9] placeholder:text-[#C8C8C9] border-input pr-10"
-                    {...field}
-                    onChange={handleDateInput}
-                    maxLength={10}
-                  />
-                  <Button
-                    variant="ghost"
-                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                    type="button"
-                  >
-                    <CalendarIcon className="h-4 w-4 text-primary" />
-                  </Button>
-                </div>
+                <Button
+                  variant="outline"
+                  className={`w-full pl-3 text-left font-normal ${
+                    !field.value && "text-muted-foreground"
+                  }`}
+                >
+                  {field.value ? (
+                    format(new Date(field.value), "PPP")
+                  ) : (
+                    <span>Pick a date</span>
+                  )}
+                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                </Button>
               </FormControl>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
@@ -55,8 +38,7 @@ export function PatientDateOfBirthField({ form }) {
                 selected={field.value ? new Date(field.value) : undefined}
                 onSelect={(date) => {
                   if (date) {
-                    const formattedDate = format(date, 'MM/dd/yyyy');
-                    form.setValue('date_of_birth', formattedDate);
+                    form.setValue('date_of_birth', format(date, 'yyyy-MM-dd'));
                   }
                 }}
                 disabled={(date) => date > new Date()}
