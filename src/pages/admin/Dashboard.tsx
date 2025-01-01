@@ -15,20 +15,53 @@ const AdminDashboard = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        console.log("No user found, redirecting to login");
-        navigate("/admin/login");
-        return;
-      }
+    const checkAdminAuth = async () => {
+      try {
+        // Get current user
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
+        
+        if (userError || !user) {
+          console.log("No user found, redirecting to login");
+          navigate("/admin/login");
+          return;
+        }
 
-      console.log("User authenticated:", user.id);
+        console.log("Checking admin status for user:", user.id);
+        
+        // Verify admin status
+        const { data: adminCheck, error: adminError } = await supabase
+          .from('profiles')
+          .select('is_admin')
+          .eq('id', user.id)
+          .limit(1)
+          .single();
+
+        if (adminError) {
+          console.error("Error checking admin status:", adminError);
+          navigate("/admin/login");
+          return;
+        }
+
+        if (!adminCheck?.is_admin) {
+          console.log("User is not an admin, redirecting to login");
+          toast({
+            variant: "destructive",
+            title: "Access Denied",
+            description: "You must be an admin to access this page.",
+          });
+          navigate("/admin/login");
+          return;
+        }
+
+        console.log("Admin access verified");
+      } catch (error) {
+        console.error("Error in admin authentication:", error);
+        navigate("/admin/login");
+      }
     };
 
-    checkAuth();
-  }, [navigate]);
+    checkAdminAuth();
+  }, [navigate, toast]);
 
   const statsData = [
     {
