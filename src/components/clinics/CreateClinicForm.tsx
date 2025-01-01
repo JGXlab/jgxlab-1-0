@@ -59,6 +59,13 @@ export function CreateClinicForm() {
     try {
       console.log("Creating clinic with values:", values);
       
+      // Get the current authenticated user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast.error("You must be logged in to create a clinic");
+        return;
+      }
+
       // First check if a clinic with this email already exists
       const { data: existingClinic } = await supabase
         .from('clinics')
@@ -80,10 +87,12 @@ export function CreateClinicForm() {
         contact_person: values.contactPerson,
         contact_phone: values.contactPhone,
         address: values.address,
-        user_id: (await supabase.auth.getUser()).data.user?.id
+        user_id: user.id,
+        auth_user_id: user.id // Add the auth_user_id field
       });
 
       if (clinicError) {
+        console.error('Error creating clinic:', clinicError);
         if (clinicError.code === '23505') {
           toast.error("A clinic with this email already exists.");
           return;
