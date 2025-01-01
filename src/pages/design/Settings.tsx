@@ -1,67 +1,36 @@
 import { DesignLayout } from "@/components/design/DesignLayout";
 import { Card } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
-import { Bell, Moon, Globe } from "lucide-react";
-import { useState, useEffect } from "react";
+import { Bell, Moon, Globe, Lock, Shield } from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
-import { useTheme } from "next-themes";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
 
 export default function DesignSettings() {
   const [notifications, setNotifications] = useState(false);
-  const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-  const [language, setLanguage] = useState('English (US)');
-
-  // Wait for component to mount to avoid hydration mismatch
-  useEffect(() => {
-    setMounted(true);
-    // Load notification preference from localStorage
-    const savedNotifications = localStorage.getItem('notifications') === 'true';
-    setNotifications(savedNotifications);
-  }, []);
+  const [darkMode, setDarkMode] = useState(false);
+  const [twoFactor, setTwoFactor] = useState(false);
+  const [passwordProtection, setPasswordProtection] = useState(false);
 
   const handleToggle = (setting: string, value: boolean) => {
     switch (setting) {
       case 'notifications':
         setNotifications(value);
-        localStorage.setItem('notifications', value.toString());
-        if (value) {
-          // Request notification permission
-          Notification.requestPermission().then((permission) => {
-            if (permission === 'granted') {
-              toast.success('Notifications enabled');
-            } else {
-              toast.error('Notification permission denied');
-              setNotifications(false);
-              localStorage.setItem('notifications', 'false');
-            }
-          });
-        } else {
-          toast.success('Notifications disabled');
-        }
+        toast.success(`Notifications ${value ? 'enabled' : 'disabled'}`);
         break;
       case 'darkMode':
-        setTheme(value ? 'dark' : 'light');
+        setDarkMode(value);
         toast.success(`Dark mode ${value ? 'enabled' : 'disabled'}`);
+        break;
+      case 'twoFactor':
+        setTwoFactor(value);
+        toast.success(`Two-factor authentication ${value ? 'enabled' : 'disabled'}`);
+        break;
+      case 'passwordProtection':
+        setPasswordProtection(value);
+        toast.success(`Password protection ${value ? 'enabled' : 'disabled'}`);
         break;
     }
   };
-
-  const handleLanguageChange = (newLanguage: string) => {
-    setLanguage(newLanguage);
-    toast.success(`Language changed to ${newLanguage}`);
-    // Here you would typically integrate with an i18n library
-  };
-
-  // Avoid hydration mismatch by not rendering until mounted
-  if (!mounted) return null;
 
   return (
     <DesignLayout>
@@ -97,7 +66,7 @@ export default function DesignSettings() {
                 </div>
               </div>
               <Switch
-                checked={theme === 'dark'}
+                checked={darkMode}
                 onCheckedChange={(checked) => handleToggle('darkMode', checked)}
               />
             </div>
@@ -108,28 +77,45 @@ export default function DesignSettings() {
                 <Globe className="w-5 h-5 text-muted-foreground" />
                 <div>
                   <h3 className="font-medium">Language</h3>
-                  <p className="text-sm text-muted-foreground">{language}</p>
+                  <p className="text-sm text-muted-foreground">English (US)</p>
                 </div>
               </div>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline">Change Language</Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuItem onClick={() => handleLanguageChange('English (US)')}>
-                    English (US)
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleLanguageChange('English (UK)')}>
-                    English (UK)
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleLanguageChange('Spanish')}>
-                    Spanish
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleLanguageChange('French')}>
-                    French
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+            </div>
+          </div>
+        </Card>
+
+        {/* Security Section */}
+        <Card className="p-6">
+          <h2 className="text-lg font-semibold mb-4">Security</h2>
+          <div className="space-y-6">
+            {/* Two-Factor Authentication */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <Lock className="w-5 h-5 text-muted-foreground" />
+                <div>
+                  <h3 className="font-medium">Two-Factor Authentication</h3>
+                  <p className="text-sm text-muted-foreground">Add an extra layer of security</p>
+                </div>
+              </div>
+              <Switch
+                checked={twoFactor}
+                onCheckedChange={(checked) => handleToggle('twoFactor', checked)}
+              />
+            </div>
+
+            {/* Password Protection */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <Shield className="w-5 h-5 text-muted-foreground" />
+                <div>
+                  <h3 className="font-medium">Password Protection</h3>
+                  <p className="text-sm text-muted-foreground">Require password for sensitive actions</p>
+                </div>
+              </div>
+              <Switch
+                checked={passwordProtection}
+                onCheckedChange={(checked) => handleToggle('passwordProtection', checked)}
+              />
             </div>
           </div>
         </Card>

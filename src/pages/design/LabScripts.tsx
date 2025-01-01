@@ -43,8 +43,15 @@ const DesignLabScripts = () => {
         throw error;
       }
 
-      console.log('Fetched lab scripts:', data);
-      return data;
+      // Transform the data to match the expected interface
+      const transformedData = data.map(script => ({
+        ...script,
+        patients: script.patients,
+        clinics: script.patients?.clinics || null
+      }));
+
+      console.log('Fetched lab scripts:', transformedData);
+      return transformedData;
     }
   });
 
