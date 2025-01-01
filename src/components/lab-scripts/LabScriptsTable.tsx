@@ -130,28 +130,33 @@ export const LabScriptsTable = ({ labScripts, onPreview, onStatusUpdate }: LabSc
                 />
               </TableCell>
               <TableCell>
-                <ContextMenu>
-                  <ContextMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 p-0"
-                    >
-                      <MoreVertical className="h-4 w-4" />
-                    </Button>
-                  </ContextMenuTrigger>
-                  <ContextMenuContent>
-                    <ContextMenuItem onClick={(e) => onPreview(script, e)}>
-                      Edit
-                    </ContextMenuItem>
-                    <ContextMenuItem 
-                      className="text-destructive"
-                      onClick={() => handleDelete(script.id)}
-                    >
-                      Delete
-                    </ContextMenuItem>
-                  </ContextMenuContent>
-                </ContextMenu>
+                <div className="relative">
+                  <ContextMenu>
+                    <ContextMenuTrigger>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 p-0 hover:bg-gray-100"
+                      >
+                        <MoreVertical className="h-4 w-4" />
+                      </Button>
+                    </ContextMenuTrigger>
+                    <ContextMenuContent className="w-40">
+                      <ContextMenuItem 
+                        className="cursor-pointer"
+                        onClick={(e) => onPreview(script, e)}
+                      >
+                        Edit
+                      </ContextMenuItem>
+                      <ContextMenuItem 
+                        className="cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50"
+                        onClick={() => handleDelete(script.id)}
+                      >
+                        Delete
+                      </ContextMenuItem>
+                    </ContextMenuContent>
+                  </ContextMenu>
+                </div>
               </TableCell>
             </TableRow>
           ))}
