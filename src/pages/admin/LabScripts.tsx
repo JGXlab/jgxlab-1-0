@@ -124,14 +124,14 @@ const LabScripts = () => {
 
   return (
     <AdminLayout>
-      <div className="space-y-8 p-8 animate-fade-in">
+      <div className="space-y-4 animate-fade-in">
         <StatusCardsGrid 
           statusCounts={statusCounts} 
           selectedStatus={selectedStatus}
           onStatusSelect={handleStatusSelect}
         />
 
-        <Card className="p-6 backdrop-blur-sm bg-white/50 shadow-lg">
+        <Card className="p-3 backdrop-blur-sm bg-white/50 shadow-lg">
           {isLoading ? (
             <LoadingLabScripts />
           ) : !filteredLabScripts?.length ? (
