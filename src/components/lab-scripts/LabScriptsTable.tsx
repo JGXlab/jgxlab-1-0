@@ -10,12 +10,13 @@ interface LabScript {
   patients: {
     first_name: string;
     last_name: string;
+    clinic_id: string | null;
+    clinics: {
+      name: string;
+      doctor_name: string;
+    } | null;
   };
   user_id: string;
-  clinics: {
-    name: string;
-    doctor_name: string;
-  } | null;
   treatment_type: string;
   appliance_type: string;
   due_date: string;
@@ -71,12 +72,18 @@ export const LabScriptsTable = ({ labScripts, onPreview, onStatusUpdate }: LabSc
               <TableCell className="font-medium text-primary">
                 {script.patients?.first_name} {script.patients?.last_name}
               </TableCell>
-              <TableCell className="text-gray-600">
-                {script.clinics?.name || 'N/A'}
-                {script.clinics?.doctor_name && (
-                  <div className="text-sm text-gray-500">
-                    Dr. {script.clinics.doctor_name}
+              <TableCell>
+                {script.patients?.clinics ? (
+                  <div>
+                    <div className="text-gray-900">{script.patients.clinics.name}</div>
+                    {script.patients.clinics.doctor_name && (
+                      <div className="text-sm text-gray-500">
+                        Dr. {script.patients.clinics.doctor_name}
+                      </div>
+                    )}
                   </div>
+                ) : (
+                  <span className="text-gray-500">No clinic assigned</span>
                 )}
               </TableCell>
               <TableCell className="text-primary">{script.appliance_type}</TableCell>
