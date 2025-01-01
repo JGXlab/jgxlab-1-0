@@ -1,7 +1,7 @@
 import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Eye } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { StatusUpdateButtons } from "./StatusUpdateButtons";
 
@@ -16,6 +16,7 @@ interface LabScript {
   due_date: string;
   status: string;
   created_at: string;
+  arch: string;
 }
 
 interface LabScriptsTableProps {
@@ -28,7 +29,7 @@ export const LabScriptsTable = ({ labScripts, onPreview, onStatusUpdate }: LabSc
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case 'pending':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-amber-100 text-amber-800';
       case 'completed':
         return 'bg-green-100 text-green-800';
       case 'in_progress':
@@ -36,65 +37,82 @@ export const LabScriptsTable = ({ labScripts, onPreview, onStatusUpdate }: LabSc
       case 'paused':
         return 'bg-orange-100 text-orange-800';
       case 'on_hold':
-        return 'bg-purple-100 text-purple-800';
-      case 'rejected':
         return 'bg-red-100 text-red-800';
+      case 'incomplete':
+        return 'bg-pink-100 text-pink-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
   };
 
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Patient Name</TableHead>
-          <TableHead>Treatment Type</TableHead>
-          <TableHead>Appliance Type</TableHead>
-          <TableHead>Due Date</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead>Created At</TableHead>
-          <TableHead>Actions</TableHead>
-          <TableHead>Status Update</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {labScripts.map((script) => (
-          <TableRow key={script.id} className="hover:bg-gray-50">
-            <TableCell className="font-medium">
-              {script.patients?.first_name} {script.patients?.last_name}
-            </TableCell>
-            <TableCell>{script.treatment_type}</TableCell>
-            <TableCell>{script.appliance_type}</TableCell>
-            <TableCell>{script.due_date}</TableCell>
-            <TableCell>
-              <Badge className={getStatusColor(script.status)}>
-                {script.status}
-              </Badge>
-            </TableCell>
-            <TableCell className="text-gray-500">
-              {format(new Date(script.created_at), 'MMM d, yyyy')}
-            </TableCell>
-            <TableCell>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="w-full flex items-center justify-center gap-2"
-                onClick={(e) => onPreview(script, e)}
-              >
-                <Eye className="h-4 w-4" />
-                <span>Preview</span>
-              </Button>
-            </TableCell>
-            <TableCell>
-              <StatusUpdateButtons 
-                script={script}
-                onStatusUpdate={onStatusUpdate}
-              />
-            </TableCell>
+    <div className="overflow-x-auto">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Patient Name</TableHead>
+            <TableHead>Appliance Type</TableHead>
+            <TableHead>Request Date</TableHead>
+            <TableHead>Due Date</TableHead>
+            <TableHead>Treatments</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Update Status</TableHead>
+            <TableHead>Actions</TableHead>
           </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+        </TableHeader>
+        <TableBody>
+          {labScripts.map((script) => (
+            <TableRow key={script.id} className="hover:bg-gray-50">
+              <TableCell className="font-medium text-primary">
+                {script.patients?.first_name} {script.patients?.last_name}
+              </TableCell>
+              <TableCell className="text-primary">{script.appliance_type}</TableCell>
+              <TableCell>{format(new Date(script.created_at), 'MMM dd, yyyy')}</TableCell>
+              <TableCell>{script.due_date}</TableCell>
+              <TableCell>
+                <div className="space-y-1">
+                  <div>
+                    <span className="font-medium">Upper:</span> {script.arch}
+                  </div>
+                  <div>
+                    <span className="font-medium">Lower:</span> {script.arch}
+                  </div>
+                </div>
+              </TableCell>
+              <TableCell>
+                <Badge className={getStatusColor(script.status)}>
+                  {script.status}
+                </Badge>
+              </TableCell>
+              <TableCell>
+                <StatusUpdateButtons 
+                  script={script}
+                  onStatusUpdate={onStatusUpdate}
+                />
+              </TableCell>
+              <TableCell>
+                <div className="flex gap-2">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-primary hover:text-primary/80"
+                    onClick={(e) => onPreview(script, e)}
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-destructive hover:text-destructive/80"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
   );
 };

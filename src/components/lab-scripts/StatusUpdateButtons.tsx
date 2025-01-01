@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Play, Pause, Loader, StopCircle } from "lucide-react";
+import { Play, Pause, Loader2, StopCircle, CheckCircle } from "lucide-react";
 
 interface StatusUpdateButtonsProps {
   script: {
@@ -15,8 +15,9 @@ export const StatusUpdateButtons = ({ script, onStatusUpdate }: StatusUpdateButt
 
   if (status === 'completed') {
     return (
-      <Badge className="bg-green-100 text-green-800">
-        Design Completed
+      <Badge className="bg-green-100 text-green-800 w-full flex items-center justify-center py-1">
+        <CheckCircle className="w-4 h-4 mr-1" />
+        Completed
       </Badge>
     );
   }
@@ -66,7 +67,7 @@ export const StatusUpdateButtons = ({ script, onStatusUpdate }: StatusUpdateButt
         className="w-full flex items-center justify-center gap-2"
         onClick={() => onStatusUpdate(script.id, 'on_hold')}
       >
-        <Loader className="h-4 w-4" />
+        <StopCircle className="h-4 w-4" />
         Hold
       </Button>
       <Button
@@ -75,7 +76,7 @@ export const StatusUpdateButtons = ({ script, onStatusUpdate }: StatusUpdateButt
         className="w-full flex items-center justify-center gap-2"
         onClick={() => onStatusUpdate(script.id, 'completed')}
       >
-        <StopCircle className="h-4 w-4" />
+        <CheckCircle className="h-4 w-4" />
         Complete
       </Button>
     </div>
