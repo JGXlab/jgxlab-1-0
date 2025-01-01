@@ -53,12 +53,12 @@ export function ClinicsTable() {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Clinic Name</TableHead>
-            <TableHead>Doctor</TableHead>
-            <TableHead>Contact Person</TableHead>
-            <TableHead>Email</TableHead>
-            <TableHead>Phone</TableHead>
-            <TableHead>Address</TableHead>
+            <TableHead className="text-foreground font-semibold">Clinic Name</TableHead>
+            <TableHead className="text-foreground font-semibold">Doctor</TableHead>
+            <TableHead className="text-foreground font-semibold">Contact Person</TableHead>
+            <TableHead className="text-foreground font-semibold">Email</TableHead>
+            <TableHead className="text-foreground font-semibold">Phone</TableHead>
+            <TableHead className="text-foreground font-semibold">Address</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
