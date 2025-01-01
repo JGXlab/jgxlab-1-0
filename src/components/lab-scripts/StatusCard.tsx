@@ -36,9 +36,9 @@ export const StatusCard = ({
         <div className={`p-2 rounded-xl ${color} transition-transform duration-300 group-hover:scale-110`}>
           <Icon className="w-4 h-4 text-white" />
         </div>
-        <span className="text-2xl font-bold tracking-tight animate-fade-in dark:text-white">{count}</span>
+        <span className="text-2xl font-bold tracking-tight animate-fade-in">{count}</span>
       </div>
-      <p className="text-sm text-gray-600 dark:text-white/80 text-center w-full truncate">{label}</p>
+      <p className="text-sm text-gray-600 text-center w-full truncate">{label}</p>
     </div>
   </Card>
 );

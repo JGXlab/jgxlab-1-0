@@ -21,7 +21,7 @@ export const StatusUpdateButtons = ({ script, onStatusUpdate }: StatusUpdateButt
 
   if (status === 'completed') {
     return (
-      <Badge className="bg-green-100/10 dark:bg-green-900/20 text-green-800 dark:text-green-100 w-8 h-8 flex items-center justify-center p-0">
+      <Badge className="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-100 w-8 h-8 flex items-center justify-center p-0">
         <CheckCircle className="w-4 h-4" />
       </Badge>
     );
@@ -35,14 +35,14 @@ export const StatusUpdateButtons = ({ script, onStatusUpdate }: StatusUpdateButt
             <Button
               variant="outline"
               size="icon"
-              className="w-8 h-8 border-border/50 dark:border-border/30 hover:bg-muted/50 dark:hover:bg-muted/20 dark:text-white"
+              className="w-8 h-8 dark:border-muted-foreground/50 dark:hover:bg-muted/20"
               onClick={() => onStatusUpdate(script.id, 'in_progress')}
             >
               <Play className="h-4 w-4" />
             </Button>
           </TooltipTrigger>
           <TooltipContent>
-            <p className="dark:text-white">Resume</p>
+            <p>Resume</p>
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
@@ -57,14 +57,14 @@ export const StatusUpdateButtons = ({ script, onStatusUpdate }: StatusUpdateButt
             <Button
               variant="outline"
               size="icon"
-              className="w-8 h-8 border-border/50 dark:border-border/30 hover:bg-muted/50 dark:hover:bg-muted/20 dark:text-white"
+              className="w-8 h-8 dark:border-muted-foreground/50 dark:hover:bg-muted/20"
               onClick={() => onStatusUpdate(script.id, 'in_progress')}
             >
               <Play className="h-4 w-4" />
             </Button>
           </TooltipTrigger>
           <TooltipContent>
-            <p className="dark:text-white">Start Design</p>
+            <p>Start Design</p>
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
@@ -79,14 +79,14 @@ export const StatusUpdateButtons = ({ script, onStatusUpdate }: StatusUpdateButt
             <Button
               variant="outline"
               size="icon"
-              className="w-8 h-8 border-border/50 dark:border-border/30 hover:bg-muted/50 dark:hover:bg-muted/20 dark:text-white"
+              className="w-8 h-8 dark:border-muted-foreground/50 dark:hover:bg-muted/20"
               onClick={() => onStatusUpdate(script.id, 'paused')}
             >
               <Pause className="h-4 w-4" />
             </Button>
           </TooltipTrigger>
           <TooltipContent>
-            <p className="dark:text-white">Pause</p>
+            <p>Pause</p>
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
@@ -97,14 +97,14 @@ export const StatusUpdateButtons = ({ script, onStatusUpdate }: StatusUpdateButt
             <Button
               variant="outline"
               size="icon"
-              className="w-8 h-8 border-border/50 dark:border-border/30 hover:bg-muted/50 dark:hover:bg-muted/20 dark:text-white"
+              className="w-8 h-8 dark:border-muted-foreground/50 dark:hover:bg-muted/20"
               onClick={() => onStatusUpdate(script.id, 'on_hold')}
             >
               <StopCircle className="h-4 w-4" />
             </Button>
           </TooltipTrigger>
           <TooltipContent>
-            <p className="dark:text-white">Hold</p>
+            <p>Hold</p>
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
@@ -115,14 +115,14 @@ export const StatusUpdateButtons = ({ script, onStatusUpdate }: StatusUpdateButt
             <Button
               variant="outline"
               size="icon"
-              className="w-8 h-8 border-border/50 dark:border-border/30 hover:bg-muted/50 dark:hover:bg-muted/20 dark:text-white"
+              className="w-8 h-8 dark:border-muted-foreground/50 dark:hover:bg-muted/20"
               onClick={() => onStatusUpdate(script.id, 'completed')}
             >
               <CheckCircle className="h-4 w-4" />
             </Button>
           </TooltipTrigger>
           <TooltipContent>
-            <p className="dark:text-white">Complete</p>
+            <p>Complete</p>
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>

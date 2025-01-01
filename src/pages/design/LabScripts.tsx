@@ -139,7 +139,7 @@ const DesignLabScripts = () => {
           onStatusSelect={handleStatusSelect}
         />
 
-        <Card className="p-6 bg-background/80 dark:bg-background/30 backdrop-blur-sm border-border/50 shadow-lg">
+        <Card className="p-6 backdrop-blur-sm bg-white/50 shadow-lg">
           {isLoading ? (
             <LoadingLabScripts />
           ) : !filteredLabScripts?.length ? (
