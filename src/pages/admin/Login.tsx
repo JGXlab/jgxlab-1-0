@@ -22,6 +22,7 @@ const AdminLogin = () => {
     try {
       console.log("Starting admin login process...");
       
+      // First, attempt to sign in
       const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -49,12 +50,12 @@ const AdminLogin = () => {
 
       console.log("User signed in successfully, checking admin status...");
 
-      // First check if the user exists in profiles
+      // Check admin status
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
-        .select('*')
+        .select('is_admin')
         .eq('id', signInData.user.id)
-        .maybeSingle();
+        .single();
 
       if (profileError) {
         console.error("Error fetching profile:", profileError);
@@ -62,25 +63,12 @@ const AdminLogin = () => {
         toast({
           variant: "destructive",
           title: "Access Denied",
-          description: "Could not verify user profile",
+          description: "Could not verify admin status",
         });
         return;
       }
 
-      if (!profileData) {
-        console.error("No profile found for user");
-        await supabase.auth.signOut();
-        toast({
-          variant: "destructive",
-          title: "Access Denied",
-          description: "User profile not found",
-        });
-        return;
-      }
-
-      console.log("Profile data:", profileData);
-
-      if (!profileData.is_admin) {
+      if (!profileData?.is_admin) {
         console.log("Non-admin user attempted to login");
         await supabase.auth.signOut();
         toast({
