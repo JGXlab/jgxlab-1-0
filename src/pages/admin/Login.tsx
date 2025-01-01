@@ -22,7 +22,6 @@ const AdminLogin = () => {
     try {
       console.log("Attempting admin login with email:", email);
       
-      // First attempt to sign in
       const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -50,43 +49,7 @@ const AdminLogin = () => {
         return;
       }
 
-      console.log("User signed in successfully, checking admin status...");
-
-      // Simplified admin check query
-      const { data: adminCheck, error: adminError } = await supabase
-        .from('profiles')
-        .select('is_admin')
-        .eq('id', signInData.user.id)
-        .limit(1)
-        .maybeSingle();
-
-      console.log("Admin check response:", { adminCheck, adminError });
-
-      if (adminError) {
-        console.error("Error checking admin status:", adminError);
-        await supabase.auth.signOut();
-        toast({
-          variant: "destructive",
-          title: "Access Denied",
-          description: "Could not verify admin status",
-        });
-        setIsLoading(false);
-        return;
-      }
-
-      if (!adminCheck?.is_admin) {
-        console.log("Non-admin user attempted to login");
-        await supabase.auth.signOut();
-        toast({
-          variant: "destructive",
-          title: "Access Denied",
-          description: "This account does not have admin privileges",
-        });
-        setIsLoading(false);
-        return;
-      }
-
-      console.log("Admin login successful, redirecting...");
+      console.log("Login successful, redirecting to admin dashboard...");
       toast({
         title: "Welcome Admin",
         description: "Successfully logged in to admin panel",
