@@ -21,7 +21,7 @@ const AdminLogin = () => {
     
     try {
       // Step 1: Sign in the user
-      console.log("Step 1: Attempting to sign in user with email:", email);
+      console.log("Attempting to sign in with email:", email);
       const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -38,7 +38,7 @@ const AdminLogin = () => {
       }
 
       if (!signInData.user) {
-        console.error("No user data returned");
+        console.error("No user data returned after sign in");
         toast({
           variant: "destructive",
           title: "Login Failed",
@@ -48,12 +48,12 @@ const AdminLogin = () => {
       }
 
       // Step 2: Check admin status
-      console.log("Step 2: Checking admin status for user:", signInData.user.id);
+      console.log("Checking admin status for user:", signInData.user.id);
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('is_admin')
         .eq('id', signInData.user.id)
-        .maybeSingle();
+        .single();
 
       if (profileError) {
         console.error("Profile fetch error:", profileError);
@@ -66,7 +66,7 @@ const AdminLogin = () => {
         return;
       }
 
-      if (!profileData || !profileData.is_admin) {
+      if (!profileData?.is_admin) {
         console.log("User is not an admin:", profileData);
         await supabase.auth.signOut();
         toast({
