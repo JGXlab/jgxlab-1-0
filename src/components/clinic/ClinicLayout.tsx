@@ -3,9 +3,13 @@ import { ClinicSidebar } from "./ClinicSidebar";
 
 export function ClinicLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen w-full">
       <ClinicSidebar />
-      <main className="flex-1 bg-gray-50">{children}</main>
+      <main className="flex-1 pl-64">
+        <div className="p-8">
+          {children}
+        </div>
+      </main>
     </div>
   );
 }

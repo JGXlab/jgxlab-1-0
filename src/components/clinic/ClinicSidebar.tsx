@@ -1,51 +1,110 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, Users, FilePlus, FileCheck, UserRound } from "lucide-react";
+import { LayoutDashboard, Users, FilePlus, FileCheck, UserRound, LogOut } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
-const navigation = [
-  { name: "Dashboard", href: "/clinic/dashboard", icon: LayoutDashboard },
-  { name: "Patients", href: "/clinic/patients", icon: Users },
-  { name: "Add New Lab Script", href: "/clinic/addnewlabscript", icon: FilePlus },
-  { name: "Submitted Lab Scripts", href: "/clinic/submittedlabscripts", icon: FileCheck },
-  { name: "My Account", href: "/clinic/myaccount", icon: UserRound },
+const sidebarButtons = [
+  {
+    icon: LayoutDashboard,
+    label: "Dashboard",
+    path: "/clinic/dashboard",
+  },
+  {
+    icon: Users,
+    label: "Patients",
+    path: "/clinic/patients",
+  },
+  {
+    icon: FilePlus,
+    label: "Add New Lab Script",
+    path: "/clinic/addnewlabscript",
+  },
+  {
+    icon: FileCheck,
+    label: "Submitted Lab Scripts",
+    path: "/clinic/submittedlabscripts",
+  },
+  {
+    icon: UserRound,
+    label: "My Account",
+    path: "/clinic/myaccount",
+  },
 ];
 
 export function ClinicSidebar() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const handleLogout = async () => {
+    try {
+      console.log("Clinic logging out...");
+      await supabase.auth.signOut();
+      toast({
+        title: "Logged out successfully",
+        description: "You have been logged out of your clinic account.",
+      });
+      navigate("/");
+    } catch (error) {
+      console.error("Error logging out:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to log out. Please try again.",
+      });
+    }
+  };
 
   return (
-    <div className="flex flex-col w-64 bg-white border-r border-gray-200">
-      <div className="flex flex-col flex-grow pt-5 pb-4 overflow-y-auto">
-        <div className="flex items-center flex-shrink-0 px-4">
-          <h1 className="text-xl font-semibold text-gray-800">Clinic Portal</h1>
-        </div>
-        <nav className="mt-5 flex-1 px-2 space-y-1">
-          {navigation.map((item) => {
-            const Icon = item.icon;
+    <div className="fixed left-0 top-0 flex flex-col w-64 h-screen bg-white border-r border-gray-100">
+      <div className="flex items-center h-16 px-6 border-b border-gray-100">
+        <Link to="/clinic/dashboard" className="flex items-center gap-2">
+          <span className="text-xl font-semibold text-primary">Clinic Portal</span>
+        </Link>
+      </div>
+      <div className="flex-1 overflow-y-auto py-4">
+        <div className="flex flex-col gap-1 px-3">
+          {sidebarButtons.map((button) => {
+            const isActive = location.pathname === button.path;
             return (
               <Link
-                key={item.name}
-                to={item.href}
+                key={button.label}
+                to={button.path}
                 className={cn(
-                  location.pathname === item.href
-                    ? "bg-primary text-white"
-                    : "text-gray-600 hover:bg-gray-50",
-                  "group flex items-center px-2 py-2 text-sm font-medium rounded-md"
+                  "flex items-center gap-3 px-3 py-2 rounded-lg transition-colors relative group",
+                  isActive
+                    ? "bg-[#EEF2FF] text-[#375BDC]"
+                    : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
                 )}
               >
-                <Icon
+                <button.icon
                   className={cn(
-                    location.pathname === item.href
-                      ? "text-white"
-                      : "text-gray-400 group-hover:text-gray-500",
-                    "mr-3 h-5 w-5 flex-shrink-0"
+                    "h-5 w-5",
+                    isActive ? "text-[#375BDC]" : "text-gray-500 group-hover:text-gray-900"
                   )}
                 />
-                {item.name}
+                <span
+                  className={cn(
+                    "font-medium text-sm",
+                    isActive ? "text-[#375BDC]" : "text-gray-500 group-hover:text-gray-900"
+                  )}
+                >
+                  {button.label}
+                </span>
               </Link>
             );
           })}
-        </nav>
+        </div>
+      </div>
+      <div className="px-3 pb-4">
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-3 px-3 py-2 w-full rounded-lg transition-colors text-[#ea384c] hover:bg-red-50"
+        >
+          <LogOut className="h-5 w-5" />
+          <span className="font-medium text-sm">Logout</span>
+        </button>
       </div>
     </div>
   );
