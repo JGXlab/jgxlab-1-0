@@ -13,27 +13,27 @@ export function PatientDateOfBirthField({ form }: { form: any }) {
       name="dateOfBirth"
       render={({ field }) => (
         <FormItem className="flex flex-col">
-          <FormLabel>Date of Birth</FormLabel>
+          <FormLabel className="text-foreground font-medium">Date of Birth</FormLabel>
           <Popover>
             <PopoverTrigger asChild>
               <FormControl>
                 <Button
                   variant={"outline"}
                   className={cn(
-                    "w-full pl-3 text-left font-normal",
-                    !field.value && "text-muted-foreground"
+                    "w-full pl-3 text-left font-normal bg-background border-input",
+                    !field.value && "text-foreground"
                   )}
                 >
                   {field.value ? (
-                    format(field.value, "PPP")
+                    <span className="text-foreground">{format(field.value, "PPP")}</span>
                   ) : (
-                    <span>Pick a date</span>
+                    <span className="text-foreground">Pick a date</span>
                   )}
-                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                  <CalendarIcon className="ml-auto h-4 w-4 text-foreground" />
                 </Button>
               </FormControl>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
+            <PopoverContent className="w-auto p-0 bg-background border-input" align="start">
               <Calendar
                 mode="single"
                 selected={field.value}
@@ -42,10 +42,11 @@ export function PatientDateOfBirthField({ form }: { form: any }) {
                   date > new Date() || date < new Date("1900-01-01")
                 }
                 initialFocus
+                className="bg-background text-foreground"
               />
             </PopoverContent>
           </Popover>
-          <FormMessage />
+          <FormMessage className="text-destructive" />
         </FormItem>
       )}
     />
