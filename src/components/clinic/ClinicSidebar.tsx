@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, Users, FilePlus, FileCheck, UserRound, LogOut } from "lucide-react";
+import { LayoutDashboard, Users, FileCheck, UserRound, LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -14,11 +14,6 @@ const sidebarButtons = [
     icon: Users,
     label: "Patients",
     path: "/clinic/patients",
-  },
-  {
-    icon: FilePlus,
-    label: "Add New Lab Script",
-    path: "/clinic/addnewlabscript",
   },
   {
     icon: FileCheck,
