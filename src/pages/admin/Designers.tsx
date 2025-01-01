@@ -2,17 +2,38 @@ import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Card } from "@/components/ui/card";
 import { Bell, Search, Users, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { CreateDesignerForm } from "@/components/designers/CreateDesignerForm";
+import { useState } from "react";
 
 const Designers = () => {
+  const [dialogOpen, setDialogOpen] = useState(false);
+
   return (
     <AdminLayout>
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-2xl font-semibold">Designers</h1>
         <div className="flex items-center gap-4">
-          <Button className="flex items-center gap-2">
-            <UserPlus className="h-4 w-4" />
-            Add Designer
-          </Button>
+          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="flex items-center gap-2">
+                <UserPlus className="h-4 w-4" />
+                Add Designer
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Create New Designer</DialogTitle>
+              </DialogHeader>
+              <CreateDesignerForm onSuccess={() => setDialogOpen(false)} />
+            </DialogContent>
+          </Dialog>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
             <input
