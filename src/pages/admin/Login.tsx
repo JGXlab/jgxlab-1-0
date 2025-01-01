@@ -22,7 +22,6 @@ const AdminLogin = () => {
     try {
       console.log("Attempting admin login with email:", email);
       
-      // First, attempt to sign in
       const { data: authData, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -48,16 +47,16 @@ const AdminLogin = () => {
         return;
       }
 
-      // Then, check if the user has admin role
+      console.log("User authenticated, checking admin role for user:", authData.user.id);
+      
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('role')
         .eq('id', authData.user.id)
-        .single();
+        .maybeSingle();
 
       if (profileError) {
         console.error("Error fetching user role:", profileError);
-        // Sign out the user since they're not verified as admin
         await supabase.auth.signOut();
         toast({
           variant: "destructive",
@@ -67,11 +66,21 @@ const AdminLogin = () => {
         return;
       }
 
+      if (!profileData) {
+        console.error("No profile found for user");
+        await supabase.auth.signOut();
+        toast({
+          variant: "destructive",
+          title: "Profile Not Found",
+          description: "No user profile found. Please contact support.",
+        });
+        return;
+      }
+
       console.log("Profile data received:", profileData);
 
-      if (profileData?.role !== 'admin') {
-        console.error("User is not an admin. Role:", profileData?.role);
-        // Sign out the non-admin user
+      if (profileData.role !== 'admin') {
+        console.error("User is not an admin. Role:", profileData.role);
         await supabase.auth.signOut();
         toast({
           variant: "destructive",
