@@ -25,7 +25,31 @@ export function ClinicProfileForm() {
 
       console.log("Authenticated user ID:", user.id);
       
-      // First try to find clinic by auth_user_id
+      // First check if there's already a clinic with this email
+      const { data: existingClinicByEmail } = await supabase
+        .from("clinics")
+        .select("*")
+        .eq("email", user.email)
+        .maybeSingle();
+
+      if (existingClinicByEmail) {
+        console.log("Found existing clinic by email:", existingClinicByEmail);
+        // Update the clinic to associate it with this user if not already
+        if (existingClinicByEmail.auth_user_id !== user.id) {
+          const { error: updateError } = await supabase
+            .from("clinics")
+            .update({ auth_user_id: user.id })
+            .eq("id", existingClinicByEmail.id);
+
+          if (updateError) {
+            console.error("Error updating clinic association:", updateError);
+            throw updateError;
+          }
+        }
+        return existingClinicByEmail as Clinic;
+      }
+
+      // If no clinic found by email, try to find by auth_user_id
       const { data: clinicData, error: clinicError } = await supabase
         .from("clinics")
         .select("*")
