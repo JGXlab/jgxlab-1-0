@@ -1,25 +1,16 @@
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Card } from "@/components/ui/card";
-import { 
-  Table, 
-  TableHeader, 
-  TableBody, 
-  TableHead, 
-  TableRow, 
-  TableCell 
-} from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Search, Bell, Eye, Play, Pause, StopCircle, Loader } from "lucide-react";
+import { Search, Bell } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { LoadingLabScripts } from "@/components/lab-scripts/LoadingLabScripts";
 import { EmptyLabScripts } from "@/components/lab-scripts/EmptyLabScripts";
-import { format } from "date-fns";
 import { PreviewLabScriptModal } from "@/components/surgical-form/PreviewLabScriptModal";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { LabScriptsTable } from "@/components/lab-scripts/LabScriptsTable";
 
 const LabScripts = () => {
   const [selectedScript, setSelectedScript] = useState<any>(null);
@@ -78,91 +69,14 @@ const LabScripts = () => {
     },
   });
 
-  const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case 'pending':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'completed':
-        return 'bg-green-100 text-green-800';
-      case 'in_progress':
-        return 'bg-blue-100 text-blue-800';
-      case 'paused':
-        return 'bg-orange-100 text-orange-800';
-      case 'on_hold':
-        return 'bg-purple-100 text-purple-800';
-      case 'rejected':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  const handleStatusUpdate = (id: string, newStatus: string) => {
-    updateStatusMutation.mutate({ id, newStatus });
+  const handleStatusUpdate = (id: string, status: string) => {
+    updateStatusMutation.mutate({ id, status });
   };
 
   const handlePreview = (script: any, e: React.MouseEvent) => {
     e.stopPropagation();
     setSelectedScript(script);
     setIsPreviewOpen(true);
-  };
-
-  const renderStatusButtons = (script: any) => {
-    const status = script.status.toLowerCase();
-
-    if (status === 'completed') {
-      return (
-        <Badge className="bg-green-100 text-green-800">
-          Design Completed
-        </Badge>
-      );
-    }
-
-    if (status === 'paused' || status === 'on_hold') {
-      return (
-        <Button
-          variant="outline"
-          size="sm"
-          className="w-full flex items-center justify-center gap-2"
-          onClick={() => handleStatusUpdate(script.id, 'in_progress')}
-        >
-          <Play className="h-4 w-4" />
-          Resume
-        </Button>
-      );
-    }
-
-    return (
-      <div className="flex flex-col gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          className="w-full flex items-center justify-center gap-2"
-          onClick={() => handleStatusUpdate(script.id, 'paused')}
-        >
-          <Pause className="h-4 w-4" />
-          Pause
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          className="w-full flex items-center justify-center gap-2"
-          onClick={() => handleStatusUpdate(script.id, 'on_hold')}
-        >
-          <Loader className="h-4 w-4" />
-          Hold
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          className="w-full flex items-center justify-center gap-2"
-          onClick={() => handleStatusUpdate(script.id, 'completed')}
-        >
-          <StopCircle className="h-4 w-4" />
-          Complete
-        </Button>
-      </div>
-    );
   };
 
   return (
@@ -199,54 +113,11 @@ const LabScripts = () => {
         ) : !labScripts?.length ? (
           <EmptyLabScripts />
         ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Patient Name</TableHead>
-                <TableHead>Treatment Type</TableHead>
-                <TableHead>Appliance Type</TableHead>
-                <TableHead>Due Date</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Created At</TableHead>
-                <TableHead>Actions</TableHead>
-                <TableHead>Status Update</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {labScripts.map((script) => (
-                <TableRow key={script.id} className="hover:bg-gray-50">
-                  <TableCell className="font-medium">
-                    {script.patients?.first_name} {script.patients?.last_name}
-                  </TableCell>
-                  <TableCell>{script.treatment_type}</TableCell>
-                  <TableCell>{script.appliance_type}</TableCell>
-                  <TableCell>{script.due_date}</TableCell>
-                  <TableCell>
-                    <Badge className={getStatusColor(script.status)}>
-                      {script.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-gray-500">
-                    {format(new Date(script.created_at), 'MMM d, yyyy')}
-                  </TableCell>
-                  <TableCell>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="w-full flex items-center justify-center gap-2"
-                      onClick={(e) => handlePreview(script, e)}
-                    >
-                      <Eye className="h-4 w-4" />
-                      <span>Preview</span>
-                    </Button>
-                  </TableCell>
-                  <TableCell>
-                    {renderStatusButtons(script)}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          <LabScriptsTable
+            labScripts={labScripts}
+            onPreview={handlePreview}
+            onStatusUpdate={handleStatusUpdate}
+          />
         )}
       </Card>
 
