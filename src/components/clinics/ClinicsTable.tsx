@@ -48,7 +48,12 @@ export function ClinicsTable() {
   const handleInvite = async (email: string, clinicName: string) => {
     try {
       console.log('Sending invitation to:', email);
-      const { error } = await supabase.auth.admin.inviteUserByEmail(email);
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          emailRedirectTo: `${window.location.origin}/admin/login`,
+        },
+      });
       
       if (error) {
         console.error('Error sending invitation:', error);
