@@ -35,7 +35,7 @@ export default function NewLabScriptForm() {
     },
   });
 
-  const { mutate: submitLabScript, isLoading } = useMutation({
+  const { mutate: submitLabScript, isPending } = useMutation({
     mutationFn: async (values: z.infer<typeof formSchema>) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("No user found");
@@ -116,8 +116,8 @@ export default function NewLabScriptForm() {
                 <AdditionalInformationSection form={form} />
 
                 <div className="pt-6 border-t">
-                  <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? "Submitting..." : "Submit Lab Script"}
+                  <Button type="submit" className="w-full" disabled={isPending}>
+                    {isPending ? "Submitting..." : "Submit Lab Script"}
                   </Button>
                 </div>
               </form>
