@@ -1,9 +1,9 @@
 import { ClinicLayout } from "@/components/clinic/ClinicLayout";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { ArrowLeft, Clock, Send, X, Pencil } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
+import { TeethArch } from "@/components/clinic/TeethArch";
 
 export default function SurgicalDayApplianceForm() {
   const navigate = useNavigate();
@@ -11,9 +11,9 @@ export default function SurgicalDayApplianceForm() {
 
   return (
     <ClinicLayout>
-      <div className="bg-white rounded-lg shadow-sm p-6">
+      <div className="bg-white rounded-lg shadow-sm">
         {/* Header Section */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between p-6 border-b">
           <div className="flex items-center gap-4">
             <Button
               variant="ghost"
@@ -34,22 +34,16 @@ export default function SurgicalDayApplianceForm() {
         </div>
 
         {/* Main Content */}
-        <div className="grid grid-cols-2 gap-8">
+        <div className="grid grid-cols-2">
           {/* Left Column - Tooth Diagram */}
-          <div className="border rounded-lg p-6">
+          <div className="border-r p-6">
             <div className="flex gap-4 mb-6">
               <Button variant="secondary" className="rounded-full">Medical</Button>
               <Button variant="ghost" className="rounded-full">Cosmetic</Button>
             </div>
             
-            {/* Tooth Chart */}
-            <div className="relative w-full aspect-square">
-              <img 
-                src="/lovable-uploads/ef1abaac-2ec2-43f7-b02d-6c96a852d775.png" 
-                alt="Tooth Diagram"
-                className="w-full h-full object-contain"
-              />
-            </div>
+            {/* Teeth Arch Component */}
+            <TeethArch />
 
             <div className="flex gap-4 mt-4">
               <div className="flex items-center gap-2">
