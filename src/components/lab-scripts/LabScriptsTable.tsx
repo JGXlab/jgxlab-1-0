@@ -1,6 +1,6 @@
 import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { MoreVertical } from "lucide-react";
+import { MoreVertical, Pencil, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { StatusUpdateButtons } from "./StatusUpdateButtons";
 import {
@@ -98,7 +98,7 @@ export const LabScriptsTable = ({ labScripts, onPreview, onStatusUpdate }: LabSc
             <TableHead>Due Date</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Update Status</TableHead>
-            <TableHead className="w-[50px]"></TableHead>
+            <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -130,7 +130,23 @@ export const LabScriptsTable = ({ labScripts, onPreview, onStatusUpdate }: LabSc
                 />
               </TableCell>
               <TableCell>
-                <div className="relative">
+                <div className="flex justify-end gap-2">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 p-0 hover:bg-gray-100"
+                    onClick={(e) => onPreview(script, e)}
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 p-0 hover:bg-red-100 hover:text-red-600"
+                    onClick={() => handleDelete(script.id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                   <ContextMenu>
                     <ContextMenuTrigger>
                       <Button
