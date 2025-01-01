@@ -21,7 +21,7 @@ const DesignLabScripts = () => {
   const { data: labScripts, isLoading } = useQuery({
     queryKey: ['design-lab-scripts'],
     queryFn: async () => {
-      console.log('Fetching lab scripts for designer...');
+      console.log('Fetching all lab scripts for designer...');
       const { data, error } = await supabase
         .from('lab_scripts')
         .select(`
