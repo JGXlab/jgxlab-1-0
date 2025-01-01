@@ -18,7 +18,17 @@ interface ApplianceDetailsSectionProps {
 
 export const ApplianceDetailsSection = ({ form }: ApplianceDetailsSectionProps) => {
   const applianceType = form.watch('applianceType');
+  const treatmentType = form.watch('treatmentType');
   const isNightguard = applianceType === 'nightguard';
+
+  // Check if treatment type is denture or one piece implant
+  const shouldHideScrewSection = (value: string) => {
+    const [upper, lower] = value.split('|');
+    return (upper === 'denture' || upper === 'one-piece-implant') && 
+           (lower === 'denture' || lower === 'one-piece-implant' || !lower);
+  };
+
+  const hideScrewSection = shouldHideScrewSection(treatmentType);
 
   // Reset fields when switching to nightguard
   React.useEffect(() => {
@@ -30,6 +40,14 @@ export const ApplianceDetailsSection = ({ form }: ApplianceDetailsSectionProps) 
       form.setValue('shade', '');
     }
   }, [isNightguard, form]);
+
+  // Reset screw type when treatment type changes to denture or one piece implant
+  React.useEffect(() => {
+    if (hideScrewSection) {
+      form.setValue('screwType', '');
+      form.setValue('otherScrewType', '');
+    }
+  }, [hideScrewSection, form]);
 
   return (
     <FormSection title="Appliance Details" className="pt-6 border-t">
@@ -84,21 +102,23 @@ export const ApplianceDetailsSection = ({ form }: ApplianceDetailsSectionProps) 
             )}
           />
 
-          <FormField
-            control={form.control}
-            name="screwType"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Screw Type</FormLabel>
-                <ScrewTypeSelector 
-                  value={field.value} 
-                  onChange={field.onChange}
-                  otherValue={form.watch('otherScrewType')}
-                  onOtherValueChange={(value) => form.setValue('otherScrewType', value)}
-                />
-              </FormItem>
-            )}
-          />
+          {!hideScrewSection && (
+            <FormField
+              control={form.control}
+              name="screwType"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Screw Type</FormLabel>
+                  <ScrewTypeSelector 
+                    value={field.value} 
+                    onChange={field.onChange}
+                    otherValue={form.watch('otherScrewType')}
+                    onOtherValueChange={(value) => form.setValue('otherScrewType', value)}
+                  />
+                </FormItem>
+              )}
+            />
+          )}
 
           <FormField
             control={form.control}
