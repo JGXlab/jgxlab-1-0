@@ -99,10 +99,10 @@ export default function NewLabScriptForm() {
                       <FormItem>
                         <FormLabel>Appliance Type</FormLabel>
                         <Select onValueChange={field.onChange} value={field.value}>
-                          <SelectTrigger>
+                          <SelectTrigger className="bg-white">
                             <SelectValue placeholder="Select appliance type" />
                           </SelectTrigger>
-                          <SelectContent>
+                          <SelectContent className="bg-white z-50">
                             <SelectItem value="surgical-day">Surgical Day Appliance</SelectItem>
                             <SelectItem value="printed-try-in">Printed Try-in</SelectItem>
                             <SelectItem value="nightguard">Nightguard</SelectItem>
