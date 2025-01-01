@@ -9,9 +9,13 @@ interface ScrewTypeSelectorProps {
 }
 
 const screwTypeOptions = [
-  { id: "type1", label: "Type 1" },
-  { id: "type2", label: "Type 2" },
-  { id: "type3", label: "Type 3" },
+  { id: "dc", label: "DC Screw" },
+  { id: "rosen", label: "Rosen" },
+  { id: "powerball", label: "Powerball" },
+  { id: "dess", label: "Dess" },
+  { id: "sin", label: "SIN" },
+  { id: "neodent", label: "Neodent" },
+  { id: "others", label: "Others" },
 ];
 
 export const ScrewTypeSelector = ({ value, onChange }: ScrewTypeSelectorProps) => {

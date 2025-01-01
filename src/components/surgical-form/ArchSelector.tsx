@@ -9,9 +9,9 @@ interface ArchSelectorProps {
 }
 
 const archOptions = [
-  { id: "upper", label: "Upper" },
-  { id: "lower", label: "Lower" },
-  { id: "both", label: "Both" },
+  { id: "upper", label: "Upper Arch" },
+  { id: "lower", label: "Lower Arch" },
+  { id: "dual", label: "Dual Arch" },
 ];
 
 export const ArchSelector = ({ value, onChange }: ArchSelectorProps) => {

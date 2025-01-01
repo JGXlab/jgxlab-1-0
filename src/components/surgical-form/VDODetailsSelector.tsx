@@ -9,9 +9,10 @@ interface VDODetailsSelectorProps {
 }
 
 const vdoDetailsOptions = [
-  { id: "detail1", label: "Detail 1" },
-  { id: "detail2", label: "Detail 2" },
-  { id: "detail3", label: "Detail 3" },
+  { id: "open_4mm_no_call", label: "Open upto 4 mm without calling Doctor" },
+  { id: "open_4mm_with_call", label: "Open upto 4 mm with calling Doctor" },
+  { id: "open_vdo_requirement", label: "Open VDO based on requirement" },
+  { id: "no_changes", label: "No changes required in VDO" },
 ];
 
 export const VDODetailsSelector = ({ value, onChange }: VDODetailsSelectorProps) => {
