@@ -15,7 +15,8 @@ const Patients = () => {
         .select(`
           *,
           clinics (
-            name
+            name,
+            user_id
           )
         `)
         .order('created_at', { ascending: false });
