@@ -1,6 +1,6 @@
 import { Check, ChevronsUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -66,40 +66,42 @@ export function PatientSelector({ value, onChange }: PatientSelectorProps) {
         <PopoverContent className="w-[400px] p-0">
           <Command>
             <CommandInput placeholder="Search patients..." />
-            <CommandEmpty>
-              No patient found.
-              <Button
-                type="button"
-                variant="link"
-                className="mt-2"
-                onClick={() => {
-                  setOpen(false);
-                  setCreatePatientOpen(true);
-                }}
-              >
-                Create new patient
-              </Button>
-            </CommandEmpty>
-            <CommandGroup>
-              {patients.map((patient) => (
-                <CommandItem
-                  key={patient.id}
-                  value={patient.id}
-                  onSelect={() => {
-                    onChange(patient.id);
+            <CommandList>
+              <CommandEmpty>
+                No patient found.
+                <Button
+                  type="button"
+                  variant="link"
+                  className="mt-2"
+                  onClick={() => {
                     setOpen(false);
+                    setCreatePatientOpen(true);
                   }}
                 >
-                  <Check
-                    className={cn(
-                      "mr-2 h-4 w-4",
-                      value === patient.id ? "opacity-100" : "opacity-0"
-                    )}
-                  />
-                  {patient.first_name} {patient.last_name}
-                </CommandItem>
-              ))}
-            </CommandGroup>
+                  Create new patient
+                </Button>
+              </CommandEmpty>
+              <CommandGroup>
+                {patients.map((patient) => (
+                  <CommandItem
+                    key={patient.id}
+                    value={patient.id}
+                    onSelect={() => {
+                      onChange(patient.id);
+                      setOpen(false);
+                    }}
+                  >
+                    <Check
+                      className={cn(
+                        "mr-2 h-4 w-4",
+                        value === patient.id ? "opacity-100" : "opacity-0"
+                      )}
+                    />
+                    {patient.first_name} {patient.last_name}
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            </CommandList>
           </Command>
         </PopoverContent>
       </Popover>
