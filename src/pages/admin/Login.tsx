@@ -20,8 +20,8 @@ const AdminLogin = () => {
     setIsLoading(true);
     
     try {
-      console.log("Attempting admin login with email:", email);
-      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+      console.log("Attempting login with email:", email);
+      const { error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
@@ -36,56 +36,15 @@ const AdminLogin = () => {
         return;
       }
 
-      if (!signInData.user) {
-        console.error("No user data returned after sign in");
-        toast({
-          variant: "destructive",
-          title: "Login Failed",
-          description: "Unable to retrieve user information",
-        });
-        return;
-      }
-
-      // Verify admin status using a direct query
-      console.log("Verifying admin status for user:", signInData.user.id);
-      const { data: adminCheck, error: adminCheckError } = await supabase
-        .from('profiles')
-        .select('is_admin')
-        .eq('id', signInData.user.id)
-        .limit(1)
-        .single();
-
-      if (adminCheckError) {
-        console.error("Admin verification failed:", adminCheckError);
-        await supabase.auth.signOut();
-        toast({
-          variant: "destructive",
-          title: "Access Denied",
-          description: "Could not verify admin status",
-        });
-        return;
-      }
-
-      if (!adminCheck?.is_admin) {
-        console.log("Non-admin user attempted login:", adminCheck);
-        await supabase.auth.signOut();
-        toast({
-          variant: "destructive",
-          title: "Access Denied",
-          description: "This account does not have admin privileges",
-        });
-        return;
-      }
-
-      console.log("Admin login successful, redirecting to dashboard");
+      console.log("Login successful, redirecting to dashboard");
       toast({
-        title: "Welcome Admin",
-        description: "Successfully logged in to admin panel",
+        title: "Welcome",
+        description: "Successfully logged in",
       });
       navigate("/admin/dashboard");
       
     } catch (error) {
-      console.error("Unexpected error during admin login:", error);
+      console.error("Unexpected error during login:", error);
       toast({
         variant: "destructive",
         title: "Error",
@@ -104,8 +63,8 @@ const AdminLogin = () => {
             <div className="flex justify-center">
               <Shield className="h-12 w-12 text-primary" />
             </div>
-            <h1 className="text-2xl font-semibold text-gray-900">Admin Login</h1>
-            <p className="text-gray-500">Enter your credentials to access admin panel</p>
+            <h1 className="text-2xl font-semibold text-gray-900">Login</h1>
+            <p className="text-gray-500">Enter your credentials to access the dashboard</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -113,7 +72,7 @@ const AdminLogin = () => {
               <label className="text-sm text-gray-600">Email</label>
               <Input
                 type="email"
-                placeholder="admin@example.com"
+                placeholder="Enter your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
