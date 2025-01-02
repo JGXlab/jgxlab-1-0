@@ -57,33 +57,35 @@ export default function SubmittedLabScripts() {
 
   return (
     <ClinicLayout>
-      <div className="mx-auto max-w-5xl space-y-6">
-        <LabScriptsHeader />
-        
-        <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
-          {isLoading ? (
-            <LoadingLabScripts />
-          ) : labScripts.length === 0 ? (
-            <EmptyLabScripts />
-          ) : (
-            <LabScriptsTable 
-              labScripts={labScripts}
-              onPreview={handlePreview}
-              onStatusUpdate={() => {}}
+      <div className="flex flex-col items-center w-full">
+        <div className="w-full max-w-5xl space-y-6">
+          <LabScriptsHeader />
+          
+          <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
+            {isLoading ? (
+              <LoadingLabScripts />
+            ) : labScripts.length === 0 ? (
+              <EmptyLabScripts />
+            ) : (
+              <LabScriptsTable 
+                labScripts={labScripts}
+                onPreview={handlePreview}
+                onStatusUpdate={() => {}}
+              />
+            )}
+          </div>
+
+          {selectedScript && (
+            <PreviewLabScriptModal
+              isOpen={isPreviewOpen}
+              onClose={() => {
+                setIsPreviewOpen(false);
+                setSelectedScript(null);
+              }}
+              labScriptId={selectedScript.id}
             />
           )}
         </div>
-
-        {selectedScript && (
-          <PreviewLabScriptModal
-            isOpen={isPreviewOpen}
-            onClose={() => {
-              setIsPreviewOpen(false);
-              setSelectedScript(null);
-            }}
-            labScriptId={selectedScript.id}
-          />
-        )}
       </div>
     </ClinicLayout>
   );
