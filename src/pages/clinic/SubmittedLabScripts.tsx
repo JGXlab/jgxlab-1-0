@@ -27,7 +27,14 @@ export default function SubmittedLabScripts() {
           *,
           patients (
             first_name,
-            last_name
+            last_name,
+            user_id
+          ),
+          clinics:patient_id (
+            clinics:clinic_id (
+              name,
+              doctor_name
+            )
           )
         `)
         .order('created_at', { ascending: false });
