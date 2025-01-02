@@ -29,13 +29,15 @@ import DesignMyProfile from "./pages/design/MyProfile";
 const queryClient = new QueryClient();
 
 const App = () => {
-  // Get the current hostname
+  // Get the current hostname and pathname
   const hostname = window.location.hostname;
+  const pathname = window.location.pathname;
   console.log('Current hostname:', hostname);
+  console.log('Current pathname:', pathname);
 
-  // Determine which portal to show based on subdomain
-  const isAdminPortal = hostname.includes('admin.');
-  const isDesignPortal = hostname.includes('design.');
+  // Determine which portal to show based on pathname or subdomain
+  const isAdminPortal = hostname.includes('admin.') || pathname.startsWith('/admin');
+  const isDesignPortal = hostname.includes('design.') || pathname.startsWith('/design');
 
   console.log('Portal type:', { isAdminPortal, isDesignPortal });
 
