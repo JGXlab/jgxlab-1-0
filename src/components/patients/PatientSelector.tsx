@@ -98,6 +98,7 @@ export function PatientSelector({ value, onChange, clinicId }: PatientSelectorPr
                     key={patient.id}
                     value={`${patient.first_name} ${patient.last_name}`.toLowerCase()}
                     onSelect={() => {
+                      console.log('Selected patient:', patient);
                       onChange(patient.id);
                       setOpen(false);
                     }}
