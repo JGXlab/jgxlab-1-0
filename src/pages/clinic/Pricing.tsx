@@ -8,43 +8,29 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
-const pricingData = [
-  {
-    service: "Surgical day appliance (Night guard included)",
-    price: 275.00
-  },
-  {
-    service: "Implant detection (IDID)",
-    price: 100.00
-  },
-  {
-    service: "Further Revisions (PTIs)",
-    price: 100.00
-  },
-  {
-    service: "Nightguard",
-    price: 50.00
-  },
-  {
-    service: "Final DLZ (Zi / PMMA)",
-    price: 100.00
-  },
-  {
-    service: "Final Ti-bar & SS",
-    price: 250.00
-  },
-  {
-    service: "Ti-Bar Design",
-    price: 250.00
-  },
-  {
-    service: "Express design (in 24 hours)",
-    price: 50.00
-  }
-];
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 const Pricing = () => {
+  const { data: pricingData, isLoading } = useQuery({
+    queryKey: ['service-prices'],
+    queryFn: async () => {
+      console.log('Fetching service prices...');
+      const { data, error } = await supabase
+        .from('service_prices')
+        .select('*')
+        .order('service_name');
+      
+      if (error) {
+        console.error('Error fetching service prices:', error);
+        throw error;
+      }
+      
+      console.log('Service prices fetched:', data);
+      return data;
+    }
+  });
+
   return (
     <ClinicLayout>
       <div className="space-y-8">
@@ -73,16 +59,22 @@ const Pricing = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {pricingData.map((item, index) => (
+                {isLoading ? (
+                  <TableRow>
+                    <TableCell colSpan={2} className="text-center py-4">
+                      Loading prices...
+                    </TableCell>
+                  </TableRow>
+                ) : pricingData?.map((item) => (
                   <TableRow 
-                    key={index}
+                    key={item.id}
                     className="hover:bg-white/80 transition-all duration-200 cursor-default border-b border-accent"
                   >
                     <TableCell className="font-medium py-4 text-foreground/80">
-                      {item.service}
+                      {item.service_name}
                     </TableCell>
                     <TableCell className="text-right font-semibold text-primary py-4">
-                      ${item.price.toFixed(2)}
+                      ${Number(item.price).toFixed(2)}
                     </TableCell>
                   </TableRow>
                 ))}

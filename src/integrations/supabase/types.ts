@@ -290,6 +290,27 @@ export type Database = {
         }
         Relationships: []
       }
+      service_prices: {
+        Row: {
+          created_at: string
+          id: string
+          price: number
+          service_name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          price: number
+          service_name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          price?: number
+          service_name?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
