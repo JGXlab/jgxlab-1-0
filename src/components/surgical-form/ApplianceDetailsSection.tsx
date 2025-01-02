@@ -7,10 +7,20 @@ import { ScrewTypeSelector } from "./ScrewTypeSelector";
 import { VDODetailsSelector } from "./VDODetailsSelector";
 import { NightguardSelector } from "./NightguardSelector";
 import { ShadeSelector } from "./ShadeSelector";
+import { UseFormReturn } from "react-hook-form";
+import { z } from "zod";
+import { formSchema } from "./formSchema";
 
-export const ApplianceDetailsSection = ({ form }: { form: any }) => {
+interface ApplianceDetailsSectionProps {
+  form: UseFormReturn<z.infer<typeof formSchema>>;
+}
+
+export const ApplianceDetailsSection = ({ form }: ApplianceDetailsSectionProps) => {
   return (
-    <FormSection title="Appliance Details" description="Specify the details of the appliance">
+    <FormSection 
+      title="Appliance Details" 
+      description="Specify the details of the appliance"
+    >
       <FormField
         control={form.control}
         name="applianceType"
@@ -55,12 +65,80 @@ export const ApplianceDetailsSection = ({ form }: { form: any }) => {
         )}
       />
 
-      <ArchSelector form={form} />
-      <TreatmentTypeSelector form={form} />
-      <ScrewTypeSelector form={form} />
-      <VDODetailsSelector form={form} />
-      <NightguardSelector form={form} />
-      <ShadeSelector form={form} />
+      <FormField
+        control={form.control}
+        name="arch"
+        render={({ field }) => (
+          <FormItem className="space-y-3">
+            <FormLabel>Arch</FormLabel>
+            <ArchSelector value={field.value} onChange={field.onChange} />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
+        name="treatmentType"
+        render={({ field }) => (
+          <FormItem className="space-y-3">
+            <FormLabel>Treatment Type</FormLabel>
+            <TreatmentTypeSelector 
+              value={field.value} 
+              onChange={field.onChange} 
+              selectedArch={[form.watch("arch")]} 
+            />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
+        name="screwType"
+        render={({ field }) => (
+          <FormItem className="space-y-3">
+            <FormLabel>Screw Type</FormLabel>
+            <ScrewTypeSelector 
+              value={field.value} 
+              onChange={field.onChange}
+              otherValue={form.watch("otherScrewType")}
+              onOtherValueChange={(value) => form.setValue("otherScrewType", value)}
+            />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
+        name="vdoDetails"
+        render={({ field }) => (
+          <FormItem className="space-y-3">
+            <FormLabel>VDO Details</FormLabel>
+            <VDODetailsSelector value={field.value} onChange={field.onChange} />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
+        name="needsNightguard"
+        render={({ field }) => (
+          <FormItem className="space-y-3">
+            <FormLabel>Nightguard</FormLabel>
+            <NightguardSelector value={field.value} onChange={field.onChange} />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
+        name="shade"
+        render={({ field }) => (
+          <FormItem className="space-y-3">
+            <FormLabel>Shade</FormLabel>
+            <ShadeSelector value={field.value} onChange={field.onChange} />
+          </FormItem>
+        )}
+      />
     </FormSection>
   );
 };

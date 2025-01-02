@@ -106,6 +106,7 @@ export type Database = {
           arch: string
           created_at: string
           due_date: string
+          express_design: string | null
           id: string
           needs_nightguard: string | null
           other_screw_type: string | null
@@ -123,6 +124,7 @@ export type Database = {
           arch: string
           created_at?: string
           due_date: string
+          express_design?: string | null
           id?: string
           needs_nightguard?: string | null
           other_screw_type?: string | null
@@ -140,6 +142,7 @@ export type Database = {
           arch?: string
           created_at?: string
           due_date?: string
+          express_design?: string | null
           id?: string
           needs_nightguard?: string | null
           other_screw_type?: string | null
