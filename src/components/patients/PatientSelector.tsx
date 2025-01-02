@@ -71,14 +71,21 @@ export function PatientSelector({ value, onChange, clinicId }: PatientSelectorPr
           </FormControl>
         </PopoverTrigger>
         <PopoverContent 
-          className="w-[400px] p-0" 
+          className="w-[400px] p-0 bg-white" 
           align="start"
           sideOffset={4}
-          style={{ zIndex: 9999 }}
+          style={{ 
+            zIndex: 9999,
+            position: 'relative',
+            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
+          }}
         >
           <Command>
-            <CommandInput placeholder="Search patients..." />
-            <CommandList>
+            <CommandInput 
+              placeholder="Search patients..." 
+              className="border-0"
+            />
+            <CommandList className="max-h-[300px] overflow-y-auto">
               <CommandEmpty>
                 No patient found.
                 <Button
@@ -102,6 +109,7 @@ export function PatientSelector({ value, onChange, clinicId }: PatientSelectorPr
                       onChange(patient.id);
                       setOpen(false);
                     }}
+                    className="cursor-pointer hover:bg-gray-100"
                   >
                     <Check
                       className={cn(
