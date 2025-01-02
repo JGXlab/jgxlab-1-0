@@ -106,7 +106,6 @@ export type Database = {
           arch: string
           created_at: string
           due_date: string
-          express_design: string | null
           id: string
           needs_nightguard: string | null
           other_screw_type: string | null
@@ -124,7 +123,6 @@ export type Database = {
           arch: string
           created_at?: string
           due_date: string
-          express_design?: string | null
           id?: string
           needs_nightguard?: string | null
           other_screw_type?: string | null
@@ -142,7 +140,6 @@ export type Database = {
           arch?: string
           created_at?: string
           due_date?: string
-          express_design?: string | null
           id?: string
           needs_nightguard?: string | null
           other_screw_type?: string | null
@@ -290,27 +287,6 @@ export type Database = {
           email?: string | null
           id?: string
           role?: Database["public"]["Enums"]["user_role"]
-        }
-        Relationships: []
-      }
-      service_prices: {
-        Row: {
-          created_at: string
-          id: string
-          price: number
-          service_name: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          price: number
-          service_name: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          price?: number
-          service_name?: string
         }
         Relationships: []
       }

@@ -24,13 +24,9 @@ export function PatientSelector({ value, onChange, clinicId }: PatientSelectorPr
     queryKey: ['patients', clinicId],
     queryFn: async () => {
       console.log('Fetching patients for clinic:', clinicId);
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("No user found");
-
       const query = supabase
         .from('patients')
         .select('*')
-        .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
       if (clinicId) {
@@ -65,10 +61,10 @@ export function PatientSelector({ value, onChange, clinicId }: PatientSelectorPr
             >
               {isLoading ? (
                 "Loading patients..."
-              ) : value && selectedPatient ? (
-                `${selectedPatient.first_name} ${selectedPatient.last_name}`
               ) : (
-                "Select patient"
+                selectedPatient
+                  ? `${selectedPatient.first_name} ${selectedPatient.last_name}`
+                  : "Select patient"
               )}
               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
@@ -96,7 +92,7 @@ export function PatientSelector({ value, onChange, clinicId }: PatientSelectorPr
                 {patients.map((patient) => (
                   <CommandItem
                     key={patient.id}
-                    value={`${patient.first_name} ${patient.last_name}`.toLowerCase()}
+                    value={patient.id}
                     onSelect={() => {
                       onChange(patient.id);
                       setOpen(false);
