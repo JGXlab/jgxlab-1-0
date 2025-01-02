@@ -175,6 +175,7 @@ export default function SubmittedLabScripts() {
                 <AdditionalInformationSection form={form} />
                 <PaymentSection 
                   applianceType={form.watch('applianceType')}
+                  archType={form.watch('arch')}
                   onSubmit={form.handleSubmit(onSubmit)}
                   isSubmitting={isPending}
                 />

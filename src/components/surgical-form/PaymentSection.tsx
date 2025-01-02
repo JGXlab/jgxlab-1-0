@@ -14,11 +14,12 @@ const priceMap = {
 
 interface PaymentSectionProps {
   applianceType: string;
+  archType: string;
   onSubmit: () => void;
   isSubmitting: boolean;
 }
 
-export const PaymentSection = ({ applianceType, onSubmit, isSubmitting }: PaymentSectionProps) => {
+export const PaymentSection = ({ applianceType, archType, onSubmit, isSubmitting }: PaymentSectionProps) => {
   const priceId = applianceType ? priceMap[applianceType as keyof typeof priceMap] : null;
 
   const { data: priceData, isLoading } = useQuery({
@@ -38,7 +39,21 @@ export const PaymentSection = ({ applianceType, onSubmit, isSubmitting }: Paymen
     enabled: !!priceId,
   });
 
+  // Calculate final price based on arch type
+  const calculateFinalPrice = () => {
+    if (!priceData?.price) return '0.00';
+    const basePrice = Number(priceData.price);
+    return archType === 'dual' ? (basePrice * 2).toFixed(2) : basePrice.toFixed(2);
+  };
+
   if (!applianceType) return null;
+
+  console.log('Price calculation:', { 
+    applianceType, 
+    archType, 
+    basePrice: priceData?.price,
+    finalPrice: calculateFinalPrice()
+  });
 
   return (
     <div className="pt-6 border-t space-y-4">
@@ -49,7 +64,10 @@ export const PaymentSection = ({ applianceType, onSubmit, isSubmitting }: Paymen
             <div className="h-6 w-20 animate-pulse bg-gray-200 rounded" />
           ) : (
             <p className="text-2xl font-semibold text-gray-900">
-              ${priceData?.price || '0.00'}
+              ${calculateFinalPrice()}
+              {archType === 'dual' && (
+                <span className="text-sm text-gray-500 ml-2">(Dual arch price)</span>
+              )}
             </p>
           )}
         </div>
