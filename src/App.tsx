@@ -34,8 +34,8 @@ const App = () => {
   console.log('Current hostname:', hostname);
 
   // Determine which portal to show based on subdomain
-  const isAdminPortal = hostname.startsWith('admin.');
-  const isDesignPortal = hostname.startsWith('design.');
+  const isAdminPortal = hostname.includes('admin.');
+  const isDesignPortal = hostname.includes('design.');
 
   console.log('Portal type:', { isAdminPortal, isDesignPortal });
 
@@ -50,8 +50,7 @@ const App = () => {
               {/* Admin Portal Routes */}
               {isAdminPortal ? (
                 <>
-                  <Route path="/" element={<Navigate to="/admin/login" replace />} />
-                  <Route path="/admin/*" element={<Navigate to="/admin/login" replace />} />
+                  <Route path="/" element={<AdminLogin />} />
                   <Route path="/admin/login" element={<AdminLogin />} />
                   <Route path="/admin/dashboard" element={<AdminGuard><AdminDashboard /></AdminGuard>} />
                   <Route path="/admin/notifications" element={<AdminGuard><Notifications /></AdminGuard>} />
@@ -65,8 +64,7 @@ const App = () => {
               ) : isDesignPortal ? (
                 <>
                   {/* Designer Portal Routes */}
-                  <Route path="/" element={<Navigate to="/design/login" replace />} />
-                  <Route path="/design/*" element={<Navigate to="/design/login" replace />} />
+                  <Route path="/" element={<DesignLogin />} />
                   <Route path="/design/login" element={<DesignLogin />} />
                   <Route path="/design/dashboard" element={<DesignGuard><DesignDashboard /></DesignGuard>} />
                   <Route path="/design/labscripts" element={<DesignGuard><DesignLabScripts /></DesignGuard>} />
