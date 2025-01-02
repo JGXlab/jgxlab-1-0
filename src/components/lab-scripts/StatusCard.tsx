@@ -23,7 +23,7 @@ export const StatusCard = ({
   onClick 
 }: StatusCardProps) => (
   <Card 
-    className={`group relative overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 h-24 cursor-pointer ${
+    className={`group relative overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 h-24 w-24 cursor-pointer ${
       isHighlighted ? 'border-2 border-primary' : ''
     } ${
       isSelected ? 'ring-2 ring-primary shadow-lg' : ''
