@@ -56,7 +56,7 @@ export const PaymentSection = ({ applianceType, archType, onSubmit, isSubmitting
   });
 
   return (
-    <div className="sticky bottom-0 bg-white border-t shadow-lg p-4 mt-auto">
+    <div className="sticky bottom-0 bg-white border-t shadow-lg p-4">
       <div className="flex justify-between items-center">
         <div className="space-y-1">
           <p className="text-sm font-medium text-gray-500">Total Amount</p>

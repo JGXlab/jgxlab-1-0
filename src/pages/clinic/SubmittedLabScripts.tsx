@@ -164,12 +164,12 @@ export default function SubmittedLabScripts() {
         )}
 
         <Dialog open={isNewLabScriptOpen} onOpenChange={setIsNewLabScriptOpen}>
-          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-3xl h-[90vh] flex flex-col">
             <DialogHeader>
               <DialogTitle>New Lab Script</DialogTitle>
             </DialogHeader>
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 pb-16">
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 flex-1 overflow-y-auto">
                 <PatientInformationSection form={form} />
                 <ApplianceDetailsSection form={form} />
                 <AdditionalInformationSection form={form} />
