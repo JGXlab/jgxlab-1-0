@@ -12,29 +12,34 @@ interface AdditionalInformationSectionProps {
 }
 
 export const AdditionalInformationSection = ({ form }: AdditionalInformationSectionProps) => {
+  const applianceType = form.watch('applianceType');
+  const showExpressDesign = applianceType !== 'surgical-day';
+
   return (
     <FormSection title="Additional Information" className="pt-6 border-t">
-      <FormField
-        control={form.control}
-        name="expressDesign"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Express Design (within 24 hours)</FormLabel>
-            <div className="flex flex-wrap gap-4">
-              <SelectionButton
-                label="Yes"
-                isSelected={field.value === "yes"}
-                onClick={() => field.onChange("yes")}
-              />
-              <SelectionButton
-                label="No"
-                isSelected={field.value === "no"}
-                onClick={() => field.onChange("no")}
-              />
-            </div>
-          </FormItem>
-        )}
-      />
+      {showExpressDesign && (
+        <FormField
+          control={form.control}
+          name="expressDesign"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Express Design (within 24 hours)</FormLabel>
+              <div className="flex flex-wrap gap-4">
+                <SelectionButton
+                  label="Yes"
+                  isSelected={field.value === "yes"}
+                  onClick={() => field.onChange("yes")}
+                />
+                <SelectionButton
+                  label="No"
+                  isSelected={field.value === "no"}
+                  onClick={() => field.onChange("no")}
+                />
+              </div>
+            </FormItem>
+          )}
+        />
+      )}
 
       <FormField
         control={form.control}
