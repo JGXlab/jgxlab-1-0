@@ -104,12 +104,12 @@ export function PatientSelector({ value, onChange, clinicId }: PatientSelectorPr
                 {patients.map((patient) => (
                   <CommandItem
                     key={patient.id}
-                    value={patient.id}
+                    value={`${patient.first_name} ${patient.last_name}`.toLowerCase()}
                     onSelect={() => {
                       onChange(patient.id);
                       setOpen(false);
                     }}
-                    className="cursor-pointer hover:bg-gray-100"
+                    className="cursor-pointer hover:bg-gray-100 py-2"
                   >
                     <Check
                       className={cn(
