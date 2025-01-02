@@ -92,9 +92,14 @@ export const DesignNavbar = ({ isCollapsed, setIsCollapsed }: DesignNavbarProps)
           isCollapsed ? "justify-center" : "justify-between"
         )}>
           {!isCollapsed && (
-            <h1 className="text-2xl font-bold text-primary animate-fade-in">
-              Designer Portal
-            </h1>
+            <div className="flex flex-col animate-fade-in">
+              <h1 className="text-2xl font-bold text-primary">
+                JGX Digital Lab
+              </h1>
+              <span className="text-sm text-muted-foreground">
+                Designer Portal
+              </span>
+            </div>
           )}
           <Button
             variant="ghost"
