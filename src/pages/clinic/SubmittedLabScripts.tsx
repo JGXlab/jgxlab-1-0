@@ -15,6 +15,7 @@ import { formSchema } from "@/components/surgical-form/formSchema";
 import { PatientInformationSection } from "@/components/surgical-form/PatientInformationSection";
 import { ApplianceDetailsSection } from "@/components/surgical-form/ApplianceDetailsSection";
 import { AdditionalInformationSection } from "@/components/surgical-form/AdditionalInformationSection";
+import { PaymentSection } from "@/components/surgical-form/PaymentSection";
 import { useToast } from "@/components/ui/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { z } from "zod";
@@ -172,12 +173,11 @@ export default function SubmittedLabScripts() {
                 <PatientInformationSection form={form} />
                 <ApplianceDetailsSection form={form} />
                 <AdditionalInformationSection form={form} />
-
-                <div className="pt-6 border-t">
-                  <Button type="submit" className="w-full" disabled={isPending}>
-                    {isPending ? "Submitting..." : "Submit Lab Script"}
-                  </Button>
-                </div>
+                <PaymentSection 
+                  applianceType={form.watch('applianceType')}
+                  onSubmit={form.handleSubmit(onSubmit)}
+                  isSubmitting={isPending}
+                />
               </form>
             </Form>
           </DialogContent>
