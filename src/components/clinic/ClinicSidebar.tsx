@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, Users, FileCheck, UserRound, LogOut, ChevronLeft, ChevronRight } from "lucide-react";
+import { LayoutDashboard, Users, FileCheck, UserRound, LogOut, ChevronLeft, ChevronRight, DollarSign } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -52,6 +52,11 @@ export function ClinicSidebar({ isCollapsed, setIsCollapsed }: ClinicSidebarProp
       icon: FileCheck,
       label: "Lab Scripts",
       path: "/clinic/submittedlabscripts",
+    },
+    {
+      icon: DollarSign,
+      label: "Pricing",
+      path: "/clinic/pricing",
     },
     {
       icon: UserRound,

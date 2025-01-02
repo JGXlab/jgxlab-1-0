@@ -20,6 +20,7 @@ import ClinicPatients from "./pages/clinic/Patients";
 import NewLabScriptForm from "./pages/clinic/NewLabScriptForm";
 import SubmittedLabScripts from "./pages/clinic/SubmittedLabScripts";
 import MyAccount from "./pages/clinic/MyAccount";
+import Pricing from "./pages/clinic/Pricing";
 import DesignLogin from "./pages/design/Login";
 import DesignDashboard from "./pages/design/Dashboard";
 import DesignLabScripts from "./pages/design/LabScripts";
@@ -83,6 +84,7 @@ const App = () => {
                   <Route path="/clinic/new-lab-script" element={<ClinicGuard><NewLabScriptForm /></ClinicGuard>} />
                   <Route path="/clinic/submittedlabscripts" element={<ClinicGuard><SubmittedLabScripts /></ClinicGuard>} />
                   <Route path="/clinic/myaccount" element={<ClinicGuard><MyAccount /></ClinicGuard>} />
+                  <Route path="/clinic/pricing" element={<ClinicGuard><Pricing /></ClinicGuard>} />
                 </>
               )}
             </Routes>
