@@ -90,23 +90,28 @@ export const AdminNavbar = ({ isCollapsed, setIsCollapsed }: AdminNavbarProps) =
     <div 
       className={cn(
         "fixed left-0 top-0 h-full flex transition-all duration-300 ease-spring z-50",
-        isCollapsed ? "w-[45px]" : "w-full sm:w-48" // Changed from w-[60px] and sm:w-64
+        isCollapsed ? "w-[60px]" : "w-full sm:w-64"
       )}
     >
-      <nav className="w-full bg-white p-3 relative shadow-sm"> {/* Changed padding from p-4 */}
+      <nav className="w-full bg-white p-4 relative shadow-sm">
         <div className={cn(
-          "mb-6 flex items-center transition-all duration-300 ease-spring", // Reduced margin from mb-8
+          "mb-8 flex items-center transition-all duration-300 ease-spring",
           isCollapsed ? "justify-center" : "justify-between"
         )}>
           {!isCollapsed && (
-            <h1 className="text-xl font-bold text-primary animate-fade-in"> {/* Reduced text size from 2xl */}
-              Admin Portal
-            </h1>
+            <div className="flex flex-col animate-fade-in">
+              <h1 className="text-2xl font-bold text-primary">
+                JGX Digital Lab
+              </h1>
+              <span className="text-sm text-muted-foreground">
+                Admin Portal
+              </span>
+            </div>
           )}
           <Button
             variant="ghost"
             size="icon"
-            className="h-7 w-7 transition-transform duration-300 ease-spring hover:bg-accent" // Reduced button size from h-8 w-8
+            className="h-8 w-8 transition-transform duration-300 ease-spring hover:bg-accent"
             onClick={() => setIsCollapsed(!isCollapsed)}
           >
             {isCollapsed ? (
@@ -125,7 +130,7 @@ export const AdminNavbar = ({ isCollapsed, setIsCollapsed }: AdminNavbarProps) =
                 key={item.path}
                 to={item.path}
                 className={cn(
-                  "flex items-center p-2 rounded-lg transition-all duration-200 ease-spring group", // Reduced padding from p-3
+                  "flex items-center p-3 rounded-lg transition-all duration-200 ease-spring group",
                   isCollapsed ? "justify-center" : "space-x-3",
                   isActive(item.path) 
                     ? "bg-accent text-primary shadow-sm" 
@@ -133,29 +138,29 @@ export const AdminNavbar = ({ isCollapsed, setIsCollapsed }: AdminNavbarProps) =
                 )}
               >
                 <Icon className={cn(
-                  "h-4 w-4 flex-shrink-0 transition-transform duration-200 ease-spring", // Reduced icon size from h-5 w-5
+                  "h-5 w-5 flex-shrink-0 transition-transform duration-200 ease-spring",
                   !isActive(item.path) && "group-hover:scale-110"
                 )} />
                 {!isCollapsed && (
-                  <span className="font-medium text-xs">{item.label}</span> // Reduced text size from sm
+                  <span className="font-medium text-sm">{item.label}</span>
                 )}
               </Link>
             );
           })}
         </div>
 
-        <div className="absolute bottom-4 left-0 right-0 px-3"> {/* Reduced padding from px-4 */}
+        <div className="absolute bottom-4 left-0 right-0 px-4">
           <Button
             variant="ghost"
             className={cn(
               "w-full transition-colors duration-200 ease-spring",
               "text-destructive hover:text-destructive/90 hover:bg-destructive/10",
-              isCollapsed ? "justify-center p-2" : "justify-start space-x-3 p-2" // Reduced padding from p-3
+              isCollapsed ? "justify-center p-3" : "justify-start space-x-3 p-3"
             )}
             onClick={handleLogout}
           >
-            <LogOut className="h-4 w-4 flex-shrink-0" /> {/* Reduced icon size from h-5 w-5 */}
-            {!isCollapsed && <span className="text-xs">Logout</span>} {/* Reduced text size */}
+            <LogOut className="h-5 w-5 flex-shrink-0" />
+            {!isCollapsed && <span>Logout</span>}
           </Button>
         </div>
       </nav>

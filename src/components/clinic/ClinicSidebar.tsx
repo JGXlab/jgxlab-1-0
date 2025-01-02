@@ -54,9 +54,10 @@ export function ClinicSidebar() {
   return (
     <div className="fixed left-0 top-0 flex flex-col w-64 h-screen bg-white border-r border-gray-100">
       <div className="flex items-center h-16 px-6 border-b border-gray-100">
-        <Link to="/clinic/dashboard" className="flex items-center gap-2">
-          <span className="text-xl font-semibold text-primary">JGX Digital Lab</span>
-        </Link>
+        <div className="flex flex-col">
+          <h1 className="text-2xl font-bold text-primary">JGX Digital Lab</h1>
+          <span className="text-sm text-muted-foreground">Clinic Portal</span>
+        </div>
       </div>
       <div className="flex-1 overflow-y-auto py-4">
         <div className="flex flex-col gap-1 px-3">
@@ -69,24 +70,17 @@ export function ClinicSidebar() {
                 className={cn(
                   "flex items-center gap-3 px-3 py-2 rounded-lg transition-colors relative group",
                   isActive
-                    ? "bg-[#EEF2FF] text-[#375BDC]"
-                    : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
+                    ? "bg-accent text-primary shadow-sm"
+                    : "text-secondary hover:bg-accent/50 hover:text-primary"
                 )}
               >
                 <button.icon
                   className={cn(
                     "h-5 w-5",
-                    isActive ? "text-[#375BDC]" : "text-gray-500 group-hover:text-gray-900"
+                    isActive ? "text-primary" : "text-secondary group-hover:text-primary"
                   )}
                 />
-                <span
-                  className={cn(
-                    "font-medium text-sm",
-                    isActive ? "text-[#375BDC]" : "text-gray-500 group-hover:text-gray-900"
-                  )}
-                >
-                  {button.label}
-                </span>
+                <span className="font-medium text-sm">{button.label}</span>
               </Link>
             );
           })}
@@ -95,7 +89,7 @@ export function ClinicSidebar() {
       <div className="px-3 pb-4">
         <button
           onClick={handleLogout}
-          className="flex items-center gap-3 px-3 py-2 w-full rounded-lg transition-colors text-[#ea384c] hover:bg-red-50"
+          className="flex items-center gap-3 px-3 py-2 w-full rounded-lg transition-colors text-destructive hover:bg-destructive/10"
         >
           <LogOut className="h-5 w-5" />
           <span className="font-medium text-sm">Logout</span>
@@ -103,4 +97,4 @@ export function ClinicSidebar() {
       </div>
     </div>
   );
-}
+};
