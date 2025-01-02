@@ -56,38 +56,36 @@ export const PaymentSection = ({ applianceType, archType, onSubmit, isSubmitting
   });
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg p-4 z-50">
-      <div className="max-w-3xl mx-auto">
-        <div className="flex justify-between items-center">
-          <div className="space-y-1">
-            <p className="text-sm font-medium text-gray-500">Total Amount</p>
-            {isLoading ? (
-              <div className="h-6 w-20 animate-pulse bg-gray-200 rounded" />
-            ) : (
-              <p className="text-2xl font-semibold text-gray-900">
-                ${calculateFinalPrice()}
-                {archType === 'dual' && (
-                  <span className="text-sm text-gray-500 ml-2">(Dual arch price)</span>
-                )}
-              </p>
-            )}
-          </div>
-          <Button 
-            type="submit" 
-            size="lg"
-            disabled={isSubmitting || isLoading}
-            className="min-w-[200px]"
-          >
-            {isSubmitting ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Submitting...
-              </>
-            ) : (
-              'Submit and Pay'
-            )}
-          </Button>
+    <div className="sticky bottom-0 bg-white border-t shadow-lg p-4">
+      <div className="flex justify-between items-center">
+        <div className="space-y-1">
+          <p className="text-sm font-medium text-gray-500">Total Amount</p>
+          {isLoading ? (
+            <div className="h-6 w-20 animate-pulse bg-gray-200 rounded" />
+          ) : (
+            <p className="text-2xl font-semibold text-gray-900">
+              ${calculateFinalPrice()}
+              {archType === 'dual' && (
+                <span className="text-sm text-gray-500 ml-2">(Dual arch price)</span>
+              )}
+            </p>
+          )}
         </div>
+        <Button 
+          type="submit" 
+          size="lg"
+          disabled={isSubmitting || isLoading}
+          className="min-w-[200px]"
+        >
+          {isSubmitting ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Submitting...
+            </>
+          ) : (
+            'Submit and Pay'
+          )}
+        </Button>
       </div>
     </div>
   );
