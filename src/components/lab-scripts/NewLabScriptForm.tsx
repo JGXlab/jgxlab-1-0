@@ -23,7 +23,6 @@ export const NewLabScriptForm = ({ onSuccess }: NewLabScriptFormProps) => {
     defaultValues: {
       patientId: "",
       applianceType: "",
-      expressDesign: "",
       arch: "",
       treatmentType: "",
       screwType: "",
@@ -47,7 +46,6 @@ export const NewLabScriptForm = ({ onSuccess }: NewLabScriptFormProps) => {
           {
             patient_id: values.patientId,
             appliance_type: values.applianceType,
-            express_design: values.expressDesign,
             arch: values.arch,
             treatment_type: values.treatmentType,
             screw_type: values.screwType,
