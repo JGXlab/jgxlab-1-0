@@ -12,7 +12,9 @@ export const DesignLayout = ({ children }: { children: React.ReactNode }) => {
           isCollapsed ? 'ml-[60px]' : 'ml-[60px] sm:ml-64'
         }`}
       >
-        {children}
+        <div className="max-w-[1280px] mx-auto w-full">
+          {children}
+        </div>
       </main>
     </div>
   );

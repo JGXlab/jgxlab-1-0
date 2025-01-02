@@ -122,7 +122,8 @@ const DesignLogin = () => {
 
   return (
     <div className="h-screen w-screen flex items-center justify-center bg-gray-50">
-      <Card className="w-full max-w-[420px] mx-auto bg-white shadow-lg rounded-3xl border-0">
+      <div className="max-w-[1280px] w-full mx-auto px-4">
+        <Card className="w-full max-w-[420px] mx-auto bg-white shadow-lg rounded-3xl border-0">
         <CardContent className="p-8">
           <div className="text-center space-y-4 mb-8">
             <div className="flex justify-center">
@@ -175,7 +176,8 @@ const DesignLogin = () => {
             </Button>
           </form>
         </CardContent>
-      </Card>
+        </Card>
+      </div>
     </div>
   );
 };
