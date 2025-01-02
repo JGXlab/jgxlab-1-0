@@ -1,36 +1,22 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, Users, FileCheck, UserRound, LogOut } from "lucide-react";
+import { LayoutDashboard, Users, FileCheck, UserRound, LogOut, ChevronLeft, ChevronRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 
-const sidebarButtons = [
-  {
-    icon: LayoutDashboard,
-    label: "Dashboard",
-    path: "/clinic/dashboard",
-  },
-  {
-    icon: Users,
-    label: "Patients",
-    path: "/clinic/patients",
-  },
-  {
-    icon: FileCheck,
-    label: "Lab Script",
-    path: "/clinic/submittedlabscripts",
-  },
-  {
-    icon: UserRound,
-    label: "My Account",
-    path: "/clinic/myaccount",
-  },
-];
+interface ClinicSidebarProps {
+  isCollapsed: boolean;
+  setIsCollapsed: (value: boolean) => void;
+}
 
-export function ClinicSidebar() {
+export function ClinicSidebar({ isCollapsed, setIsCollapsed }: ClinicSidebarProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const { toast } = useToast();
+  
+  const isActive = (path: string) => location.pathname === path;
 
   const handleLogout = async () => {
     try {
@@ -51,50 +37,108 @@ export function ClinicSidebar() {
     }
   };
 
+  const navItems = [
+    {
+      icon: LayoutDashboard,
+      label: "Dashboard",
+      path: "/clinic/dashboard",
+    },
+    {
+      icon: Users,
+      label: "Patients",
+      path: "/clinic/patients",
+    },
+    {
+      icon: FileCheck,
+      label: "Lab Scripts",
+      path: "/clinic/submittedlabscripts",
+    },
+    {
+      icon: UserRound,
+      label: "My Account",
+      path: "/clinic/myaccount",
+    },
+  ];
+
   return (
-    <div className="fixed left-0 top-0 flex flex-col w-64 h-screen bg-white border-r border-gray-100">
-      <div className="flex items-center h-16 px-6 border-b border-gray-100">
-        <div className="flex flex-col">
-          <h1 className="text-2xl font-bold text-primary">JGX Digital Lab</h1>
-          <span className="text-sm text-muted-foreground">Clinic Portal</span>
+    <div 
+      className={cn(
+        "fixed left-0 top-0 h-full flex transition-all duration-300 ease-spring z-50",
+        isCollapsed ? "w-[60px]" : "w-full sm:w-64"
+      )}
+    >
+      <nav className="w-full bg-white p-4 relative shadow-sm">
+        <div className={cn(
+          "mb-8 flex items-center transition-all duration-300 ease-spring",
+          isCollapsed ? "justify-center" : "justify-between"
+        )}>
+          {!isCollapsed && (
+            <div className="flex flex-col animate-fade-in">
+              <h1 className="text-2xl font-bold text-primary">
+                JGX Digital Lab
+              </h1>
+              <span className="text-sm text-muted-foreground">
+                Clinic Portal
+              </span>
+            </div>
+          )}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 transition-transform duration-300 ease-spring hover:bg-accent"
+            onClick={() => setIsCollapsed(!isCollapsed)}
+          >
+            {isCollapsed ? (
+              <ChevronRight className="h-4 w-4" />
+            ) : (
+              <ChevronLeft className="h-4 w-4" />
+            )}
+          </Button>
         </div>
-      </div>
-      <div className="flex-1 overflow-y-auto py-4">
-        <div className="flex flex-col gap-1 px-3">
-          {sidebarButtons.map((button) => {
-            const isActive = location.pathname === button.path;
+        
+        <div className="space-y-1">
+          {navItems.map((item) => {
+            const Icon = item.icon;
             return (
               <Link
-                key={button.label}
-                to={button.path}
+                key={item.path}
+                to={item.path}
                 className={cn(
-                  "flex items-center gap-3 px-3 py-2 rounded-lg transition-colors relative group",
-                  isActive
-                    ? "bg-accent text-primary shadow-sm"
+                  "flex items-center p-3 rounded-lg transition-all duration-200 ease-spring group",
+                  isCollapsed ? "justify-center" : "space-x-3",
+                  isActive(item.path) 
+                    ? "bg-accent text-primary shadow-sm" 
                     : "text-secondary hover:bg-accent/50 hover:text-primary"
                 )}
               >
-                <button.icon
-                  className={cn(
-                    "h-5 w-5",
-                    isActive ? "text-primary" : "text-secondary group-hover:text-primary"
-                  )}
-                />
-                <span className="font-medium text-sm">{button.label}</span>
+                <Icon className={cn(
+                  "h-5 w-5 flex-shrink-0 transition-transform duration-200 ease-spring",
+                  !isActive(item.path) && "group-hover:scale-110"
+                )} />
+                {!isCollapsed && (
+                  <span className="font-medium text-sm">{item.label}</span>
+                )}
               </Link>
             );
           })}
         </div>
-      </div>
-      <div className="px-3 pb-4">
-        <button
-          onClick={handleLogout}
-          className="flex items-center gap-3 px-3 py-2 w-full rounded-lg transition-colors text-destructive hover:bg-destructive/10"
-        >
-          <LogOut className="h-5 w-5" />
-          <span className="font-medium text-sm">Logout</span>
-        </button>
-      </div>
+
+        <div className="absolute bottom-4 left-0 right-0 px-4">
+          <Button
+            variant="ghost"
+            className={cn(
+              "w-full transition-colors duration-200 ease-spring",
+              "text-destructive hover:text-destructive/90 hover:bg-destructive/10",
+              isCollapsed ? "justify-center p-3" : "justify-start space-x-3 p-3"
+            )}
+            onClick={handleLogout}
+          >
+            <LogOut className="h-5 w-5 flex-shrink-0" />
+            {!isCollapsed && <span>Logout</span>}
+          </Button>
+        </div>
+      </nav>
+      <Separator orientation="vertical" className="h-full" />
     </div>
   );
-};
+}

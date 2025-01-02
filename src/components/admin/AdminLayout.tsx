@@ -8,8 +8,8 @@ export const AdminLayout = ({ children }: { children: React.ReactNode }) => {
     <div className="min-h-screen bg-accent/30 flex relative w-full">
       <AdminNavbar isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
       <main 
-        className={`flex-1 p-3 sm:p-6 transition-all duration-300 ease-spring animate-fade-in w-full ${
-          isCollapsed ? 'ml-[45px]' : 'ml-[45px] sm:ml-48'
+        className={`flex-1 p-8 transition-all duration-300 ease-spring animate-fade-in w-full ${
+          isCollapsed ? 'ml-[60px]' : 'ml-[60px] sm:ml-64'
         }`}
       >
         {children}
