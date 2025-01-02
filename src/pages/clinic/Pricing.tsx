@@ -1,5 +1,4 @@
 import { ClinicLayout } from "@/components/clinic/ClinicLayout";
-import { PriceTableDropdown } from "@/components/surgical-form/PriceTableDropdown";
 
 const Pricing = () => {
   return (
@@ -11,7 +10,7 @@ const Pricing = () => {
         
         <div className="bg-white rounded-lg shadow-sm p-6">
           <div className="max-w-3xl mx-auto">
-            <PriceTableDropdown />
+            {/* Placeholder for new pricing content */}
           </div>
         </div>
       </div>
