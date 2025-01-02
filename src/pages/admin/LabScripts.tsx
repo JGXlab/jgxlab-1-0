@@ -132,17 +132,12 @@ const LabScripts = () => {
         />
 
         <Card className="p-3 backdrop-blur-sm bg-white/50 shadow-lg">
-          {isLoading ? (
-            <LoadingLabScripts />
-          ) : !filteredLabScripts?.length ? (
-            <EmptyLabScripts />
-          ) : (
-            <LabScriptsTable
-              labScripts={filteredLabScripts}
-              onPreview={handlePreview}
-              onStatusUpdate={handleStatusUpdate}
-            />
-          )}
+          <LabScriptsTable
+            labScripts={filteredLabScripts || []}
+            isLoading={isLoading}
+            onPreview={handlePreview}
+            onStatusUpdate={handleStatusUpdate}
+          />
         </Card>
 
         {selectedScript && (
