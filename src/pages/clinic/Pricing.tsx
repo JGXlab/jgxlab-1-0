@@ -37,6 +37,10 @@ const pricingData = [
   {
     service: "Ti-Bar Design",
     price: 250.00
+  },
+  {
+    service: "Express design (in 24 hours)",
+    price: 50.00
   }
 ];
 
