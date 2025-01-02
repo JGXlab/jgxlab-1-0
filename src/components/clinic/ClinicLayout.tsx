@@ -7,7 +7,7 @@ export function ClinicLayout({ children }: { children: ReactNode }) {
       <div className="max-w-[1280px] mx-auto relative flex">
         <ClinicSidebar />
         <main className="flex-1 pl-64">
-          <div className="py-8 px-6">
+          <div className="p-6">
             {children}
           </div>
         </main>

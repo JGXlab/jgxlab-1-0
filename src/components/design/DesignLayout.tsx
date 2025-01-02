@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import { DesignNavbar } from "./DesignNavbar";
 
-export const DesignLayout = ({ children }: { children: React.ReactNode }) => {
+export const DesignLayout = ({ children }: { children: ReactNode }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   return (
@@ -9,13 +9,17 @@ export const DesignLayout = ({ children }: { children: React.ReactNode }) => {
       <div className="max-w-[1280px] mx-auto relative flex">
         <DesignNavbar isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
         <main 
-          className={`flex-1 p-4 sm:p-8 transition-all duration-300 ease-spring animate-fade-in ${
+          className={`flex-1 transition-all duration-300 ease-spring animate-fade-in ${
             isCollapsed ? 'ml-[60px]' : 'ml-[60px] sm:ml-64'
           }`}
         >
-          {children}
+          <div className="p-6">
+            {children}
+          </div>
         </main>
       </div>
     </div>
   );
 };
+
+export default DesignLayout;
