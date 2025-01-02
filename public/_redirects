@@ -1,0 +1,6 @@
+# Subdomain routing
+https://admin.yourdomain.com/*  /admin/:splat  200
+https://design.yourdomain.com/* /design/:splat 200
+
+# Fallback
+/*  /index.html  200
