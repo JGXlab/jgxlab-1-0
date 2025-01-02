@@ -70,7 +70,12 @@ export function PatientSelector({ value, onChange, clinicId }: PatientSelectorPr
             </Button>
           </FormControl>
         </PopoverTrigger>
-        <PopoverContent className="w-[400px] p-0">
+        <PopoverContent 
+          className="w-[400px] p-0" 
+          align="start"
+          sideOffset={4}
+          style={{ zIndex: 9999 }}
+        >
           <Command>
             <CommandInput placeholder="Search patients..." />
             <CommandList>
