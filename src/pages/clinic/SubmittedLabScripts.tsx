@@ -169,7 +169,7 @@ export default function SubmittedLabScripts() {
               <DialogTitle>New Lab Script</DialogTitle>
             </DialogHeader>
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 pb-24">
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 pb-16">
                 <PatientInformationSection form={form} />
                 <ApplianceDetailsSection form={form} />
                 <AdditionalInformationSection form={form} />
