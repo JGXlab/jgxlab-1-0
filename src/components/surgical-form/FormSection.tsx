@@ -1,3 +1,5 @@
+import { cn } from "@/lib/utils";
+
 interface FormSectionProps {
   title: string;
   children: React.ReactNode;
