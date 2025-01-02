@@ -5,6 +5,7 @@ import { FormSection } from "./FormSection";
 import { UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 import { formSchema } from "./formSchema";
+import { SelectionButton } from "./SelectionButton";
 
 interface AdditionalInformationSectionProps {
   form: UseFormReturn<z.infer<typeof formSchema>>;
@@ -13,6 +14,28 @@ interface AdditionalInformationSectionProps {
 export const AdditionalInformationSection = ({ form }: AdditionalInformationSectionProps) => {
   return (
     <FormSection title="Additional Information" className="pt-6 border-t">
+      <FormField
+        control={form.control}
+        name="expressDesign"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Express Design (within 24 hours)</FormLabel>
+            <div className="flex flex-wrap gap-4">
+              <SelectionButton
+                label="Yes"
+                isSelected={field.value === "yes"}
+                onClick={() => field.onChange("yes")}
+              />
+              <SelectionButton
+                label="No"
+                isSelected={field.value === "no"}
+                onClick={() => field.onChange("no")}
+              />
+            </div>
+          </FormItem>
+        )}
+      />
+
       <FormField
         control={form.control}
         name="dueDate"

@@ -12,4 +12,5 @@ export const formSchema = z.object({
   shade: z.string().min(1, "Shade must be selected"),
   dueDate: z.string().min(1, "Due date is required"),
   specificInstructions: z.string().optional(),
+  expressDesign: z.string().min(1, "Please specify if express design is needed"),
 });

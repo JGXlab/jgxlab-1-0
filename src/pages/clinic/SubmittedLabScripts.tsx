@@ -39,6 +39,7 @@ export default function SubmittedLabScripts() {
       shade: "",
       dueDate: "",
       specificInstructions: "",
+      expressDesign: "",
     },
   });
 
@@ -90,6 +91,7 @@ export default function SubmittedLabScripts() {
             shade: values.shade,
             due_date: values.dueDate,
             specific_instructions: values.specificInstructions,
+            express_design: values.expressDesign,
             user_id: user.id,
           }
         ])
