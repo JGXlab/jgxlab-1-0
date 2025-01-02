@@ -1,5 +1,5 @@
 import { ClinicLayout } from "@/components/clinic/ClinicLayout";
-import { Calendar, User, FileText, CheckCircle2, Clock, Info, Database, Eye } from "lucide-react";
+import { Calendar, User, FileText, CheckCircle2, Clock, Info, Database } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -16,7 +16,7 @@ import { useNavigate } from "react-router-dom";
 import { EmptyLabScripts } from "@/components/lab-scripts/EmptyLabScripts";
 import { LoadingLabScripts } from "@/components/lab-scripts/LoadingLabScripts";
 import { LabScriptsHeader } from "@/components/lab-scripts/LabScriptsHeader";
-import { Button } from "@/components/ui/button";
+import { TableActions } from "@/components/lab-scripts/TableActions";
 import { PreviewLabScriptModal } from "@/components/surgical-form/PreviewLabScriptModal";
 import { useState } from "react";
 
@@ -86,7 +86,7 @@ export default function SubmittedLabScripts() {
   });
 
   const handlePreview = (script: any, e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent row click when clicking preview button
+    e.stopPropagation();
     setSelectedScript(script);
     setIsPreviewOpen(true);
   };
@@ -201,15 +201,7 @@ export default function SubmittedLabScripts() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="w-full flex items-center justify-center gap-2"
-                        onClick={(e) => handlePreview(script, e)}
-                      >
-                        <Eye className="h-4 w-4" />
-                        <span>Preview</span>
-                      </Button>
+                      <TableActions onPreview={(e) => handlePreview(script, e)} />
                     </TableCell>
                   </TableRow>
                 ))
