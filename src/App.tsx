@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AdminGuard } from "@/components/admin/AdminGuard";
 import { ClinicGuard } from "@/components/clinic/ClinicGuard";
 import { DesignGuard } from "@/components/design/DesignGuard";
@@ -28,44 +28,67 @@ import DesignMyProfile from "./pages/design/MyProfile";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <div className="flex min-h-screen w-full">
-          <Routes>
-            <Route path="/" element={<Index />} />
-            
-            {/* Admin Routes */}
-            <Route path="/admin/login" element={<AdminLogin />} />
-            <Route path="/admin/dashboard" element={<AdminGuard><AdminDashboard /></AdminGuard>} />
-            <Route path="/admin/notifications" element={<AdminGuard><Notifications /></AdminGuard>} />
-            <Route path="/admin/patients" element={<AdminGuard><AdminPatients /></AdminGuard>} />
-            <Route path="/admin/lab-scripts" element={<AdminGuard><LabScripts /></AdminGuard>} />
-            <Route path="/admin/settings" element={<AdminGuard><Settings /></AdminGuard>} />
-            <Route path="/admin/clinics" element={<AdminGuard><Clinics /></AdminGuard>} />
-            <Route path="/admin/designers" element={<AdminGuard><Designers /></AdminGuard>} />
-            
-            {/* Clinic Routes */}
-            <Route path="/clinic/dashboard" element={<ClinicGuard><ClinicDashboard /></ClinicGuard>} />
-            <Route path="/clinic/patients" element={<ClinicGuard><ClinicPatients /></ClinicGuard>} />
-            <Route path="/clinic/new-lab-script" element={<ClinicGuard><NewLabScriptForm /></ClinicGuard>} />
-            <Route path="/clinic/submittedlabscripts" element={<ClinicGuard><SubmittedLabScripts /></ClinicGuard>} />
-            <Route path="/clinic/myaccount" element={<ClinicGuard><MyAccount /></ClinicGuard>} />
+const App = () => {
+  // Get the current hostname
+  const hostname = window.location.hostname;
+  console.log('Current hostname:', hostname);
 
-            {/* Designer Routes */}
-            <Route path="/design/login" element={<DesignLogin />} />
-            <Route path="/design/dashboard" element={<DesignGuard><DesignDashboard /></DesignGuard>} />
-            <Route path="/design/labscripts" element={<DesignGuard><DesignLabScripts /></DesignGuard>} />
-            <Route path="/design/settings" element={<DesignGuard><DesignSettings /></DesignGuard>} />
-            <Route path="/design/myprofile" element={<DesignGuard><DesignMyProfile /></DesignGuard>} />
-          </Routes>
-        </div>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+  // Determine which portal to show based on subdomain
+  const isAdminPortal = hostname.startsWith('admin.');
+  const isDesignPortal = hostname.startsWith('design.');
+
+  console.log('Portal type:', { isAdminPortal, isDesignPortal });
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <div className="flex min-h-screen w-full">
+            <Routes>
+              {/* Admin Portal Routes */}
+              {isAdminPortal ? (
+                <>
+                  <Route path="/" element={<Navigate to="/admin/login" replace />} />
+                  <Route path="/admin/login" element={<AdminLogin />} />
+                  <Route path="/admin/dashboard" element={<AdminGuard><AdminDashboard /></AdminGuard>} />
+                  <Route path="/admin/notifications" element={<AdminGuard><Notifications /></AdminGuard>} />
+                  <Route path="/admin/patients" element={<AdminGuard><AdminPatients /></AdminGuard>} />
+                  <Route path="/admin/lab-scripts" element={<AdminGuard><LabScripts /></AdminGuard>} />
+                  <Route path="/admin/settings" element={<AdminGuard><Settings /></AdminGuard>} />
+                  <Route path="/admin/clinics" element={<AdminGuard><Clinics /></AdminGuard>} />
+                  <Route path="/admin/designers" element={<AdminGuard><Designers /></AdminGuard>} />
+                  <Route path="*" element={<Navigate to="/admin/login" replace />} />
+                </>
+              ) : isDesignPortal ? (
+                <>
+                  {/* Designer Portal Routes */}
+                  <Route path="/" element={<Navigate to="/design/login" replace />} />
+                  <Route path="/design/login" element={<DesignLogin />} />
+                  <Route path="/design/dashboard" element={<DesignGuard><DesignDashboard /></DesignGuard>} />
+                  <Route path="/design/labscripts" element={<DesignGuard><DesignLabScripts /></DesignGuard>} />
+                  <Route path="/design/settings" element={<DesignGuard><DesignSettings /></DesignGuard>} />
+                  <Route path="/design/myprofile" element={<DesignGuard><DesignMyProfile /></DesignGuard>} />
+                  <Route path="*" element={<Navigate to="/design/login" replace />} />
+                </>
+              ) : (
+                <>
+                  {/* Main/Clinic Portal Routes */}
+                  <Route path="/" element={<Index />} />
+                  <Route path="/clinic/dashboard" element={<ClinicGuard><ClinicDashboard /></ClinicGuard>} />
+                  <Route path="/clinic/patients" element={<ClinicGuard><ClinicPatients /></ClinicGuard>} />
+                  <Route path="/clinic/new-lab-script" element={<ClinicGuard><NewLabScriptForm /></ClinicGuard>} />
+                  <Route path="/clinic/submittedlabscripts" element={<ClinicGuard><SubmittedLabScripts /></ClinicGuard>} />
+                  <Route path="/clinic/myaccount" element={<ClinicGuard><MyAccount /></ClinicGuard>} />
+                </>
+              )}
+            </Routes>
+          </div>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;
