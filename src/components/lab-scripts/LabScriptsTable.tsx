@@ -43,9 +43,10 @@ interface LabScriptsTableProps {
   labScripts: any[];
   isLoading: boolean;
   onPreview: (script: any, e: React.MouseEvent) => void;
+  onStatusUpdate?: (id: string, status: string) => void;
 }
 
-export function LabScriptsTable({ labScripts, isLoading, onPreview }: LabScriptsTableProps) {
+export function LabScriptsTable({ labScripts, isLoading, onPreview, onStatusUpdate }: LabScriptsTableProps) {
   const navigate = useNavigate();
 
   return (
