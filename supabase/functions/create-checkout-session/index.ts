@@ -28,38 +28,38 @@ serve(async (req) => {
       throw new Error('No email found');
     }
 
-    const { formData, productId, totalAmount } = await req.json();
-    console.log('Received request:', { formData, productId, totalAmount });
+    const { formData, totalAmount } = await req.json();
+    console.log('Received request data:', { formData, totalAmount });
 
-    if (!productId) {
-      throw new Error('No productId provided');
+    if (!formData || !totalAmount) {
+      throw new Error('Missing required data');
     }
 
-    // Initialize Stripe
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
       apiVersion: '2023-10-16',
     });
 
-    // Calculate total amount in cents for Stripe
-    const finalAmount = Math.round(totalAmount * 100);
-    console.log('Final amount in cents:', finalAmount);
+    // Calculate amount in cents
+    const amountInCents = Math.round(totalAmount * 100);
 
-    // Create line items array with the main service
-    const lineItems = [{
-      price_data: {
-        currency: 'usd',
-        product: productId,
-        unit_amount: finalAmount,
-      },
-      quantity: 1,
-    }];
-
-    console.log('Creating checkout session with line items:', lineItems);
-
-    // Create Stripe checkout session
+    console.log('Creating checkout session...');
     const session = await stripe.checkout.sessions.create({
       customer_email: user.email,
-      line_items: lineItems,
+      line_items: [
+        {
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: `${formData.applianceType.split('-').map(word => 
+                word.charAt(0).toUpperCase() + word.slice(1)
+              ).join(' ')} - ${formData.arch.charAt(0).toUpperCase() + formData.arch.slice(1)} Arch`,
+              description: `Due Date: ${formData.dueDate}`,
+            },
+            unit_amount: amountInCents,
+          },
+          quantity: 1,
+        },
+      ],
       mode: 'payment',
       success_url: `${req.headers.get('origin')}/clinic/submittedlabscripts?session_id={CHECKOUT_SESSION_ID}&success=true`,
       cancel_url: `${req.headers.get('origin')}/clinic/submittedlabscripts?canceled=true`,
