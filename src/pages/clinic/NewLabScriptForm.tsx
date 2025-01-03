@@ -10,6 +10,7 @@ import { PatientInformationSection } from "@/components/surgical-form/PatientInf
 import { ApplianceDetailsSection } from "@/components/surgical-form/ApplianceDetailsSection";
 import { AdditionalInformationSection } from "@/components/surgical-form/AdditionalInformationSection";
 import { PreviewLabScriptModal } from "@/components/surgical-form/PreviewLabScriptModal";
+import { PaymentSection } from "@/components/surgical-form/PaymentSection";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
@@ -31,11 +32,11 @@ export default function NewLabScriptForm() {
       screwType: "",
       otherScrewType: "",
       vdoDetails: "",
-      needsNightguard: "no", // Set default to "no"
+      needsNightguard: "no",
       shade: "",
       dueDate: "",
       specificInstructions: "",
-      expressDesign: "no", // Set default to "no"
+      expressDesign: "no",
     },
   });
 
@@ -90,6 +91,13 @@ export default function NewLabScriptForm() {
     submitLabScript(values);
   };
 
+  const watchedValues = {
+    applianceType: form.watch('applianceType'),
+    arch: form.watch('arch'),
+    needsNightguard: form.watch('needsNightguard'),
+    expressDesign: form.watch('expressDesign'),
+  };
+
   return (
     <ClinicLayout>
       <div className="min-h-screen bg-gray-50">
@@ -119,12 +127,14 @@ export default function NewLabScriptForm() {
                 <PatientInformationSection form={form} />
                 <ApplianceDetailsSection form={form} />
                 <AdditionalInformationSection form={form} />
-
-                <div className="pt-6 border-t">
-                  <Button type="submit" className="w-full" disabled={isPending}>
-                    {isPending ? "Submitting..." : "Submit Lab Script"}
-                  </Button>
-                </div>
+                <PaymentSection 
+                  applianceType={watchedValues.applianceType}
+                  archType={watchedValues.arch}
+                  needsNightguard={watchedValues.needsNightguard}
+                  expressDesign={watchedValues.expressDesign}
+                  onSubmit={onSubmit}
+                  isSubmitting={isPending}
+                />
               </form>
             </Form>
           </div>

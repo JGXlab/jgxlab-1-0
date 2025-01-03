@@ -12,14 +12,26 @@ const priceMap = {
   'ti-bar': 'e5593f92-37e7-43a2-b379-cc12bbcb9da4'
 };
 
+const NIGHTGUARD_PRICE = 50;
+const EXPRESS_DESIGN_PRICE = 50;
+
 interface PaymentSectionProps {
   applianceType: string;
   archType: string;
+  needsNightguard?: string;
+  expressDesign?: string;
   onSubmit: () => void;
   isSubmitting: boolean;
 }
 
-export const PaymentSection = ({ applianceType, archType, onSubmit, isSubmitting }: PaymentSectionProps) => {
+export const PaymentSection = ({ 
+  applianceType, 
+  archType, 
+  needsNightguard = 'no',
+  expressDesign = 'no',
+  onSubmit, 
+  isSubmitting 
+}: PaymentSectionProps) => {
   const priceId = applianceType ? priceMap[applianceType as keyof typeof priceMap] : null;
 
   const { data: priceData, isLoading } = useQuery({
@@ -39,11 +51,28 @@ export const PaymentSection = ({ applianceType, archType, onSubmit, isSubmitting
     enabled: !!priceId,
   });
 
-  // Calculate final price based on arch type
+  // Calculate final price based on arch type and add-ons
   const calculateFinalPrice = () => {
     if (!priceData?.price) return '0.00';
-    const basePrice = Number(priceData.price);
-    return archType === 'dual' ? (basePrice * 2).toFixed(2) : basePrice.toFixed(2);
+    
+    let totalPrice = Number(priceData.price);
+    
+    // Double the price for dual arch
+    if (archType === 'dual') {
+      totalPrice *= 2;
+    }
+
+    // Add nightguard price if selected
+    if (needsNightguard === 'yes' && applianceType !== 'surgical-day') {
+      totalPrice += NIGHTGUARD_PRICE;
+    }
+
+    // Add express design price if selected
+    if (expressDesign === 'yes' && applianceType !== 'surgical-day') {
+      totalPrice += EXPRESS_DESIGN_PRICE;
+    }
+
+    return totalPrice.toFixed(2);
   };
 
   if (!applianceType) return null;
@@ -52,24 +81,47 @@ export const PaymentSection = ({ applianceType, archType, onSubmit, isSubmitting
     applianceType, 
     archType, 
     basePrice: priceData?.price,
+    needsNightguard,
+    expressDesign,
     finalPrice: calculateFinalPrice()
   });
 
+  // Function to render price breakdown
+  const renderPriceBreakdown = () => {
+    if (!priceData?.price) return null;
+
+    const basePrice = Number(priceData.price);
+    const isDual = archType === 'dual';
+    const hasNightguard = needsNightguard === 'yes' && applianceType !== 'surgical-day';
+    const hasExpressDesign = expressDesign === 'yes' && applianceType !== 'surgical-day';
+
+    return (
+      <div className="space-y-1 text-sm text-gray-500">
+        <div>Base price: ${basePrice.toFixed(2)}</div>
+        {isDual && <div>Dual arch: ${(basePrice * 2).toFixed(2)}</div>}
+        {hasNightguard && <div>Nightguard: +${NIGHTGUARD_PRICE.toFixed(2)}</div>}
+        {hasExpressDesign && <div>Express design: +${EXPRESS_DESIGN_PRICE.toFixed(2)}</div>}
+      </div>
+    );
+  };
+
   return (
     <div className="sticky bottom-0 bg-white border-t shadow-lg p-4">
-      <div className="flex justify-between items-center">
-        <div className="space-y-1">
-          <p className="text-sm font-medium text-gray-500">Total Amount</p>
-          {isLoading ? (
-            <div className="h-6 w-20 animate-pulse bg-gray-200 rounded" />
-          ) : (
-            <p className="text-2xl font-semibold text-gray-900">
-              ${calculateFinalPrice()}
-              {archType === 'dual' && (
-                <span className="text-sm text-gray-500 ml-2">(Dual arch price)</span>
-              )}
-            </p>
-          )}
+      <div className="flex justify-between items-start">
+        <div className="space-y-2">
+          <div className="space-y-1">
+            <p className="text-sm font-medium text-gray-500">Total Amount</p>
+            {isLoading ? (
+              <div className="h-6 w-20 animate-pulse bg-gray-200 rounded" />
+            ) : (
+              <>
+                <p className="text-2xl font-semibold text-gray-900">
+                  ${calculateFinalPrice()}
+                </p>
+                {renderPriceBreakdown()}
+              </>
+            )}
+          </div>
         </div>
         <Button 
           type="submit" 
