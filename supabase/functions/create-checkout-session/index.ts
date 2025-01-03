@@ -7,9 +7,6 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const NIGHTGUARD_PRICE = 50;
-const EXPRESS_DESIGN_PRICE = 50;
-
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -31,38 +28,17 @@ serve(async (req) => {
       throw new Error('No email found');
     }
 
-    const { formData, serviceId, totalAmount } = await req.json();
-    console.log('Received request:', { formData, serviceId, totalAmount });
+    const { formData, productId, totalAmount } = await req.json();
+    console.log('Received request:', { formData, productId, totalAmount });
 
-    if (!serviceId) {
-      throw new Error('No serviceId provided');
+    if (!productId) {
+      throw new Error('No productId provided');
     }
 
     // Initialize Stripe
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
       apiVersion: '2023-10-16',
     });
-
-    // Get the specific service price with better error handling
-    const { data: servicePrices, error: servicePriceError } = await supabaseClient
-      .from('service_prices')
-      .select('*')
-      .eq('id', serviceId);
-
-    console.log('Service price lookup result:', { servicePrices, servicePriceError });
-
-    if (servicePriceError) {
-      console.error('Service price error:', servicePriceError);
-      throw new Error(`Service price lookup failed: ${servicePriceError.message}`);
-    }
-
-    if (!servicePrices || servicePrices.length === 0) {
-      console.error('No service price found for ID:', serviceId);
-      throw new Error(`No service price found for ID: ${serviceId}`);
-    }
-
-    const servicePrice = servicePrices[0];
-    console.log('Selected service price:', servicePrice);
 
     // Calculate total amount in cents for Stripe
     const finalAmount = Math.round(totalAmount * 100);
@@ -72,10 +48,7 @@ serve(async (req) => {
     const lineItems = [{
       price_data: {
         currency: 'usd',
-        product_data: {
-          name: `${servicePrice.service_name} - ${formData.arch.toUpperCase()} Arch`,
-          description: `Lab script for ${formData.applianceType.split('-').join(' ')}`
-        },
+        product: productId,
         unit_amount: finalAmount,
       },
       quantity: 1,
