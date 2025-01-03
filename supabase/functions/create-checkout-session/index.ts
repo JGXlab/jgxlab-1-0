@@ -8,13 +8,15 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    console.log('Received request to create checkout session');
     const { formData, lineItems, applianceType } = await req.json();
-    console.log('Received request data:', { formData, lineItems, applianceType });
+    console.log('Request data:', { formData, lineItems, applianceType });
 
     // Validate required data
     if (!formData) {
@@ -37,6 +39,7 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
     );
 
+    console.log('Fetching service prices from database');
     // Get the price IDs from the service_prices table
     const { data: servicePrices, error: pricesError } = await supabaseClient
       .from('service_prices')
@@ -47,6 +50,8 @@ serve(async (req) => {
       console.error('Error fetching service prices:', pricesError);
       throw new Error('Failed to fetch service prices');
     }
+
+    console.log('Service prices fetched:', servicePrices);
 
     // Map the line items to use the correct price IDs from the database
     const stripeLineItems = lineItems.map(item => {
