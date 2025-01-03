@@ -134,6 +134,7 @@ export default function NewLabScriptForm() {
                   expressDesign={watchedValues.expressDesign}
                   onSubmit={onSubmit}
                   isSubmitting={isPending}
+                  form={form}
                 />
               </form>
             </Form>
