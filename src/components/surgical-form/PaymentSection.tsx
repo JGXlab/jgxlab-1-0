@@ -7,6 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { calculateTotalPrice } from "./utils/priceCalculations";
 import { TotalAmountDisplay } from "./payment/TotalAmountDisplay";
 import { useEffect, useState } from "react";
+import { PaymentButton } from "../lab-scripts/PaymentButton";
 
 interface PaymentSectionProps {
   applianceType: string;
@@ -97,9 +98,15 @@ export const PaymentSection = ({
     ).join(' ');
   };
 
+  const handlePayment = async () => {
+    const formValues = form.getValues();
+    console.log('Form values:', formValues);
+    onSubmit(formValues);
+  };
+
   return (
     <div className="sticky bottom-0 bg-white border-t shadow-lg p-4">
-      <div className="flex justify-between items-start">
+      <div className="flex justify-between items-center">
         <TotalAmountDisplay
           basePrice={0}
           totalAmount={totalAmount}
@@ -109,6 +116,11 @@ export const PaymentSection = ({
           expressDesign={expressDesign}
           formattedApplianceType={formatApplianceType(applianceType)}
           isLoading={isPriceLoading}
+        />
+        <PaymentButton
+          amount={totalAmount}
+          onClick={handlePayment}
+          isLoading={isSubmitting}
         />
       </div>
     </div>
