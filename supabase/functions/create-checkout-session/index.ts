@@ -28,8 +28,8 @@ serve(async (req) => {
       throw new Error('No email found');
     }
 
-    const { formData, productId, totalAmount } = await req.json();
-    console.log('Received request data:', { formData, productId, totalAmount });
+    const { formData, totalAmount } = await req.json();
+    console.log('Creating test checkout with data:', { formData, totalAmount });
 
     if (!formData || !totalAmount) {
       throw new Error('Missing required data');
@@ -39,34 +39,10 @@ serve(async (req) => {
       apiVersion: '2023-10-16',
     });
 
-    // Format the appliance name
-    const applianceName = formData.applianceType
-      .split('-')
-      .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
-
-    // Format the arch type
-    const archType = formData.arch.charAt(0).toUpperCase() + formData.arch.slice(1);
-
     // Calculate amount in cents
     const amountInCents = Math.round(totalAmount * 100);
 
-    console.log('Creating checkout session with details:', {
-      applianceName,
-      archType,
-      amountInCents,
-      productId,
-      dueDate: formData.dueDate
-    });
-
-    // First, verify the product exists
-    try {
-      const product = await stripe.products.retrieve(productId);
-      console.log('Found Stripe product:', product);
-    } catch (error) {
-      console.error('Error retrieving Stripe product:', error);
-      throw new Error(`Invalid product ID: ${productId}`);
-    }
+    console.log('Creating checkout session with amount:', amountInCents);
 
     const session = await stripe.checkout.sessions.create({
       customer_email: user.email,
@@ -75,7 +51,10 @@ serve(async (req) => {
         {
           price_data: {
             currency: 'usd',
-            product: productId, // Use the product ID directly
+            product_data: {
+              name: 'Lab Script Service',
+              description: `Due Date: ${formData.dueDate}`,
+            },
             unit_amount: amountInCents,
           },
           quantity: 1,
