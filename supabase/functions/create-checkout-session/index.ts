@@ -44,23 +44,12 @@ serve(async (req) => {
       apiVersion: '2023-10-16',
     });
 
-    // First, let's log all service prices to debug
-    const { data: allPrices, error: allPricesError } = await supabaseClient
-      .from('service_prices')
-      .select('*');
-    
-    console.log('All available service prices:', allPrices);
-    
-    if (allPricesError) {
-      console.error('Error fetching all prices:', allPricesError);
-    }
-
-    // Get the specific service price
+    // Get the specific service price using maybeSingle() instead of single()
     const { data: servicePrices, error: servicePriceError } = await supabaseClient
       .from('service_prices')
       .select('*')
       .eq('id', serviceId)
-      .single();
+      .maybeSingle();
 
     console.log('Service price lookup result:', { servicePrices, servicePriceError });
 
