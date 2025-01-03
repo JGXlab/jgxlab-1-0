@@ -65,15 +65,6 @@ export const PaymentSection = ({
     updatePrices();
   }, [basePrice, archType, needsNightguard, expressDesign, applianceType]);
 
-  console.log('Payment details:', {
-    applianceType,
-    basePrice,
-    archType,
-    needsNightguard,
-    expressDesign,
-    lineItems
-  });
-
   const createCheckoutSession = useMutation({
     mutationFn: async (formData: z.infer<typeof formSchema>) => {
       console.log('Creating checkout session with:', { formData, lineItems });
