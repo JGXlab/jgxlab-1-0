@@ -39,21 +39,42 @@ serve(async (req) => {
       apiVersion: '2023-10-16',
     });
 
+    // Format the appliance name
+    const applianceName = formData.applianceType
+      .split('-')
+      .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+
+    // Format the arch type
+    const archType = formData.arch.charAt(0).toUpperCase() + formData.arch.slice(1);
+
     // Calculate amount in cents
     const amountInCents = Math.round(totalAmount * 100);
 
-    console.log('Creating checkout session...');
+    console.log('Creating checkout session with details:', {
+      applianceName,
+      archType,
+      amountInCents,
+      dueDate: formData.dueDate
+    });
+
     const session = await stripe.checkout.sessions.create({
       customer_email: user.email,
+      payment_method_types: ['card'],
       line_items: [
         {
           price_data: {
             currency: 'usd',
             product_data: {
-              name: `${formData.applianceType.split('-').map(word => 
-                word.charAt(0).toUpperCase() + word.slice(1)
-              ).join(' ')} - ${formData.arch.charAt(0).toUpperCase() + formData.arch.slice(1)} Arch`,
+              name: `${applianceName} - ${archType} Arch`,
               description: `Due Date: ${formData.dueDate}`,
+              metadata: {
+                appliance_type: formData.applianceType,
+                arch: formData.arch,
+                treatment_type: formData.treatmentType,
+                needs_nightguard: formData.needsNightguard || 'no',
+                express_design: formData.expressDesign || 'no'
+              }
             },
             unit_amount: amountInCents,
           },
