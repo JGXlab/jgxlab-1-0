@@ -10,6 +10,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PaymentButton } from "@/components/lab-scripts/PaymentButton";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const pricingData = [
   {
@@ -61,26 +62,24 @@ const Pricing = () => {
     try {
       console.log('Creating checkout session for price:', stripe_price_id);
       
-      const response = await fetch('/functions/v1/create-checkout-session', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      const { data, error } = await supabase.functions.invoke('create-checkout-session', {
+        body: {
           lineItems: [{
             price: stripe_price_id,
             quantity: 1
           }]
-        }),
+        }
       });
 
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
+      if (error) {
+        console.error('Payment error:', error);
+        throw error;
       }
 
-      const { url } = await response.json();
-      console.log('Redirecting to checkout URL:', url);
-      window.location.href = url;
+      if (data?.url) {
+        console.log('Redirecting to checkout URL:', data.url);
+        window.location.href = data.url;
+      }
     } catch (error) {
       console.error('Payment error:', error);
       toast({
