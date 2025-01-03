@@ -7,6 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { calculateTotalPrice } from "./utils/priceCalculations";
 import { TotalAmountDisplay } from "./payment/TotalAmountDisplay";
 import { useEffect, useState } from "react";
+import { PaymentButton } from "../lab-scripts/PaymentButton";
 
 interface PaymentSectionProps {
   applianceType: string;
@@ -97,6 +98,22 @@ export const PaymentSection = ({
     ).join(' ');
   };
 
+  const handlePaymentClick = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (!form.formState.isValid) {
+      toast({
+        title: "Form Validation Error",
+        description: "Please fill in all required fields correctly.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const formData = form.getValues();
+    console.log('Submitting form with data:', formData);
+    onSubmit(formData);
+  };
+
   return (
     <div className="sticky bottom-0 bg-white border-t shadow-lg p-4">
       <div className="flex justify-between items-start">
@@ -109,6 +126,11 @@ export const PaymentSection = ({
           expressDesign={expressDesign}
           formattedApplianceType={formatApplianceType(applianceType)}
           isLoading={isPriceLoading}
+        />
+        <PaymentButton
+          amount={totalAmount}
+          onClick={handlePaymentClick}
+          isLoading={isSubmitting}
         />
       </div>
     </div>
