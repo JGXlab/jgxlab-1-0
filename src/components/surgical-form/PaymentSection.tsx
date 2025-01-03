@@ -2,6 +2,8 @@ import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
+import { z } from "zod";
+import { formSchema } from "./formSchema";
 
 const priceMap = {
   'surgical-day': 'e843686b-55ac-4f55-bab7-38d5c420a1b8',
@@ -20,7 +22,7 @@ interface PaymentSectionProps {
   archType: string;
   needsNightguard?: string;
   expressDesign?: string;
-  onSubmit: () => void;
+  onSubmit: (values: z.infer<typeof formSchema>) => void;
   isSubmitting: boolean;
 }
 
@@ -128,6 +130,10 @@ export const PaymentSection = ({
           size="lg"
           disabled={isSubmitting || isLoading}
           className="min-w-[200px]"
+          onClick={(e) => {
+            e.preventDefault();
+            onSubmit(form.getValues());
+          }}
         >
           {isSubmitting ? (
             <>
