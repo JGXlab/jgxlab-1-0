@@ -15,7 +15,7 @@ const priceMap = {
   'ti-bar': 'e5593f92-37e7-43a2-b379-cc12bbcb9da4'
 };
 
-interface PaymentSectionProps {
+export interface PaymentSectionProps {
   applianceType: string;
   archType: string;
   formData: z.infer<typeof formSchema>;
@@ -76,8 +76,6 @@ export const PaymentSection = ({ applianceType, archType, formData, isSubmitting
           priceId: priceData?.stripe_product_id,
           totalAmount: calculateFinalPrice(),
           metadata: {
-            applianceType,
-            archType,
             formData: JSON.stringify(formData)
           }
         }
