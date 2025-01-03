@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 import { z } from "zod";
 import { formSchema } from "./formSchema";
+import { UseFormReturn } from "react-hook-form";
 
 const priceMap = {
   'surgical-day': 'e843686b-55ac-4f55-bab7-38d5c420a1b8',
@@ -24,6 +25,7 @@ interface PaymentSectionProps {
   expressDesign?: string;
   onSubmit: (values: z.infer<typeof formSchema>) => void;
   isSubmitting: boolean;
+  form: UseFormReturn<z.infer<typeof formSchema>>;
 }
 
 export const PaymentSection = ({ 
@@ -32,7 +34,8 @@ export const PaymentSection = ({
   needsNightguard = 'no',
   expressDesign = 'no',
   onSubmit, 
-  isSubmitting 
+  isSubmitting,
+  form
 }: PaymentSectionProps) => {
   const priceId = applianceType ? priceMap[applianceType as keyof typeof priceMap] : null;
 

@@ -126,7 +126,7 @@ export default function SubmittedLabScripts() {
     setIsPreviewOpen(true);
   };
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
     submitLabScript(values);
   };
 
@@ -176,8 +176,11 @@ export default function SubmittedLabScripts() {
                 <PaymentSection 
                   applianceType={form.watch('applianceType')}
                   archType={form.watch('arch')}
-                  onSubmit={form.handleSubmit(onSubmit)}
+                  needsNightguard={form.watch('needsNightguard')}
+                  expressDesign={form.watch('expressDesign')}
+                  onSubmit={onSubmit}
                   isSubmitting={isPending}
+                  form={form}
                 />
               </form>
             </Form>
