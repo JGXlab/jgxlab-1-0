@@ -28,9 +28,8 @@ serve(async (req) => {
       throw new Error('No email found');
     }
 
-    const { formData, serviceId } = await req.json();
-    console.log('Received request with serviceId:', serviceId);
-    console.log('Form data:', formData);
+    const { formData, serviceId, totalAmount } = await req.json();
+    console.log('Received request:', { serviceId, totalAmount, formData });
 
     // Initialize Stripe
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
@@ -40,15 +39,20 @@ serve(async (req) => {
     // Get the stripe_product_id from service_prices table
     const { data: servicePrice, error: servicePriceError } = await supabaseClient
       .from('service_prices')
-      .select('stripe_product_id')
+      .select('*')
       .eq('id', serviceId)
       .single();
 
     console.log('Service price lookup result:', { servicePrice, servicePriceError });
 
-    if (servicePriceError || !servicePrice?.stripe_product_id) {
-      console.error('Service price not found:', servicePriceError);
-      throw new Error('Service price not found');
+    if (servicePriceError) {
+      console.error('Service price lookup error:', servicePriceError);
+      throw new Error(`Service price lookup failed: ${servicePriceError.message}`);
+    }
+
+    if (!servicePrice?.stripe_product_id) {
+      console.error('No stripe_product_id found for service:', serviceId);
+      throw new Error('No Stripe product ID found for this service');
     }
 
     const lineItems = [];
@@ -115,9 +119,12 @@ serve(async (req) => {
       }
     );
   } catch (error) {
-    console.error('Error creating payment session:', error);
+    console.error('Error in create-checkout-session:', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error.message,
+        details: error.toString()
+      }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 500,

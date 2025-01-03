@@ -48,8 +48,13 @@ export const PaymentSection = ({
   const { toast } = useToast();
   const priceId = applianceType ? priceMap[applianceType as keyof typeof priceMap] : null;
 
-  console.log('Current priceId:', priceId);
-  console.log('Current applianceType:', applianceType);
+  console.log('Payment details:', {
+    applianceType,
+    priceId,
+    archType,
+    needsNightguard,
+    expressDesign
+  });
 
   const { data: priceData, isLoading } = useQuery({
     queryKey: ['servicePrice', priceId],
@@ -62,7 +67,10 @@ export const PaymentSection = ({
         .eq('id', priceId)
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching price:', error);
+        throw error;
+      }
       console.log('Fetched price data:', data);
       return data;
     },
@@ -71,7 +79,12 @@ export const PaymentSection = ({
 
   const createCheckoutSession = useMutation({
     mutationFn: async (formData: z.infer<typeof formSchema>) => {
-      console.log('Creating checkout session with:', { formData, priceId });
+      console.log('Creating checkout session with:', { 
+        formData, 
+        priceId,
+        totalAmount: calculateFinalPrice()
+      });
+
       const { data, error } = await supabase.functions.invoke('create-checkout-session', {
         body: {
           formData,
@@ -82,8 +95,13 @@ export const PaymentSection = ({
 
       if (error) {
         console.error('Error from edge function:', error);
-        throw error;
+        throw new Error(`Checkout session creation failed: ${error.message}`);
       }
+
+      if (!data?.url) {
+        throw new Error('No checkout URL returned from server');
+      }
+
       return data;
     },
     onSuccess: (data) => {
@@ -91,11 +109,11 @@ export const PaymentSection = ({
         window.location.href = data.url;
       }
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       console.error('Error creating checkout session:', error);
       toast({
-        title: "Error",
-        description: "Failed to create checkout session. Please try again.",
+        title: "Payment Error",
+        description: error.message || "Failed to create checkout session. Please try again.",
         variant: "destructive",
       });
     },
@@ -134,6 +152,16 @@ export const PaymentSection = ({
   const handleSubmitAndPay = async (e: React.MouseEvent) => {
     e.preventDefault();
     const values = form.getValues();
+    
+    if (!priceId) {
+      toast({
+        title: "Configuration Error",
+        description: "Invalid appliance type selected.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (Object.keys(form.formState.errors).length > 0) {
       toast({
         title: "Validation Error",
@@ -142,6 +170,7 @@ export const PaymentSection = ({
       });
       return;
     }
+
     createCheckoutSession.mutate(values);
   };
 
@@ -217,7 +246,7 @@ export const PaymentSection = ({
         <Button 
           type="submit" 
           size="lg"
-          disabled={isSubmitting || isLoading || createCheckoutSession.isPending}
+          disabled={isSubmitting || isLoading || createCheckoutSession.isPending || !priceId}
           className="min-w-[200px]"
           onClick={handleSubmitAndPay}
         >
