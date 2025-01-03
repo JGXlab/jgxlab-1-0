@@ -17,6 +17,7 @@ interface TotalAmountDisplayProps {
   needsNightguard: string;
   expressDesign: string;
   formattedApplianceType: string;
+  isLoading?: boolean;
 }
 
 export const TotalAmountDisplay = ({
@@ -27,6 +28,7 @@ export const TotalAmountDisplay = ({
   needsNightguard,
   expressDesign,
   formattedApplianceType,
+  isLoading = false,
 }: TotalAmountDisplayProps) => {
   return (
     <div className="space-y-2">
@@ -54,7 +56,11 @@ export const TotalAmountDisplay = ({
         </Dialog>
       </div>
       <p className="text-2xl font-semibold text-gray-900">
-        ${totalAmount.toFixed(2)}
+        {isLoading ? (
+          <span className="text-gray-400">Loading...</span>
+        ) : (
+          `$${totalAmount.toFixed(2)}`
+        )}
       </p>
     </div>
   );

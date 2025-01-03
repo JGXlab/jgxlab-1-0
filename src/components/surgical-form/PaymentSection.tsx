@@ -1,11 +1,11 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { z } from "zod";
 import { formSchema } from "./formSchema";
 import { UseFormReturn } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
 import { calculateTotalPrice } from "./utils/priceCalculations";
-import { STRIPE_PRODUCT_IDS, BASE_PRICES } from "./utils/priceConstants";
+import { STRIPE_PRODUCT_IDS } from "./utils/priceConstants";
 import { TotalAmountDisplay } from "./payment/TotalAmountDisplay";
 import { SubmitButton } from "./payment/SubmitButton";
 
@@ -30,7 +30,26 @@ export const PaymentSection = ({
 }: PaymentSectionProps) => {
   const { toast } = useToast();
   const productId = applianceType ? STRIPE_PRODUCT_IDS[applianceType as keyof typeof STRIPE_PRODUCT_IDS] : null;
-  const basePrice = applianceType ? BASE_PRICES[applianceType as keyof typeof BASE_PRICES] : 0;
+
+  const { data: basePrice = 0, isLoading: isPriceLoading } = useQuery({
+    queryKey: ['service-price', applianceType],
+    queryFn: async () => {
+      if (!applianceType) return 0;
+      const { data, error } = await supabase
+        .from('service_prices')
+        .select('price')
+        .eq('service_name', applianceType)
+        .maybeSingle();
+
+      if (error) {
+        console.error('Error fetching price:', error);
+        return 0;
+      }
+
+      return data?.price ?? 0;
+    },
+    enabled: !!applianceType,
+  });
 
   console.log('Payment details:', {
     applianceType,
@@ -45,14 +64,16 @@ export const PaymentSection = ({
     mutationFn: async (formData: z.infer<typeof formSchema>) => {
       console.log('Creating checkout session with:', { formData, productId });
 
+      const totalAmount = calculateTotalPrice(
+        basePrice,
+        { archType, needsNightguard, expressDesign, applianceType }
+      );
+
       const { data, error } = await supabase.functions.invoke('create-checkout-session', {
         body: {
           formData,
           productId,
-          totalAmount: calculateTotalPrice(
-            basePrice,
-            { archType, needsNightguard, expressDesign, applianceType }
-          ),
+          totalAmount,
         },
       });
 
@@ -130,6 +151,7 @@ export const PaymentSection = ({
           needsNightguard={needsNightguard}
           expressDesign={expressDesign}
           formattedApplianceType={formatApplianceType(applianceType)}
+          isLoading={isPriceLoading}
         />
         <SubmitButton
           isSubmitting={isSubmitting}
