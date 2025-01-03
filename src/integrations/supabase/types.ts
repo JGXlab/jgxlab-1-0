@@ -295,24 +295,33 @@ export type Database = {
       }
       service_prices: {
         Row: {
+          addon_type: string | null
           created_at: string
           id: string
+          is_addon: boolean | null
           price: number
           service_name: string
+          stripe_price_id: string | null
           stripe_product_id: string | null
         }
         Insert: {
+          addon_type?: string | null
           created_at?: string
           id?: string
+          is_addon?: boolean | null
           price: number
           service_name: string
+          stripe_price_id?: string | null
           stripe_product_id?: string | null
         }
         Update: {
+          addon_type?: string | null
           created_at?: string
           id?: string
+          is_addon?: boolean | null
           price?: number
           service_name?: string
+          stripe_price_id?: string | null
           stripe_product_id?: string | null
         }
         Relationships: []

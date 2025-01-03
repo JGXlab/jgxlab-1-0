@@ -7,50 +7,53 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    // Initialize Stripe
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
       apiVersion: '2023-10-16',
     });
 
-    // Log the Stripe key (masked)
-    const stripeKey = Deno.env.get('STRIPE_SECRET_KEY') || '';
-    console.log('Stripe key present:', !!stripeKey);
-    
-    // Parse the request body
-    const { formData, totalAmount } = await req.json();
-    console.log('Received request data:', { formData, totalAmount });
+    const { formData, totalAmount, applianceType } = await req.json();
+    console.log('Received request data:', { formData, totalAmount, applianceType });
 
-    if (!formData || !totalAmount) {
+    if (!formData || !totalAmount || !applianceType) {
       throw new Error('Missing required data');
     }
 
-    // Calculate amount in cents and ensure it's a valid number
-    const amountInCents = Math.round(totalAmount * 100);
-    if (isNaN(amountInCents) || amountInCents <= 0) {
-      throw new Error('Invalid amount');
+    // Create Supabase client to fetch price IDs
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    
+    if (!supabaseUrl || !supabaseKey) {
+      throw new Error('Missing Supabase environment variables');
     }
 
-    console.log('Creating checkout session with amount:', amountInCents);
+    const { createClient } = await import('https://esm.sh/@supabase/supabase-js@2');
+    const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Create a checkout session with minimal required fields
+    // Fetch the Stripe price ID for the appliance type
+    const { data: priceData, error: priceError } = await supabase
+      .from('service_prices')
+      .select('stripe_price_id')
+      .eq('service_name', applianceType)
+      .single();
+
+    if (priceError || !priceData?.stripe_price_id) {
+      console.error('Error fetching price ID:', priceError);
+      throw new Error('Price not found for appliance type');
+    }
+
+    console.log('Creating checkout session with price ID:', priceData.stripe_price_id);
+
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
       payment_method_types: ['card'],
       line_items: [
         {
-          price_data: {
-            currency: 'usd',
-            product_data: {
-              name: 'Lab Script Service',
-            },
-            unit_amount: amountInCents,
-          },
+          price: priceData.stripe_price_id,
           quantity: 1,
         },
       ],
