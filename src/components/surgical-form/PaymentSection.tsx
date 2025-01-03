@@ -1,92 +1,116 @@
-import { FormSection } from "./FormSection";
-import { UseFormReturn } from "react-hook-form";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { z } from "zod";
 import { formSchema } from "./formSchema";
+import { UseFormReturn } from "react-hook-form";
+import { useToast } from "@/hooks/use-toast";
+import { calculateTotalPrice } from "./utils/priceCalculations";
 import { TotalAmountDisplay } from "./payment/TotalAmountDisplay";
-import { calculateTotalAmount, formatApplianceType } from "./utils/priceCalculations";
-import { PaymentButton } from "../lab-scripts/PaymentButton";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
+import { useEffect, useState } from "react";
 
 interface PaymentSectionProps {
-  form: UseFormReturn<z.infer<typeof formSchema>>;
   applianceType: string;
   archType: string;
-  needsNightguard: string;
-  expressDesign: string;
+  needsNightguard?: string;
+  expressDesign?: string;
   onSubmit: (values: z.infer<typeof formSchema>) => void;
   isSubmitting: boolean;
+  form: UseFormReturn<z.infer<typeof formSchema>>;
 }
 
-export const PaymentSection = ({
-  form,
-  applianceType,
-  archType,
-  needsNightguard,
-  expressDesign,
-  onSubmit,
+export const PaymentSection = ({ 
+  applianceType, 
+  archType, 
+  needsNightguard = 'no',
+  expressDesign = 'no',
+  onSubmit, 
   isSubmitting,
+  form
 }: PaymentSectionProps) => {
-  const formattedApplianceType = formatApplianceType(applianceType);
-  const basePrice = 100; // This should match your base price logic
-  const totalAmount = calculateTotalAmount({
-    basePrice,
-    applianceType,
-    archType,
-    needsNightguard,
-    expressDesign,
+  const { toast } = useToast();
+  const [totalAmount, setTotalAmount] = useState(0);
+  const [lineItems, setLineItems] = useState<Array<{ price: string; quantity: number }>>([]);
+
+  const { data: servicePrices = [], isLoading: isPriceLoading } = useQuery({
+    queryKey: ['service-prices'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('service_prices')
+        .select('*');
+
+      if (error) {
+        console.error('Error fetching prices:', error);
+        return [];
+      }
+
+      return data || [];
+    },
   });
 
-  const handlePayment = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    const values = form.getValues();
-    
-    try {
-      console.log("Starting payment process...");
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        toast.error("User not authenticated");
-        return;
+  useEffect(() => {
+    const updatePrices = async () => {
+      // Find the base price for the appliance type
+      const baseService = servicePrices.find(p => p.service_name === applianceType);
+      const nightguardService = servicePrices.find(p => p.service_name === 'additional-nightguard');
+      const expressService = servicePrices.find(p => p.service_name === 'express-design');
+
+      const newLineItems: Array<{ price: string; quantity: number }> = [];
+
+      if (baseService?.stripe_price_id) {
+        newLineItems.push({
+          price: baseService.stripe_price_id,
+          quantity: archType === 'dual' ? 2 : 1,
+        });
       }
 
-      const response = await supabase.functions.invoke('create-checkout-session', {
-        body: { amount: totalAmount },
-      });
-
-      if (response.error) {
-        console.error('Error creating checkout session:', response.error);
-        toast.error("Failed to initiate payment. Please try again.");
-        return;
+      if (needsNightguard === 'yes' && nightguardService?.stripe_price_id) {
+        newLineItems.push({
+          price: nightguardService.stripe_price_id,
+          quantity: 1,
+        });
       }
 
-      console.log("Payment session created, submitting form...");
-      onSubmit(values);
-    } catch (error) {
-      console.error('Error processing payment:', error);
-      toast.error("Failed to process payment. Please try again.");
-    }
+      if (expressDesign === 'yes' && expressService?.stripe_price_id) {
+        newLineItems.push({
+          price: expressService.stripe_price_id,
+          quantity: 1,
+        });
+      }
+
+      console.log('Updated line items:', newLineItems);
+      setLineItems(newLineItems);
+
+      const result = await calculateTotalPrice(
+        baseService?.price || 0,
+        { archType, needsNightguard, expressDesign, applianceType }
+      );
+      setTotalAmount(result.total);
+    };
+
+    updatePrices();
+  }, [servicePrices, archType, needsNightguard, expressDesign, applianceType]);
+
+  const formatApplianceType = (type: string) => {
+    if (!type) return '';
+    return type.split('-').map(word => 
+      word.charAt(0).toUpperCase() + word.slice(1)
+    ).join(' ');
   };
 
   return (
-    <FormSection title="Payment Details">
-      <div className="space-y-6">
+    <div className="sticky bottom-0 bg-white border-t shadow-lg p-4">
+      <div className="flex justify-between items-start">
         <TotalAmountDisplay
-          basePrice={basePrice}
+          basePrice={0}
           totalAmount={totalAmount}
           applianceType={applianceType}
           archType={archType}
           needsNightguard={needsNightguard}
           expressDesign={expressDesign}
-          formattedApplianceType={formattedApplianceType}
-          isLoading={isSubmitting}
-        />
-        
-        <PaymentButton
-          amount={totalAmount}
-          onClick={handlePayment}
-          isLoading={isSubmitting}
+          formattedApplianceType={formatApplianceType(applianceType)}
+          isLoading={isPriceLoading}
         />
       </div>
-    </FormSection>
+    </div>
   );
 };
