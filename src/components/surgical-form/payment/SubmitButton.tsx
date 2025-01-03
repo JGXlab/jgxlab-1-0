@@ -8,22 +8,5 @@ interface SubmitButtonProps {
 }
 
 export const SubmitButton = ({ isSubmitting, isPending, onClick }: SubmitButtonProps) => {
-  return (
-    <Button 
-      type="submit" 
-      size="lg"
-      disabled={isSubmitting || isPending}
-      className="min-w-[200px]"
-      onClick={onClick}
-    >
-      {isPending ? (
-        <>
-          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          Redirecting to payment...
-        </>
-      ) : (
-        'Submit and Pay'
-      )}
-    </Button>
-  );
+  return null; // Component removed as requested
 };
