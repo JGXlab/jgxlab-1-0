@@ -1,10 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2 } from "lucide-react";
+import { Loader2, Info } from "lucide-react";
 import { z } from "zod";
 import { formSchema } from "./formSchema";
 import { UseFormReturn } from "react-hook-form";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const priceMap = {
   'surgical-day': 'e843686b-55ac-4f55-bab7-38d5c420a1b8',
@@ -82,15 +88,6 @@ export const PaymentSection = ({
 
   if (!applianceType) return null;
 
-  console.log('Price calculation:', { 
-    applianceType, 
-    archType, 
-    basePrice: priceData?.price,
-    needsNightguard,
-    expressDesign,
-    finalPrice: calculateFinalPrice()
-  });
-
   // Function to render price breakdown
   const renderPriceBreakdown = () => {
     if (!priceData?.price) return null;
@@ -101,7 +98,7 @@ export const PaymentSection = ({
     const hasExpressDesign = expressDesign === 'yes' && applianceType !== 'surgical-day';
 
     return (
-      <div className="space-y-1 text-sm text-gray-500">
+      <div className="space-y-1 text-sm">
         <div>Base price: ${basePrice.toFixed(2)}</div>
         {isDual && <div>Dual arch: ${(basePrice * 2).toFixed(2)}</div>}
         {hasNightguard && <div>Nightguard: +${NIGHTGUARD_PRICE.toFixed(2)}</div>}
@@ -114,19 +111,28 @@ export const PaymentSection = ({
     <div className="sticky bottom-0 bg-white border-t shadow-lg p-4">
       <div className="flex justify-between items-start">
         <div className="space-y-2">
-          <div className="space-y-1">
+          <div className="flex items-center gap-2">
             <p className="text-sm font-medium text-gray-500">Total Amount</p>
-            {isLoading ? (
-              <div className="h-6 w-20 animate-pulse bg-gray-200 rounded" />
-            ) : (
-              <>
-                <p className="text-2xl font-semibold text-gray-900">
-                  ${calculateFinalPrice()}
-                </p>
-                {renderPriceBreakdown()}
-              </>
-            )}
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-6 w-6 p-0">
+                    <Info className="h-4 w-4 text-gray-500" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  {renderPriceBreakdown()}
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
+          {isLoading ? (
+            <div className="h-6 w-20 animate-pulse bg-gray-200 rounded" />
+          ) : (
+            <p className="text-2xl font-semibold text-gray-900">
+              ${calculateFinalPrice()}
+            </p>
+          )}
         </div>
         <Button 
           type="submit" 
