@@ -70,10 +70,11 @@ export const PaymentSection = ({ applianceType, archType, formData, isSubmitting
 
   const handleCheckout = async () => {
     try {
+      console.log('Creating checkout session with form data:', formData);
+      
       const { data: session, error } = await supabase.functions.invoke('create-checkout', {
         body: {
           formData,
-          priceId: priceData?.stripe_product_id,
           totalAmount: calculateFinalPrice(),
           metadata: {
             formData: JSON.stringify(formData)
@@ -81,7 +82,14 @@ export const PaymentSection = ({ applianceType, archType, formData, isSubmitting
         }
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error creating checkout session:', error);
+        throw error;
+      }
+
+      if (!session?.url) {
+        throw new Error('No checkout URL returned');
+      }
 
       // Redirect to Stripe Checkout
       window.location.href = session.url;

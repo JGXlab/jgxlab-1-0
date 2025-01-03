@@ -18,14 +18,10 @@ serve(async (req) => {
       apiVersion: '2023-10-16',
     })
 
-    // Create Supabase client
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
-    )
-
     // Get the request body
-    const { formData, priceId, totalAmount, metadata } = await req.json()
+    const { formData, totalAmount, metadata } = await req.json()
+
+    console.log('Creating checkout session with:', { formData, totalAmount, metadata })
 
     // Create the checkout session
     const session = await stripe.checkout.sessions.create({
@@ -35,8 +31,8 @@ serve(async (req) => {
           price_data: {
             currency: 'usd',
             product_data: {
-              name: `Lab Script - ${metadata.applianceType}`,
-              description: `${metadata.archType} arch`,
+              name: `Lab Script - ${formData.applianceType}`,
+              description: `${formData.arch} arch`,
             },
             unit_amount: Math.round(parseFloat(totalAmount) * 100), // Convert to cents
           },
@@ -46,7 +42,9 @@ serve(async (req) => {
       mode: 'payment',
       success_url: `${req.headers.get('origin')}/clinic/submittedlabscripts?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${req.headers.get('origin')}/clinic/submittedlabscripts`,
-      metadata: metadata,
+      metadata: {
+        formData: JSON.stringify(formData)
+      },
     })
 
     // Return the session URL
