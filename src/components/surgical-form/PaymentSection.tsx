@@ -32,38 +32,64 @@ export const PaymentSection = ({
   const [totalAmount, setTotalAmount] = useState(0);
   const [lineItems, setLineItems] = useState<Array<{ price: string; quantity: number }>>([]);
 
-  const { data: basePrice = 0, isLoading: isPriceLoading } = useQuery({
-    queryKey: ['service-price', applianceType],
+  const { data: servicePrices = [], isLoading: isPriceLoading } = useQuery({
+    queryKey: ['service-prices'],
     queryFn: async () => {
-      if (!applianceType) return 0;
       const { data, error } = await supabase
         .from('service_prices')
-        .select('price')
-        .eq('service_name', applianceType)
-        .maybeSingle();
+        .select('*');
 
       if (error) {
-        console.error('Error fetching price:', error);
-        return 0;
+        console.error('Error fetching prices:', error);
+        return [];
       }
 
-      return data?.price ?? 0;
+      return data || [];
     },
-    enabled: !!applianceType,
   });
 
   useEffect(() => {
     const updatePrices = async () => {
+      // Find the base price for the appliance type
+      const baseService = servicePrices.find(p => p.service_name === applianceType);
+      const nightguardService = servicePrices.find(p => p.service_name === 'additional-nightguard');
+      const expressService = servicePrices.find(p => p.service_name === 'express-design');
+
+      const newLineItems: Array<{ price: string; quantity: number }> = [];
+
+      if (baseService?.stripe_price_id) {
+        newLineItems.push({
+          price: baseService.stripe_price_id,
+          quantity: archType === 'dual' ? 2 : 1,
+        });
+      }
+
+      if (needsNightguard === 'yes' && nightguardService?.stripe_price_id) {
+        newLineItems.push({
+          price: nightguardService.stripe_price_id,
+          quantity: 1,
+        });
+      }
+
+      if (expressDesign === 'yes' && expressService?.stripe_price_id) {
+        newLineItems.push({
+          price: expressService.stripe_price_id,
+          quantity: 1,
+        });
+      }
+
+      console.log('Updated line items:', newLineItems);
+      setLineItems(newLineItems);
+
       const result = await calculateTotalPrice(
-        basePrice,
+        baseService?.price || 0,
         { archType, needsNightguard, expressDesign, applianceType }
       );
       setTotalAmount(result.total);
-      setLineItems(result.lineItems);
     };
 
     updatePrices();
-  }, [basePrice, archType, needsNightguard, expressDesign, applianceType]);
+  }, [servicePrices, archType, needsNightguard, expressDesign, applianceType]);
 
   const createCheckoutSession = useMutation({
     mutationFn: async (formData: z.infer<typeof formSchema>) => {
@@ -130,7 +156,7 @@ export const PaymentSection = ({
     <div className="sticky bottom-0 bg-white border-t shadow-lg p-4">
       <div className="flex justify-between items-start">
         <TotalAmountDisplay
-          basePrice={basePrice}
+          basePrice={0}
           totalAmount={totalAmount}
           applianceType={applianceType}
           archType={archType}
