@@ -216,7 +216,6 @@ export function LabScriptsTable({ labScripts, isLoading, onPreview, onStatusUpda
                   </Button>
                   {script.payment_status === 'unpaid' && (
                     <PaymentButton
-                      amount={100} // Replace with actual amount from your calculation
                       onClick={(e) => handlePayment(script, e)}
                     />
                   )}

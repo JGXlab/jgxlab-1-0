@@ -118,7 +118,6 @@ export const PaymentSection = ({
           isLoading={isPriceLoading}
         />
         <PaymentButton
-          amount={totalAmount}
           onClick={handlePayment}
           isLoading={isSubmitting}
         />

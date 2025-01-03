@@ -8,7 +8,7 @@ interface PaymentButtonProps {
 export const PaymentButton = ({ onClick, isLoading = false }: PaymentButtonProps) => {
   return (
     <Button
-      variant="outline"
+      variant="default"
       size="sm"
       className="flex items-center gap-2"
       onClick={onClick}
