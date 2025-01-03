@@ -20,6 +20,7 @@ export const ApplianceDetailsSection = ({ form }: ApplianceDetailsSectionProps) 
   const applianceType = form.watch('applianceType');
   const treatmentType = form.watch('treatmentType');
   const isNightguard = applianceType === 'nightguard';
+  const isSurgicalDay = applianceType === 'surgical-day';
 
   // Check if treatment type is denture or one piece implant
   const shouldHideScrewSection = (value: string) => {
@@ -131,16 +132,18 @@ export const ApplianceDetailsSection = ({ form }: ApplianceDetailsSectionProps) 
             )}
           />
 
-          <FormField
-            control={form.control}
-            name="needsNightguard"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Do you need Nightguard?</FormLabel>
-                <NightguardSelector value={field.value} onChange={field.onChange} />
-              </FormItem>
-            )}
-          />
+          {!isSurgicalDay && (
+            <FormField
+              control={form.control}
+              name="needsNightguard"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Do you need Nightguard?</FormLabel>
+                  <NightguardSelector value={field.value} onChange={field.onChange} />
+                </FormItem>
+              )}
+            />
+          )}
 
           <FormField
             control={form.control}
