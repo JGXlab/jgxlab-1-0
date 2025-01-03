@@ -35,15 +35,22 @@ serve(async (req) => {
     const { createClient } = await import('https://esm.sh/@supabase/supabase-js@2');
     const supabase = createClient(supabaseUrl, supabaseKey);
 
+    console.log(`Processing ${products.data.length} products...`);
+
     // Update service_prices table
     for (const product of products.data) {
       const price = product.default_price as Stripe.Price;
-      if (!price) continue;
+      if (!price) {
+        console.log(`Skipping product ${product.id} - no default price`);
+        continue;
+      }
+
+      console.log(`Updating price for product: ${product.name}`);
 
       const { error } = await supabase
         .from('service_prices')
         .upsert({
-          service_name: product.name,
+          service_name: product.name.toLowerCase().replace(/ /g, '-'),
           price: price.unit_amount ? price.unit_amount / 100 : 0,
           stripe_product_id: product.id,
           stripe_price_id: price.id,

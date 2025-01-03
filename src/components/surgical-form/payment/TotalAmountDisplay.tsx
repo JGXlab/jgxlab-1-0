@@ -59,7 +59,7 @@ export const TotalAmountDisplay = ({
         {isLoading ? (
           <span className="text-gray-400">Loading...</span>
         ) : (
-          `$${totalAmount.toFixed(2)}`
+          `$${Number(totalAmount).toFixed(2)}`
         )}
       </p>
     </div>

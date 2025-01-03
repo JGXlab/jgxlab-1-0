@@ -8,7 +8,7 @@ export const calculateTotalPrice = (basePrice: number, options: {
   needsNightguard: string;
   expressDesign: string;
   applianceType: string;
-}) => {
+}): number => {
   const { archType, needsNightguard, expressDesign, applianceType } = options;
   let totalPrice = basePrice;
 
@@ -30,8 +30,10 @@ export const calculateTotalPrice = (basePrice: number, options: {
   return totalPrice;
 };
 
-export const fetchPriceForService = async (serviceName: string): Promise<number | null> => {
-  if (!serviceName) return null;
+export const fetchPriceForService = async (serviceName: string): Promise<number> => {
+  if (!serviceName) return 0;
+
+  console.log('Fetching price for service:', serviceName);
 
   const { data, error } = await supabase
     .from('service_prices')
@@ -41,8 +43,9 @@ export const fetchPriceForService = async (serviceName: string): Promise<number 
 
   if (error) {
     console.error('Error fetching price:', error);
-    return null;
+    return 0;
   }
 
-  return data?.price ?? null;
+  console.log('Price data:', data);
+  return data?.price ?? 0;
 };
