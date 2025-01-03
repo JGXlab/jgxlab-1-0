@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from 'https://esm.sh/stripe@14.21.0';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -30,10 +31,39 @@ serve(async (req) => {
       apiVersion: '2023-10-16',
     });
 
-    console.log('Creating checkout session with line items:', lineItems);
+    // Create Supabase client
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+    );
+
+    // Get the price IDs from the service_prices table
+    const { data: servicePrices, error: pricesError } = await supabaseClient
+      .from('service_prices')
+      .select('service_name, stripe_price_id')
+      .in('service_name', lineItems.map(item => item.service_name));
+
+    if (pricesError) {
+      console.error('Error fetching service prices:', pricesError);
+      throw new Error('Failed to fetch service prices');
+    }
+
+    // Map the line items to use the correct price IDs from the database
+    const stripeLineItems = lineItems.map(item => {
+      const servicePrice = servicePrices.find(sp => sp.service_name === item.service_name);
+      if (!servicePrice?.stripe_price_id) {
+        throw new Error(`No price ID found for service: ${item.service_name}`);
+      }
+      return {
+        price: servicePrice.stripe_price_id,
+        quantity: item.quantity,
+      };
+    });
+
+    console.log('Creating checkout session with line items:', stripeLineItems);
     
     const session = await stripe.checkout.sessions.create({
-      line_items: lineItems,
+      line_items: stripeLineItems,
       mode: 'payment',
       success_url: `${req.headers.get('origin')}/clinic/submittedlabscripts?success=true`,
       cancel_url: `${req.headers.get('origin')}/clinic/submittedlabscripts?canceled=true`,
