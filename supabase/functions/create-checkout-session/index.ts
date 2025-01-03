@@ -1,6 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from 'https://esm.sh/stripe@14.21.0';
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -13,39 +12,35 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  const supabaseClient = createClient(
-    Deno.env.get('SUPABASE_URL') ?? '',
-    Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-  );
-
   try {
-    // Get the session or user object
-    const authHeader = req.headers.get('Authorization')!;
-    const token = authHeader.replace('Bearer ', '');
-    const { data: { user } } = await supabaseClient.auth.getUser(token);
+    // Initialize Stripe
+    const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
+      apiVersion: '2023-10-16',
+    });
 
-    if (!user?.email) {
-      throw new Error('No email found');
-    }
-
+    // Log the Stripe key (masked)
+    const stripeKey = Deno.env.get('STRIPE_SECRET_KEY') || '';
+    console.log('Stripe key present:', !!stripeKey);
+    
+    // Parse the request body
     const { formData, totalAmount } = await req.json();
-    console.log('Creating test checkout with data:', { formData, totalAmount });
+    console.log('Received request data:', { formData, totalAmount });
 
     if (!formData || !totalAmount) {
       throw new Error('Missing required data');
     }
 
-    const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
-      apiVersion: '2023-10-16',
-    });
-
-    // Calculate amount in cents
+    // Calculate amount in cents and ensure it's a valid number
     const amountInCents = Math.round(totalAmount * 100);
+    if (isNaN(amountInCents) || amountInCents <= 0) {
+      throw new Error('Invalid amount');
+    }
 
     console.log('Creating checkout session with amount:', amountInCents);
 
+    // Create a checkout session with minimal required fields
     const session = await stripe.checkout.sessions.create({
-      customer_email: user.email,
+      mode: 'payment',
       payment_method_types: ['card'],
       line_items: [
         {
@@ -53,23 +48,18 @@ serve(async (req) => {
             currency: 'usd',
             product_data: {
               name: 'Lab Script Service',
-              description: `Due Date: ${formData.dueDate}`,
             },
             unit_amount: amountInCents,
           },
           quantity: 1,
         },
       ],
-      mode: 'payment',
-      success_url: `${req.headers.get('origin')}/clinic/submittedlabscripts?session_id={CHECKOUT_SESSION_ID}&success=true`,
+      success_url: `${req.headers.get('origin')}/clinic/submittedlabscripts?success=true`,
       cancel_url: `${req.headers.get('origin')}/clinic/submittedlabscripts?canceled=true`,
-      metadata: {
-        formData: JSON.stringify(formData),
-        userId: user.id,
-      },
     });
 
-    console.log('Payment session created:', session.id);
+    console.log('Checkout session created:', session.id);
+
     return new Response(
       JSON.stringify({ url: session.url }),
       { 
@@ -79,6 +69,7 @@ serve(async (req) => {
     );
   } catch (error) {
     console.error('Error in create-checkout-session:', error);
+    
     return new Response(
       JSON.stringify({ 
         error: error.message,
