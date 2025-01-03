@@ -37,16 +37,42 @@ serve(async (req) => {
 
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    console.log('Fetching price for appliance type:', applianceType);
+    // Fetch base price and any add-ons
     const { data: priceData, error: priceError } = await supabase
       .from('service_prices')
       .select('stripe_price_id')
-      .eq('service_name', applianceType.toLowerCase().replace(/ /g, '-'))
+      .eq('service_name', applianceType)
       .single();
 
     if (priceError || !priceData?.stripe_price_id) {
       console.error('Error fetching price ID:', priceError);
       throw new Error('Price not found for appliance type');
+    }
+
+    // Get any add-ons (nightguard, express design)
+    const addOns = [];
+    if (formData.needsNightguard === 'yes' && applianceType !== 'surgical-day') {
+      const { data: nightguardData } = await supabase
+        .from('service_prices')
+        .select('stripe_price_id')
+        .eq('service_name', 'additional-nightguard')
+        .single();
+      
+      if (nightguardData?.stripe_price_id) {
+        addOns.push({ price: nightguardData.stripe_price_id, quantity: 1 });
+      }
+    }
+
+    if (formData.expressDesign === 'yes' && applianceType !== 'surgical-day') {
+      const { data: expressData } = await supabase
+        .from('service_prices')
+        .select('stripe_price_id')
+        .eq('service_name', 'express-design')
+        .single();
+      
+      if (expressData?.stripe_price_id) {
+        addOns.push({ price: expressData.stripe_price_id, quantity: 1 });
+      }
     }
 
     console.log('Found price ID:', priceData.stripe_price_id);
@@ -55,14 +81,19 @@ serve(async (req) => {
       apiVersion: '2023-10-16',
     });
 
-    console.log('Creating checkout session...');
+    // Create line items array with base product and add-ons
+    const lineItems = [
+      {
+        price: priceData.stripe_price_id,
+        quantity: formData.arch === 'dual' ? 2 : 1,
+      },
+      ...addOns
+    ];
+
+    console.log('Creating checkout session with line items:', lineItems);
+    
     const session = await stripe.checkout.sessions.create({
-      line_items: [
-        {
-          price: priceData.stripe_price_id,
-          quantity: 1,
-        },
-      ],
+      line_items: lineItems,
       mode: 'payment',
       success_url: `${req.headers.get('origin')}/clinic/submittedlabscripts?success=true`,
       cancel_url: `${req.headers.get('origin')}/clinic/submittedlabscripts?canceled=true`,

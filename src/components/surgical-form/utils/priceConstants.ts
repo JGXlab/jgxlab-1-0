@@ -1,10 +1,12 @@
+// This file is kept for backwards compatibility
+// Prices are now fetched dynamically from the service_prices table
 export const STRIPE_PRODUCT_IDS = {
-  'surgical-day': 'prod_RVzscT5uiHbQiH',
-  'printed-try-in': 'prod_RVztnTFmC2pNyD',
-  'nightguard': 'prod_RVzuRFvflBNc97',
-  'direct-load-pmma': 'prod_RVzuTRkWeEYc0z',
-  'direct-load-zirconia': 'prod_RVzuTRkWeEYc0z',
-  'ti-bar': 'prod_RVzwrEj9zmlbUA'
+  'surgical-day': '',
+  'printed-try-in': '',
+  'nightguard': '',
+  'direct-load-pmma': '',
+  'direct-load-zirconia': '',
+  'ti-bar': ''
 } as const;
 
 export const BASE_PRICES = {
