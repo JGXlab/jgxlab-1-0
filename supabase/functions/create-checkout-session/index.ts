@@ -37,19 +37,24 @@ serve(async (req) => {
     });
 
     // Get the stripe_product_id from service_prices table
-    const { data: servicePrice, error: servicePriceError } = await supabaseClient
+    const { data: servicePrices, error: servicePriceError } = await supabaseClient
       .from('service_prices')
-      .select('*')
-      .eq('id', serviceId)
-      .single();
+      .select('stripe_product_id')
+      .eq('id', serviceId);
 
-    console.log('Service price lookup result:', { servicePrice, servicePriceError });
+    console.log('Service price lookup result:', { servicePrices, servicePriceError });
 
     if (servicePriceError) {
       console.error('Service price lookup error:', servicePriceError);
       throw new Error(`Service price lookup failed: ${servicePriceError.message}`);
     }
 
+    if (!servicePrices || servicePrices.length === 0) {
+      console.error('No service price found for ID:', serviceId);
+      throw new Error('No service price found');
+    }
+
+    const servicePrice = servicePrices[0];
     if (!servicePrice?.stripe_product_id) {
       console.error('No stripe_product_id found for service:', serviceId);
       throw new Error('No Stripe product ID found for this service');
@@ -65,15 +70,14 @@ serve(async (req) => {
 
     // Add nightguard if selected
     if (formData.needsNightguard === 'yes' && formData.applianceType !== 'surgical-day') {
-      const { data: nightguardPrice } = await supabaseClient
+      const { data: nightguardPrices } = await supabaseClient
         .from('service_prices')
         .select('stripe_product_id')
-        .eq('service_name', 'nightguard')
-        .single();
+        .eq('service_name', 'nightguard');
 
-      if (nightguardPrice?.stripe_product_id) {
+      if (nightguardPrices && nightguardPrices.length > 0 && nightguardPrices[0]?.stripe_product_id) {
         lineItems.push({
-          price: nightguardPrice.stripe_product_id,
+          price: nightguardPrices[0].stripe_product_id,
           quantity: 1,
         });
       }
@@ -81,15 +85,14 @@ serve(async (req) => {
 
     // Add express design if selected
     if (formData.expressDesign === 'yes' && formData.applianceType !== 'surgical-day') {
-      const { data: expressPrice } = await supabaseClient
+      const { data: expressPrices } = await supabaseClient
         .from('service_prices')
         .select('stripe_product_id')
-        .eq('service_name', 'express_design')
-        .single();
+        .eq('service_name', 'express_design');
 
-      if (expressPrice?.stripe_product_id) {
+      if (expressPrices && expressPrices.length > 0 && expressPrices[0]?.stripe_product_id) {
         lineItems.push({
-          price: expressPrice.stripe_product_id,
+          price: expressPrices[0].stripe_product_id,
           quantity: 1,
         });
       }
