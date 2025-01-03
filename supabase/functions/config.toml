@@ -1,7 +1,7 @@
 project_id = "zuwhzwfdourrvrwhrajj"
 
 [functions.create-checkout-session]
-verify_jwt = true
+verify_jwt = false
 
 [functions.get-stripe-price]
 verify_jwt = false
