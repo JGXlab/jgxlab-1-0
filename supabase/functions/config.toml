@@ -4,4 +4,4 @@ project_id = "zuwhzwfdourrvrwhrajj"
 verify_jwt = true
 
 [functions.get-stripe-price]
-verify_jwt = true
+verify_jwt = false
