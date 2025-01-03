@@ -24,6 +24,15 @@ serve(async (req) => {
       apiVersion: '2023-10-16',
     });
 
+    // Verify that the price exists before creating the session
+    try {
+      const price = await stripe.prices.retrieve(lineItems[0].price);
+      console.log('Price verified:', price.id);
+    } catch (error) {
+      console.error('Error verifying price:', error);
+      throw new Error(`Invalid price ID: ${lineItems[0].price}`);
+    }
+
     console.log('Creating checkout session with line items:', lineItems);
     
     const session = await stripe.checkout.sessions.create({

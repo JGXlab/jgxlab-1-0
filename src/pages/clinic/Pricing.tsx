@@ -11,52 +11,38 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PaymentButton } from "@/components/lab-scripts/PaymentButton";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
 
-const pricingData = [
-  {
-    service: "Surgical day appliance (Night guard included)",
-    price: 275.00,
-    stripe_price_id: "price_1OvKYyKuudEiZepQPMqPzLZq"
-  },
-  {
-    service: "Implant detection (IDID)",
-    price: 100.00,
-    stripe_price_id: "price_1OvKZbKuudEiZepQxgTrWxDp"
-  },
-  {
-    service: "Further Revisions (PTIs)",
-    price: 100.00,
-    stripe_price_id: "price_1OvKa3KuudEiZepQKXx9Xp8Y"
-  },
-  {
-    service: "Nightguard",
-    price: 50.00,
-    stripe_price_id: "price_1OvKaQKuudEiZepQbvEEXtxR"
-  },
-  {
-    service: "Final DLZ (Zi / PMMA)",
-    price: 100.00,
-    stripe_price_id: "price_1OvKanKuudEiZepQGxfyPGWB"
-  },
-  {
-    service: "Final Ti-bar & SS",
-    price: 250.00,
-    stripe_price_id: "price_1OvKbBKuudEiZepQxdxVxR8Y"
-  },
-  {
-    service: "Ti-Bar Design",
-    price: 250.00,
-    stripe_price_id: "price_1OvKbYKuudEiZepQPgpbxR8Y"
-  },
-  {
-    service: "Express design (in 24 hours)",
-    price: 50.00,
-    stripe_price_id: "price_1OvKbvKuudEiZepQPMqPzLZq"
+interface ServicePrice {
+  id: string;
+  service_name: string;
+  price: number;
+  stripe_price_id: string;
+}
+
+const fetchPrices = async () => {
+  console.log('Fetching service prices from Supabase...');
+  const { data, error } = await supabase
+    .from('service_prices')
+    .select('*')
+    .order('created_at', { ascending: true });
+
+  if (error) {
+    console.error('Error fetching prices:', error);
+    throw error;
   }
-];
+
+  console.log('Fetched prices:', data);
+  return data;
+};
 
 const Pricing = () => {
   const { toast } = useToast();
+  
+  const { data: pricingData, isLoading, error } = useQuery({
+    queryKey: ['servicePrices'],
+    queryFn: fetchPrices,
+  });
 
   const handlePayment = async (stripe_price_id: string, service: string) => {
     try {
@@ -90,6 +76,26 @@ const Pricing = () => {
     }
   };
 
+  if (isLoading) {
+    return (
+      <ClinicLayout>
+        <div className="flex items-center justify-center h-96">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+        </div>
+      </ClinicLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <ClinicLayout>
+        <div className="flex items-center justify-center h-96">
+          <div className="text-red-500">Error loading pricing data. Please try again later.</div>
+        </div>
+      </ClinicLayout>
+    );
+  }
+
   return (
     <ClinicLayout>
       <div className="space-y-8">
@@ -119,20 +125,20 @@ const Pricing = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {pricingData.map((item, index) => (
+                {pricingData?.map((item: ServicePrice) => (
                   <TableRow 
-                    key={index}
+                    key={item.id}
                     className="hover:bg-white/80 transition-all duration-200 cursor-default border-b border-accent"
                   >
                     <TableCell className="font-medium py-4 text-foreground/80">
-                      {item.service}
+                      {item.service_name}
                     </TableCell>
                     <TableCell className="text-right font-semibold text-primary py-4">
                       ${item.price.toFixed(2)}
                     </TableCell>
                     <TableCell className="text-right">
                       <PaymentButton
-                        onClick={() => handlePayment(item.stripe_price_id, item.service)}
+                        onClick={() => handlePayment(item.stripe_price_id, item.service_name)}
                       />
                     </TableCell>
                   </TableRow>
