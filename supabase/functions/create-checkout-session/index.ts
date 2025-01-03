@@ -10,33 +10,6 @@ const corsHeaders = {
 const NIGHTGUARD_PRICE = 50;
 const EXPRESS_DESIGN_PRICE = 50;
 
-const calculateTotalPrice = (basePrice: number, options: {
-  arch: string;
-  needsNightguard: string;
-  expressDesign: string;
-  applianceType: string;
-}) => {
-  const { arch, needsNightguard, expressDesign, applianceType } = options;
-  let totalPrice = basePrice;
-
-  // Double the price for dual arch
-  if (arch === 'dual') {
-    totalPrice *= 2;
-  }
-
-  // Add nightguard price if selected (not for surgical-day)
-  if (needsNightguard === 'yes' && applianceType !== 'surgical-day') {
-    totalPrice += NIGHTGUARD_PRICE;
-  }
-
-  // Add express design price if selected (not for surgical-day)
-  if (expressDesign === 'yes' && applianceType !== 'surgical-day') {
-    totalPrice += EXPRESS_DESIGN_PRICE;
-  }
-
-  return totalPrice;
-};
-
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -59,7 +32,7 @@ serve(async (req) => {
     }
 
     const { formData, serviceId, totalAmount } = await req.json();
-    console.log('Received request with:', { serviceId, formData, totalAmount });
+    console.log('Received request:', { formData, serviceId, totalAmount });
 
     if (!serviceId) {
       throw new Error('No serviceId provided');
@@ -75,18 +48,13 @@ serve(async (req) => {
       .from('service_prices')
       .select('*')
       .eq('id', serviceId)
-      .maybeSingle();
+      .single();
 
     console.log('Service price lookup result:', { servicePrice, servicePriceError });
 
-    if (servicePriceError) {
-      console.error('Service price lookup error:', servicePriceError);
-      throw new Error(`Service price lookup failed: ${servicePriceError.message}`);
-    }
-
-    if (!servicePrice) {
-      console.error('No service price found for ID:', serviceId);
-      throw new Error('No service price found');
+    if (servicePriceError || !servicePrice) {
+      console.error('Service price error:', servicePriceError || 'No service price found');
+      throw new Error('Service price lookup failed');
     }
 
     // Calculate total amount in cents for Stripe
@@ -98,8 +66,8 @@ serve(async (req) => {
       price_data: {
         currency: 'usd',
         product_data: {
-          name: servicePrice.service_name,
-          description: `${formData.arch} arch${formData.arch === 'dual' ? 'es' : ''}`
+          name: `${servicePrice.service_name} - ${formData.arch.toUpperCase()} Arch`,
+          description: `Lab script for ${formData.applianceType.split('-').join(' ')}`
         },
         unit_amount: finalAmount,
       },
