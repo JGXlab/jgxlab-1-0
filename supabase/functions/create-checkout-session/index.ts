@@ -10,6 +10,33 @@ const corsHeaders = {
 const NIGHTGUARD_PRICE = 50;
 const EXPRESS_DESIGN_PRICE = 50;
 
+const calculateTotalPrice = (basePrice: number, options: {
+  arch: string;
+  needsNightguard: string;
+  expressDesign: string;
+  applianceType: string;
+}) => {
+  const { arch, needsNightguard, expressDesign, applianceType } = options;
+  let totalPrice = basePrice;
+
+  // Double the price for dual arch
+  if (arch === 'dual') {
+    totalPrice *= 2;
+  }
+
+  // Add nightguard price if selected (not for surgical-day)
+  if (needsNightguard === 'yes' && applianceType !== 'surgical-day') {
+    totalPrice += NIGHTGUARD_PRICE;
+  }
+
+  // Add express design price if selected (not for surgical-day)
+  if (expressDesign === 'yes' && applianceType !== 'surgical-day') {
+    totalPrice += EXPRESS_DESIGN_PRICE;
+  }
+
+  return totalPrice;
+};
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -31,8 +58,8 @@ serve(async (req) => {
       throw new Error('No email found');
     }
 
-    const { formData, serviceId } = await req.json();
-    console.log('Received request with:', { serviceId, formData });
+    const { formData, serviceId, totalAmount } = await req.json();
+    console.log('Received request with:', { serviceId, formData, totalAmount });
 
     if (!serviceId) {
       throw new Error('No serviceId provided');
@@ -62,27 +89,9 @@ serve(async (req) => {
       throw new Error('No service price found');
     }
 
-    // Calculate base price
-    let totalAmount = Number(servicePrice.price);
-    
-    // Double the price for dual arch
-    if (formData.arch === 'dual') {
-      totalAmount *= 2;
-    }
-
-    // Add nightguard price if selected (not for surgical-day)
-    if (formData.needsNightguard === 'yes' && formData.applianceType !== 'surgical-day') {
-      totalAmount += NIGHTGUARD_PRICE;
-    }
-
-    // Add express design price if selected (not for surgical-day)
-    if (formData.expressDesign === 'yes' && formData.applianceType !== 'surgical-day') {
-      totalAmount += EXPRESS_DESIGN_PRICE;
-    }
-
-    // Convert to cents for Stripe
-    const unitAmount = Math.round(totalAmount * 100);
-    console.log('Final amount in cents:', unitAmount);
+    // Calculate total amount in cents for Stripe
+    const finalAmount = Math.round(totalAmount * 100);
+    console.log('Final amount in cents:', finalAmount);
 
     // Create line items array with the main service
     const lineItems = [{
@@ -92,7 +101,7 @@ serve(async (req) => {
           name: servicePrice.service_name,
           description: `${formData.arch} arch${formData.arch === 'dual' ? 'es' : ''}`
         },
-        unit_amount: unitAmount,
+        unit_amount: finalAmount,
       },
       quantity: 1,
     }];

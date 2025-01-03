@@ -13,6 +13,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
+import { PriceBreakdown } from "./PriceBreakdown";
+import { calculateTotalPrice } from "./utils/priceCalculations";
 
 const priceMap = {
   'surgical-day': 'e843686b-55ac-4f55-bab7-38d5c420a1b8',
@@ -22,9 +24,6 @@ const priceMap = {
   'direct-load-zirconia': '3291311b-1e2b-4f06-bc06-359dd1181494',
   'ti-bar': 'e5593f92-37e7-43a2-b379-cc12bbcb9da4'
 };
-
-const NIGHTGUARD_PRICE = 50;
-const EXPRESS_DESIGN_PRICE = 50;
 
 interface PaymentSectionProps {
   applianceType: string;
@@ -79,17 +78,16 @@ export const PaymentSection = ({
 
   const createCheckoutSession = useMutation({
     mutationFn: async (formData: z.infer<typeof formSchema>) => {
-      console.log('Creating checkout session with:', { 
-        formData, 
-        priceId,
-        totalAmount: calculateFinalPrice()
-      });
+      console.log('Creating checkout session with:', { formData, priceId });
 
       const { data, error } = await supabase.functions.invoke('create-checkout-session', {
         body: {
           formData,
           serviceId: priceId,
-          totalAmount: calculateFinalPrice(),
+          totalAmount: calculateTotalPrice(
+            Number(priceData?.price || 0),
+            { archType, needsNightguard, expressDesign, applianceType }
+          ),
         },
       });
 
@@ -118,29 +116,6 @@ export const PaymentSection = ({
       });
     },
   });
-
-  const calculateFinalPrice = () => {
-    if (!priceData?.price) return '0.00';
-    
-    let totalPrice = Number(priceData.price);
-    
-    // Double the price for dual arch
-    if (archType === 'dual') {
-      totalPrice *= 2;
-    }
-
-    // Add nightguard price if selected
-    if (needsNightguard === 'yes' && applianceType !== 'surgical-day') {
-      totalPrice += NIGHTGUARD_PRICE;
-    }
-
-    // Add express design price if selected
-    if (expressDesign === 'yes' && applianceType !== 'surgical-day') {
-      totalPrice += EXPRESS_DESIGN_PRICE;
-    }
-
-    return totalPrice.toFixed(2);
-  };
 
   const formatApplianceType = (type: string) => {
     if (!type) return '';
@@ -174,47 +149,6 @@ export const PaymentSection = ({
     createCheckoutSession.mutate(values);
   };
 
-  const renderPriceBreakdown = () => {
-    if (!priceData?.price) return null;
-
-    const basePrice = Number(priceData.price);
-    const isDual = archType === 'dual';
-    const hasNightguard = needsNightguard === 'yes' && applianceType !== 'surgical-day';
-    const hasExpressDesign = expressDesign === 'yes' && applianceType !== 'surgical-day';
-    const quantity = isDual ? 2 : 1;
-
-    return (
-      <div className="space-y-2">
-        <div className="text-sm font-medium">Price Breakdown:</div>
-        <div className="space-y-1 text-sm">
-          <div className="flex justify-between items-center">
-            <div className="flex-1">
-              <span>{formatApplianceType(applianceType)}</span>
-              <span className="text-gray-500 ml-2">x{quantity}</span>
-            </div>
-            <span>${(basePrice * quantity).toFixed(2)}</span>
-          </div>
-          {hasNightguard && (
-            <div className="flex justify-between">
-              <span>Nightguard</span>
-              <span>+${NIGHTGUARD_PRICE.toFixed(2)}</span>
-            </div>
-          )}
-          {hasExpressDesign && (
-            <div className="flex justify-between">
-              <span>Express Design</span>
-              <span>+${EXPRESS_DESIGN_PRICE.toFixed(2)}</span>
-            </div>
-          )}
-          <div className="pt-2 border-t flex justify-between font-semibold">
-            <span>Total:</span>
-            <span>${calculateFinalPrice()}</span>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
   return (
     <div className="sticky bottom-0 bg-white border-t shadow-lg p-4">
       <div className="flex justify-between items-start">
@@ -231,7 +165,16 @@ export const PaymentSection = ({
                 <DialogHeader>
                   <DialogTitle>Price Details</DialogTitle>
                 </DialogHeader>
-                {renderPriceBreakdown()}
+                {priceData && (
+                  <PriceBreakdown
+                    basePrice={Number(priceData.price)}
+                    archType={archType}
+                    needsNightguard={needsNightguard}
+                    expressDesign={expressDesign}
+                    applianceType={applianceType}
+                    formattedApplianceType={formatApplianceType(applianceType)}
+                  />
+                )}
               </DialogContent>
             </Dialog>
           </div>
@@ -239,7 +182,10 @@ export const PaymentSection = ({
             <div className="h-6 w-20 animate-pulse bg-gray-200 rounded" />
           ) : (
             <p className="text-2xl font-semibold text-gray-900">
-              ${calculateFinalPrice()}
+              ${calculateTotalPrice(
+                Number(priceData?.price || 0),
+                { archType, needsNightguard, expressDesign, applianceType }
+              ).toFixed(2)}
             </p>
           )}
         </div>
