@@ -1,4 +1,4 @@
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import Stripe from 'https://esm.sh/stripe@12.0.0'
 
@@ -14,22 +14,34 @@ serve(async (req) => {
   }
 
   try {
-    // Initialize Stripe
+    // Get auth user
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+    )
+
+    const authHeader = req.headers.get('Authorization')!
+    const { data: { user }, error: authError } = await supabaseClient.auth.getUser(authHeader.replace('Bearer ', ''))
+    
+    if (authError || !user) {
+      throw new Error('Unauthorized')
+    }
+
+    // Initialize Stripe with proper HTTP client
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
       apiVersion: '2023-10-16',
       httpClient: Stripe.createFetchHttpClient(),
     })
 
-    // Get the request body
+    // Get and validate request body
     const { formData, totalAmount, metadata } = await req.json()
-
     console.log('Creating checkout session with:', { formData, totalAmount, metadata })
 
     if (!formData || !totalAmount) {
       throw new Error('Missing required fields')
     }
 
-    // Create the checkout session
+    // Create checkout session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [
@@ -49,11 +61,13 @@ serve(async (req) => {
       success_url: `${req.headers.get('origin')}/clinic/submittedlabscripts?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${req.headers.get('origin')}/clinic/submittedlabscripts`,
       metadata: {
-        formData: JSON.stringify(formData)
+        formData: JSON.stringify(formData),
+        user_id: user.id
       },
     })
 
-    // Return the session URL
+    console.log('Checkout session created:', session.id)
+
     return new Response(
       JSON.stringify({ url: session.url }),
       {
@@ -62,7 +76,7 @@ serve(async (req) => {
       }
     )
   } catch (error) {
-    console.error('Error:', error)
+    console.error('Error in create-checkout:', error)
     return new Response(
       JSON.stringify({ error: error.message }),
       {

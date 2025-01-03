@@ -48,20 +48,17 @@ export const PaymentSection = ({ applianceType, archType, formData, isSubmitting
     if (!priceData?.price) return '0.00';
     let totalPrice = Number(priceData.price);
 
-    // Double the price for dual arch
     if (archType === 'dual') {
       totalPrice *= 2;
     }
 
-    // Add nightguard price if requested
     if (formData.needsNightguard === 'yes') {
-      const nightguardPrice = 150; // Fixed price for nightguard
+      const nightguardPrice = 150;
       totalPrice += nightguardPrice;
     }
 
-    // Add express design fee if requested
     if (formData.expressDesign === 'yes') {
-      const expressFee = 100; // Fixed price for express design
+      const expressFee = 100;
       totalPrice += expressFee;
     }
 
@@ -89,7 +86,7 @@ export const PaymentSection = ({ applianceType, archType, formData, isSubmitting
           description: "Failed to create checkout session. Please try again.",
           variant: "destructive",
         });
-        throw error;
+        return;
       }
 
       if (!session?.url) {
@@ -99,7 +96,7 @@ export const PaymentSection = ({ applianceType, archType, formData, isSubmitting
           description: "Invalid checkout session response. Please try again.",
           variant: "destructive",
         });
-        throw new Error('No checkout URL returned');
+        return;
       }
 
       // Redirect to Stripe Checkout
