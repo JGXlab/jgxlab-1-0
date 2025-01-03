@@ -28,8 +28,8 @@ serve(async (req) => {
       throw new Error('No email found');
     }
 
-    const { formData, totalAmount } = await req.json();
-    console.log('Received request data:', { formData, totalAmount });
+    const { formData, productId, totalAmount } = await req.json();
+    console.log('Received request data:', { formData, productId, totalAmount });
 
     if (!formData || !totalAmount) {
       throw new Error('Missing required data');
@@ -55,8 +55,18 @@ serve(async (req) => {
       applianceName,
       archType,
       amountInCents,
+      productId,
       dueDate: formData.dueDate
     });
+
+    // First, verify the product exists
+    try {
+      const product = await stripe.products.retrieve(productId);
+      console.log('Found Stripe product:', product);
+    } catch (error) {
+      console.error('Error retrieving Stripe product:', error);
+      throw new Error(`Invalid product ID: ${productId}`);
+    }
 
     const session = await stripe.checkout.sessions.create({
       customer_email: user.email,
@@ -65,17 +75,7 @@ serve(async (req) => {
         {
           price_data: {
             currency: 'usd',
-            product_data: {
-              name: `${applianceName} - ${archType} Arch`,
-              description: `Due Date: ${formData.dueDate}`,
-              metadata: {
-                appliance_type: formData.applianceType,
-                arch: formData.arch,
-                treatment_type: formData.treatmentType,
-                needs_nightguard: formData.needsNightguard || 'no',
-                express_design: formData.expressDesign || 'no'
-              }
-            },
+            product: productId, // Use the product ID directly
             unit_amount: amountInCents,
           },
           quantity: 1,
