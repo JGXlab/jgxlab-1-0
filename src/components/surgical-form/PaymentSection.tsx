@@ -6,11 +6,12 @@ import { z } from "zod";
 import { formSchema } from "./formSchema";
 import { UseFormReturn } from "react-hook-form";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 const priceMap = {
   'surgical-day': 'e843686b-55ac-4f55-bab7-38d5c420a1b8',
@@ -86,8 +87,6 @@ export const PaymentSection = ({
     return totalPrice.toFixed(2);
   };
 
-  if (!applianceType) return null;
-
   // Function to render price breakdown
   const renderPriceBreakdown = () => {
     if (!priceData?.price) return null;
@@ -98,11 +97,36 @@ export const PaymentSection = ({
     const hasExpressDesign = expressDesign === 'yes' && applianceType !== 'surgical-day';
 
     return (
-      <div className="space-y-1 text-sm">
-        <div>Base price: ${basePrice.toFixed(2)}</div>
-        {isDual && <div>Dual arch: ${(basePrice * 2).toFixed(2)}</div>}
-        {hasNightguard && <div>Nightguard: +${NIGHTGUARD_PRICE.toFixed(2)}</div>}
-        {hasExpressDesign && <div>Express design: +${EXPRESS_DESIGN_PRICE.toFixed(2)}</div>}
+      <div className="space-y-2">
+        <div className="text-sm font-medium">Price Breakdown:</div>
+        <div className="space-y-1 text-sm">
+          <div className="flex justify-between">
+            <span>Base price:</span>
+            <span>${basePrice.toFixed(2)}</span>
+          </div>
+          {isDual && (
+            <div className="flex justify-between">
+              <span>Dual arch:</span>
+              <span>${(basePrice * 2).toFixed(2)}</span>
+            </div>
+          )}
+          {hasNightguard && (
+            <div className="flex justify-between">
+              <span>Nightguard:</span>
+              <span>+${NIGHTGUARD_PRICE.toFixed(2)}</span>
+            </div>
+          )}
+          {hasExpressDesign && (
+            <div className="flex justify-between">
+              <span>Express design:</span>
+              <span>+${EXPRESS_DESIGN_PRICE.toFixed(2)}</span>
+            </div>
+          )}
+          <div className="pt-2 border-t flex justify-between font-semibold">
+            <span>Total:</span>
+            <span>${calculateFinalPrice()}</span>
+          </div>
+        </div>
       </div>
     );
   };
@@ -113,18 +137,19 @@ export const PaymentSection = ({
         <div className="space-y-2">
           <div className="flex items-center gap-2">
             <p className="text-sm font-medium text-gray-500">Total Amount</p>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-6 w-6 p-0">
-                    <Info className="h-4 w-4 text-gray-500" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  {renderPriceBreakdown()}
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-6 w-6 p-0">
+                  <Info className="h-4 w-4 text-gray-500" />
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>Price Details</DialogTitle>
+                </DialogHeader>
+                {renderPriceBreakdown()}
+              </DialogContent>
+            </Dialog>
           </div>
           {isLoading ? (
             <div className="h-6 w-20 animate-pulse bg-gray-200 rounded" />
