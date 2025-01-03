@@ -71,19 +71,28 @@ export function PatientSelector({ value, onChange, clinicId }: PatientSelectorPr
           </FormControl>
         </PopoverTrigger>
         <PopoverContent 
-          className="w-[400px] p-0 bg-white" 
+          className="w-[400px] p-0" 
           align="start"
           sideOffset={4}
-          style={{ 
-            zIndex: 9999,
+          onInteractOutside={(e) => {
+            e.preventDefault();
+            setOpen(false);
+          }}
+          style={{
+            zIndex: 50,
+            backgroundColor: 'white',
             position: 'relative',
-            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
+            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+            pointerEvents: 'auto'
           }}
         >
           <Command>
             <CommandInput 
               placeholder="Search patients..." 
               className="border-0"
+              onKeyDown={(e) => {
+                e.stopPropagation();
+              }}
             />
             <CommandList className="max-h-[300px] overflow-y-auto">
               <CommandEmpty>
@@ -92,7 +101,8 @@ export function PatientSelector({ value, onChange, clinicId }: PatientSelectorPr
                   type="button"
                   variant="link"
                   className="mt-2"
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.stopPropagation();
                     setOpen(false);
                     setCreatePatientOpen(true);
                   }}
@@ -105,11 +115,19 @@ export function PatientSelector({ value, onChange, clinicId }: PatientSelectorPr
                   <CommandItem
                     key={patient.id}
                     value={`${patient.first_name} ${patient.last_name}`.toLowerCase()}
-                    onSelect={() => {
-                      onChange(patient.id);
-                      setOpen(false);
+                    onSelect={(currentValue) => {
+                      const selectedPatient = patients.find(
+                        (p) => `${p.first_name} ${p.last_name}`.toLowerCase() === currentValue
+                      );
+                      if (selectedPatient) {
+                        onChange(selectedPatient.id);
+                        setOpen(false);
+                      }
                     }}
                     className="cursor-pointer hover:bg-gray-100 py-2"
+                    onMouseDown={(e) => {
+                      e.stopPropagation();
+                    }}
                   >
                     <Check
                       className={cn(
