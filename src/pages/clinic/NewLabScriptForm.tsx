@@ -31,11 +31,11 @@ export default function NewLabScriptForm() {
       screwType: "",
       otherScrewType: "",
       vdoDetails: "",
-      needsNightguard: "",
+      needsNightguard: "no", // Set default to "no"
       shade: "",
       dueDate: "",
       specificInstructions: "",
-      expressDesign: "",
+      expressDesign: "no", // Set default to "no"
     },
   });
 
