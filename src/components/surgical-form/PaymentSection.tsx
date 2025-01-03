@@ -7,6 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { calculateTotalPrice } from "./utils/priceCalculations";
 import { TotalAmountDisplay } from "./payment/TotalAmountDisplay";
 import { SubmitButton } from "./payment/SubmitButton";
+import { useEffect, useState } from "react";
 
 interface PaymentSectionProps {
   applianceType: string;
@@ -28,6 +29,7 @@ export const PaymentSection = ({
   form
 }: PaymentSectionProps) => {
   const { toast } = useToast();
+  const [totalAmount, setTotalAmount] = useState(0);
 
   const { data: basePrice = 0, isLoading: isPriceLoading } = useQuery({
     queryKey: ['service-price', applianceType],
@@ -49,6 +51,18 @@ export const PaymentSection = ({
     enabled: !!applianceType,
   });
 
+  useEffect(() => {
+    const updateTotalAmount = async () => {
+      const calculatedTotal = await calculateTotalPrice(
+        basePrice,
+        { archType, needsNightguard, expressDesign, applianceType }
+      );
+      setTotalAmount(calculatedTotal);
+    };
+
+    updateTotalAmount();
+  }, [basePrice, archType, needsNightguard, expressDesign, applianceType]);
+
   console.log('Payment details:', {
     applianceType,
     basePrice,
@@ -61,7 +75,7 @@ export const PaymentSection = ({
     mutationFn: async (formData: z.infer<typeof formSchema>) => {
       console.log('Creating checkout session with:', { formData });
 
-      const totalAmount = await calculateTotalPrice(
+      const calculatedTotal = await calculateTotalPrice(
         basePrice,
         { archType, needsNightguard, expressDesign, applianceType }
       );
@@ -69,7 +83,7 @@ export const PaymentSection = ({
       const { data, error } = await supabase.functions.invoke('create-checkout-session', {
         body: {
           formData,
-          totalAmount,
+          totalAmount: calculatedTotal,
           applianceType,
         },
       });
@@ -122,11 +136,6 @@ export const PaymentSection = ({
 
     createCheckoutSession.mutate(values);
   };
-
-  const totalAmount = await calculateTotalPrice(
-    basePrice,
-    { archType, needsNightguard, expressDesign, applianceType }
-  );
 
   return (
     <div className="sticky bottom-0 bg-white border-t shadow-lg p-4">
