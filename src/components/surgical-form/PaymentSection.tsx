@@ -87,6 +87,13 @@ export const PaymentSection = ({
     return totalPrice.toFixed(2);
   };
 
+  const formatApplianceType = (type: string) => {
+    if (!type) return '';
+    return type.split('-').map(word => 
+      word.charAt(0).toUpperCase() + word.slice(1)
+    ).join(' ');
+  };
+
   // Function to render price breakdown
   const renderPriceBreakdown = () => {
     if (!priceData?.price) return null;
@@ -95,30 +102,28 @@ export const PaymentSection = ({
     const isDual = archType === 'dual';
     const hasNightguard = needsNightguard === 'yes' && applianceType !== 'surgical-day';
     const hasExpressDesign = expressDesign === 'yes' && applianceType !== 'surgical-day';
+    const quantity = isDual ? 2 : 1;
 
     return (
       <div className="space-y-2">
         <div className="text-sm font-medium">Price Breakdown:</div>
         <div className="space-y-1 text-sm">
-          <div className="flex justify-between">
-            <span>Base price:</span>
-            <span>${basePrice.toFixed(2)}</span>
-          </div>
-          {isDual && (
-            <div className="flex justify-between">
-              <span>Dual arch:</span>
-              <span>${(basePrice * 2).toFixed(2)}</span>
+          <div className="flex justify-between items-center">
+            <div className="flex-1">
+              <span>{formatApplianceType(applianceType)}</span>
+              <span className="text-gray-500 ml-2">x{quantity}</span>
             </div>
-          )}
+            <span>${(basePrice * quantity).toFixed(2)}</span>
+          </div>
           {hasNightguard && (
             <div className="flex justify-between">
-              <span>Nightguard:</span>
+              <span>Nightguard</span>
               <span>+${NIGHTGUARD_PRICE.toFixed(2)}</span>
             </div>
           )}
           {hasExpressDesign && (
             <div className="flex justify-between">
-              <span>Express design:</span>
+              <span>Express Design</span>
               <span>+${EXPRESS_DESIGN_PRICE.toFixed(2)}</span>
             </div>
           )}
