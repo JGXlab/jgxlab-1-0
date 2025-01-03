@@ -41,8 +41,15 @@ export const PriceBreakdown = ({
   });
 
   const isLoading = isLoadingBase || (hasNightguard && isLoadingNightguard) || (hasExpressDesign && isLoadingExpress);
+  
+  // Calculate base price with quantity
   const baseTotal = basePrice * quantity;
-  const total = baseTotal + (hasNightguard ? nightguardPrice : 0) + (hasExpressDesign ? expressPrice : 0);
+  
+  // Add-ons are not multiplied by quantity
+  const addonsTotal = (hasNightguard ? nightguardPrice : 0) + (hasExpressDesign ? expressPrice : 0);
+  
+  // Total is base price (with quantity) plus add-ons (without quantity)
+  const total = baseTotal + addonsTotal;
 
   if (isLoading) {
     return (
