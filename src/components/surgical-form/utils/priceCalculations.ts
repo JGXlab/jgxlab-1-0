@@ -3,46 +3,23 @@ import { supabase } from "@/integrations/supabase/client";
 export const NIGHTGUARD_PRICE = 50;
 export const EXPRESS_DESIGN_PRICE = 50;
 
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
-const fetchStripePrice = async (priceId: string, retries = 3): Promise<number> => {
+const fetchStripePrice = async (priceId: string): Promise<number> => {
   if (!priceId) {
     console.log('No price ID provided');
     return 0;
   }
   
   console.log('Fetching Stripe price for ID:', priceId);
-  
-  for (let attempt = 1; attempt <= retries; attempt++) {
-    try {
-      const { data, error } = await supabase.functions.invoke('get-stripe-price', {
-        body: { priceId }
-      });
+  const { data, error } = await supabase.functions.invoke('get-stripe-price', {
+    body: { priceId }
+  });
 
-      if (error) {
-        console.error('Error fetching Stripe price:', error);
-        
-        // If it's a rate limit error, wait before retrying
-        if (error.status === 429) {
-          const retryAfter = parseInt(error.retryAfter) || 5;
-          console.log(`Rate limited. Waiting ${retryAfter} seconds before retry...`);
-          await delay(retryAfter * 1000);
-          continue;
-        }
-        
-        throw error;
-      }
-
-      console.log('Price data received:', data);
-      return data.price || 0;
-    } catch (error) {
-      console.error(`Attempt ${attempt} failed:`, error);
-      if (attempt === retries) throw error;
-      await delay(1000 * attempt); // Exponential backoff
-    }
+  if (error) {
+    console.error('Error fetching Stripe price:', error);
+    return 0;
   }
 
-  return 0;
+  return data.price || 0;
 };
 
 export const calculateTotalPrice = async (basePrice: number, options: {

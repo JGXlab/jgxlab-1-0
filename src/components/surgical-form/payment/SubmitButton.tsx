@@ -9,11 +9,12 @@ interface SubmitButtonProps {
 
 export const SubmitButton = ({ isSubmitting, isPending, onClick }: SubmitButtonProps) => {
   return (
-    <Button
-      type="submit"
+    <Button 
+      type="submit" 
+      size="lg"
       disabled={isSubmitting || isPending}
+      className="min-w-[200px]"
       onClick={onClick}
-      className="w-full md:w-auto"
     >
       {isPending ? (
         <>
@@ -21,7 +22,7 @@ export const SubmitButton = ({ isSubmitting, isPending, onClick }: SubmitButtonP
           Redirecting to payment...
         </>
       ) : (
-        "Submit and Pay"
+        'Submit and Pay'
       )}
     </Button>
   );
