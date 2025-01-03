@@ -4,8 +4,12 @@ export const NIGHTGUARD_PRICE = 50;
 export const EXPRESS_DESIGN_PRICE = 50;
 
 const fetchStripePrice = async (priceId: string): Promise<number> => {
-  if (!priceId) return 0;
+  if (!priceId) {
+    console.log('No price ID provided');
+    return 0;
+  }
   
+  console.log('Fetching Stripe price for ID:', priceId);
   const { data, error } = await supabase.functions.invoke('get-stripe-price', {
     body: { priceId }
   });
@@ -27,12 +31,24 @@ export const calculateTotalPrice = async (basePrice: number, options: {
   const { archType, needsNightguard, expressDesign, applianceType } = options;
   const lineItems: Array<{ price: string; quantity: number }> = [];
 
+  console.log('Calculating price for:', { applianceType, archType, needsNightguard, expressDesign });
+
+  if (!applianceType) {
+    console.log('No appliance type provided');
+    return { total: 0, lineItems: [] };
+  }
+
   // Get base price Stripe ID
-  const { data: baseProduct } = await supabase
+  const { data: baseProduct, error: baseError } = await supabase
     .from('service_prices')
     .select('stripe_price_id')
     .eq('service_name', applianceType)
-    .single();
+    .maybeSingle();
+
+  if (baseError) {
+    console.error('Error fetching base price:', baseError);
+    return { total: 0, lineItems: [] };
+  }
 
   let totalPrice = 0;
   
@@ -47,13 +63,15 @@ export const calculateTotalPrice = async (basePrice: number, options: {
 
   // Add nightguard if selected (not for surgical-day)
   if (needsNightguard === 'yes' && applianceType !== 'surgical-day') {
-    const { data: nightguardPrice } = await supabase
+    const { data: nightguardPrice, error: nightguardError } = await supabase
       .from('service_prices')
       .select('stripe_price_id')
       .eq('service_name', 'additional-nightguard')
-      .single();
+      .maybeSingle();
     
-    if (nightguardPrice?.stripe_price_id) {
+    if (nightguardError) {
+      console.error('Error fetching nightguard price:', nightguardError);
+    } else if (nightguardPrice?.stripe_price_id) {
       const price = await fetchStripePrice(nightguardPrice.stripe_price_id);
       totalPrice += price;
       lineItems.push({
@@ -65,13 +83,15 @@ export const calculateTotalPrice = async (basePrice: number, options: {
 
   // Add express design if selected (not for surgical-day)
   if (expressDesign === 'yes' && applianceType !== 'surgical-day') {
-    const { data: expressPrice } = await supabase
+    const { data: expressPrice, error: expressError } = await supabase
       .from('service_prices')
       .select('stripe_price_id')
       .eq('service_name', 'express-design')
-      .single();
+      .maybeSingle();
     
-    if (expressPrice?.stripe_price_id) {
+    if (expressError) {
+      console.error('Error fetching express design price:', expressError);
+    } else if (expressPrice?.stripe_price_id) {
       const price = await fetchStripePrice(expressPrice.stripe_price_id);
       totalPrice += price;
       lineItems.push({
@@ -99,7 +119,10 @@ export const calculateTotalPrice = async (basePrice: number, options: {
 };
 
 export const fetchPriceForService = async (serviceName: string): Promise<number> => {
-  if (!serviceName) return 0;
+  if (!serviceName) {
+    console.log('No service name provided');
+    return 0;
+  }
 
   console.log('Fetching price for service:', serviceName);
 
