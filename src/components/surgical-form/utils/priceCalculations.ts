@@ -3,23 +3,39 @@ import { supabase } from "@/integrations/supabase/client";
 export const NIGHTGUARD_PRICE = 50;
 export const EXPRESS_DESIGN_PRICE = 50;
 
+// Cache for Stripe prices
+const stripePriceCache: { [key: string]: number } = {};
+
 const fetchStripePrice = async (priceId: string): Promise<number> => {
   if (!priceId) {
     console.log('No price ID provided');
     return 0;
   }
   
+  // Check cache first
+  if (stripePriceCache[priceId] !== undefined) {
+    console.log('Using cached price for:', priceId);
+    return stripePriceCache[priceId];
+  }
+  
   console.log('Fetching Stripe price for ID:', priceId);
-  const { data, error } = await supabase.functions.invoke('get-stripe-price', {
-    body: { priceId }
-  });
+  try {
+    const { data, error } = await supabase.functions.invoke('get-stripe-price', {
+      body: { priceId }
+    });
 
-  if (error) {
+    if (error) {
+      console.error('Error fetching Stripe price:', error);
+      return 0;
+    }
+
+    // Cache the price
+    stripePriceCache[priceId] = data.price || 0;
+    return data.price || 0;
+  } catch (error) {
     console.error('Error fetching Stripe price:', error);
     return 0;
   }
-
-  return data.price || 0;
 };
 
 export const calculateTotalPrice = async (basePrice: number, options: {
@@ -41,7 +57,7 @@ export const calculateTotalPrice = async (basePrice: number, options: {
   // Get base price Stripe ID
   const { data: baseProduct, error: baseError } = await supabase
     .from('service_prices')
-    .select('stripe_price_id')
+    .select('stripe_price_id, price')
     .eq('service_name', applianceType)
     .maybeSingle();
 
@@ -53,7 +69,7 @@ export const calculateTotalPrice = async (basePrice: number, options: {
   let totalPrice = 0;
   
   if (baseProduct?.stripe_price_id) {
-    const price = await fetchStripePrice(baseProduct.stripe_price_id);
+    const price = baseProduct.price || await fetchStripePrice(baseProduct.stripe_price_id);
     totalPrice = price;
     lineItems.push({
       price: baseProduct.stripe_price_id,
@@ -65,14 +81,14 @@ export const calculateTotalPrice = async (basePrice: number, options: {
   if (needsNightguard === 'yes' && applianceType !== 'surgical-day') {
     const { data: nightguardPrice, error: nightguardError } = await supabase
       .from('service_prices')
-      .select('stripe_price_id')
+      .select('stripe_price_id, price')
       .eq('service_name', 'additional-nightguard')
       .maybeSingle();
     
     if (nightguardError) {
       console.error('Error fetching nightguard price:', nightguardError);
     } else if (nightguardPrice?.stripe_price_id) {
-      const price = await fetchStripePrice(nightguardPrice.stripe_price_id);
+      const price = nightguardPrice.price || await fetchStripePrice(nightguardPrice.stripe_price_id);
       totalPrice += price;
       lineItems.push({
         price: nightguardPrice.stripe_price_id,
@@ -85,14 +101,14 @@ export const calculateTotalPrice = async (basePrice: number, options: {
   if (expressDesign === 'yes' && applianceType !== 'surgical-day') {
     const { data: expressPrice, error: expressError } = await supabase
       .from('service_prices')
-      .select('stripe_price_id')
+      .select('stripe_price_id, price')
       .eq('service_name', 'express-design')
       .maybeSingle();
     
     if (expressError) {
       console.error('Error fetching express design price:', expressError);
     } else if (expressPrice?.stripe_price_id) {
-      const price = await fetchStripePrice(expressPrice.stripe_price_id);
+      const price = expressPrice.price || await fetchStripePrice(expressPrice.stripe_price_id);
       totalPrice += price;
       lineItems.push({
         price: expressPrice.stripe_price_id,
@@ -128,7 +144,7 @@ export const fetchPriceForService = async (serviceName: string): Promise<number>
 
   const { data, error } = await supabase
     .from('service_prices')
-    .select('stripe_price_id')
+    .select('stripe_price_id, price')
     .eq('service_name', serviceName)
     .maybeSingle();
 
@@ -142,5 +158,6 @@ export const fetchPriceForService = async (serviceName: string): Promise<number>
     return 0;
   }
 
-  return fetchStripePrice(data.stripe_price_id);
+  // Use the price from the database if available, otherwise fetch from Stripe
+  return data.price || await fetchStripePrice(data.stripe_price_id);
 };

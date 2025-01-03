@@ -11,9 +11,7 @@ serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, {
-      headers: {
-        ...corsHeaders,
-      },
+      headers: corsHeaders,
     });
   }
 
@@ -32,6 +30,7 @@ serve(async (req) => {
 
     const stripe = new Stripe(stripeKey, {
       apiVersion: '2023-10-16',
+      maxNetworkRetries: 2, // Add retries for reliability
     });
 
     const price = await stripe.prices.retrieve(priceId);
