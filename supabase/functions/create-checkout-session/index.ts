@@ -7,9 +7,6 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const NIGHTGUARD_PRICE = 50;
-const EXPRESS_DESIGN_PRICE = 50;
-
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -31,9 +28,8 @@ serve(async (req) => {
       throw new Error('No email found');
     }
 
-    const { formData, serviceId } = await req.json();
-    console.log('Received request with serviceId:', serviceId);
-    console.log('Form data:', formData);
+    const { formData, serviceId, totalAmount } = await req.json();
+    console.log('Received request with:', { serviceId, totalAmount, formData });
 
     if (!serviceId) {
       throw new Error('No serviceId provided');
@@ -44,73 +40,40 @@ serve(async (req) => {
       apiVersion: '2023-10-16',
     });
 
-    // Get the specific service price using maybeSingle() instead of single()
-    const { data: servicePrices, error: servicePriceError } = await supabaseClient
+    // Get the specific service price using maybeSingle()
+    const { data: servicePrice, error: servicePriceError } = await supabaseClient
       .from('service_prices')
       .select('*')
       .eq('id', serviceId)
       .maybeSingle();
 
-    console.log('Service price lookup result:', { servicePrices, servicePriceError });
+    console.log('Service price lookup result:', { servicePrice, servicePriceError });
 
     if (servicePriceError) {
       console.error('Service price lookup error:', servicePriceError);
       throw new Error(`Service price lookup failed: ${servicePriceError.message}`);
     }
 
-    if (!servicePrices) {
+    if (!servicePrice) {
       console.error('No service price found for ID:', serviceId);
       throw new Error('No service price found');
     }
 
-    console.log('Found service price:', servicePrices);
-
     // Calculate the unit amount (in cents)
-    let unitAmount = Math.round(Number(servicePrices.price) * 100);
-    console.log('Base unit amount:', unitAmount);
+    const unitAmount = Math.round(Number(totalAmount) * 100);
+    console.log('Calculated unit amount:', unitAmount);
 
-    // Create line items array
-    const lineItems = [];
-
-    // Add main service with correct quantity for dual arch
-    lineItems.push({
+    // Create line items array with the main service
+    const lineItems = [{
       price_data: {
         currency: 'usd',
         product_data: {
-          name: servicePrices.service_name,
+          name: servicePrice.service_name,
         },
         unit_amount: unitAmount,
       },
-      quantity: formData.arch === 'dual' ? 2 : 1,
-    });
-
-    // Add nightguard if selected (not for surgical-day)
-    if (formData.needsNightguard === 'yes' && formData.applianceType !== 'surgical-day') {
-      lineItems.push({
-        price_data: {
-          currency: 'usd',
-          product_data: {
-            name: 'Nightguard',
-          },
-          unit_amount: NIGHTGUARD_PRICE * 100,
-        },
-        quantity: 1,
-      });
-    }
-
-    // Add express design if selected (not for surgical-day)
-    if (formData.expressDesign === 'yes' && formData.applianceType !== 'surgical-day') {
-      lineItems.push({
-        price_data: {
-          currency: 'usd',
-          product_data: {
-            name: 'Express Design (24h)',
-          },
-          unit_amount: EXPRESS_DESIGN_PRICE * 100,
-        },
-        quantity: 1,
-      });
-    }
+      quantity: 1,
+    }];
 
     console.log('Creating checkout session with line items:', lineItems);
 
