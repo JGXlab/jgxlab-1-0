@@ -48,6 +48,9 @@ export const PaymentSection = ({
   const { toast } = useToast();
   const priceId = applianceType ? priceMap[applianceType as keyof typeof priceMap] : null;
 
+  console.log('Current priceId:', priceId);
+  console.log('Current applianceType:', applianceType);
+
   const { data: priceData, isLoading } = useQuery({
     queryKey: ['servicePrice', priceId],
     queryFn: async () => {
@@ -60,6 +63,7 @@ export const PaymentSection = ({
         .single();
 
       if (error) throw error;
+      console.log('Fetched price data:', data);
       return data;
     },
     enabled: !!priceId,
@@ -67,6 +71,7 @@ export const PaymentSection = ({
 
   const createCheckoutSession = useMutation({
     mutationFn: async (formData: z.infer<typeof formSchema>) => {
+      console.log('Creating checkout session with:', { formData, priceId });
       const { data, error } = await supabase.functions.invoke('create-checkout-session', {
         body: {
           formData,
@@ -75,7 +80,10 @@ export const PaymentSection = ({
         },
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error from edge function:', error);
+        throw error;
+      }
       return data;
     },
     onSuccess: (data) => {
@@ -93,7 +101,6 @@ export const PaymentSection = ({
     },
   });
 
-  // Calculate final price based on arch type and add-ons
   const calculateFinalPrice = () => {
     if (!priceData?.price) return '0.00';
     
@@ -124,7 +131,20 @@ export const PaymentSection = ({
     ).join(' ');
   };
 
-  // Function to render price breakdown
+  const handleSubmitAndPay = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    const values = form.getValues();
+    if (Object.keys(form.formState.errors).length > 0) {
+      toast({
+        title: "Validation Error",
+        description: "Please fill in all required fields correctly.",
+        variant: "destructive",
+      });
+      return;
+    }
+    createCheckoutSession.mutate(values);
+  };
+
   const renderPriceBreakdown = () => {
     if (!priceData?.price) return null;
 
@@ -164,20 +184,6 @@ export const PaymentSection = ({
         </div>
       </div>
     );
-  };
-
-  const handleSubmitAndPay = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    const values = form.getValues();
-    if (Object.keys(form.formState.errors).length > 0) {
-      toast({
-        title: "Validation Error",
-        description: "Please fill in all required fields correctly.",
-        variant: "destructive",
-      });
-      return;
-    }
-    createCheckoutSession.mutate(values);
   };
 
   return (
