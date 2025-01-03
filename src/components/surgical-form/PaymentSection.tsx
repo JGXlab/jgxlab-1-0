@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, Info } from "lucide-react";
@@ -12,6 +12,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { useToast } from "@/hooks/use-toast";
 
 const priceMap = {
   'surgical-day': 'e843686b-55ac-4f55-bab7-38d5c420a1b8',
@@ -44,6 +45,7 @@ export const PaymentSection = ({
   isSubmitting,
   form
 }: PaymentSectionProps) => {
+  const { toast } = useToast();
   const priceId = applianceType ? priceMap[applianceType as keyof typeof priceMap] : null;
 
   const { data: priceData, isLoading } = useQuery({
@@ -61,6 +63,34 @@ export const PaymentSection = ({
       return data;
     },
     enabled: !!priceId,
+  });
+
+  const createCheckoutSession = useMutation({
+    mutationFn: async (formData: z.infer<typeof formSchema>) => {
+      const { data, error } = await supabase.functions.invoke('create-checkout-session', {
+        body: {
+          formData,
+          serviceId: priceId,
+          totalAmount: calculateFinalPrice(),
+        },
+      });
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (data) => {
+      if (data.url) {
+        window.location.href = data.url;
+      }
+    },
+    onError: (error) => {
+      console.error('Error creating checkout session:', error);
+      toast({
+        title: "Error",
+        description: "Failed to create checkout session. Please try again.",
+        variant: "destructive",
+      });
+    },
   });
 
   // Calculate final price based on arch type and add-ons
@@ -136,6 +166,20 @@ export const PaymentSection = ({
     );
   };
 
+  const handleSubmitAndPay = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    const values = form.getValues();
+    if (Object.keys(form.formState.errors).length > 0) {
+      toast({
+        title: "Validation Error",
+        description: "Please fill in all required fields correctly.",
+        variant: "destructive",
+      });
+      return;
+    }
+    createCheckoutSession.mutate(values);
+  };
+
   return (
     <div className="sticky bottom-0 bg-white border-t shadow-lg p-4">
       <div className="flex justify-between items-start">
@@ -167,17 +211,14 @@ export const PaymentSection = ({
         <Button 
           type="submit" 
           size="lg"
-          disabled={isSubmitting || isLoading}
+          disabled={isSubmitting || isLoading || createCheckoutSession.isPending}
           className="min-w-[200px]"
-          onClick={(e) => {
-            e.preventDefault();
-            onSubmit(form.getValues());
-          }}
+          onClick={handleSubmitAndPay}
         >
-          {isSubmitting ? (
+          {createCheckoutSession.isPending ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Submitting...
+              Redirecting to payment...
             </>
           ) : (
             'Submit and Pay'
