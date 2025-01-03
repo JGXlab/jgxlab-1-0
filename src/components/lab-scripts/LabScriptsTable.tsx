@@ -6,8 +6,6 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { EmptyLabScripts } from "./EmptyLabScripts";
 import { LoadingLabScripts } from "./LoadingLabScripts";
-import { useToast } from "@/hooks/use-toast";
-import { PaymentButton } from "./PaymentButton";
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -50,54 +48,6 @@ interface LabScriptsTableProps {
 
 export function LabScriptsTable({ labScripts, isLoading, onPreview, onStatusUpdate }: LabScriptsTableProps) {
   const navigate = useNavigate();
-  const { toast } = useToast();
-
-  const handlePayment = async (script: any, e: React.MouseEvent) => {
-    e.stopPropagation();
-    console.log('Processing payment for lab script:', script.id);
-    
-    try {
-      const response = await fetch('/functions/v1/create-checkout-session', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          formData: script,
-          lineItems: [
-            {
-              price_data: {
-                currency: 'usd',
-                product_data: {
-                  name: `Lab Script - ${getApplianceTypeDisplay(script.appliance_type)}`,
-                  description: `Lab Script for ${script.patients?.first_name} ${script.patients?.last_name}`,
-                },
-                unit_amount: 10000, // $100.00
-              },
-              quantity: 1,
-            },
-          ],
-          applianceType: script.appliance_type,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to create checkout session');
-      }
-
-      const { url } = await response.json();
-      if (url) {
-        window.location.href = url;
-      }
-    } catch (error) {
-      console.error('Payment error:', error);
-      toast({
-        variant: "destructive",
-        title: "Payment Error",
-        description: "Failed to process payment. Please try again.",
-      });
-    }
-  };
 
   return (
     <Table>
@@ -133,7 +83,7 @@ export function LabScriptsTable({ labScripts, isLoading, onPreview, onStatusUpda
               <span>Created</span>
             </div>
           </TableHead>
-          <TableHead className="w-[180px]">
+          <TableHead className="w-[100px]">
             <span className="sr-only">Actions</span>
           </TableHead>
         </TableRow>
@@ -204,22 +154,15 @@ export function LabScriptsTable({ labScripts, isLoading, onPreview, onStatusUpda
                 </div>
               </TableCell>
               <TableCell>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="flex items-center gap-2"
-                    onClick={(e) => onPreview(script, e)}
-                  >
-                    <Eye className="h-4 w-4" />
-                    <span>Preview</span>
-                  </Button>
-                  {script.payment_status === 'unpaid' && (
-                    <PaymentButton
-                      onClick={(e) => handlePayment(script, e)}
-                    />
-                  )}
-                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="w-full flex items-center justify-center gap-2"
+                  onClick={(e) => onPreview(script, e)}
+                >
+                  <Eye className="h-4 w-4" />
+                  <span>Preview</span>
+                </Button>
               </TableCell>
             </TableRow>
           ))

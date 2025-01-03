@@ -6,8 +6,8 @@ import { UseFormReturn } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
 import { calculateTotalPrice } from "./utils/priceCalculations";
 import { TotalAmountDisplay } from "./payment/TotalAmountDisplay";
+import { SubmitButton } from "./payment/SubmitButton";
 import { useEffect, useState } from "react";
-import { PaymentButton } from "../lab-scripts/PaymentButton";
 
 interface PaymentSectionProps {
   applianceType: string;
@@ -32,64 +32,85 @@ export const PaymentSection = ({
   const [totalAmount, setTotalAmount] = useState(0);
   const [lineItems, setLineItems] = useState<Array<{ price: string; quantity: number }>>([]);
 
-  const { data: servicePrices = [], isLoading: isPriceLoading } = useQuery({
-    queryKey: ['service-prices'],
+  const { data: basePrice = 0, isLoading: isPriceLoading } = useQuery({
+    queryKey: ['service-price', applianceType],
     queryFn: async () => {
+      if (!applianceType) return 0;
       const { data, error } = await supabase
         .from('service_prices')
-        .select('*');
+        .select('price')
+        .eq('service_name', applianceType)
+        .maybeSingle();
 
       if (error) {
-        console.error('Error fetching prices:', error);
-        return [];
+        console.error('Error fetching price:', error);
+        return 0;
       }
 
-      return data || [];
+      return data?.price ?? 0;
     },
+    enabled: !!applianceType,
   });
 
   useEffect(() => {
     const updatePrices = async () => {
-      // Find the base price for the appliance type
-      const baseService = servicePrices.find(p => p.service_name === applianceType);
-      const nightguardService = servicePrices.find(p => p.service_name === 'additional-nightguard');
-      const expressService = servicePrices.find(p => p.service_name === 'express-design');
-
-      const newLineItems: Array<{ price: string; quantity: number }> = [];
-
-      if (baseService?.stripe_price_id) {
-        newLineItems.push({
-          price: baseService.stripe_price_id,
-          quantity: archType === 'dual' ? 2 : 1,
-        });
-      }
-
-      if (needsNightguard === 'yes' && nightguardService?.stripe_price_id) {
-        newLineItems.push({
-          price: nightguardService.stripe_price_id,
-          quantity: 1,
-        });
-      }
-
-      if (expressDesign === 'yes' && expressService?.stripe_price_id) {
-        newLineItems.push({
-          price: expressService.stripe_price_id,
-          quantity: 1,
-        });
-      }
-
-      console.log('Updated line items:', newLineItems);
-      setLineItems(newLineItems);
-
       const result = await calculateTotalPrice(
-        baseService?.price || 0,
+        basePrice,
         { archType, needsNightguard, expressDesign, applianceType }
       );
       setTotalAmount(result.total);
+      setLineItems(result.lineItems);
     };
 
     updatePrices();
-  }, [servicePrices, archType, needsNightguard, expressDesign, applianceType]);
+  }, [basePrice, archType, needsNightguard, expressDesign, applianceType]);
+
+  console.log('Payment details:', {
+    applianceType,
+    basePrice,
+    archType,
+    needsNightguard,
+    expressDesign,
+    lineItems
+  });
+
+  const createCheckoutSession = useMutation({
+    mutationFn: async (formData: z.infer<typeof formSchema>) => {
+      console.log('Creating checkout session with:', { formData, lineItems });
+
+      const { data, error } = await supabase.functions.invoke('create-checkout-session', {
+        body: {
+          formData,
+          lineItems,
+          applianceType,
+        },
+      });
+
+      if (error) {
+        console.error('Error from edge function:', error);
+        throw new Error(`Checkout session creation failed: ${error.message}`);
+      }
+
+      if (!data?.url) {
+        throw new Error('No checkout URL returned from server');
+      }
+
+      return data;
+    },
+    onSuccess: (data) => {
+      if (data.url) {
+        window.location.href = data.url;
+      }
+    },
+    onError: (error: Error) => {
+      console.error('Error creating checkout session:', error);
+      toast({
+        title: "Payment Error",
+        description: error.message || "Failed to create checkout session. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
 
   const formatApplianceType = (type: string) => {
     if (!type) return '';
@@ -98,17 +119,27 @@ export const PaymentSection = ({
     ).join(' ');
   };
 
-  const handlePayment = async () => {
-    const formValues = form.getValues();
-    console.log('Form values:', formValues);
-    onSubmit(formValues);
+  const handleSubmitAndPay = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    const values = form.getValues();
+    
+    if (Object.keys(form.formState.errors).length > 0) {
+      toast({
+        title: "Validation Error",
+        description: "Please fill in all required fields correctly.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    createCheckoutSession.mutate(values);
   };
 
   return (
     <div className="sticky bottom-0 bg-white border-t shadow-lg p-4">
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-start">
         <TotalAmountDisplay
-          basePrice={0}
+          basePrice={basePrice}
           totalAmount={totalAmount}
           applianceType={applianceType}
           archType={archType}
@@ -117,9 +148,10 @@ export const PaymentSection = ({
           formattedApplianceType={formatApplianceType(applianceType)}
           isLoading={isPriceLoading}
         />
-        <PaymentButton
-          onClick={handlePayment}
-          isLoading={isSubmitting}
+        <SubmitButton
+          isSubmitting={isSubmitting}
+          isPending={createCheckoutSession.isPending}
+          onClick={handleSubmitAndPay}
         />
       </div>
     </div>
