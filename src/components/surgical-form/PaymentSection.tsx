@@ -30,6 +30,7 @@ export const PaymentSection = ({
 }: PaymentSectionProps) => {
   const { toast } = useToast();
   const [totalAmount, setTotalAmount] = useState(0);
+  const [lineItems, setLineItems] = useState<Array<{ price: string; quantity: number }>>([]);
 
   const { data: basePrice = 0, isLoading: isPriceLoading } = useQuery({
     queryKey: ['service-price', applianceType],
@@ -37,7 +38,7 @@ export const PaymentSection = ({
       if (!applianceType) return 0;
       const { data, error } = await supabase
         .from('service_prices')
-        .select('price, stripe_price_id')
+        .select('price')
         .eq('service_name', applianceType)
         .maybeSingle();
 
@@ -52,15 +53,16 @@ export const PaymentSection = ({
   });
 
   useEffect(() => {
-    const updateTotalAmount = async () => {
-      const calculatedTotal = await calculateTotalPrice(
+    const updatePrices = async () => {
+      const result = await calculateTotalPrice(
         basePrice,
         { archType, needsNightguard, expressDesign, applianceType }
       );
-      setTotalAmount(calculatedTotal);
+      setTotalAmount(result.total);
+      setLineItems(result.lineItems);
     };
 
-    updateTotalAmount();
+    updatePrices();
   }, [basePrice, archType, needsNightguard, expressDesign, applianceType]);
 
   console.log('Payment details:', {
@@ -68,22 +70,18 @@ export const PaymentSection = ({
     basePrice,
     archType,
     needsNightguard,
-    expressDesign
+    expressDesign,
+    lineItems
   });
 
   const createCheckoutSession = useMutation({
     mutationFn: async (formData: z.infer<typeof formSchema>) => {
-      console.log('Creating checkout session with:', { formData });
-
-      const calculatedTotal = await calculateTotalPrice(
-        basePrice,
-        { archType, needsNightguard, expressDesign, applianceType }
-      );
+      console.log('Creating checkout session with:', { formData, lineItems });
 
       const { data, error } = await supabase.functions.invoke('create-checkout-session', {
         body: {
           formData,
-          totalAmount: calculatedTotal,
+          lineItems,
           applianceType,
         },
       });

@@ -8,42 +8,72 @@ export const calculateTotalPrice = async (basePrice: number, options: {
   needsNightguard: string;
   expressDesign: string;
   applianceType: string;
-}): Promise<number> => {
+}): Promise<{ total: number; lineItems: Array<{ price: string; quantity: number }> }> => {
   const { archType, needsNightguard, expressDesign, applianceType } = options;
-  let totalPrice = basePrice;
+  const lineItems: Array<{ price: string; quantity: number }> = [];
 
-  // Double the price for dual arch
-  if (archType === 'dual') {
-    totalPrice *= 2;
+  // Get base price Stripe ID
+  const { data: baseProduct } = await supabase
+    .from('service_prices')
+    .select('stripe_price_id')
+    .eq('service_name', applianceType)
+    .single();
+
+  if (baseProduct?.stripe_price_id) {
+    lineItems.push({
+      price: baseProduct.stripe_price_id,
+      quantity: archType === 'dual' ? 2 : 1
+    });
   }
 
-  // Add nightguard price if selected (not for surgical-day)
+  // Add nightguard if selected (not for surgical-day)
   if (needsNightguard === 'yes' && applianceType !== 'surgical-day') {
     const { data: nightguardPrice } = await supabase
       .from('service_prices')
-      .select('price')
+      .select('stripe_price_id')
       .eq('service_name', 'additional-nightguard')
       .single();
     
-    if (nightguardPrice?.price) {
-      totalPrice += Number(nightguardPrice.price);
+    if (nightguardPrice?.stripe_price_id) {
+      lineItems.push({
+        price: nightguardPrice.stripe_price_id,
+        quantity: 1
+      });
     }
   }
 
-  // Add express design price if selected (not for surgical-day)
+  // Add express design if selected (not for surgical-day)
   if (expressDesign === 'yes' && applianceType !== 'surgical-day') {
     const { data: expressPrice } = await supabase
       .from('service_prices')
-      .select('price')
+      .select('stripe_price_id')
       .eq('service_name', 'express-design')
       .single();
     
-    if (expressPrice?.price) {
-      totalPrice += Number(expressPrice.price);
+    if (expressPrice?.stripe_price_id) {
+      lineItems.push({
+        price: expressPrice.stripe_price_id,
+        quantity: 1
+      });
     }
   }
 
-  return totalPrice;
+  // Calculate total for display (we'll still need this for the UI)
+  let totalPrice = basePrice;
+  if (archType === 'dual') {
+    totalPrice *= 2;
+  }
+  if (needsNightguard === 'yes' && applianceType !== 'surgical-day') {
+    totalPrice += NIGHTGUARD_PRICE;
+  }
+  if (expressDesign === 'yes' && applianceType !== 'surgical-day') {
+    totalPrice += EXPRESS_DESIGN_PRICE;
+  }
+
+  return {
+    total: totalPrice,
+    lineItems
+  };
 };
 
 export const fetchPriceForService = async (serviceName: string): Promise<number> => {

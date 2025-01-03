@@ -13,82 +13,23 @@ serve(async (req) => {
   }
 
   try {
-    const { formData, totalAmount, applianceType } = await req.json();
-    console.log('Received request data:', { formData, totalAmount, applianceType });
+    const { formData, lineItems, applianceType } = await req.json();
+    console.log('Received request data:', { formData, lineItems, applianceType });
 
     // Validate required data
     if (!formData) {
       throw new Error('Form data is missing');
     }
-    if (!totalAmount || isNaN(totalAmount)) {
-      throw new Error('Invalid total amount');
+    if (!lineItems || !lineItems.length) {
+      throw new Error('Line items are missing');
     }
     if (!applianceType) {
       throw new Error('Appliance type is missing');
     }
 
-    // Get Stripe price ID for the appliance type
-    const supabaseUrl = Deno.env.get('SUPABASE_URL');
-    const supabaseKey = Deno.env.get('SUPABASE_ANON_KEY');
-
-    if (!supabaseUrl || !supabaseKey) {
-      throw new Error('Missing Supabase environment variables');
-    }
-
-    const supabase = createClient(supabaseUrl, supabaseKey);
-
-    // Fetch base price and any add-ons
-    const { data: priceData, error: priceError } = await supabase
-      .from('service_prices')
-      .select('stripe_price_id')
-      .eq('service_name', applianceType)
-      .single();
-
-    if (priceError || !priceData?.stripe_price_id) {
-      console.error('Error fetching price ID:', priceError);
-      throw new Error('Price not found for appliance type');
-    }
-
-    // Get any add-ons (nightguard, express design)
-    const addOns = [];
-    if (formData.needsNightguard === 'yes' && applianceType !== 'surgical-day') {
-      const { data: nightguardData } = await supabase
-        .from('service_prices')
-        .select('stripe_price_id')
-        .eq('service_name', 'additional-nightguard')
-        .single();
-      
-      if (nightguardData?.stripe_price_id) {
-        addOns.push({ price: nightguardData.stripe_price_id, quantity: 1 });
-      }
-    }
-
-    if (formData.expressDesign === 'yes' && applianceType !== 'surgical-day') {
-      const { data: expressData } = await supabase
-        .from('service_prices')
-        .select('stripe_price_id')
-        .eq('service_name', 'express-design')
-        .single();
-      
-      if (expressData?.stripe_price_id) {
-        addOns.push({ price: expressData.stripe_price_id, quantity: 1 });
-      }
-    }
-
-    console.log('Found price ID:', priceData.stripe_price_id);
-
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
       apiVersion: '2023-10-16',
     });
-
-    // Create line items array with base product and add-ons
-    const lineItems = [
-      {
-        price: priceData.stripe_price_id,
-        quantity: formData.arch === 'dual' ? 2 : 1,
-      },
-      ...addOns
-    ];
 
     console.log('Creating checkout session with line items:', lineItems);
     
