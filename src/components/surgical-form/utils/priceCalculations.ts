@@ -3,12 +3,12 @@ import { supabase } from "@/integrations/supabase/client";
 export const NIGHTGUARD_PRICE = 50;
 export const EXPRESS_DESIGN_PRICE = 50;
 
-export const calculateTotalPrice = (basePrice: number, options: {
+export const calculateTotalPrice = async (basePrice: number, options: {
   archType: string;
   needsNightguard: string;
   expressDesign: string;
   applianceType: string;
-}): number => {
+}): Promise<number> => {
   const { archType, needsNightguard, expressDesign, applianceType } = options;
   let totalPrice = basePrice;
 
@@ -19,12 +19,28 @@ export const calculateTotalPrice = (basePrice: number, options: {
 
   // Add nightguard price if selected (not for surgical-day)
   if (needsNightguard === 'yes' && applianceType !== 'surgical-day') {
-    totalPrice += NIGHTGUARD_PRICE;
+    const { data: nightguardPrice } = await supabase
+      .from('service_prices')
+      .select('price')
+      .eq('service_name', 'additional-nightguard')
+      .single();
+    
+    if (nightguardPrice?.price) {
+      totalPrice += Number(nightguardPrice.price);
+    }
   }
 
   // Add express design price if selected (not for surgical-day)
   if (expressDesign === 'yes' && applianceType !== 'surgical-day') {
-    totalPrice += EXPRESS_DESIGN_PRICE;
+    const { data: expressPrice } = await supabase
+      .from('service_prices')
+      .select('price')
+      .eq('service_name', 'express-design')
+      .single();
+    
+    if (expressPrice?.price) {
+      totalPrice += Number(expressPrice.price);
+    }
   }
 
   return totalPrice;

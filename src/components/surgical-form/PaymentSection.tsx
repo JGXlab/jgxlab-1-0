@@ -5,7 +5,6 @@ import { formSchema } from "./formSchema";
 import { UseFormReturn } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
 import { calculateTotalPrice } from "./utils/priceCalculations";
-import { STRIPE_PRODUCT_IDS } from "./utils/priceConstants";
 import { TotalAmountDisplay } from "./payment/TotalAmountDisplay";
 import { SubmitButton } from "./payment/SubmitButton";
 
@@ -29,7 +28,6 @@ export const PaymentSection = ({
   form
 }: PaymentSectionProps) => {
   const { toast } = useToast();
-  const productId = applianceType ? STRIPE_PRODUCT_IDS[applianceType as keyof typeof STRIPE_PRODUCT_IDS] : null;
 
   const { data: basePrice = 0, isLoading: isPriceLoading } = useQuery({
     queryKey: ['service-price', applianceType],
@@ -37,7 +35,7 @@ export const PaymentSection = ({
       if (!applianceType) return 0;
       const { data, error } = await supabase
         .from('service_prices')
-        .select('price')
+        .select('price, stripe_price_id')
         .eq('service_name', applianceType)
         .maybeSingle();
 
@@ -53,7 +51,6 @@ export const PaymentSection = ({
 
   console.log('Payment details:', {
     applianceType,
-    productId,
     basePrice,
     archType,
     needsNightguard,
@@ -62,9 +59,9 @@ export const PaymentSection = ({
 
   const createCheckoutSession = useMutation({
     mutationFn: async (formData: z.infer<typeof formSchema>) => {
-      console.log('Creating checkout session with:', { formData, productId });
+      console.log('Creating checkout session with:', { formData });
 
-      const totalAmount = calculateTotalPrice(
+      const totalAmount = await calculateTotalPrice(
         basePrice,
         { archType, needsNightguard, expressDesign, applianceType }
       );
@@ -72,8 +69,8 @@ export const PaymentSection = ({
       const { data, error } = await supabase.functions.invoke('create-checkout-session', {
         body: {
           formData,
-          productId,
           totalAmount,
+          applianceType,
         },
       });
 
@@ -114,15 +111,6 @@ export const PaymentSection = ({
     e.preventDefault();
     const values = form.getValues();
     
-    if (!productId) {
-      toast({
-        title: "Configuration Error",
-        description: "Invalid appliance type selected.",
-        variant: "destructive",
-      });
-      return;
-    }
-
     if (Object.keys(form.formState.errors).length > 0) {
       toast({
         title: "Validation Error",
@@ -135,7 +123,7 @@ export const PaymentSection = ({
     createCheckoutSession.mutate(values);
   };
 
-  const totalAmount = calculateTotalPrice(
+  const totalAmount = await calculateTotalPrice(
     basePrice,
     { archType, needsNightguard, expressDesign, applianceType }
   );
