@@ -1,6 +1,6 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, User, FileText, CheckCircle2, Clock, Info, Database, Eye } from "lucide-react";
+import { Calendar, User, FileText, CheckCircle2, Clock, Info, Database, Eye, DollarSign } from "lucide-react";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -49,6 +49,12 @@ interface LabScriptsTableProps {
 export function LabScriptsTable({ labScripts, isLoading, onPreview, onStatusUpdate }: LabScriptsTableProps) {
   const navigate = useNavigate();
 
+  const handlePayment = async (script: any, e: React.MouseEvent) => {
+    e.stopPropagation();
+    console.log('Processing payment for lab script:', script.id);
+    // Payment logic will be handled by the parent component
+  };
+
   return (
     <Table>
       <TableHeader>
@@ -83,7 +89,7 @@ export function LabScriptsTable({ labScripts, isLoading, onPreview, onStatusUpda
               <span>Created</span>
             </div>
           </TableHead>
-          <TableHead className="w-[100px]">
+          <TableHead className="w-[180px]">
             <span className="sr-only">Actions</span>
           </TableHead>
         </TableRow>
@@ -154,15 +160,26 @@ export function LabScriptsTable({ labScripts, isLoading, onPreview, onStatusUpda
                 </div>
               </TableCell>
               <TableCell>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="w-full flex items-center justify-center gap-2"
-                  onClick={(e) => onPreview(script, e)}
-                >
-                  <Eye className="h-4 w-4" />
-                  <span>Preview</span>
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="flex items-center gap-2"
+                    onClick={(e) => onPreview(script, e)}
+                  >
+                    <Eye className="h-4 w-4" />
+                    <span>Preview</span>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex items-center gap-2"
+                    onClick={(e) => handlePayment(script, e)}
+                  >
+                    <DollarSign className="h-4 w-4" />
+                    <span>Pay</span>
+                  </Button>
+                </div>
               </TableCell>
             </TableRow>
           ))
