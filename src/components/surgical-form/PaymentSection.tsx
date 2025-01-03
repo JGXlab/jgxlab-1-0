@@ -4,10 +4,9 @@ import { z } from "zod";
 import { formSchema } from "./formSchema";
 import { UseFormReturn } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
+import { calculateTotalPrice } from "./utils/priceCalculations";
 import { TotalAmountDisplay } from "./payment/TotalAmountDisplay";
-import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
-import { useState } from "react"; // Added this import
+import { useEffect, useState } from "react";
 
 interface PaymentSectionProps {
   applianceType: string;
@@ -20,128 +19,97 @@ interface PaymentSectionProps {
 }
 
 export const PaymentSection = ({ 
-  applianceType,
-  archType,
+  applianceType, 
+  archType, 
   needsNightguard = 'no',
   expressDesign = 'no',
-  onSubmit,
+  onSubmit, 
   isSubmitting,
   form
 }: PaymentSectionProps) => {
   const { toast } = useToast();
   const [totalAmount, setTotalAmount] = useState(0);
+  const [lineItems, setLineItems] = useState<Array<{ price: string; quantity: number }>>([]);
 
-  // Query to get the surgical day price
-  const { data: surgicalDayPrice, isLoading: isPriceLoading } = useQuery({
-    queryKey: ['surgical-day-price'],
+  const { data: servicePrices = [], isLoading: isPriceLoading } = useQuery({
+    queryKey: ['service-prices'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('service_prices')
-        .select('*')
-        .eq('service_name', 'surgical-day')
-        .single();
+        .select('*');
 
       if (error) {
-        console.error('Error fetching surgical day price:', error);
-        return null;
+        console.error('Error fetching prices:', error);
+        return [];
       }
 
-      return data;
+      return data || [];
     },
   });
 
-  const createCheckoutSession = useMutation({
-    mutationFn: async (formData: z.infer<typeof formSchema>) => {
-      if (!surgicalDayPrice?.stripe_price_id) {
-        throw new Error('Surgical day price not found');
+  useEffect(() => {
+    const updatePrices = async () => {
+      // Find the base price for the appliance type
+      const baseService = servicePrices.find(p => p.service_name === applianceType);
+      const nightguardService = servicePrices.find(p => p.service_name === 'additional-nightguard');
+      const expressService = servicePrices.find(p => p.service_name === 'express-design');
+
+      const newLineItems: Array<{ price: string; quantity: number }> = [];
+
+      if (baseService?.stripe_price_id) {
+        newLineItems.push({
+          price: baseService.stripe_price_id,
+          quantity: archType === 'dual' ? 2 : 1,
+        });
       }
 
-      const lineItems = [{
-        price: surgicalDayPrice.stripe_price_id,
-        quantity: 1
-      }];
-
-      console.log('Creating checkout session with:', { formData, lineItems });
-
-      const { data, error } = await supabase.functions.invoke('create-checkout-session', {
-        body: {
-          formData,
-          lineItems,
-          applianceType: 'surgical-day'
-        },
-      });
-
-      if (error) {
-        console.error('Error from edge function:', error);
-        throw new Error(`Checkout session creation failed: ${error.message}`);
+      if (needsNightguard === 'yes' && nightguardService?.stripe_price_id) {
+        newLineItems.push({
+          price: nightguardService.stripe_price_id,
+          quantity: 1,
+        });
       }
 
-      if (!data?.url) {
-        throw new Error('No checkout URL returned from server');
+      if (expressDesign === 'yes' && expressService?.stripe_price_id) {
+        newLineItems.push({
+          price: expressService.stripe_price_id,
+          quantity: 1,
+        });
       }
 
-      return data;
-    },
-    onSuccess: (data) => {
-      if (data.url) {
-        window.location.href = data.url;
-      }
-    },
-    onError: (error: Error) => {
-      console.error('Error creating checkout session:', error);
-      toast({
-        title: "Payment Error",
-        description: error.message || "Failed to create checkout session. Please try again.",
-        variant: "destructive",
-      });
-    },
-  });
+      console.log('Updated line items:', newLineItems);
+      setLineItems(newLineItems);
 
-  const handlePayment = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    const values = form.getValues();
-    
-    if (Object.keys(form.formState.errors).length > 0) {
-      toast({
-        title: "Validation Error",
-        description: "Please fill in all required fields correctly.",
-        variant: "destructive",
-      });
-      return;
-    }
+      const result = await calculateTotalPrice(
+        baseService?.price || 0,
+        { archType, needsNightguard, expressDesign, applianceType }
+      );
+      setTotalAmount(result.total);
+    };
 
-    createCheckoutSession.mutate(values);
+    updatePrices();
+  }, [servicePrices, archType, needsNightguard, expressDesign, applianceType]);
+
+  const formatApplianceType = (type: string) => {
+    if (!type) return '';
+    return type.split('-').map(word => 
+      word.charAt(0).toUpperCase() + word.slice(1)
+    ).join(' ');
   };
 
   return (
     <div className="sticky bottom-0 bg-white border-t shadow-lg p-4">
       <div className="flex justify-between items-start">
         <TotalAmountDisplay
-          basePrice={surgicalDayPrice?.price || 0}
-          totalAmount={surgicalDayPrice?.price || 0}
+          basePrice={0}
+          totalAmount={totalAmount}
           applianceType={applianceType}
           archType={archType}
           needsNightguard={needsNightguard}
           expressDesign={expressDesign}
-          formattedApplianceType="Surgical Day"
+          formattedApplianceType={formatApplianceType(applianceType)}
           isLoading={isPriceLoading}
         />
-        <Button
-          type="submit"
-          size="lg"
-          disabled={isSubmitting || createCheckoutSession.isPending || !surgicalDayPrice}
-          className="min-w-[200px]"
-          onClick={handlePayment}
-        >
-          {createCheckoutSession.isPending ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Redirecting to payment...
-            </>
-          ) : (
-            'Pay for Surgical Day'
-          )}
-        </Button>
       </div>
     </div>
   );
