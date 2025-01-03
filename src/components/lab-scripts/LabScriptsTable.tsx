@@ -1,12 +1,13 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, User, FileText, CheckCircle2, Clock, Info, Database, Eye, DollarSign } from "lucide-react";
+import { Calendar, User, FileText, CheckCircle2, Clock, Info, Database, Eye } from "lucide-react";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { EmptyLabScripts } from "./EmptyLabScripts";
 import { LoadingLabScripts } from "./LoadingLabScripts";
 import { useToast } from "@/hooks/use-toast";
+import { PaymentButton } from "./PaymentButton";
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -214,15 +215,10 @@ export function LabScriptsTable({ labScripts, isLoading, onPreview, onStatusUpda
                     <span>Preview</span>
                   </Button>
                   {script.payment_status === 'unpaid' && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="flex items-center gap-2"
+                    <PaymentButton
+                      amount={100} // Replace with actual amount from your calculation
                       onClick={(e) => handlePayment(script, e)}
-                    >
-                      <DollarSign className="h-4 w-4" />
-                      <span>Pay</span>
-                    </Button>
+                    />
                   )}
                 </div>
               </TableCell>
