@@ -22,7 +22,7 @@ export const SubmitButton = ({ isSubmitting, isPending, onClick }: SubmitButtonP
           Redirecting to payment...
         </>
       ) : (
-        'Submit and Pay'
+        'Pay and Submit Lab Script'
       )}
     </Button>
   );
