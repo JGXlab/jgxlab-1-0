@@ -12,18 +12,12 @@ serve(async (req) => {
   }
 
   try {
-    const { formData, lineItems, applianceType } = await req.json();
-    console.log('Received request data:', { formData, lineItems, applianceType });
+    const { lineItems } = await req.json();
+    console.log('Received request with line items:', lineItems);
 
     // Validate required data
-    if (!formData) {
-      throw new Error('Form data is missing');
-    }
     if (!lineItems || !lineItems.length) {
       throw new Error('Line items are missing');
-    }
-    if (!applianceType) {
-      throw new Error('Appliance type is missing');
     }
 
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
@@ -36,7 +30,7 @@ serve(async (req) => {
       line_items: lineItems,
       mode: 'payment',
       success_url: `${req.headers.get('origin')}/clinic/submittedlabscripts?success=true`,
-      cancel_url: `${req.headers.get('origin')}/clinic/submittedlabscripts?canceled=true`,
+      cancel_url: `${req.headers.get('origin')}/clinic/pricing?canceled=true`,
     });
 
     console.log('Checkout session created:', session.id);
