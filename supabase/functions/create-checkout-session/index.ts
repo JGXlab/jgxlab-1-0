@@ -34,6 +34,10 @@ serve(async (req) => {
     const { formData, serviceId } = await req.json();
     console.log('Received request:', { serviceId, formData });
 
+    if (!serviceId) {
+      throw new Error('No serviceId provided');
+    }
+
     // Initialize Stripe
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
       apiVersion: '2023-10-16',
@@ -43,7 +47,8 @@ serve(async (req) => {
     const { data: servicePrices, error: servicePriceError } = await supabaseClient
       .from('service_prices')
       .select('*')
-      .eq('id', serviceId);
+      .eq('id', serviceId)
+      .limit(1);
 
     console.log('Service price lookup result:', { servicePrices, servicePriceError });
 
@@ -58,10 +63,7 @@ serve(async (req) => {
     }
 
     const servicePrice = servicePrices[0];
-    if (!servicePrice?.stripe_product_id) {
-      console.error('No stripe_product_id found for service:', serviceId);
-      throw new Error('No Stripe product ID found for this service');
-    }
+    console.log('Found service price:', servicePrice);
 
     // Calculate the unit amount (in cents)
     let unitAmount = Math.round(Number(servicePrice.price) * 100);
