@@ -2,9 +2,6 @@ import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
-import { z } from "zod";
-import { formSchema } from "./formSchema";
 
 const priceMap = {
   'surgical-day': 'e843686b-55ac-4f55-bab7-38d5c420a1b8',
@@ -15,15 +12,14 @@ const priceMap = {
   'ti-bar': 'e5593f92-37e7-43a2-b379-cc12bbcb9da4'
 };
 
-export interface PaymentSectionProps {
+interface PaymentSectionProps {
   applianceType: string;
   archType: string;
-  formData: z.infer<typeof formSchema>;
+  onSubmit: () => void;
   isSubmitting: boolean;
 }
 
-export const PaymentSection = ({ applianceType, archType, formData, isSubmitting }: PaymentSectionProps) => {
-  const { toast } = useToast();
+export const PaymentSection = ({ applianceType, archType, onSubmit, isSubmitting }: PaymentSectionProps) => {
   const priceId = applianceType ? priceMap[applianceType as keyof typeof priceMap] : null;
 
   const { data: priceData, isLoading } = useQuery({
@@ -43,75 +39,21 @@ export const PaymentSection = ({ applianceType, archType, formData, isSubmitting
     enabled: !!priceId,
   });
 
-  // Calculate final price based on arch type and additional services
+  // Calculate final price based on arch type
   const calculateFinalPrice = () => {
     if (!priceData?.price) return '0.00';
-    let totalPrice = Number(priceData.price);
-
-    if (archType === 'dual') {
-      totalPrice *= 2;
-    }
-
-    if (formData.needsNightguard === 'yes') {
-      const nightguardPrice = 150;
-      totalPrice += nightguardPrice;
-    }
-
-    if (formData.expressDesign === 'yes') {
-      const expressFee = 100;
-      totalPrice += expressFee;
-    }
-
-    return totalPrice.toFixed(2);
-  };
-
-  const handleCheckout = async () => {
-    try {
-      console.log('Creating checkout session with form data:', formData);
-      
-      const { data: session, error } = await supabase.functions.invoke('create-checkout', {
-        body: {
-          formData,
-          totalAmount: calculateFinalPrice(),
-          metadata: {
-            formData: JSON.stringify(formData)
-          }
-        }
-      });
-
-      if (error) {
-        console.error('Error creating checkout session:', error);
-        toast({
-          title: "Error",
-          description: "Failed to create checkout session. Please try again.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      if (!session?.url) {
-        console.error('No checkout URL returned');
-        toast({
-          title: "Error",
-          description: "Invalid checkout session response. Please try again.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // Redirect to Stripe Checkout
-      window.location.href = session.url;
-    } catch (error) {
-      console.error('Error creating checkout session:', error);
-      toast({
-        title: "Error",
-        description: "Failed to create checkout session. Please try again.",
-        variant: "destructive",
-      });
-    }
+    const basePrice = Number(priceData.price);
+    return archType === 'dual' ? (basePrice * 2).toFixed(2) : basePrice.toFixed(2);
   };
 
   if (!applianceType) return null;
+
+  console.log('Price calculation:', { 
+    applianceType, 
+    archType, 
+    basePrice: priceData?.price,
+    finalPrice: calculateFinalPrice()
+  });
 
   return (
     <div className="sticky bottom-0 bg-white border-t shadow-lg p-4">
@@ -130,7 +72,7 @@ export const PaymentSection = ({ applianceType, archType, formData, isSubmitting
           )}
         </div>
         <Button 
-          onClick={handleCheckout}
+          type="submit" 
           size="lg"
           disabled={isSubmitting || isLoading}
           className="min-w-[200px]"
@@ -138,7 +80,7 @@ export const PaymentSection = ({ applianceType, archType, formData, isSubmitting
           {isSubmitting ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Processing...
+              Submitting...
             </>
           ) : (
             'Submit and Pay'
