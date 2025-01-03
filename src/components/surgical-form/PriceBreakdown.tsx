@@ -1,4 +1,5 @@
-import { NIGHTGUARD_PRICE, EXPRESS_DESIGN_PRICE } from "./utils/priceCalculations";
+import { useQuery } from "@tanstack/react-query";
+import { fetchPriceForService } from "./utils/priceCalculations";
 
 interface PriceBreakdownProps {
   basePrice: number;
@@ -10,7 +11,6 @@ interface PriceBreakdownProps {
 }
 
 export const PriceBreakdown = ({
-  basePrice,
   archType,
   needsNightguard,
   expressDesign,
@@ -21,7 +21,37 @@ export const PriceBreakdown = ({
   const hasNightguard = needsNightguard === 'yes' && applianceType !== 'surgical-day';
   const hasExpressDesign = expressDesign === 'yes' && applianceType !== 'surgical-day';
   const quantity = isDual ? 2 : 1;
+
+  const { data: basePrice = 0, isLoading: isLoadingBase } = useQuery({
+    queryKey: ['price', applianceType],
+    queryFn: () => fetchPriceForService(applianceType),
+    enabled: !!applianceType,
+  });
+
+  const { data: nightguardPrice = 0, isLoading: isLoadingNightguard } = useQuery({
+    queryKey: ['price', 'additional-nightguard'],
+    queryFn: () => fetchPriceForService('additional-nightguard'),
+    enabled: hasNightguard,
+  });
+
+  const { data: expressPrice = 0, isLoading: isLoadingExpress } = useQuery({
+    queryKey: ['price', 'express-design'],
+    queryFn: () => fetchPriceForService('express-design'),
+    enabled: hasExpressDesign,
+  });
+
+  const isLoading = isLoadingBase || (hasNightguard && isLoadingNightguard) || (hasExpressDesign && isLoadingExpress);
   const baseTotal = basePrice * quantity;
+  const total = baseTotal + (hasNightguard ? nightguardPrice : 0) + (hasExpressDesign ? expressPrice : 0);
+
+  if (isLoading) {
+    return (
+      <div className="space-y-2">
+        <div className="text-sm font-medium">Price Breakdown:</div>
+        <div className="text-sm text-gray-500">Loading prices...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-2">
@@ -37,21 +67,18 @@ export const PriceBreakdown = ({
         {hasNightguard && (
           <div className="flex justify-between">
             <span>Nightguard</span>
-            <span>+${NIGHTGUARD_PRICE.toFixed(2)}</span>
+            <span>+${nightguardPrice.toFixed(2)}</span>
           </div>
         )}
         {hasExpressDesign && (
           <div className="flex justify-between">
             <span>Express Design</span>
-            <span>+${EXPRESS_DESIGN_PRICE.toFixed(2)}</span>
+            <span>+${expressPrice.toFixed(2)}</span>
           </div>
         )}
         <div className="pt-2 border-t flex justify-between font-semibold">
           <span>Total:</span>
-          <span>${(baseTotal + 
-            (hasNightguard ? NIGHTGUARD_PRICE : 0) + 
-            (hasExpressDesign ? EXPRESS_DESIGN_PRICE : 0)
-          ).toFixed(2)}</span>
+          <span>${total.toFixed(2)}</span>
         </div>
       </div>
     </div>
