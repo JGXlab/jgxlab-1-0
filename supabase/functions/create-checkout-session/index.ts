@@ -44,23 +44,25 @@ serve(async (req) => {
     });
 
     // Get the specific service price with better error handling
-    const { data: servicePrice, error: servicePriceError } = await supabaseClient
+    const { data: servicePrices, error: servicePriceError } = await supabaseClient
       .from('service_prices')
       .select('*')
-      .eq('id', serviceId)
-      .single();
+      .eq('id', serviceId);
 
-    console.log('Service price lookup result:', { servicePrice, servicePriceError });
+    console.log('Service price lookup result:', { servicePrices, servicePriceError });
 
     if (servicePriceError) {
       console.error('Service price error:', servicePriceError);
       throw new Error(`Service price lookup failed: ${servicePriceError.message}`);
     }
 
-    if (!servicePrice) {
+    if (!servicePrices || servicePrices.length === 0) {
       console.error('No service price found for ID:', serviceId);
       throw new Error(`No service price found for ID: ${serviceId}`);
     }
+
+    const servicePrice = servicePrices[0];
+    console.log('Selected service price:', servicePrice);
 
     // Calculate total amount in cents for Stripe
     const finalAmount = Math.round(totalAmount * 100);
