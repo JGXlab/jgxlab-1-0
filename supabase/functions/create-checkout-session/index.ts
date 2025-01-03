@@ -32,7 +32,8 @@ serve(async (req) => {
     }
 
     const { formData, serviceId } = await req.json();
-    console.log('Received request:', { serviceId, formData });
+    console.log('Received request with serviceId:', serviceId);
+    console.log('Form data:', formData);
 
     if (!serviceId) {
       throw new Error('No serviceId provided');
@@ -43,12 +44,23 @@ serve(async (req) => {
       apiVersion: '2023-10-16',
     });
 
-    // Get the service price details
+    // First, let's log all service prices to debug
+    const { data: allPrices, error: allPricesError } = await supabaseClient
+      .from('service_prices')
+      .select('*');
+    
+    console.log('All available service prices:', allPrices);
+    
+    if (allPricesError) {
+      console.error('Error fetching all prices:', allPricesError);
+    }
+
+    // Get the specific service price
     const { data: servicePrices, error: servicePriceError } = await supabaseClient
       .from('service_prices')
       .select('*')
       .eq('id', serviceId)
-      .limit(1);
+      .single();
 
     console.log('Service price lookup result:', { servicePrices, servicePriceError });
 
@@ -57,16 +69,15 @@ serve(async (req) => {
       throw new Error(`Service price lookup failed: ${servicePriceError.message}`);
     }
 
-    if (!servicePrices || servicePrices.length === 0) {
+    if (!servicePrices) {
       console.error('No service price found for ID:', serviceId);
       throw new Error('No service price found');
     }
 
-    const servicePrice = servicePrices[0];
-    console.log('Found service price:', servicePrice);
+    console.log('Found service price:', servicePrices);
 
     // Calculate the unit amount (in cents)
-    let unitAmount = Math.round(Number(servicePrice.price) * 100);
+    let unitAmount = Math.round(Number(servicePrices.price) * 100);
     console.log('Base unit amount:', unitAmount);
 
     // Create line items array
@@ -77,7 +88,7 @@ serve(async (req) => {
       price_data: {
         currency: 'usd',
         product_data: {
-          name: servicePrice.service_name,
+          name: servicePrices.service_name,
         },
         unit_amount: unitAmount,
       },
@@ -92,7 +103,7 @@ serve(async (req) => {
           product_data: {
             name: 'Nightguard',
           },
-          unit_amount: NIGHTGUARD_PRICE * 100, // Convert to cents
+          unit_amount: NIGHTGUARD_PRICE * 100,
         },
         quantity: 1,
       });
@@ -106,7 +117,7 @@ serve(async (req) => {
           product_data: {
             name: 'Express Design (24h)',
           },
-          unit_amount: EXPRESS_DESIGN_PRICE * 100, // Convert to cents
+          unit_amount: EXPRESS_DESIGN_PRICE * 100,
         },
         quantity: 1,
       });
