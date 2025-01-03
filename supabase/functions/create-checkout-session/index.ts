@@ -7,6 +7,9 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+const NIGHTGUARD_PRICE = 50;
+const EXPRESS_DESIGN_PRICE = 50;
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -28,8 +31,8 @@ serve(async (req) => {
       throw new Error('No email found');
     }
 
-    const { formData, serviceId, totalAmount } = await req.json();
-    console.log('Received request with:', { serviceId, totalAmount, formData });
+    const { formData, serviceId } = await req.json();
+    console.log('Received request with:', { serviceId, formData });
 
     if (!serviceId) {
       throw new Error('No serviceId provided');
@@ -40,7 +43,7 @@ serve(async (req) => {
       apiVersion: '2023-10-16',
     });
 
-    // Get the specific service price using maybeSingle()
+    // Get the specific service price
     const { data: servicePrice, error: servicePriceError } = await supabaseClient
       .from('service_prices')
       .select('*')
@@ -59,9 +62,27 @@ serve(async (req) => {
       throw new Error('No service price found');
     }
 
-    // Calculate the unit amount (in cents)
-    const unitAmount = Math.round(Number(totalAmount) * 100);
-    console.log('Calculated unit amount:', unitAmount);
+    // Calculate base price
+    let totalAmount = Number(servicePrice.price);
+    
+    // Double the price for dual arch
+    if (formData.arch === 'dual') {
+      totalAmount *= 2;
+    }
+
+    // Add nightguard price if selected (not for surgical-day)
+    if (formData.needsNightguard === 'yes' && formData.applianceType !== 'surgical-day') {
+      totalAmount += NIGHTGUARD_PRICE;
+    }
+
+    // Add express design price if selected (not for surgical-day)
+    if (formData.expressDesign === 'yes' && formData.applianceType !== 'surgical-day') {
+      totalAmount += EXPRESS_DESIGN_PRICE;
+    }
+
+    // Convert to cents for Stripe
+    const unitAmount = Math.round(totalAmount * 100);
+    console.log('Final amount in cents:', unitAmount);
 
     // Create line items array with the main service
     const lineItems = [{
@@ -69,6 +90,7 @@ serve(async (req) => {
         currency: 'usd',
         product_data: {
           name: servicePrice.service_name,
+          description: `${formData.arch} arch${formData.arch === 'dual' ? 'es' : ''}`
         },
         unit_amount: unitAmount,
       },
