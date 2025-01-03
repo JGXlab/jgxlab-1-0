@@ -100,10 +100,24 @@ export const PaymentSection = ({
 
   const handlePaymentClick = async (e: React.MouseEvent) => {
     e.preventDefault();
+    
+    // Trigger validation on all fields
+    await form.trigger();
+    
+    // Get all form errors
+    const errors = form.formState.errors;
+    console.log('Form validation errors:', errors);
+    
     if (!form.formState.isValid) {
+      // Create a more detailed error message
+      const errorFields = Object.keys(errors).map(field => {
+        const error = errors[field];
+        return `${field}: ${error?.message}`;
+      }).join('\n');
+      
       toast({
         title: "Form Validation Error",
-        description: "Please fill in all required fields correctly.",
+        description: `Please fill in all required fields correctly:\n${errorFields}`,
         variant: "destructive",
       });
       return;
