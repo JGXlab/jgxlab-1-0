@@ -2,6 +2,9 @@ import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
+import { z } from "zod";
+import { formSchema } from "./formSchema";
 
 const priceMap = {
   'surgical-day': 'e843686b-55ac-4f55-bab7-38d5c420a1b8',
@@ -15,11 +18,12 @@ const priceMap = {
 interface PaymentSectionProps {
   applianceType: string;
   archType: string;
-  onSubmit: () => void;
+  formData: z.infer<typeof formSchema>;
   isSubmitting: boolean;
 }
 
-export const PaymentSection = ({ applianceType, archType, onSubmit, isSubmitting }: PaymentSectionProps) => {
+export const PaymentSection = ({ applianceType, archType, formData, isSubmitting }: PaymentSectionProps) => {
+  const { toast } = useToast();
   const priceId = applianceType ? priceMap[applianceType as keyof typeof priceMap] : null;
 
   const { data: priceData, isLoading } = useQuery({
@@ -39,21 +43,61 @@ export const PaymentSection = ({ applianceType, archType, onSubmit, isSubmitting
     enabled: !!priceId,
   });
 
-  // Calculate final price based on arch type
+  // Calculate final price based on arch type and additional services
   const calculateFinalPrice = () => {
     if (!priceData?.price) return '0.00';
-    const basePrice = Number(priceData.price);
-    return archType === 'dual' ? (basePrice * 2).toFixed(2) : basePrice.toFixed(2);
+    let totalPrice = Number(priceData.price);
+
+    // Double the price for dual arch
+    if (archType === 'dual') {
+      totalPrice *= 2;
+    }
+
+    // Add nightguard price if requested
+    if (formData.needsNightguard === 'yes') {
+      const nightguardPrice = 150; // Fixed price for nightguard
+      totalPrice += nightguardPrice;
+    }
+
+    // Add express design fee if requested
+    if (formData.expressDesign === 'yes') {
+      const expressFee = 100; // Fixed price for express design
+      totalPrice += expressFee;
+    }
+
+    return totalPrice.toFixed(2);
+  };
+
+  const handleCheckout = async () => {
+    try {
+      const { data: session, error } = await supabase.functions.invoke('create-checkout', {
+        body: {
+          formData,
+          priceId: priceData?.stripe_product_id,
+          totalAmount: calculateFinalPrice(),
+          metadata: {
+            applianceType,
+            archType,
+            formData: JSON.stringify(formData)
+          }
+        }
+      });
+
+      if (error) throw error;
+
+      // Redirect to Stripe Checkout
+      window.location.href = session.url;
+    } catch (error) {
+      console.error('Error creating checkout session:', error);
+      toast({
+        title: "Error",
+        description: "Failed to create checkout session. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   if (!applianceType) return null;
-
-  console.log('Price calculation:', { 
-    applianceType, 
-    archType, 
-    basePrice: priceData?.price,
-    finalPrice: calculateFinalPrice()
-  });
 
   return (
     <div className="sticky bottom-0 bg-white border-t shadow-lg p-4">
@@ -72,7 +116,7 @@ export const PaymentSection = ({ applianceType, archType, onSubmit, isSubmitting
           )}
         </div>
         <Button 
-          type="submit" 
+          onClick={handleCheckout}
           size="lg"
           disabled={isSubmitting || isLoading}
           className="min-w-[200px]"
@@ -80,7 +124,7 @@ export const PaymentSection = ({ applianceType, archType, onSubmit, isSubmitting
           {isSubmitting ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Submitting...
+              Processing...
             </>
           ) : (
             'Submit and Pay'

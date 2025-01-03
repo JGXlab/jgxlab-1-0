@@ -299,18 +299,21 @@ export type Database = {
           id: string
           price: number
           service_name: string
+          stripe_product_id: string | null
         }
         Insert: {
           created_at?: string
           id?: string
           price: number
           service_name: string
+          stripe_product_id?: string | null
         }
         Update: {
           created_at?: string
           id?: string
           price?: number
           service_name?: string
+          stripe_product_id?: string | null
         }
         Relationships: []
       }
