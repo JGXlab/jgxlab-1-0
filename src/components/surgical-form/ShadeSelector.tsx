@@ -34,13 +34,13 @@ export const ShadeSelector = ({ value, onChange }: ShadeSelectorProps) => {
       <SelectTrigger className="w-full bg-white max-w-[240px]">
         <SelectValue placeholder="Select a shade" />
       </SelectTrigger>
-      <SelectContent>
+      <SelectContent className="bg-white z-50 shadow-lg border border-gray-200">
         <div className="max-h-[300px] overflow-y-auto">
           {shadeOptions.map((shade) => (
             <SelectItem
               key={shade.id}
               value={shade.id}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 hover:bg-gray-100"
             >
               {shade.label}
             </SelectItem>
