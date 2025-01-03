@@ -22,56 +22,100 @@ const fetchStripePrice = async (priceId: string): Promise<number> => {
   return data.price || 0;
 };
 
-export const calculateTotalAmount = ({
-  basePrice,
-  applianceType,
-  archType,
-  needsNightguard,
-  expressDesign,
-}: {
-  basePrice: number;
-  applianceType: string;
+export const calculateTotalPrice = async (basePrice: number, options: {
   archType: string;
   needsNightguard: string;
   expressDesign: string;
-}): number => {
-  let total = basePrice;
+  applianceType: string;
+}): Promise<{ total: number; lineItems: Array<{ price: string; quantity: number }> }> => {
+  const { archType, needsNightguard, expressDesign, applianceType } = options;
+  const lineItems: Array<{ price: string; quantity: number }> = [];
 
-  // Double the price for dual arch
-  if (archType === 'dual') {
-    total *= 2;
+  console.log('Calculating price for:', { applianceType, archType, needsNightguard, expressDesign });
+
+  if (!applianceType) {
+    console.log('No appliance type provided');
+    return { total: 0, lineItems: [] };
   }
 
-  // Add nightguard price if selected (not for surgical-day)
+  // Get base price Stripe ID
+  const { data: baseProduct, error: baseError } = await supabase
+    .from('service_prices')
+    .select('stripe_price_id')
+    .eq('service_name', applianceType)
+    .maybeSingle();
+
+  if (baseError) {
+    console.error('Error fetching base price:', baseError);
+    return { total: 0, lineItems: [] };
+  }
+
+  let totalPrice = 0;
+  
+  if (baseProduct?.stripe_price_id) {
+    const price = await fetchStripePrice(baseProduct.stripe_price_id);
+    totalPrice = price;
+    lineItems.push({
+      price: baseProduct.stripe_price_id,
+      quantity: archType === 'dual' ? 2 : 1
+    });
+  }
+
+  // Add nightguard if selected (not for surgical-day)
   if (needsNightguard === 'yes' && applianceType !== 'surgical-day') {
-    total += NIGHTGUARD_PRICE;
+    const { data: nightguardPrice, error: nightguardError } = await supabase
+      .from('service_prices')
+      .select('stripe_price_id')
+      .eq('service_name', 'additional-nightguard')
+      .maybeSingle();
+    
+    if (nightguardError) {
+      console.error('Error fetching nightguard price:', nightguardError);
+    } else if (nightguardPrice?.stripe_price_id) {
+      const price = await fetchStripePrice(nightguardPrice.stripe_price_id);
+      totalPrice += price;
+      lineItems.push({
+        price: nightguardPrice.stripe_price_id,
+        quantity: 1
+      });
+    }
   }
 
-  // Add express design price if selected (not for surgical-day)
+  // Add express design if selected (not for surgical-day)
   if (expressDesign === 'yes' && applianceType !== 'surgical-day') {
-    total += EXPRESS_DESIGN_PRICE;
+    const { data: expressPrice, error: expressError } = await supabase
+      .from('service_prices')
+      .select('stripe_price_id')
+      .eq('service_name', 'express-design')
+      .maybeSingle();
+    
+    if (expressError) {
+      console.error('Error fetching express design price:', expressError);
+    } else if (expressPrice?.stripe_price_id) {
+      const price = await fetchStripePrice(expressPrice.stripe_price_id);
+      totalPrice += price;
+      lineItems.push({
+        price: expressPrice.stripe_price_id,
+        quantity: 1
+      });
+    }
   }
 
-  return total;
-};
-
-export const formatApplianceType = (applianceType: string): string => {
-  switch (applianceType) {
-    case 'surgical-day':
-      return 'Surgical Day Appliance';
-    case 'implant-detection':
-      return 'Implant Detection (IDID)';
-    case 'further-revision':
-      return 'Further Revision (PTIs)';
-    case 'final-dlz':
-      return 'Final DLZ (Zi / PMMA)';
-    case 'final-ti-bar':
-      return 'Final Ti-bar & SS';
-    case 'ti-bar-design':
-      return 'Ti-Bar Design';
-    default:
-      return applianceType;
+  // Apply quantity for dual arch
+  if (archType === 'dual') {
+    totalPrice *= 2;
   }
+
+  console.log('Price calculation complete:', {
+    totalPrice,
+    lineItems,
+    options
+  });
+
+  return {
+    total: totalPrice,
+    lineItems
+  };
 };
 
 export const fetchPriceForService = async (serviceName: string): Promise<number> => {
