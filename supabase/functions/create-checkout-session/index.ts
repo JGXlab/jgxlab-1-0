@@ -7,6 +7,9 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+const NIGHTGUARD_PRICE = 50;
+const EXPRESS_DESIGN_PRICE = 50;
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -28,18 +31,18 @@ serve(async (req) => {
       throw new Error('No email found');
     }
 
-    const { formData, serviceId, totalAmount } = await req.json();
-    console.log('Received request:', { serviceId, totalAmount, formData });
+    const { formData, serviceId } = await req.json();
+    console.log('Received request:', { serviceId, formData });
 
     // Initialize Stripe
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
       apiVersion: '2023-10-16',
     });
 
-    // Get the stripe_product_id from service_prices table
+    // Get the service price details
     const { data: servicePrices, error: servicePriceError } = await supabaseClient
       .from('service_prices')
-      .select('stripe_product_id')
+      .select('*')
       .eq('id', serviceId);
 
     console.log('Service price lookup result:', { servicePrices, servicePriceError });
@@ -60,42 +63,51 @@ serve(async (req) => {
       throw new Error('No Stripe product ID found for this service');
     }
 
+    // Calculate the unit amount (in cents)
+    let unitAmount = Math.round(Number(servicePrice.price) * 100);
+    console.log('Base unit amount:', unitAmount);
+
+    // Create line items array
     const lineItems = [];
 
-    // Add main service
+    // Add main service with correct quantity for dual arch
     lineItems.push({
-      price: servicePrice.stripe_product_id,
+      price_data: {
+        currency: 'usd',
+        product_data: {
+          name: servicePrice.service_name,
+        },
+        unit_amount: unitAmount,
+      },
       quantity: formData.arch === 'dual' ? 2 : 1,
     });
 
-    // Add nightguard if selected
+    // Add nightguard if selected (not for surgical-day)
     if (formData.needsNightguard === 'yes' && formData.applianceType !== 'surgical-day') {
-      const { data: nightguardPrices } = await supabaseClient
-        .from('service_prices')
-        .select('stripe_product_id')
-        .eq('service_name', 'nightguard');
-
-      if (nightguardPrices && nightguardPrices.length > 0 && nightguardPrices[0]?.stripe_product_id) {
-        lineItems.push({
-          price: nightguardPrices[0].stripe_product_id,
-          quantity: 1,
-        });
-      }
+      lineItems.push({
+        price_data: {
+          currency: 'usd',
+          product_data: {
+            name: 'Nightguard',
+          },
+          unit_amount: NIGHTGUARD_PRICE * 100, // Convert to cents
+        },
+        quantity: 1,
+      });
     }
 
-    // Add express design if selected
+    // Add express design if selected (not for surgical-day)
     if (formData.expressDesign === 'yes' && formData.applianceType !== 'surgical-day') {
-      const { data: expressPrices } = await supabaseClient
-        .from('service_prices')
-        .select('stripe_product_id')
-        .eq('service_name', 'express_design');
-
-      if (expressPrices && expressPrices.length > 0 && expressPrices[0]?.stripe_product_id) {
-        lineItems.push({
-          price: expressPrices[0].stripe_product_id,
-          quantity: 1,
-        });
-      }
+      lineItems.push({
+        price_data: {
+          currency: 'usd',
+          product_data: {
+            name: 'Express Design (24h)',
+          },
+          unit_amount: EXPRESS_DESIGN_PRICE * 100, // Convert to cents
+        },
+        quantity: 1,
+      });
     }
 
     console.log('Creating checkout session with line items:', lineItems);
