@@ -84,10 +84,21 @@ export const PaymentSection = ({ applianceType, archType, formData, isSubmitting
 
       if (error) {
         console.error('Error creating checkout session:', error);
+        toast({
+          title: "Error",
+          description: "Failed to create checkout session. Please try again.",
+          variant: "destructive",
+        });
         throw error;
       }
 
       if (!session?.url) {
+        console.error('No checkout URL returned');
+        toast({
+          title: "Error",
+          description: "Invalid checkout session response. Please try again.",
+          variant: "destructive",
+        });
         throw new Error('No checkout URL returned');
       }
 

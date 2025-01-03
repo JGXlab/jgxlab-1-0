@@ -14,14 +14,20 @@ serve(async (req) => {
   }
 
   try {
+    // Initialize Stripe
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
       apiVersion: '2023-10-16',
+      httpClient: Stripe.createFetchHttpClient(),
     })
 
     // Get the request body
     const { formData, totalAmount, metadata } = await req.json()
 
     console.log('Creating checkout session with:', { formData, totalAmount, metadata })
+
+    if (!formData || !totalAmount) {
+      throw new Error('Missing required fields')
+    }
 
     // Create the checkout session
     const session = await stripe.checkout.sessions.create({
