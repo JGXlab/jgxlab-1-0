@@ -30,7 +30,7 @@ export const PaymentSection = ({
 }: PaymentSectionProps) => {
   const { toast } = useToast();
   const [totalAmount, setTotalAmount] = useState(0);
-  const [lineItems, setLineItems] = useState<Array<{ service_name: string; quantity: number }>>([]);
+  const [lineItems, setLineItems] = useState<Array<{ price: string; quantity: number }>>([]);
 
   const { data: servicePrices = [], isLoading: isPriceLoading } = useQuery({
     queryKey: ['service-prices'],
@@ -50,26 +50,30 @@ export const PaymentSection = ({
 
   useEffect(() => {
     const updatePrices = async () => {
-      const newLineItems: Array<{ service_name: string; quantity: number }> = [];
+      // Find the base price for the appliance type
+      const baseService = servicePrices.find(p => p.service_name === applianceType);
+      const nightguardService = servicePrices.find(p => p.service_name === 'additional-nightguard');
+      const expressService = servicePrices.find(p => p.service_name === 'express-design');
 
-      // Add base appliance
-      newLineItems.push({
-        service_name: applianceType,
-        quantity: archType === 'dual' ? 2 : 1,
-      });
+      const newLineItems: Array<{ price: string; quantity: number }> = [];
 
-      // Add nightguard if selected
-      if (needsNightguard === 'yes' && applianceType !== 'surgical-day') {
+      if (baseService?.stripe_price_id) {
         newLineItems.push({
-          service_name: 'additional-nightguard',
+          price: baseService.stripe_price_id,
+          quantity: archType === 'dual' ? 2 : 1,
+        });
+      }
+
+      if (needsNightguard === 'yes' && nightguardService?.stripe_price_id) {
+        newLineItems.push({
+          price: nightguardService.stripe_price_id,
           quantity: 1,
         });
       }
 
-      // Add express design if selected
-      if (expressDesign === 'yes' && applianceType !== 'surgical-day') {
+      if (expressDesign === 'yes' && expressService?.stripe_price_id) {
         newLineItems.push({
-          service_name: 'express-design',
+          price: expressService.stripe_price_id,
           quantity: 1,
         });
       }
@@ -77,8 +81,6 @@ export const PaymentSection = ({
       console.log('Updated line items:', newLineItems);
       setLineItems(newLineItems);
 
-      // Calculate total price
-      const baseService = servicePrices.find(p => p.service_name === applianceType);
       const result = await calculateTotalPrice(
         baseService?.price || 0,
         { archType, needsNightguard, expressDesign, applianceType }

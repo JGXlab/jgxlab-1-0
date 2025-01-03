@@ -1,6 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from 'https://esm.sh/stripe@14.21.0';
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -8,15 +7,13 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    console.log('Received request to create checkout session');
     const { formData, lineItems, applianceType } = await req.json();
-    console.log('Request data:', { formData, lineItems, applianceType });
+    console.log('Received request data:', { formData, lineItems, applianceType });
 
     // Validate required data
     if (!formData) {
@@ -33,42 +30,10 @@ serve(async (req) => {
       apiVersion: '2023-10-16',
     });
 
-    // Create Supabase client
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-    );
-
-    console.log('Fetching service prices from database');
-    // Get the price IDs from the service_prices table
-    const { data: servicePrices, error: pricesError } = await supabaseClient
-      .from('service_prices')
-      .select('service_name, stripe_price_id')
-      .in('service_name', lineItems.map(item => item.service_name));
-
-    if (pricesError) {
-      console.error('Error fetching service prices:', pricesError);
-      throw new Error('Failed to fetch service prices');
-    }
-
-    console.log('Service prices fetched:', servicePrices);
-
-    // Map the line items to use the correct price IDs from the database
-    const stripeLineItems = lineItems.map(item => {
-      const servicePrice = servicePrices.find(sp => sp.service_name === item.service_name);
-      if (!servicePrice?.stripe_price_id) {
-        throw new Error(`No price ID found for service: ${item.service_name}`);
-      }
-      return {
-        price: servicePrice.stripe_price_id,
-        quantity: item.quantity,
-      };
-    });
-
-    console.log('Creating checkout session with line items:', stripeLineItems);
+    console.log('Creating checkout session with line items:', lineItems);
     
     const session = await stripe.checkout.sessions.create({
-      line_items: stripeLineItems,
+      line_items: lineItems,
       mode: 'payment',
       success_url: `${req.headers.get('origin')}/clinic/submittedlabscripts?success=true`,
       cancel_url: `${req.headers.get('origin')}/clinic/submittedlabscripts?canceled=true`,
