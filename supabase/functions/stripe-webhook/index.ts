@@ -24,6 +24,11 @@ serve(async (req) => {
     const signature = req.headers.get('stripe-signature');
     const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET');
 
+    console.log('Webhook headers:', {
+      signature: signature ? 'Present' : 'Missing',
+      webhookSecret: webhookSecret ? 'Present' : 'Missing'
+    });
+
     if (!signature || !webhookSecret) {
       console.error('Missing required headers:', { signature: !!signature, webhookSecret: !!webhookSecret });
       throw new Error('Missing stripe signature or webhook secret');
@@ -31,7 +36,7 @@ serve(async (req) => {
 
     // Get the raw body as text
     const body = await req.text();
-    console.log('Received webhook body:', body);
+    console.log('Received webhook body length:', body.length);
     
     let event;
     try {
@@ -63,6 +68,11 @@ serve(async (req) => {
 
       try {
         // Parse the form data from session metadata
+        console.log('Session metadata:', session.metadata);
+        if (!session.metadata?.formData) {
+          throw new Error('No form data found in session metadata');
+        }
+
         const formData = JSON.parse(session.metadata.formData);
         console.log('Parsed form data:', formData);
 
@@ -95,10 +105,22 @@ serve(async (req) => {
         }
 
         console.log('Successfully created lab script:', labScript);
+        
+        return new Response(
+          JSON.stringify({ received: true, labScript }), 
+          { 
+            status: 200,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          }
+        );
       } catch (error) {
         console.error('Error processing webhook data:', error);
         return new Response(
-          JSON.stringify({ error: 'Error processing webhook data' }), 
+          JSON.stringify({ 
+            error: 'Error processing webhook data',
+            details: error.message,
+            stack: error.stack
+          }), 
           { 
             status: 500,
             headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -117,7 +139,11 @@ serve(async (req) => {
   } catch (error) {
     console.error('Webhook handler failed:', error);
     return new Response(
-      JSON.stringify({ error: 'Webhook handler failed', details: error.message }), 
+      JSON.stringify({ 
+        error: 'Webhook handler failed', 
+        details: error.message,
+        stack: error.stack 
+      }), 
       { 
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
