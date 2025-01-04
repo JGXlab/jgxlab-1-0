@@ -102,9 +102,9 @@ export default function SubmittedLabScripts() {
   };
 
   // Type-safe onSubmit handler
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
     console.log('Form values:', values);
-    // Handle form submission
+    // Handle form submission logic here
   };
 
   return (
@@ -146,7 +146,7 @@ export default function SubmittedLabScripts() {
               <DialogTitle>New Lab Script</DialogTitle>
             </DialogHeader>
             <Form {...form}>
-              <form className="space-y-8 flex-1 overflow-y-auto">
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 flex-1 overflow-y-auto">
                 <PatientInformationSection form={form} />
                 <ApplianceDetailsSection form={form} />
                 <AdditionalInformationSection form={form} />
@@ -155,7 +155,7 @@ export default function SubmittedLabScripts() {
                   archType={form.watch('arch')}
                   needsNightguard={form.watch('needsNightguard')}
                   expressDesign={form.watch('expressDesign')}
-                  onSubmit={form.handleSubmit}
+                  onSubmit={onSubmit}
                   isSubmitting={false}
                   form={form}
                 />
