@@ -9,12 +9,6 @@ const corsHeaders = {
 }
 
 serve(async (req) => {
-  // Initial request logging
-  console.log('Webhook received:', {
-    method: req.method,
-    headers: Object.fromEntries(req.headers.entries()),
-  });
-
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     console.log('Handling CORS preflight request');
@@ -25,6 +19,7 @@ serve(async (req) => {
   }
 
   if (req.method !== 'POST') {
+    console.log(`Invalid method: ${req.method}`);
     return new Response('Method not allowed', {
       status: 405,
       headers: corsHeaders
@@ -34,7 +29,7 @@ serve(async (req) => {
   try {
     // Get the stripe signature from headers
     const stripeSignature = req.headers.get('stripe-signature');
-    console.log('Stripe signature received:', stripeSignature);
+    console.log('Received webhook with signature:', stripeSignature ? 'present' : 'missing');
 
     if (!stripeSignature) {
       console.error('No Stripe signature found in request headers');
@@ -47,7 +42,7 @@ serve(async (req) => {
     // Get the webhook secret from environment variables
     const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET');
     if (!webhookSecret) {
-      console.error('Webhook secret not configured');
+      console.error('Webhook secret not configured in environment');
       return new Response('Webhook secret not configured', { 
         status: 500,
         headers: corsHeaders
@@ -62,7 +57,7 @@ serve(async (req) => {
 
     // Get the raw body as text for signature verification
     const rawBody = await req.text();
-    console.log('Raw webhook body length:', rawBody.length);
+    console.log('Raw webhook body received, length:', rawBody.length);
 
     // Verify the webhook signature
     let event;
@@ -74,7 +69,7 @@ serve(async (req) => {
       );
       console.log('Webhook signature verified successfully. Event type:', event.type);
     } catch (err) {
-      console.error('Error verifying webhook signature:', err);
+      console.error('Webhook signature verification failed:', err.message);
       return new Response(
         JSON.stringify({ error: `Webhook signature verification failed: ${err.message}` }),
         { 
