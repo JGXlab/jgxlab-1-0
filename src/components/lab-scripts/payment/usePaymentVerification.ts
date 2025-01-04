@@ -16,10 +16,10 @@ export const usePaymentVerification = () => {
 
   const verifyPayment = async (sessionId: string, labScriptId?: string) => {
     try {
-      console.log('Starting payment verification for session:', sessionId, 'labScriptId:', labScriptId);
+      console.log('Starting payment verification for session:', sessionId);
       
       const { data, error } = await supabase.functions.invoke('get-session-payment', {
-        body: { sessionId, labScriptId }
+        body: { sessionId }
       });
 
       if (error) {
@@ -29,7 +29,7 @@ export const usePaymentVerification = () => {
 
       console.log('Payment verification response:', data);
 
-      if (data?.status === 'paid') {  // Changed from 'complete' to 'paid' to match Stripe's status
+      if (data?.status === 'paid') {
         console.log('Payment verified successfully:', data);
         setPaymentDetails({
           paymentId: data.paymentId,
@@ -37,9 +37,11 @@ export const usePaymentVerification = () => {
         });
         setShowSuccessDialog(true);
         
+        // Invalidate and refetch lab scripts
         console.log('Invalidating lab scripts query...');
         await queryClient.invalidateQueries({ queryKey: ['labScripts'] });
-        console.log('Lab scripts query invalidated');
+        await queryClient.refetchQueries({ queryKey: ['labScripts'] });
+        console.log('Lab scripts query invalidated and refetched');
         
         toast({
           title: "Success",
