@@ -4,14 +4,29 @@ import Stripe from 'https://esm.sh/stripe@13.6.0?target=deno'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, stripe-signature',
 }
 
 serve(async (req) => {
+  // Initial request logging
+  console.log('Webhook received:', {
+    method: req.method,
+    headers: Object.fromEntries(req.headers.entries()),
+  });
+
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     console.log('Handling CORS preflight request');
     return new Response(null, {
+      status: 204,
+      headers: corsHeaders
+    });
+  }
+
+  if (req.method !== 'POST') {
+    return new Response('Method not allowed', {
+      status: 405,
       headers: corsHeaders
     });
   }
@@ -19,18 +34,24 @@ serve(async (req) => {
   try {
     // Get the stripe signature from headers
     const stripeSignature = req.headers.get('stripe-signature');
-    console.log('Received webhook request with signature:', stripeSignature);
+    console.log('Stripe signature received:', stripeSignature);
 
     if (!stripeSignature) {
       console.error('No Stripe signature found in request headers');
-      throw new Error('No Stripe signature found');
+      return new Response('No Stripe signature found', { 
+        status: 401,
+        headers: corsHeaders
+      });
     }
 
     // Get the webhook secret from environment variables
     const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET');
     if (!webhookSecret) {
       console.error('Webhook secret not configured');
-      throw new Error('Webhook secret not configured');
+      return new Response('Webhook secret not configured', { 
+        status: 500,
+        headers: corsHeaders
+      });
     }
 
     // Initialize Stripe
@@ -41,7 +62,7 @@ serve(async (req) => {
 
     // Get the raw body as text for signature verification
     const rawBody = await req.text();
-    console.log('Raw webhook body received:', rawBody);
+    console.log('Raw webhook body length:', rawBody.length);
 
     // Verify the webhook signature
     let event;
@@ -57,7 +78,7 @@ serve(async (req) => {
       return new Response(
         JSON.stringify({ error: `Webhook signature verification failed: ${err.message}` }),
         { 
-          status: 400,
+          status: 401,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         }
       );
@@ -91,7 +112,13 @@ serve(async (req) => {
 
       if (!labScriptId) {
         console.error('No lab script ID found in session metadata');
-        throw new Error('No lab script ID found in session metadata');
+        return new Response(
+          JSON.stringify({ error: 'No lab script ID found in session metadata' }),
+          { 
+            status: 400,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          }
+        );
       }
 
       // Update lab script payment status
@@ -108,7 +135,13 @@ serve(async (req) => {
 
       if (updateError) {
         console.error('Error updating lab script:', updateError);
-        throw updateError;
+        return new Response(
+          JSON.stringify({ error: `Database update failed: ${updateError.message}` }),
+          { 
+            status: 500,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          }
+        );
       }
 
       console.log('Successfully updated lab script:', updateData);
@@ -118,8 +151,8 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({ received: true }),
       { 
+        status: 200,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200
       }
     );
   } catch (error) {
@@ -127,7 +160,7 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({ error: error.message }),
       { 
-        status: 400,
+        status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       }
     );
