@@ -21,12 +21,17 @@ serve(async (req) => {
       apiVersion: '2023-10-16',
     });
 
+    // Log all request headers for debugging
+    const headers = Object.fromEntries(req.headers.entries());
+    console.log('All request headers:', headers);
+
     const signature = req.headers.get('stripe-signature');
     const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET');
 
-    console.log('Webhook headers:', {
+    console.log('Webhook verification details:', {
       signature: signature ? 'Present' : 'Missing',
-      webhookSecret: webhookSecret ? 'Present' : 'Missing'
+      webhookSecret: webhookSecret ? 'Present' : 'Missing',
+      stripeKey: Deno.env.get('STRIPE_SECRET_KEY') ? 'Present' : 'Missing'
     });
 
     if (!signature || !webhookSecret) {
