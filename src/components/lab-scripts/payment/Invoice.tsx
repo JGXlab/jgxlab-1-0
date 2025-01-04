@@ -112,7 +112,8 @@ export const Invoice = ({ labScript, onDownload }: InvoiceProps) => {
             <tr className="border-b border-gray-100">
               <td className="py-4">
                 {formatApplianceType(labScript.appliance_type)}
-                {labScript.arch === 'dual' && " (Dual Arch)"}
+                {labScript.arch === 'dual' && " (Dual Arch)"} - 
+                Patient: {patient ? `${patient.first_name} ${patient.last_name}` : 'N/A'}
               </td>
               <td className="py-4 text-center">1</td>
               <td className="py-4 text-right">
