@@ -33,7 +33,7 @@ export const usePaymentVerification = () => {
           .update({
             payment_status: 'paid',
             payment_id: data.paymentId,
-            amount_paid: data.amount_total / 100, // Convert cents to dollars
+            amount_paid: data.amount_total / 100,
             payment_date: new Date().toISOString()
           })
           .eq('id', labScriptId);
@@ -43,26 +43,23 @@ export const usePaymentVerification = () => {
           throw new Error('Failed to update payment status');
         }
 
-        // Set payment details and show success dialog
         setPaymentDetails({
           paymentId: data.paymentId,
           invoiceUrl: data.invoiceUrl
         });
         setShowSuccessDialog(true);
 
-        // Show only one toast notification
         toast({
           title: "Payment Successful",
           description: "Your lab script has been submitted successfully.",
         });
 
-        return; // Exit early after successful payment
+        return;
       }
 
       throw new Error('Payment not confirmed');
     } catch (error) {
       console.error('Payment verification error:', error);
-      // Show only one error toast
       toast({
         title: "Payment Verification Error",
         description: "There was an issue verifying your payment. Please contact support.",
@@ -77,7 +74,7 @@ export const usePaymentVerification = () => {
     navigate('/clinic/submittedlabscripts', { replace: true });
   };
 
-  return { 
+  return {
     verifyPayment,
     showSuccessDialog,
     paymentDetails,
