@@ -10,6 +10,8 @@ import { useState } from "react";
 import { Invoice } from "./payment/Invoice";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 interface TableRowContentProps {
   script: any;
@@ -21,13 +23,35 @@ export const TableRowContent = ({ script, onPreview }: TableRowContentProps) => 
   const StatusIcon = LucideIcons[script.status === 'pending' ? 'Clock' : 
     script.status === 'completed' ? 'CheckCircle2' : 'Info'];
 
+  // Query to check if an invoice exists for this lab script
+  const { data: invoice } = useQuery({
+    queryKey: ['invoice', script.id],
+    queryFn: async () => {
+      if (script.payment_status !== 'paid') return null;
+      
+      const { data, error } = await supabase
+        .from('invoices')
+        .select('*')
+        .eq('lab_script_id', script.id)
+        .single();
+
+      if (error) {
+        console.error('Error fetching invoice:', error);
+        return null;
+      }
+
+      return data;
+    },
+    enabled: script.payment_status === 'paid'
+  });
+
   const handleDownloadInvoice = async () => {
     const invoiceElement = document.getElementById('invoice-content');
     if (!invoiceElement) return;
 
     const canvas = await html2canvas(invoiceElement, {
       backgroundColor: '#ffffff',
-      scale: 2, // Increase quality
+      scale: 2,
     });
     
     const imgData = canvas.toDataURL('image/png');
@@ -117,7 +141,7 @@ export const TableRowContent = ({ script, onPreview }: TableRowContentProps) => 
               <Eye className="h-4 w-4" />
               <span>Preview</span>
             </Button>
-            {script.payment_status === 'paid' && (
+            {invoice && (
               <Button
                 variant="ghost"
                 size="sm"
