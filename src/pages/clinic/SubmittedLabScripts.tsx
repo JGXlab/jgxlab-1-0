@@ -56,11 +56,10 @@ export default function SubmittedLabScripts() {
     const checkPayment = async () => {
       const sessionId = searchParams.get('session_id');
       const paymentStatus = searchParams.get('payment_status');
-      const labScriptId = searchParams.get('lab_script_id');
 
-      if (paymentStatus === 'success' && sessionId && labScriptId) {
+      if (paymentStatus === 'success' && sessionId) {
         console.log('Initiating payment verification for session:', sessionId);
-        await verifyPayment(sessionId, labScriptId);
+        await verifyPayment(sessionId);
       }
     };
 
@@ -101,10 +100,8 @@ export default function SubmittedLabScripts() {
     setIsPreviewOpen(true);
   };
 
-  // Type-safe onSubmit handler
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     console.log('Form values:', values);
-    // Handle form submission logic here
   };
 
   return (
