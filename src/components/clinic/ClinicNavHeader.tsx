@@ -8,9 +8,9 @@ export function ClinicNavHeader() {
       <div className="flex items-center space-x-8">
         <div className="flex items-center space-x-2">
           <div className="h-8 w-8 bg-primary rounded-full flex items-center justify-center">
-            <span className="text-white font-semibold">L</span>
+            <span className="text-white font-semibold">J</span>
           </div>
-          <span className="font-semibold">Lovable</span>
+          <span className="font-semibold">JGX Digital Lab</span>
         </div>
         
         <nav className="flex items-center space-x-6">
