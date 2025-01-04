@@ -37,6 +37,26 @@ serve(async (req) => {
 
       const supabaseAdmin = createClient(supabaseUrl, supabaseServiceRoleKey)
 
+      // Check if a lab script with this payment_id already exists
+      const { data: existingLabScript } = await supabaseAdmin
+        .from('lab_scripts')
+        .select('id')
+        .eq('payment_id', session.payment_intent?.id)
+        .single()
+
+      if (existingLabScript) {
+        console.log('Lab script already exists for this payment:', existingLabScript.id)
+        return new Response(
+          JSON.stringify({ 
+            status: session.payment_status,
+            paymentId: session.payment_intent?.id || null,
+            amount_total: session.amount_total || 0,
+            invoiceUrl: session.invoice?.invoice_pdf || null
+          }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+
       // Parse the form data from session metadata
       const formData = JSON.parse(session.metadata.formData)
 
@@ -80,24 +100,13 @@ serve(async (req) => {
         amount_total: session.amount_total || 0,
         invoiceUrl: session.invoice?.invoice_pdf || null
       }),
-      { 
-        headers: { 
-          ...corsHeaders, 
-          'Content-Type': 'application/json' 
-        } 
-      },
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   } catch (error) {
     console.error('Error:', error)
     return new Response(
       JSON.stringify({ error: error.message }),
-      { 
-        status: 400, 
-        headers: { 
-          ...corsHeaders, 
-          'Content-Type': 'application/json' 
-        } 
-      },
+      { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   }
 })
