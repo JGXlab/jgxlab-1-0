@@ -16,7 +16,7 @@ export const usePaymentVerification = () => {
 
   const verifyPayment = async (sessionId: string, labScriptId?: string) => {
     try {
-      console.log('Verifying payment for session:', sessionId);
+      console.log('Starting payment verification for session:', sessionId, 'labScriptId:', labScriptId);
       
       const { data, error } = await supabase.functions.invoke('get-session-payment', {
         body: { sessionId, labScriptId }
@@ -27,6 +27,8 @@ export const usePaymentVerification = () => {
         throw error;
       }
 
+      console.log('Payment verification response:', data);
+
       if (data?.status === 'complete') {
         console.log('Payment verified successfully:', data);
         setPaymentDetails({
@@ -35,13 +37,16 @@ export const usePaymentVerification = () => {
         });
         setShowSuccessDialog(true);
         
-        // Invalidate and refetch the lab scripts query to show the new entry
+        console.log('Invalidating lab scripts query...');
         await queryClient.invalidateQueries({ queryKey: ['labScripts'] });
+        console.log('Lab scripts query invalidated');
         
         toast({
           title: "Success",
           description: "Lab script has been created successfully",
         });
+      } else {
+        console.log('Payment not complete. Status:', data?.status);
       }
     } catch (error) {
       console.error('Error verifying payment:', error);
