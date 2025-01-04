@@ -55,7 +55,7 @@ export const Invoice = ({ labScript, onDownload }: InvoiceProps) => {
   };
 
   return (
-    <div className="bg-white w-[210mm] mx-auto p-12 shadow-lg">
+    <div className="bg-white w-[210mm] mx-auto p-12">
       {/* Header */}
       <div className="flex justify-between items-start mb-12">
         <div>

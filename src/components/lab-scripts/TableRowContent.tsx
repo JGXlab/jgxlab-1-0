@@ -25,7 +25,11 @@ export const TableRowContent = ({ script, onPreview }: TableRowContentProps) => 
     const invoiceElement = document.getElementById('invoice-content');
     if (!invoiceElement) return;
 
-    const canvas = await html2canvas(invoiceElement);
+    const canvas = await html2canvas(invoiceElement, {
+      backgroundColor: '#ffffff',
+      scale: 2, // Increase quality
+    });
+    
     const imgData = canvas.toDataURL('image/png');
     
     const pdf = new jsPDF({
@@ -129,11 +133,11 @@ export const TableRowContent = ({ script, onPreview }: TableRowContentProps) => 
       </TableRow>
 
       <Dialog open={showInvoice} onOpenChange={setShowInvoice}>
-        <DialogContent className="max-w-4xl h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-4xl h-[90vh] overflow-y-auto bg-white">
           <DialogHeader>
             <DialogTitle>Invoice</DialogTitle>
           </DialogHeader>
-          <div id="invoice-content">
+          <div id="invoice-content" className="bg-white">
             <Invoice labScript={script} />
           </div>
           <DialogFooter className="mt-4">
