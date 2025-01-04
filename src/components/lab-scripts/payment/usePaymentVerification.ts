@@ -1,69 +1,83 @@
-import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { useQueryClient } from "@tanstack/react-query";
-
-interface PaymentDetails {
-  paymentId: string;
-  invoiceUrl: string;
-}
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useState } from "react";
 
 export const usePaymentVerification = () => {
-  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
-  const [paymentDetails, setPaymentDetails] = useState<PaymentDetails | null>(null);
   const { toast } = useToast();
-  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+  const [paymentDetails, setPaymentDetails] = useState<{
+    paymentId: string;
+    invoiceUrl?: string;
+  } | null>(null);
 
-  const verifyPayment = async (sessionId: string, labScriptId?: string) => {
+  const verifyPayment = async (sessionId: string, labScriptId: string) => {
+    console.log('Verifying payment for session:', sessionId, 'and lab script:', labScriptId);
+    
     try {
-      console.log('Starting payment verification for session:', sessionId, 'labScriptId:', labScriptId);
-      
       const { data, error } = await supabase.functions.invoke('get-session-payment', {
         body: { sessionId, labScriptId }
       });
 
-      if (error) {
-        console.error('Payment verification error:', error);
-        throw error;
-      }
-
       console.log('Payment verification response:', data);
 
-      if (data?.status === 'paid') {  // Changed from 'complete' to 'paid' to match Stripe's status
-        console.log('Payment verified successfully:', data);
+      if (error) {
+        console.error('Error from edge function:', error);
+        throw new Error('Failed to verify payment');
+      }
+
+      if (data.status === 'paid') {
+        const { error: updateError } = await supabase
+          .from('lab_scripts')
+          .update({
+            payment_status: 'paid',
+            payment_id: data.paymentId,
+            amount_paid: data.amount_total / 100, // Convert cents to dollars
+            payment_date: new Date().toISOString()
+          })
+          .eq('id', labScriptId);
+
+        if (updateError) {
+          console.error('Error updating lab script:', updateError);
+          throw new Error('Failed to update payment status');
+        }
+
+        // Set payment details and show success dialog
         setPaymentDetails({
           paymentId: data.paymentId,
           invoiceUrl: data.invoiceUrl
         });
         setShowSuccessDialog(true);
-        
-        console.log('Invalidating lab scripts query...');
-        await queryClient.invalidateQueries({ queryKey: ['labScripts'] });
-        console.log('Lab scripts query invalidated');
-        
+
+        // Show only one toast notification
         toast({
-          title: "Success",
-          description: "Lab script has been created successfully",
+          title: "Payment Successful",
+          description: "Your lab script has been submitted successfully.",
         });
-      } else {
-        console.log('Payment not complete. Status:', data?.status);
+
+        return; // Exit early after successful payment
       }
+
+      throw new Error('Payment not confirmed');
     } catch (error) {
-      console.error('Error verifying payment:', error);
+      console.error('Payment verification error:', error);
+      // Show only one error toast
       toast({
-        title: "Error",
-        description: "Failed to verify payment status",
+        title: "Payment Verification Error",
+        description: "There was an issue verifying your payment. Please contact support.",
         variant: "destructive",
       });
+      navigate('/clinic/submittedlabscripts', { replace: true });
     }
   };
 
   const closeSuccessDialog = () => {
     setShowSuccessDialog(false);
-    setPaymentDetails(null);
+    navigate('/clinic/submittedlabscripts', { replace: true });
   };
 
-  return {
+  return { 
     verifyPayment,
     showSuccessDialog,
     paymentDetails,

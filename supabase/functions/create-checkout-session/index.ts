@@ -21,13 +21,18 @@ serve(async (req) => {
       httpClient: Stripe.createFetchHttpClient(),
     })
 
-    // Store lab script data in metadata
-    const session = await stripe.checkout.sessions.create({
-      line_items: lineItems,
-      mode: 'payment',
-      success_url: `${req.headers.get('origin')}/clinic/submittedlabscripts?payment_status=success&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${req.headers.get('origin')}/clinic/submittedlabscripts?payment_status=failed`,
-      metadata: {
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')
+    const supabaseServiceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+    
+    if (!supabaseUrl || !supabaseServiceRoleKey) {
+      throw new Error('Missing Supabase configuration')
+    }
+
+    const supabaseAdmin = createClient(supabaseUrl, supabaseServiceRoleKey)
+
+    const { data: labScript, error: labScriptError } = await supabaseAdmin
+      .from('lab_scripts')
+      .insert([{
         patient_id: formData.patientId,
         appliance_type: formData.applianceType,
         arch: formData.arch,
@@ -40,7 +45,26 @@ serve(async (req) => {
         due_date: formData.dueDate,
         specific_instructions: formData.specificInstructions,
         express_design: formData.expressDesign,
-        user_id: formData.userId
+        user_id: formData.userId,
+        payment_status: 'pending'
+      }])
+      .select()
+      .single()
+
+    if (labScriptError) {
+      console.error('Error creating lab script:', labScriptError)
+      throw labScriptError
+    }
+
+    console.log('Created lab script:', labScript)
+
+    const session = await stripe.checkout.sessions.create({
+      line_items: lineItems,
+      mode: 'payment',
+      success_url: `${req.headers.get('origin')}/clinic/submittedlabscripts?payment_status=success&session_id={CHECKOUT_SESSION_ID}&lab_script_id=${labScript.id}`,
+      cancel_url: `${req.headers.get('origin')}/clinic/submittedlabscripts?payment_status=failed`,
+      metadata: {
+        lab_script_id: labScript.id
       }
     })
 

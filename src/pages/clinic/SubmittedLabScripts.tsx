@@ -93,8 +93,6 @@ export default function SubmittedLabScripts() {
       console.log('Fetched lab scripts:', data);
       return data || [];
     },
-    staleTime: 0, // Disable caching to ensure fresh data
-    refetchOnMount: true, // Always refetch when component mounts
   });
 
   const handlePreview = (script: any, e: React.MouseEvent) => {
@@ -103,8 +101,10 @@ export default function SubmittedLabScripts() {
     setIsPreviewOpen(true);
   };
 
+  // Type-safe onSubmit handler
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     console.log('Form values:', values);
+    // Handle form submission logic here
   };
 
   return (
