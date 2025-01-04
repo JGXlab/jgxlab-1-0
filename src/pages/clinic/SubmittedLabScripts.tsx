@@ -1,5 +1,5 @@
 import { ClinicLayout } from "@/components/clinic/ClinicLayout";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { LabScriptsHeader } from "@/components/lab-scripts/LabScriptsHeader";
 import { PreviewLabScriptModal } from "@/components/surgical-form/PreviewLabScriptModal";
@@ -16,72 +16,15 @@ import { PatientInformationSection } from "@/components/surgical-form/PatientInf
 import { ApplianceDetailsSection } from "@/components/surgical-form/ApplianceDetailsSection";
 import { AdditionalInformationSection } from "@/components/surgical-form/AdditionalInformationSection";
 import { PaymentSection } from "@/components/surgical-form/PaymentSection";
-import { useToast } from "@/hooks/use-toast";
-import { z } from "zod";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
+import { usePaymentVerification } from "@/components/lab-scripts/payment/usePaymentVerification";
 
 export default function SubmittedLabScripts() {
   const [selectedScript, setSelectedScript] = useState<any>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [isNewLabScriptOpen, setIsNewLabScriptOpen] = useState(false);
-  const { toast } = useToast();
   const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
-
-  // Handle payment status check
-  useEffect(() => {
-    const checkPaymentStatus = async () => {
-      const sessionId = searchParams.get('session_id');
-      const paymentStatus = searchParams.get('payment_status');
-      const labScriptId = searchParams.get('lab_script_id');
-
-      if (paymentStatus === 'success' && sessionId && labScriptId) {
-        try {
-          const response = await fetch('/functions/v1/get-session-payment', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${process.env.VITE_SUPABASE_ANON_KEY}`
-            },
-            body: JSON.stringify({ sessionId, labScriptId })
-          });
-
-          if (!response.ok) {
-            throw new Error('Failed to verify payment');
-          }
-
-          const data = await response.json();
-          console.log('Payment verification response:', data);
-
-          if (data.status === 'paid') {
-            toast({
-              title: "Payment Successful",
-              description: "Your lab script has been submitted successfully.",
-            });
-          }
-        } catch (error) {
-          console.error('Error verifying payment:', error);
-          toast({
-            title: "Payment Verification Error",
-            description: "There was an issue verifying your payment. Please contact support.",
-            variant: "destructive",
-          });
-        }
-
-        // Clear URL parameters
-        navigate('/clinic/submittedlabscripts', { replace: true });
-      } else if (paymentStatus === 'failed') {
-        toast({
-          title: "Payment Failed",
-          description: "There was an issue processing your payment. Please try again.",
-          variant: "destructive",
-        });
-        navigate('/clinic/submittedlabscripts', { replace: true });
-      }
-    };
-
-    checkPaymentStatus();
-  }, [searchParams, toast, navigate]);
+  const { verifyPayment } = usePaymentVerification();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -100,6 +43,22 @@ export default function SubmittedLabScripts() {
       expressDesign: "",
     },
   });
+
+  // Handle payment status check
+  useEffect(() => {
+    const checkPayment = async () => {
+      const sessionId = searchParams.get('session_id');
+      const paymentStatus = searchParams.get('payment_status');
+      const labScriptId = searchParams.get('lab_script_id');
+
+      if (paymentStatus === 'success' && sessionId && labScriptId) {
+        console.log('Initiating payment verification for session:', sessionId);
+        await verifyPayment(sessionId, labScriptId);
+      }
+    };
+
+    checkPayment();
+  }, [searchParams, verifyPayment]);
 
   const { data: labScripts = [], isLoading } = useQuery({
     queryKey: ['labScripts'],
@@ -129,62 +88,10 @@ export default function SubmittedLabScripts() {
     },
   });
 
-  const { mutate: submitLabScript, isPending } = useMutation({
-    mutationFn: async (values: z.infer<typeof formSchema>) => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("No user found");
-
-      const { data, error } = await supabase
-        .from('lab_scripts')
-        .insert([
-          {
-            patient_id: values.patientId,
-            appliance_type: values.applianceType,
-            arch: values.arch,
-            treatment_type: values.treatmentType,
-            screw_type: values.screwType,
-            other_screw_type: values.otherScrewType,
-            vdo_details: values.vdoDetails,
-            needs_nightguard: values.needsNightguard,
-            shade: values.shade,
-            due_date: values.dueDate,
-            specific_instructions: values.specificInstructions,
-            express_design: values.expressDesign,
-            user_id: user.id,
-          }
-        ])
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
-    onSuccess: () => {
-      toast({
-        title: "Success",
-        description: "Lab script has been submitted successfully",
-      });
-      setIsNewLabScriptOpen(false);
-      form.reset();
-    },
-    onError: (error) => {
-      console.error('Error submitting lab script:', error);
-      toast({
-        title: "Error",
-        description: "Failed to submit lab script. Please try again.",
-        variant: "destructive",
-      });
-    },
-  });
-
   const handlePreview = (script: any, e: React.MouseEvent) => {
     e.stopPropagation();
     setSelectedScript(script);
     setIsPreviewOpen(true);
-  };
-
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    submitLabScript(values);
   };
 
   return (
@@ -226,7 +133,7 @@ export default function SubmittedLabScripts() {
               <DialogTitle>New Lab Script</DialogTitle>
             </DialogHeader>
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 flex-1 overflow-y-auto">
+              <form className="space-y-8 flex-1 overflow-y-auto">
                 <PatientInformationSection form={form} />
                 <ApplianceDetailsSection form={form} />
                 <AdditionalInformationSection form={form} />
@@ -235,8 +142,8 @@ export default function SubmittedLabScripts() {
                   archType={form.watch('arch')}
                   needsNightguard={form.watch('needsNightguard')}
                   expressDesign={form.watch('expressDesign')}
-                  onSubmit={onSubmit}
-                  isSubmitting={isPending}
+                  onSubmit={form.handleSubmit}
+                  isSubmitting={false}
                   form={form}
                 />
               </form>
