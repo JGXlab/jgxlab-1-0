@@ -52,7 +52,7 @@ export const PaymentSection = ({ labScript }: PaymentSectionProps) => {
         />
         <PreviewField 
           label="Amount Paid" 
-          value={`$${(paymentInfo?.amount_total / 100).toFixed(2)}`} 
+          value={labScript.amount_paid ? `$${labScript.amount_paid.toFixed(2)}` : 'N/A'} 
         />
         <PreviewField 
           label="Payment ID" 
@@ -60,7 +60,7 @@ export const PaymentSection = ({ labScript }: PaymentSectionProps) => {
         />
         <PreviewField 
           label="Payment Date" 
-          value={paymentInfo?.created ? new Date(paymentInfo.created * 1000).toLocaleDateString() : 'N/A'} 
+          value={labScript.payment_date ? new Date(labScript.payment_date).toLocaleDateString() : 'N/A'} 
         />
       </div>
       {paymentInfo?.invoice_url && (

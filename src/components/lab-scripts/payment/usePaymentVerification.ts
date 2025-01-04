@@ -32,7 +32,9 @@ export const usePaymentVerification = () => {
           .from('lab_scripts')
           .update({
             payment_status: 'paid',
-            payment_id: data.paymentId
+            payment_id: data.paymentId,
+            amount_paid: data.amount_total / 100, // Convert cents to dollars
+            payment_date: new Date().toISOString()
           })
           .eq('id', labScriptId);
 

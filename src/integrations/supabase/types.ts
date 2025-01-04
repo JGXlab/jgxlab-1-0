@@ -102,6 +102,7 @@ export type Database = {
       }
       lab_scripts: {
         Row: {
+          amount_paid: number | null
           appliance_type: string
           arch: string
           created_at: string
@@ -111,6 +112,7 @@ export type Database = {
           needs_nightguard: string | null
           other_screw_type: string | null
           patient_id: string
+          payment_date: string | null
           payment_id: string | null
           payment_status: string
           screw_type: string | null
@@ -122,6 +124,7 @@ export type Database = {
           vdo_details: string | null
         }
         Insert: {
+          amount_paid?: number | null
           appliance_type: string
           arch: string
           created_at?: string
@@ -131,6 +134,7 @@ export type Database = {
           needs_nightguard?: string | null
           other_screw_type?: string | null
           patient_id: string
+          payment_date?: string | null
           payment_id?: string | null
           payment_status?: string
           screw_type?: string | null
@@ -142,6 +146,7 @@ export type Database = {
           vdo_details?: string | null
         }
         Update: {
+          amount_paid?: number | null
           appliance_type?: string
           arch?: string
           created_at?: string
@@ -151,6 +156,7 @@ export type Database = {
           needs_nightguard?: string | null
           other_screw_type?: string | null
           patient_id?: string
+          payment_date?: string | null
           payment_id?: string | null
           payment_status?: string
           screw_type?: string | null
