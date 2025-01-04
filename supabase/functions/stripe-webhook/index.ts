@@ -8,13 +8,7 @@ const corsHeaders = {
 }
 
 serve(async (req) => {
-  // Initial request logging
-  console.log('Webhook received:', {
-    method: req.method,
-    url: req.url,
-    headers: Object.fromEntries(req.headers.entries()),
-  });
-
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     console.log('Handling CORS preflight request');
     return new Response(null, {
@@ -25,7 +19,7 @@ serve(async (req) => {
   try {
     // Get the stripe signature from headers
     const stripeSignature = req.headers.get('stripe-signature');
-    console.log('Stripe signature received:', stripeSignature);
+    console.log('Received webhook request with signature:', stripeSignature);
 
     if (!stripeSignature) {
       console.error('No Stripe signature found in request headers');
@@ -45,9 +39,9 @@ serve(async (req) => {
       httpClient: Stripe.createFetchHttpClient(),
     });
 
-    // Get the raw body for webhook signature verification
+    // Get the raw body as text for signature verification
     const rawBody = await req.text();
-    console.log('Raw webhook body:', rawBody);
+    console.log('Raw webhook body received:', rawBody);
 
     // Verify the webhook signature
     let event;
@@ -57,7 +51,7 @@ serve(async (req) => {
         stripeSignature,
         webhookSecret
       );
-      console.log('Webhook signature verified successfully. Event:', event);
+      console.log('Webhook signature verified successfully. Event type:', event.type);
     } catch (err) {
       console.error('Error verifying webhook signature:', err);
       return new Response(
@@ -106,7 +100,7 @@ serve(async (req) => {
         .from('lab_scripts')
         .update({ 
           payment_status: 'paid',
-          status: 'completed'
+          status: 'pending'  // Set to pending since it needs to be processed
         })
         .eq('id', labScriptId)
         .select()
