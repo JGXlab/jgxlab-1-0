@@ -1,6 +1,10 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, Download } from "lucide-react";
+import { CheckCircle, Download, FileText } from "lucide-react";
+import { useState } from "react";
+import { Invoice } from "./Invoice";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 interface PaymentSuccessDialogProps {
   isOpen: boolean;
@@ -15,6 +19,53 @@ export const PaymentSuccessDialog = ({
   paymentId,
   invoiceUrl,
 }: PaymentSuccessDialogProps) => {
+  const [showInvoice, setShowInvoice] = useState(false);
+
+  const { data: labScript } = useQuery({
+    queryKey: ['labScript', paymentId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('lab_scripts')
+        .select('*')
+        .eq('payment_id', paymentId)
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!paymentId,
+  });
+
+  if (showInvoice && labScript) {
+    return (
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className="sm:max-w-3xl">
+          <DialogHeader>
+            <DialogTitle className="text-center text-xl">Invoice</DialogTitle>
+          </DialogHeader>
+          <Invoice labScript={labScript} />
+          <div className="flex justify-end space-x-2 mt-4">
+            <Button
+              variant="outline"
+              onClick={() => setShowInvoice(false)}
+            >
+              Back
+            </Button>
+            {invoiceUrl && (
+              <Button
+                variant="outline"
+                onClick={() => window.open(invoiceUrl, '_blank')}
+              >
+                <Download className="mr-2 h-4 w-4" />
+                Download PDF
+              </Button>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
@@ -31,16 +82,24 @@ export const PaymentSuccessDialog = ({
               {paymentId}
             </p>
           </div>
-          {invoiceUrl && (
+          <div className="flex flex-col gap-2">
             <Button
               variant="outline"
-              className="w-full"
-              onClick={() => window.open(invoiceUrl, '_blank')}
+              onClick={() => setShowInvoice(true)}
             >
-              <Download className="mr-2 h-4 w-4" />
-              Download Invoice
+              <FileText className="mr-2 h-4 w-4" />
+              View Invoice
             </Button>
-          )}
+            {invoiceUrl && (
+              <Button
+                variant="outline"
+                onClick={() => window.open(invoiceUrl, '_blank')}
+              >
+                <Download className="mr-2 h-4 w-4" />
+                Download PDF
+              </Button>
+            )}
+          </div>
         </div>
       </DialogContent>
     </Dialog>
