@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Download, Loader2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { Tables } from "@/integrations/supabase/types";
+import { format } from "date-fns";
 
 interface PaymentSectionProps {
   labScript: Tables<"lab_scripts">;
@@ -60,7 +61,10 @@ export const PaymentSection = ({ labScript }: PaymentSectionProps) => {
         />
         <PreviewField 
           label="Payment Date" 
-          value={labScript.payment_date ? new Date(labScript.payment_date).toLocaleDateString() : 'N/A'} 
+          value={labScript.payment_date 
+            ? format(new Date(labScript.payment_date), 'MMM d, yyyy h:mm a')
+            : 'N/A'
+          } 
         />
       </div>
       {paymentInfo?.invoice_url && (
