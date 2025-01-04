@@ -76,11 +76,15 @@ export const PaymentSection = ({
 
   const createCheckoutSession = useMutation({
     mutationFn: async (formData: z.infer<typeof formSchema>) => {
+      // Get the current user's ID
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('No user found');
+
       console.log('Creating checkout session with:', { formData, lineItems });
 
       const { data, error } = await supabase.functions.invoke('create-checkout-session', {
         body: {
-          formData,
+          formData: { ...formData, userId: user.id },
           lineItems,
           applianceType,
         },
