@@ -54,7 +54,7 @@ export const calculateTotalPrice = async (basePrice: number, options: {
   
   if (baseProduct?.stripe_price_id) {
     const price = await fetchStripePrice(baseProduct.stripe_price_id);
-    totalPrice = price;
+    totalPrice = price * (archType === 'dual' ? 2 : 1);
     lineItems.push({
       price: baseProduct.stripe_price_id,
       quantity: archType === 'dual' ? 2 : 1
@@ -73,7 +73,7 @@ export const calculateTotalPrice = async (basePrice: number, options: {
       console.error('Error fetching nightguard price:', nightguardError);
     } else if (nightguardPrice?.stripe_price_id) {
       const price = await fetchStripePrice(nightguardPrice.stripe_price_id);
-      totalPrice += price;
+      totalPrice += price; // Add nightguard price only once
       lineItems.push({
         price: nightguardPrice.stripe_price_id,
         quantity: 1
@@ -93,17 +93,12 @@ export const calculateTotalPrice = async (basePrice: number, options: {
       console.error('Error fetching express design price:', expressError);
     } else if (expressPrice?.stripe_price_id) {
       const price = await fetchStripePrice(expressPrice.stripe_price_id);
-      totalPrice += price;
+      totalPrice += price; // Add express design price only once
       lineItems.push({
         price: expressPrice.stripe_price_id,
         quantity: 1
       });
     }
-  }
-
-  // Apply quantity for dual arch
-  if (archType === 'dual') {
-    totalPrice *= 2;
   }
 
   console.log('Price calculation complete:', {
