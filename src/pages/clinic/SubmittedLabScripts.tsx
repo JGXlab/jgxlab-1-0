@@ -1,5 +1,5 @@
 import { ClinicLayout } from "@/components/clinic/ClinicLayout";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { LabScriptsHeader } from "@/components/lab-scripts/LabScriptsHeader";
 import { PreviewLabScriptModal } from "@/components/surgical-form/PreviewLabScriptModal";
@@ -14,8 +14,9 @@ export default function SubmittedLabScripts() {
   const { toast } = useToast();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
-  const { data: labScripts = [], isLoading, refetch } = useQuery({
+  const { data: labScripts = [], isLoading } = useQuery({
     queryKey: ['labScripts'],
     queryFn: async () => {
       console.log('Fetching lab scripts...');
@@ -40,54 +41,59 @@ export default function SubmittedLabScripts() {
 
       console.log('Fetched lab scripts:', data);
       return data || [];
-    },
-    refetchInterval: 5000 // Refetch every 5 seconds to get payment updates
+    }
   });
 
-  // Handle payment status on component mount
-  useEffect(() => {
-    const paymentStatus = searchParams.get('payment_status');
-    const labScriptId = searchParams.get('lab_script_id');
-
-    if (paymentStatus === 'success') {
-      toast({
-        title: "Payment Successful",
-        description: "Your lab script has been submitted successfully.",
-      });
-      
-      // If we have a lab script ID, show its preview
-      if (labScriptId) {
-        const fetchLabScript = async () => {
-          const { data: labScript } = await supabase
-            .from('lab_scripts')
-            .select('*')
-            .eq('id', labScriptId)
-            .single();
-
-          if (labScript) {
-            setSelectedScript(labScript);
-            setIsPreviewOpen(true);
-          }
-        };
-        
-        fetchLabScript();
+  const updatePaymentStatus = useMutation({
+    mutationFn: async ({ labScriptId, sessionId }: { labScriptId: string, sessionId: string }) => {
+      const response = await fetch(`/api/get-payment-info?sessionId=${sessionId}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch payment information');
       }
+      const paymentInfo = await response.json();
+      
+      console.log('Payment info received:', paymentInfo);
 
-      // Refetch to get the latest payment status
-      refetch();
-    } else if (paymentStatus === 'failed') {
+      const { error } = await supabase
+        .from('lab_scripts')
+        .update({
+          payment_status: paymentInfo.payment_status,
+          payment_id: paymentInfo.payment_intent_id
+        })
+        .eq('id', labScriptId);
+
+      if (error) throw error;
+      return paymentInfo;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['labScripts'] });
       toast({
-        title: "Payment Failed",
-        description: "There was an issue processing your payment. Please try again.",
+        title: "Payment Status Updated",
+        description: "The payment status has been updated successfully.",
+      });
+    },
+    onError: (error) => {
+      console.error('Error updating payment status:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update payment status. Please try again.",
         variant: "destructive",
       });
     }
+  });
 
-    // Clear the URL parameters
-    if (paymentStatus) {
+  useEffect(() => {
+    const sessionId = searchParams.get('session_id');
+    const labScriptId = searchParams.get('lab_script_id');
+
+    if (sessionId && labScriptId) {
+      console.log('Processing successful payment:', { sessionId, labScriptId });
+      updatePaymentStatus.mutate({ sessionId, labScriptId });
+      
+      // Clear URL parameters
       navigate('/clinic/submittedlabscripts', { replace: true });
     }
-  }, [searchParams, toast, navigate, refetch]);
+  }, [searchParams, navigate, updatePaymentStatus]);
 
   const handlePreview = (script: any, e: React.MouseEvent) => {
     e.stopPropagation();

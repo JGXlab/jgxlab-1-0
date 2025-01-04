@@ -8,7 +8,6 @@ const corsHeaders = {
 }
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, {
       headers: corsHeaders
@@ -19,13 +18,11 @@ serve(async (req) => {
     const { formData, lineItems, applianceType } = await req.json()
     console.log('Received request:', { formData, lineItems, applianceType })
 
-    // Initialize Stripe
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
       apiVersion: '2023-10-16',
       httpClient: Stripe.createFetchHttpClient(),
     })
 
-    // Initialize Supabase client
     const supabaseUrl = Deno.env.get('SUPABASE_URL')
     const supabaseServiceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
     
@@ -35,7 +32,7 @@ serve(async (req) => {
 
     const supabaseAdmin = createClient(supabaseUrl, supabaseServiceRoleKey)
 
-    // Create lab script first
+    // Create lab script with pending payment status
     const { data: labScript, error: labScriptError } = await supabaseAdmin
       .from('lab_scripts')
       .insert([{
@@ -64,21 +61,23 @@ serve(async (req) => {
 
     console.log('Created lab script:', labScript)
 
-    // Create Stripe checkout session
+    // Create Stripe checkout session with payment_intent_data
     const session = await stripe.checkout.sessions.create({
       line_items: lineItems,
       mode: 'payment',
-      success_url: `${req.headers.get('origin')}/clinic/submittedlabscripts?payment_status=success&lab_script_id=${labScript.id}`,
+      success_url: `${req.headers.get('origin')}/clinic/submittedlabscripts?session_id={CHECKOUT_SESSION_ID}&lab_script_id=${labScript.id}`,
       cancel_url: `${req.headers.get('origin')}/clinic/submittedlabscripts?payment_status=failed`,
-      metadata: {
-        lab_script_id: labScript.id
+      payment_intent_data: {
+        metadata: {
+          lab_script_id: labScript.id
+        }
       }
     })
 
     console.log('Created checkout session:', session)
 
     return new Response(
-      JSON.stringify({ url: session.url }),
+      JSON.stringify({ url: session.url, sessionId: session.id }),
       { 
         headers: { 
           ...corsHeaders,

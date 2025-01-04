@@ -1,5 +1,4 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import Stripe from 'https://esm.sh/stripe@12.0.0'
 
 const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
@@ -9,36 +8,33 @@ const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
 serve(async (req) => {
   try {
     const { searchParams } = new URL(req.url);
-    const labScriptId = searchParams.get('labScriptId');
+    const sessionId = searchParams.get('sessionId');
 
-    if (!labScriptId) {
+    if (!sessionId) {
       return new Response(
-        JSON.stringify({ error: 'Lab script ID is required' }),
+        JSON.stringify({ error: 'Session ID is required' }),
         { status: 400, headers: { 'Content-Type': 'application/json' } }
       );
     }
 
-    // Get the payment intent from the checkout session
-    const sessions = await stripe.checkout.sessions.list({
-      limit: 1,
-      expand: ['data.payment_intent', 'data.invoice'],
-      metadata: { lab_script_id: labScriptId },
+    console.log('Fetching session:', sessionId);
+    const session = await stripe.checkout.sessions.retrieve(sessionId, {
+      expand: ['payment_intent']
     });
 
-    const session = sessions.data[0];
-    if (!session) {
-      return new Response(
-        JSON.stringify({ error: 'Payment session not found' }),
-        { status: 404, headers: { 'Content-Type': 'application/json' } }
-      );
-    }
+    console.log('Session retrieved:', {
+      payment_intent: session.payment_intent,
+      status: session.status
+    });
+
+    const paymentIntent = session.payment_intent as Stripe.PaymentIntent;
 
     return new Response(
       JSON.stringify({
-        payment_intent: session.payment_intent?.id,
+        payment_intent_id: paymentIntent.id,
+        payment_status: paymentIntent.status === 'succeeded' ? 'paid' : 'pending',
         amount_total: session.amount_total,
-        created: session.created,
-        invoice_url: session.invoice?.invoice_pdf,
+        created: session.created
       }),
       { 
         headers: { 
