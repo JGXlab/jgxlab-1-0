@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { LabScriptsHeader } from "@/components/lab-scripts/LabScriptsHeader";
 import { PreviewLabScriptModal } from "@/components/surgical-form/PreviewLabScriptModal";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { LabScriptsTable } from "@/components/lab-scripts/LabScriptsTable";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
@@ -16,15 +16,60 @@ import { PatientInformationSection } from "@/components/surgical-form/PatientInf
 import { ApplianceDetailsSection } from "@/components/surgical-form/ApplianceDetailsSection";
 import { AdditionalInformationSection } from "@/components/surgical-form/AdditionalInformationSection";
 import { PaymentSection } from "@/components/surgical-form/PaymentSection";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { z } from "zod";
+import { useSearchParams, useNavigate } from "react-router-dom";
 
 export default function SubmittedLabScripts() {
   const [selectedScript, setSelectedScript] = useState<any>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [isNewLabScriptOpen, setIsNewLabScriptOpen] = useState(false);
   const { toast } = useToast();
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+
+  // Handle payment status on component mount
+  useEffect(() => {
+    const paymentStatus = searchParams.get('payment_status');
+    const labScriptId = searchParams.get('lab_script_id');
+
+    if (paymentStatus === 'success') {
+      toast({
+        title: "Payment Successful",
+        description: "Your lab script has been submitted successfully.",
+      });
+      
+      // If we have a lab script ID, show its preview
+      if (labScriptId) {
+        const fetchLabScript = async () => {
+          const { data: labScript } = await supabase
+            .from('lab_scripts')
+            .select('*')
+            .eq('id', labScriptId)
+            .single();
+
+          if (labScript) {
+            setSelectedScript(labScript);
+            setIsPreviewOpen(true);
+          }
+        };
+        
+        fetchLabScript();
+      }
+    } else if (paymentStatus === 'failed') {
+      toast({
+        title: "Payment Failed",
+        description: "There was an issue processing your payment. Please try again.",
+        variant: "destructive",
+      });
+    }
+
+    // Clear the URL parameters
+    if (paymentStatus) {
+      navigate('/clinic/submittedlabscripts', { replace: true });
+    }
+  }, [searchParams, toast, navigate]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
