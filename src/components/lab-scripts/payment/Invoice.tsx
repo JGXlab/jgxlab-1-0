@@ -64,6 +64,9 @@ export const Invoice = ({ labScript, onDownload }: InvoiceProps) => {
             <p>Invoice number: {labScript.payment_id}</p>
             <p>Date of issue: {format(new Date(), 'MMMM d, yyyy')}</p>
             <p>Date due: {format(new Date(), 'MMMM d, yyyy')}</p>
+            <p className="mt-2 text-gray-600">
+              Patient: {patient ? `${patient.first_name} ${patient.last_name}` : 'N/A'}
+            </p>
           </div>
         </div>
         <div className="text-right">
