@@ -1,201 +1,142 @@
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import Stripe from 'https://esm.sh/stripe@14.21.0';
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.4'
+import Stripe from 'https://esm.sh/stripe@13.6.0?target=deno'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, stripe-signature',
-};
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
 
 serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response(null, {
+      headers: corsHeaders
+    })
+  }
+
   try {
-    console.log('Webhook received:', req.method);
-    console.log('Headers:', Object.fromEntries(req.headers.entries()));
-    console.log('Authorization:', req.headers.get('Authorization'));
-    console.log('stripe-signature:', req.headers.get('stripe-signature'));
-    
-    if (req.method === 'OPTIONS') {
-      console.log('Handling CORS preflight request');
-      return new Response(null, { 
-        headers: {
-          ...corsHeaders,
-          'Access-Control-Allow-Methods': 'POST, OPTIONS',
-          'Access-Control-Max-Age': '86400',
-        } 
-      });
+    const stripeSignature = req.headers.get('stripe-signature')
+    if (!stripeSignature) {
+      throw new Error('No Stripe signature found')
     }
 
-    // Initialize Stripe with the secret key
-    const stripeSecretKey = Deno.env.get('STRIPE_SECRET_KEY');
-    if (!stripeSecretKey) {
-      console.error('Missing STRIPE_SECRET_KEY');
-      throw new Error('Missing STRIPE_SECRET_KEY');
+    const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET')
+    if (!webhookSecret) {
+      throw new Error('Webhook secret not configured')
     }
 
-    const stripe = new Stripe(stripeSecretKey, {
+    // Initialize Stripe
+    const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
       apiVersion: '2023-10-16',
       httpClient: Stripe.createFetchHttpClient(),
-    });
+    })
 
-    const signature = req.headers.get('stripe-signature');
-    const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET');
+    // Get the raw body
+    const body = await req.text()
+    console.log('Received webhook body:', body)
 
-    if (!signature || !webhookSecret) {
-      console.error('Missing required headers:', {
-        hasSignature: !!signature,
-        hasWebhookSecret: !!webhookSecret,
-      });
-      return new Response(
-        JSON.stringify({ error: 'Missing stripe signature or webhook secret' }), 
-        { 
-          status: 400,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        }
-      );
-    }
+    // Verify the webhook signature
+    const event = stripe.webhooks.constructEvent(
+      body,
+      stripeSignature,
+      webhookSecret
+    )
 
-    const body = await req.text();
-    console.log('Webhook body received, length:', body.length);
-    
-    let event;
-    try {
-      event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
-      console.log('Event constructed successfully:', event.type);
-    } catch (err) {
-      console.error('Webhook signature verification failed:', err.message);
-      return new Response(
-        JSON.stringify({ error: err.message }), 
-        { 
-          status: 400,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        }
-      );
-    }
+    console.log('Webhook event type:', event.type)
 
-    // Initialize Supabase client with service role key
-    const supabaseUrl = Deno.env.get('SUPABASE_URL');
-    const supabaseServiceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
-
-    if (!supabaseUrl || !supabaseServiceRoleKey) {
-      console.error('Missing Supabase configuration');
-      throw new Error('Missing Supabase configuration');
-    }
-
+    // Initialize Supabase Admin client
     const supabaseAdmin = createClient(
-      supabaseUrl,
-      supabaseServiceRoleKey,
-      { 
-        auth: { persistSession: false },
-        global: { 
-          headers: { 
-            Authorization: `Bearer ${supabaseServiceRoleKey}` 
-          } 
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false
         }
       }
-    );
+    )
 
     if (event.type === 'checkout.session.completed') {
-      const session = event.data.object;
-      console.log('Processing successful checkout session:', session.id);
-      
-      try {
-        if (!session.metadata?.formData) {
-          throw new Error('No form data found in session metadata');
-        }
+      const session = event.data.object
+      const labScriptId = session.metadata?.lab_script_id
 
-        const formData = JSON.parse(session.metadata.formData);
-        console.log('Parsed form data:', formData);
-
-        // Update existing lab script instead of creating a new one
-        const { data: labScript, error: updateError } = await supabaseAdmin
-          .from('lab_scripts')
-          .update({
-            payment_status: 'paid',
-            status: 'pending'
-          })
-          .eq('id', formData.labScriptId)
-          .select()
-          .single();
-
-        if (updateError) {
-          console.error('Error updating lab script:', updateError);
-          throw updateError;
-        }
-
-        console.log('Successfully updated lab script:', labScript);
-        
-        return new Response(
-          JSON.stringify({ received: true, labScript }), 
-          { 
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-            status: 200,
-          }
-        );
-      } catch (error) {
-        console.error('Error processing webhook:', error);
-        return new Response(
-          JSON.stringify({ error: error.message }), 
-          { 
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-            status: 500,
-          }
-        );
+      if (!labScriptId) {
+        throw new Error('No lab script ID found in session metadata')
       }
-    } else if (event.type === 'checkout.session.expired' || event.type === 'checkout.session.async_payment_failed') {
-      console.log('Payment failed or expired:', event.type);
-      const session = event.data.object;
-      
-      try {
-        if (session.metadata?.formData) {
-          const formData = JSON.parse(session.metadata.formData);
-          const { error: updateError } = await supabaseAdmin
-            .from('lab_scripts')
-            .update({ payment_status: 'failed' })
-            .eq('id', formData.labScriptId);
 
-          if (updateError) {
-            console.error('Error updating lab script payment status:', updateError);
-            throw updateError;
-          }
-          
-          console.log('Successfully updated lab script payment status to failed');
-        }
+      console.log('Processing successful payment for lab script:', labScriptId)
 
-        return new Response(
-          JSON.stringify({ received: true }), 
-          { 
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-            status: 200,
-          }
-        );
-      } catch (error) {
-        console.error('Error handling failed payment:', error);
-        return new Response(
-          JSON.stringify({ error: error.message }), 
-          { 
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-            status: 500,
-          }
-        );
+      // Update lab script payment status
+      const { error: updateError } = await supabaseAdmin
+        .from('lab_scripts')
+        .update({ payment_status: 'paid' })
+        .eq('id', labScriptId)
+
+      if (updateError) {
+        console.error('Error updating lab script:', updateError)
+        throw updateError
       }
+
+      // Fetch lab script details for invoice
+      const { data: labScript, error: fetchError } = await supabaseAdmin
+        .from('lab_scripts')
+        .select(`
+          *,
+          patients (
+            first_name,
+            last_name,
+            clinics (
+              name,
+              email,
+              address,
+              phone
+            )
+          )
+        `)
+        .eq('id', labScriptId)
+        .single()
+
+      if (fetchError || !labScript) {
+        console.error('Error fetching lab script details:', fetchError)
+        throw fetchError || new Error('Lab script not found')
+      }
+
+      // Create invoice
+      const invoice = await stripe.invoices.create({
+        customer: session.customer,
+        auto_advance: true, // Auto-finalize the draft
+        collection_method: 'charge_automatically',
+        metadata: {
+          lab_script_id: labScriptId
+        }
+      })
+
+      // Add invoice items
+      await stripe.invoiceItems.create({
+        customer: session.customer,
+        invoice: invoice.id,
+        amount: session.amount_total,
+        currency: session.currency,
+        description: `Lab Script - ${labScript.appliance_type} (${labScript.arch})`,
+      })
+
+      // Finalize and pay invoice
+      await stripe.invoices.pay(invoice.id)
+
+      console.log('Invoice created and paid:', invoice.id)
     }
 
-    console.log('Unhandled event type:', event.type);
-    return new Response(
-      JSON.stringify({ received: true }), 
-      { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200,
-      }
-    );
+    return new Response(JSON.stringify({ received: true }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    })
   } catch (error) {
-    console.error('Webhook handler failed:', error);
+    console.error('Error processing webhook:', error)
     return new Response(
-      JSON.stringify({ error: error.message }), 
+      JSON.stringify({ error: error.message }),
       { 
+        status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 500,
       }
-    );
+    )
   }
-});
+})
