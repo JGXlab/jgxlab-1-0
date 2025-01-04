@@ -11,7 +11,8 @@ serve(async (req) => {
   try {
     console.log('Webhook received:', req.method);
     console.log('Headers:', Object.fromEntries(req.headers.entries()));
-    console.log('Authorization header:', req.headers.get('authorization'));
+    console.log('Authorization:', req.headers.get('Authorization'));
+    console.log('stripe-signature:', req.headers.get('stripe-signature'));
     
     if (req.method === 'OPTIONS') {
       console.log('Handling CORS preflight request');
@@ -25,7 +26,13 @@ serve(async (req) => {
     }
 
     // Initialize Stripe with the secret key
-    const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
+    const stripeSecretKey = Deno.env.get('STRIPE_SECRET_KEY');
+    if (!stripeSecretKey) {
+      console.error('Missing STRIPE_SECRET_KEY');
+      throw new Error('Missing STRIPE_SECRET_KEY');
+    }
+
+    const stripe = new Stripe(stripeSecretKey, {
       apiVersion: '2023-10-16',
       httpClient: Stripe.createFetchHttpClient(),
     });
@@ -66,14 +73,22 @@ serve(async (req) => {
     }
 
     // Initialize Supabase client with service role key
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const supabaseServiceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+
+    if (!supabaseUrl || !supabaseServiceRoleKey) {
+      console.error('Missing Supabase configuration');
+      throw new Error('Missing Supabase configuration');
+    }
+
     const supabaseAdmin = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+      supabaseUrl,
+      supabaseServiceRoleKey,
       { 
         auth: { persistSession: false },
         global: { 
           headers: { 
-            Authorization: `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}` 
+            Authorization: `Bearer ${supabaseServiceRoleKey}` 
           } 
         }
       }
