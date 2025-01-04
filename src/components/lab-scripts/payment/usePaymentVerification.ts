@@ -12,12 +12,12 @@ export const usePaymentVerification = () => {
     invoiceUrl?: string;
   } | null>(null);
 
-  const verifyPayment = async (sessionId: string, labScriptId: string) => {
-    console.log('Verifying payment for session:', sessionId, 'and lab script:', labScriptId);
+  const verifyPayment = async (sessionId: string) => {
+    console.log('Verifying payment for session:', sessionId);
     
     try {
       const { data, error } = await supabase.functions.invoke('get-session-payment', {
-        body: { sessionId, labScriptId }
+        body: { sessionId }
       });
 
       console.log('Payment verification response:', data);
@@ -28,21 +28,6 @@ export const usePaymentVerification = () => {
       }
 
       if (data.status === 'paid') {
-        const { error: updateError } = await supabase
-          .from('lab_scripts')
-          .update({
-            payment_status: 'paid',
-            payment_id: data.paymentId,
-            amount_paid: data.amount_total / 100, // Convert cents to dollars
-            payment_date: new Date().toISOString()
-          })
-          .eq('id', labScriptId);
-
-        if (updateError) {
-          console.error('Error updating lab script:', updateError);
-          throw new Error('Failed to update payment status');
-        }
-
         // Set payment details and show success dialog
         setPaymentDetails({
           paymentId: data.paymentId,
@@ -50,19 +35,17 @@ export const usePaymentVerification = () => {
         });
         setShowSuccessDialog(true);
 
-        // Show only one toast notification
         toast({
           title: "Payment Successful",
           description: "Your lab script has been submitted successfully.",
         });
 
-        return; // Exit early after successful payment
+        return;
       }
 
       throw new Error('Payment not confirmed');
     } catch (error) {
       console.error('Payment verification error:', error);
-      // Show only one error toast
       toast({
         title: "Payment Verification Error",
         description: "There was an issue verifying your payment. Please contact support.",
