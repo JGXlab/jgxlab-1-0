@@ -2,6 +2,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { PatientSection } from "./PatientSection";
 import { ApplianceSection } from "./ApplianceSection";
 import { InstructionsSection } from "./InstructionsSection";
+import { PaymentSection } from "./PaymentSection";
 import { Tables } from "@/integrations/supabase/types";
 
 interface PreviewContentProps {
@@ -30,6 +31,9 @@ export const PreviewContent = ({ labScript, patient }: PreviewContentProps) => {
         />
         <InstructionsSection 
           instructions={labScript.specific_instructions}
+        />
+        <PaymentSection 
+          labScript={labScript}
         />
       </div>
     </ScrollArea>
