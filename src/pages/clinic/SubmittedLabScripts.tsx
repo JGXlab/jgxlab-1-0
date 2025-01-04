@@ -56,10 +56,11 @@ export default function SubmittedLabScripts() {
     const checkPayment = async () => {
       const sessionId = searchParams.get('session_id');
       const paymentStatus = searchParams.get('payment_status');
+      const labScriptId = searchParams.get('lab_script_id');
 
-      if (paymentStatus === 'success' && sessionId) {
+      if (paymentStatus === 'success' && sessionId && labScriptId) {
         console.log('Initiating payment verification for session:', sessionId);
-        await verifyPayment(sessionId);
+        await verifyPayment(sessionId, labScriptId);
       }
     };
 
@@ -92,9 +93,8 @@ export default function SubmittedLabScripts() {
       console.log('Fetched lab scripts:', data);
       return data || [];
     },
-    staleTime: 0,
-    refetchOnMount: true,
-    refetchOnWindowFocus: true
+    staleTime: 0, // Disable caching to ensure fresh data
+    refetchOnMount: true, // Always refetch when component mounts
   });
 
   const handlePreview = (script: any, e: React.MouseEvent) => {
