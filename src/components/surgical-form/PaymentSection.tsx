@@ -54,43 +54,12 @@ export const PaymentSection = ({
 
   useEffect(() => {
     const updatePrices = async () => {
-      const isDual = archType === 'dual';
-      const quantity = isDual ? 2 : 1;
-      const hasNightguard = needsNightguard === 'yes';
-      const hasExpressDesign = expressDesign === 'yes';
-
-      // Calculate base price with quantity
-      const baseTotal = basePrice * quantity;
-
-      // Add-ons are not multiplied by quantity
-      const addonsTotal = (hasNightguard ? 50 : 0) + (hasExpressDesign ? 50 : 0);
-
-      // Total is base price (with quantity) plus add-ons (without quantity)
-      const total = baseTotal + addonsTotal;
-
-      setTotalAmount(total);
-
-      // Update line items for Stripe
-      const items = [];
-      if (basePrice > 0) {
-        items.push({
-          price: `price_${applianceType}`,
-          quantity: quantity
-        });
-      }
-      if (hasNightguard) {
-        items.push({
-          price: 'price_nightguard',
-          quantity: 1
-        });
-      }
-      if (hasExpressDesign) {
-        items.push({
-          price: 'price_express',
-          quantity: 1
-        });
-      }
-      setLineItems(items);
+      const result = await calculateTotalPrice(
+        basePrice,
+        { archType, needsNightguard, expressDesign, applianceType }
+      );
+      setTotalAmount(result.total);
+      setLineItems(result.lineItems);
     };
 
     updatePrices();
