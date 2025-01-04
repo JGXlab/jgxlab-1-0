@@ -2,6 +2,7 @@ import { ClinicLayout } from "@/components/clinic/ClinicLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { ArrowUpRight } from "lucide-react";
 
@@ -36,7 +37,7 @@ export default function ClinicDashboard() {
   return (
     <ClinicLayout>
       <div className="flex flex-col w-[1200px] mx-auto h-screen py-8">
-        <div className="bg-[#F6F6F7] rounded-xl p-8 h-full overflow-y-auto">
+        <ScrollArea className="h-full rounded-xl bg-[#F6F6F7] p-8">
           {/* Top Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
             {/* Client Overview Chart */}
@@ -184,7 +185,7 @@ export default function ClinicDashboard() {
               </div>
             </CardContent>
           </Card>
-        </div>
+        </ScrollArea>
       </div>
     </ClinicLayout>
   );
