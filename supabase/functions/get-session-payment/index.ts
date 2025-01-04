@@ -30,7 +30,9 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({ 
         status: session.payment_status,
-        paymentId: session.payment_intent?.id || null
+        paymentId: session.payment_intent?.id || null,
+        amount: session.amount_total,
+        invoiceUrl: session.invoice ? session.invoice_url : null
       }),
       { 
         headers: { 
