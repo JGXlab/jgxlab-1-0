@@ -93,6 +93,8 @@ export default function SubmittedLabScripts() {
       console.log('Fetched lab scripts:', data);
       return data || [];
     },
+    staleTime: 0, // Disable caching to ensure fresh data
+    refetchOnMount: true, // Always refetch when component mounts
   });
 
   const handlePreview = (script: any, e: React.MouseEvent) => {

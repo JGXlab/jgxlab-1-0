@@ -29,7 +29,7 @@ export const usePaymentVerification = () => {
 
       console.log('Payment verification response:', data);
 
-      if (data?.status === 'complete') {
+      if (data?.status === 'paid') {  // Changed from 'complete' to 'paid' to match Stripe's status
         console.log('Payment verified successfully:', data);
         setPaymentDetails({
           paymentId: data.paymentId,
