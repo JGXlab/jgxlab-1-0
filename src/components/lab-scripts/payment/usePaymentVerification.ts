@@ -10,21 +10,17 @@ export const usePaymentVerification = () => {
     console.log('Verifying payment for session:', sessionId, 'and lab script:', labScriptId);
     
     try {
-      const response = await fetch('/functions/v1/get-session-payment', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${process.env.VITE_SUPABASE_ANON_KEY}`
-        },
-        body: JSON.stringify({ sessionId, labScriptId })
+      // Get the session details from Supabase edge function
+      const { data, error } = await supabase.functions.invoke('get-session-payment', {
+        body: { sessionId, labScriptId }
       });
 
-      if (!response.ok) {
+      console.log('Payment verification response:', data);
+
+      if (error) {
+        console.error('Error from edge function:', error);
         throw new Error('Failed to verify payment');
       }
-
-      const data = await response.json();
-      console.log('Payment verification response:', data);
 
       if (data.status === 'paid') {
         // Update lab script payment status
