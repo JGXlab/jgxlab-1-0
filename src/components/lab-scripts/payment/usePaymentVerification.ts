@@ -1,16 +1,21 @@
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useState } from "react";
 
 export const usePaymentVerification = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+  const [paymentDetails, setPaymentDetails] = useState<{
+    paymentId: string;
+    invoiceUrl?: string;
+  } | null>(null);
 
   const verifyPayment = async (sessionId: string, labScriptId: string) => {
     console.log('Verifying payment for session:', sessionId, 'and lab script:', labScriptId);
     
     try {
-      // Get the session details from Supabase edge function
       const { data, error } = await supabase.functions.invoke('get-session-payment', {
         body: { sessionId, labScriptId }
       });
@@ -23,7 +28,6 @@ export const usePaymentVerification = () => {
       }
 
       if (data.status === 'paid') {
-        // Update lab script payment status
         const { error: updateError } = await supabase
           .from('lab_scripts')
           .update({
@@ -36,6 +40,13 @@ export const usePaymentVerification = () => {
           console.error('Error updating lab script:', updateError);
           throw new Error('Failed to update payment status');
         }
+
+        // Set payment details and show success dialog
+        setPaymentDetails({
+          paymentId: data.paymentId,
+          invoiceUrl: data.invoiceUrl
+        });
+        setShowSuccessDialog(true);
 
         toast({
           title: "Payment Successful",
@@ -51,11 +62,19 @@ export const usePaymentVerification = () => {
         description: "There was an issue verifying your payment. Please contact support.",
         variant: "destructive",
       });
+      navigate('/clinic/submittedlabscripts', { replace: true });
     }
+  };
 
-    // Clear URL parameters regardless of outcome
+  const closeSuccessDialog = () => {
+    setShowSuccessDialog(false);
     navigate('/clinic/submittedlabscripts', { replace: true });
   };
 
-  return { verifyPayment };
+  return { 
+    verifyPayment,
+    showSuccessDialog,
+    paymentDetails,
+    closeSuccessDialog
+  };
 };

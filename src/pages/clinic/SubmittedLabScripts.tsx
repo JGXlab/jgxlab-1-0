@@ -18,14 +18,20 @@ import { AdditionalInformationSection } from "@/components/surgical-form/Additio
 import { PaymentSection } from "@/components/surgical-form/PaymentSection";
 import { useSearchParams } from "react-router-dom";
 import { usePaymentVerification } from "@/components/lab-scripts/payment/usePaymentVerification";
-import { z } from "zod"; // Added missing import
+import { PaymentSuccessDialog } from "@/components/lab-scripts/payment/PaymentSuccessDialog";
+import { z } from "zod";
 
 export default function SubmittedLabScripts() {
   const [selectedScript, setSelectedScript] = useState<any>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [isNewLabScriptOpen, setIsNewLabScriptOpen] = useState(false);
   const [searchParams] = useSearchParams();
-  const { verifyPayment } = usePaymentVerification();
+  const { 
+    verifyPayment, 
+    showSuccessDialog, 
+    paymentDetails, 
+    closeSuccessDialog 
+  } = usePaymentVerification();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -149,7 +155,7 @@ export default function SubmittedLabScripts() {
                   archType={form.watch('arch')}
                   needsNightguard={form.watch('needsNightguard')}
                   expressDesign={form.watch('expressDesign')}
-                  onSubmit={onSubmit}
+                  onSubmit={form.handleSubmit}
                   isSubmitting={false}
                   form={form}
                 />
@@ -157,6 +163,15 @@ export default function SubmittedLabScripts() {
             </Form>
           </DialogContent>
         </Dialog>
+
+        {paymentDetails && (
+          <PaymentSuccessDialog
+            isOpen={showSuccessDialog}
+            onClose={closeSuccessDialog}
+            paymentId={paymentDetails.paymentId}
+            invoiceUrl={paymentDetails.invoiceUrl}
+          />
+        )}
       </div>
     </ClinicLayout>
   );
