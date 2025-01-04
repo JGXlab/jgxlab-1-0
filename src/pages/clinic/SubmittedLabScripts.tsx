@@ -51,6 +51,22 @@ export default function SubmittedLabScripts() {
     },
   });
 
+  // Handle payment status check
+  useEffect(() => {
+    const checkPayment = async () => {
+      const sessionId = searchParams.get('session_id');
+      const paymentStatus = searchParams.get('payment_status');
+      const labScriptId = searchParams.get('lab_script_id');
+
+      if (paymentStatus === 'success' && sessionId && labScriptId) {
+        console.log('Initiating payment verification for session:', sessionId);
+        await verifyPayment(sessionId, labScriptId);
+      }
+    };
+
+    checkPayment();
+  }, [searchParams, verifyPayment]);
+
   const { data: labScripts = [], isLoading } = useQuery({
     queryKey: ['labScripts'],
     queryFn: async () => {
@@ -79,29 +95,16 @@ export default function SubmittedLabScripts() {
     },
   });
 
-  useEffect(() => {
-    const checkPayment = async () => {
-      const sessionId = searchParams.get('session_id');
-      const paymentStatus = searchParams.get('payment_status');
-      const labScriptId = searchParams.get('lab_script_id');
-
-      if (sessionId && labScriptId && paymentStatus === 'success') {
-        console.log('Initiating payment verification for session:', sessionId);
-        await verifyPayment(sessionId, labScriptId);
-      }
-    };
-
-    checkPayment();
-  }, [searchParams, verifyPayment]);
-
   const handlePreview = (script: any, e: React.MouseEvent) => {
     e.stopPropagation();
     setSelectedScript(script);
     setIsPreviewOpen(true);
   };
 
+  // Type-safe onSubmit handler
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     console.log('Form values:', values);
+    // Handle form submission logic here
   };
 
   return (
