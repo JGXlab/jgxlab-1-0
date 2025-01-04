@@ -14,9 +14,16 @@ export const usePaymentVerification = () => {
     invoiceUrl?: string;
   } | null>(null);
   const verificationInProgress = useRef(false);
+  const verifiedSessions = useRef(new Set<string>());
 
   const verifyPayment = async (sessionId: string) => {
-    // Prevent multiple verifications of the same session
+    // Check if this session has already been verified
+    if (verifiedSessions.current.has(sessionId)) {
+      console.log('Session already verified, skipping...', sessionId);
+      return;
+    }
+
+    // Prevent multiple verifications running simultaneously
     if (verificationInProgress.current) {
       console.log('Payment verification already in progress, skipping...');
       return;
@@ -39,6 +46,9 @@ export const usePaymentVerification = () => {
 
       if (data.status === 'paid') {
         console.log('Payment confirmed as paid');
+        
+        // Add session to verified set
+        verifiedSessions.current.add(sessionId);
         
         // Set payment details and show success dialog
         setPaymentDetails({
