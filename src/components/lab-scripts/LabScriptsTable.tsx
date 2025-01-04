@@ -61,6 +61,8 @@ interface LabScriptsTableProps {
 
 export function LabScriptsTable({ labScripts, isLoading, onPreview, onStatusUpdate }: LabScriptsTableProps) {
   const navigate = useNavigate();
+  
+  console.log('Lab scripts data:', labScripts); // Add logging to debug payment status
 
   return (
     <Table>
@@ -121,79 +123,83 @@ export function LabScriptsTable({ labScripts, isLoading, onPreview, onStatusUpda
             </TableCell>
           </TableRow>
         ) : (
-          labScripts.map((script: any) => (
-            <TableRow 
-              key={script.id} 
-              className="cursor-pointer hover:bg-gray-50/50 transition-colors"
-              onClick={() => navigate(`/clinic/lab-scripts/${script.id}`)}
-            >
-              <TableCell>
-                <div className="flex items-center space-x-3">
-                  <div className="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center">
-                    <User className="h-4 w-4 text-gray-600" />
+          labScripts.map((script: any) => {
+            console.log('Individual script payment status:', script.payment_status); // Debug individual script status
+            
+            return (
+              <TableRow 
+                key={script.id} 
+                className="cursor-pointer hover:bg-gray-50/50 transition-colors"
+                onClick={() => navigate(`/clinic/lab-scripts/${script.id}`)}
+              >
+                <TableCell>
+                  <div className="flex items-center space-x-3">
+                    <div className="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center">
+                      <User className="h-4 w-4 text-gray-600" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900">
+                        {script.patients?.first_name} {script.patients?.last_name}
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        ID: {script.patient_id.slice(0, 8)}
+                      </p>
+                    </div>
                   </div>
-                  <div>
+                </TableCell>
+                <TableCell>
+                  <div className="space-y-1">
                     <p className="font-medium text-gray-900">
-                      {script.patients?.first_name} {script.patients?.last_name}
+                      {getApplianceTypeDisplay(script.appliance_type)}
                     </p>
                     <p className="text-sm text-gray-600">
-                      ID: {script.patient_id.slice(0, 8)}
+                      {script.arch.charAt(0).toUpperCase() + script.arch.slice(1)} Arch
                     </p>
                   </div>
-                </div>
-              </TableCell>
-              <TableCell>
-                <div className="space-y-1">
-                  <p className="font-medium text-gray-900">
-                    {getApplianceTypeDisplay(script.appliance_type)}
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    {script.arch.charAt(0).toUpperCase() + script.arch.slice(1)} Arch
-                  </p>
-                </div>
-              </TableCell>
-              <TableCell>
-                <div className="flex items-center space-x-2 text-gray-700">
-                  <Calendar className="h-4 w-4" />
-                  <span>{script.due_date}</span>
-                </div>
-              </TableCell>
-              <TableCell>
-                <Badge 
-                  variant="secondary"
-                  className={`flex items-center gap-1 w-fit border ${getStatusColor(script.status)}`}
-                >
-                  {getStatusIcon(script.status)}
-                  <span className="capitalize">{script.status}</span>
-                </Badge>
-              </TableCell>
-              <TableCell>
-                <Badge 
-                  variant="secondary"
-                  className={`flex items-center gap-1 w-fit border ${getPaymentStatusColor(script.payment_status)}`}
-                >
-                  <CreditCard className="h-4 w-4" />
-                  <span className="capitalize">{script.payment_status}</span>
-                </Badge>
-              </TableCell>
-              <TableCell>
-                <div className="text-sm text-gray-600">
-                  {format(new Date(script.created_at), 'MMM d, yyyy')}
-                </div>
-              </TableCell>
-              <TableCell>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="w-full flex items-center justify-center gap-2"
-                  onClick={(e) => onPreview(script, e)}
-                >
-                  <Eye className="h-4 w-4" />
-                  <span>Preview</span>
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center space-x-2 text-gray-700">
+                    <Calendar className="h-4 w-4" />
+                    <span>{script.due_date}</span>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <Badge 
+                    variant="secondary"
+                    className={`flex items-center gap-1 w-fit border ${getStatusColor(script.status)}`}
+                  >
+                    {getStatusIcon(script.status)}
+                    <span className="capitalize">{script.status}</span>
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  <Badge 
+                    variant="secondary"
+                    className={`flex items-center gap-1 w-fit border ${getPaymentStatusColor(script.payment_status)}`}
+                  >
+                    <CreditCard className="h-4 w-4" />
+                    <span className="capitalize">{script.payment_status}</span>
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  <div className="text-sm text-gray-600">
+                    {format(new Date(script.created_at), 'MMM d, yyyy')}
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="w-full flex items-center justify-center gap-2"
+                    onClick={(e) => onPreview(script, e)}
+                  >
+                    <Eye className="h-4 w-4" />
+                    <span>Preview</span>
+                  </Button>
+                </TableCell>
+              </TableRow>
+            );
+          })
         )}
       </TableBody>
     </Table>
