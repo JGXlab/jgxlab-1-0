@@ -8,58 +8,59 @@ const corsHeaders = {
 }
 
 serve(async (req) => {
-  // Add initial request logging
+  // Initial request logging
   console.log('Webhook received:', {
     method: req.method,
+    url: req.url,
     headers: Object.fromEntries(req.headers.entries()),
   });
 
   if (req.method === 'OPTIONS') {
+    console.log('Handling CORS preflight request');
     return new Response(null, {
       headers: corsHeaders
-    })
+    });
   }
 
   try {
-    const stripeSignature = req.headers.get('stripe-signature')
+    // Log the raw request body for debugging
+    const rawBody = await req.text();
+    console.log('Raw webhook body:', rawBody);
+
+    const stripeSignature = req.headers.get('stripe-signature');
     if (!stripeSignature) {
       console.error('No Stripe signature found in request headers');
-      throw new Error('No Stripe signature found')
+      throw new Error('No Stripe signature found');
     }
 
-    const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET')
+    const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET');
     if (!webhookSecret) {
       console.error('Webhook secret not configured in environment');
-      throw new Error('Webhook secret not configured')
+      throw new Error('Webhook secret not configured');
     }
 
-    // Initialize Stripe
+    console.log('Initializing Stripe with secret key');
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
       apiVersion: '2023-10-16',
       httpClient: Stripe.createFetchHttpClient(),
-    })
-
-    // Get the raw body and log it
-    const body = await req.text()
-    console.log('Received webhook body:', body)
+    });
 
     // Verify the webhook signature
     let event;
     try {
       event = stripe.webhooks.constructEvent(
-        body,
+        rawBody,
         stripeSignature,
         webhookSecret
-      )
-      console.log('Webhook signature verified successfully');
+      );
+      console.log('Webhook signature verified successfully. Event type:', event.type);
     } catch (err) {
       console.error('Error verifying webhook signature:', err);
       throw new Error(`Webhook signature verification failed: ${err.message}`);
     }
 
-    console.log('Processing webhook event type:', event.type)
-
-    // Initialize Supabase Admin client
+    // Initialize Supabase client
+    console.log('Initializing Supabase client');
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
@@ -69,20 +70,28 @@ serve(async (req) => {
           persistSession: false
         }
       }
-    )
+    );
 
     if (event.type === 'checkout.session.completed') {
-      const session = event.data.object
-      const labScriptId = session.metadata?.lab_script_id
+      console.log('Processing checkout.session.completed event');
+      const session = event.data.object;
+      const labScriptId = session.metadata?.lab_script_id;
+
+      console.log('Session data:', {
+        id: session.id,
+        customer: session.customer,
+        labScriptId: labScriptId,
+        paymentStatus: session.payment_status,
+        amount: session.amount_total
+      });
 
       if (!labScriptId) {
         console.error('No lab script ID found in session metadata:', session);
-        throw new Error('No lab script ID found in session metadata')
+        throw new Error('No lab script ID found in session metadata');
       }
 
-      console.log('Processing successful payment for lab script:', labScriptId)
-
-      // Update lab script payment status to 'paid'
+      // Update lab script payment status
+      console.log('Updating lab script payment status for ID:', labScriptId);
       const { data: updateData, error: updateError } = await supabaseAdmin
         .from('lab_scripts')
         .update({ 
@@ -91,14 +100,14 @@ serve(async (req) => {
         })
         .eq('id', labScriptId)
         .select()
-        .single()
+        .single();
 
       if (updateError) {
-        console.error('Error updating lab script:', updateError)
-        throw updateError
+        console.error('Error updating lab script:', updateError);
+        throw updateError;
       }
 
-      console.log('Successfully updated lab script:', updateData)
+      console.log('Successfully updated lab script:', updateData);
 
       // Fetch lab script details for invoice
       const { data: labScript, error: fetchError } = await supabaseAdmin
@@ -117,17 +126,18 @@ serve(async (req) => {
           )
         `)
         .eq('id', labScriptId)
-        .single()
+        .single();
 
       if (fetchError || !labScript) {
-        console.error('Error fetching lab script details:', fetchError)
-        throw fetchError || new Error('Lab script not found')
+        console.error('Error fetching lab script details:', fetchError);
+        throw fetchError || new Error('Lab script not found');
       }
 
-      console.log('Fetched lab script details:', labScript)
+      console.log('Fetched lab script details:', labScript);
 
       try {
-        // Create invoice
+        // Create and process invoice
+        console.log('Creating invoice for customer:', session.customer);
         const invoice = await stripe.invoices.create({
           customer: session.customer,
           auto_advance: true,
@@ -135,9 +145,9 @@ serve(async (req) => {
           metadata: {
             lab_script_id: labScriptId
           }
-        })
+        });
 
-        console.log('Created invoice:', invoice.id)
+        console.log('Created invoice:', invoice.id);
 
         // Add invoice items
         const invoiceItem = await stripe.invoiceItems.create({
@@ -146,31 +156,31 @@ serve(async (req) => {
           amount: session.amount_total,
           currency: session.currency,
           description: `Lab Script - ${labScript.appliance_type} (${labScript.arch})`,
-        })
+        });
 
-        console.log('Created invoice item:', invoiceItem.id)
+        console.log('Created invoice item:', invoiceItem.id);
 
         // Finalize and pay invoice
-        const finalizedInvoice = await stripe.invoices.pay(invoice.id)
-        console.log('Finalized and paid invoice:', finalizedInvoice.id)
+        const finalizedInvoice = await stripe.invoices.pay(invoice.id);
+        console.log('Finalized and paid invoice:', finalizedInvoice.id);
       } catch (invoiceError) {
-        console.error('Error handling invoice creation:', invoiceError)
+        console.error('Error handling invoice creation:', invoiceError);
         // Don't throw here - we still want to acknowledge the webhook
-        // even if invoice creation fails
       }
     }
 
     return new Response(JSON.stringify({ received: true }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    })
+      status: 200
+    });
   } catch (error) {
-    console.error('Error processing webhook:', error)
+    console.error('Error processing webhook:', error);
     return new Response(
       JSON.stringify({ error: error.message }),
       { 
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       }
-    )
+    );
   }
-})
+});
