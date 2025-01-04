@@ -11,14 +11,23 @@ serve(async (req) => {
   try {
     console.log('Webhook received:', req.method);
     console.log('Headers:', Object.fromEntries(req.headers.entries()));
+    console.log('Authorization header:', req.headers.get('authorization'));
     
     if (req.method === 'OPTIONS') {
       console.log('Handling CORS preflight request');
-      return new Response(null, { headers: corsHeaders });
+      return new Response(null, { 
+        headers: {
+          ...corsHeaders,
+          'Access-Control-Allow-Methods': 'POST, OPTIONS',
+          'Access-Control-Max-Age': '86400',
+        } 
+      });
     }
 
+    // Initialize Stripe with the secret key
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
       apiVersion: '2023-10-16',
+      httpClient: Stripe.createFetchHttpClient(),
     });
 
     const signature = req.headers.get('stripe-signature');
@@ -56,11 +65,18 @@ serve(async (req) => {
       );
     }
 
-    // Initialize Supabase client
+    // Initialize Supabase client with service role key
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
-      { auth: { persistSession: false } }
+      { 
+        auth: { persistSession: false },
+        global: { 
+          headers: { 
+            Authorization: `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}` 
+          } 
+        }
+      }
     );
 
     if (event.type === 'checkout.session.completed') {
