@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Bell, Search, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -78,12 +78,14 @@ export function ClinicLayout({ children }: { children: React.ReactNode }) {
               className="flex items-center space-x-2 hover:bg-blue-50"
               onClick={() => navigate('/clinic/myaccount')}
             >
-              <Avatar className="h-8 w-8">
-                <AvatarImage src="/placeholder.svg" />
-                <AvatarFallback>
-                  <User className="h-4 w-4" />
-                </AvatarFallback>
-              </Avatar>
+              <div className="flex items-center space-x-2">
+                <Avatar className="h-8 w-8">
+                  <AvatarImage src="/placeholder.svg" alt="Profile" />
+                  <AvatarFallback>
+                    <User className="h-4 w-4" />
+                  </AvatarFallback>
+                </Avatar>
+              </div>
             </Button>
           </div>
         </div>
