@@ -52,82 +52,107 @@ export const Invoice = ({ labScript }: InvoiceProps) => {
   };
 
   return (
-    <div className="bg-white p-8 rounded-lg shadow-lg max-w-3xl mx-auto">
+    <div className="bg-white w-[210mm] min-h-[297mm] mx-auto p-12 shadow-lg">
       {/* Header */}
-      <div className="flex justify-between items-start mb-8">
+      <div className="flex justify-between items-start mb-12">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">INVOICE</h1>
-          <p className="text-gray-500 mt-1">Payment ID: {labScript.payment_id}</p>
+          <h1 className="text-3xl font-bold text-gray-900">Invoice</h1>
+          <div className="mt-4 space-y-1 text-sm">
+            <p>Invoice number: {labScript.payment_id}</p>
+            <p>Date of issue: {format(new Date(), 'MMMM d, yyyy')}</p>
+            <p>Date due: {format(new Date(), 'MMMM d, yyyy')}</p>
+          </div>
         </div>
         <div className="text-right">
-          <p className="text-gray-500">Date</p>
-          <p className="font-medium">
-            {labScript.payment_date 
-              ? format(new Date(labScript.payment_date), 'MMM dd, yyyy')
-              : format(new Date(), 'MMM dd, yyyy')}
-          </p>
+          <h2 className="text-2xl text-gray-600">JGX Dental Lab LLC</h2>
         </div>
       </div>
 
-      {/* Clinic and Patient Info */}
-      <div className="grid grid-cols-2 gap-8 mb-8">
+      {/* Addresses */}
+      <div className="grid grid-cols-2 gap-12 mb-12">
         <div>
-          <h2 className="text-lg font-semibold text-gray-900 mb-2">From</h2>
-          <div className="text-gray-600">
-            <p className="font-medium">{clinic?.name}</p>
+          <h3 className="font-semibold text-gray-700 mb-3">From</h3>
+          <div className="space-y-1">
+            <p>JGX Dental Lab LLC</p>
+            <p>25 Highview Trail</p>
+            <p>Pittsford, New York 14534</p>
+            <p>United States</p>
+            <p>+1 718-812-2869</p>
+          </div>
+        </div>
+        <div>
+          <h3 className="font-semibold text-gray-700 mb-3">Bill to</h3>
+          <div className="space-y-1">
+            <p>{clinic?.name}</p>
             <p>{clinic?.address}</p>
-            <p>Phone: {clinic?.phone}</p>
-            <p>Email: {clinic?.email}</p>
-          </div>
-        </div>
-        <div>
-          <h2 className="text-lg font-semibold text-gray-900 mb-2">Patient</h2>
-          <div className="text-gray-600">
-            <p className="font-medium">
-              {patient?.first_name} {patient?.last_name}
-            </p>
-            <p>ID: {patient?.id}</p>
+            <p>{clinic?.phone}</p>
+            <p>{clinic?.email}</p>
           </div>
         </div>
       </div>
 
-      {/* Services */}
-      <div className="mb-8">
+      {/* Services Table */}
+      <div className="mb-12">
         <table className="w-full">
           <thead>
             <tr className="border-b border-gray-200">
-              <th className="text-left py-3 px-4">Service</th>
-              <th className="text-right py-3 px-4">Amount</th>
+              <th className="text-left py-3 text-gray-600">Description</th>
+              <th className="text-center py-3 text-gray-600">Qty</th>
+              <th className="text-right py-3 text-gray-600">Unit price</th>
+              <th className="text-right py-3 text-gray-600">Amount</th>
             </tr>
           </thead>
           <tbody>
             <tr className="border-b border-gray-100">
-              <td className="py-4 px-4">
+              <td className="py-4">
                 {formatApplianceType(labScript.appliance_type)}
                 {labScript.arch === 'dual' && " (Dual Arch)"}
               </td>
-              <td className="text-right py-4 px-4">
+              <td className="py-4 text-center">1</td>
+              <td className="py-4 text-right">
+                ${labScript.amount_paid?.toFixed(2)}
+              </td>
+              <td className="py-4 text-right">
                 ${labScript.amount_paid?.toFixed(2)}
               </td>
             </tr>
             {labScript.needs_nightguard === 'yes' && (
               <tr className="border-b border-gray-100">
-                <td className="py-4 px-4">Additional Nightguard</td>
-                <td className="text-right py-4 px-4">Included</td>
+                <td className="py-4">Additional Nightguard</td>
+                <td className="py-4 text-center">1</td>
+                <td className="py-4 text-right">Included</td>
+                <td className="py-4 text-right">$0.00</td>
               </tr>
             )}
             {labScript.express_design === 'yes' && (
               <tr className="border-b border-gray-100">
-                <td className="py-4 px-4">Express Design Service</td>
-                <td className="text-right py-4 px-4">Additional Fee Included</td>
+                <td className="py-4">Express Design Service</td>
+                <td className="py-4 text-center">1</td>
+                <td className="py-4 text-right">Included</td>
+                <td className="py-4 text-right">$0.00</td>
               </tr>
             )}
           </tbody>
           <tfoot>
             <tr className="border-t border-gray-200">
-              <td className="py-4 px-4 font-semibold">Total</td>
-              <td className="text-right py-4 px-4 font-semibold">
+              <td colSpan={2}></td>
+              <td className="py-4 text-right font-semibold">Subtotal</td>
+              <td className="py-4 text-right font-semibold">
                 ${labScript.amount_paid?.toFixed(2)}
+              </td>
+            </tr>
+            <tr>
+              <td colSpan={2}></td>
+              <td className="py-4 text-right font-semibold">Total</td>
+              <td className="py-4 text-right font-semibold">
+                ${labScript.amount_paid?.toFixed(2)}
+              </td>
+            </tr>
+            <tr>
+              <td colSpan={2}></td>
+              <td className="py-4 text-right font-semibold">Amount due</td>
+              <td className="py-4 text-right font-semibold">
+                ${labScript.amount_paid?.toFixed(2)} USD
               </td>
             </tr>
           </tfoot>
@@ -135,11 +160,9 @@ export const Invoice = ({ labScript }: InvoiceProps) => {
       </div>
 
       {/* Footer */}
-      <div className="text-center text-gray-500 text-sm">
-        <p>Thank you for your business!</p>
-        <p className="mt-1">
-          If you have any questions, please contact us at {clinic?.email}
-        </p>
+      <div className="text-xs text-gray-500 border-t pt-8">
+        <p>{labScript.payment_id} · ${labScript.amount_paid?.toFixed(2)} USD due {format(new Date(), 'MMMM d, yyyy')}</p>
+        <p className="mt-1">Page 1 of 1</p>
       </div>
     </div>
   );
