@@ -13,7 +13,7 @@ serve(async (req) => {
 
   try {
     const { formData, lineItems, applianceType } = await req.json();
-    console.log('Received request data:', { formData, lineItems, applianceType });
+    console.log('Creating checkout session with:', { formData, lineItems, applianceType });
 
     // Validate required data
     if (!formData) {
@@ -30,7 +30,7 @@ serve(async (req) => {
       apiVersion: '2023-10-16',
     });
 
-    console.log('Creating checkout session with line items:', lineItems);
+    console.log('Creating Stripe session with line items:', lineItems);
     
     // Create Stripe checkout session with form data in metadata
     const session = await stripe.checkout.sessions.create({

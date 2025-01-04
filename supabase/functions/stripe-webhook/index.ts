@@ -2,8 +2,21 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from 'https://esm.sh/stripe@14.21.0';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
 
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
 serve(async (req) => {
   try {
+    console.log('Webhook received:', req.method);
+    
+    // Handle CORS preflight
+    if (req.method === 'OPTIONS') {
+      console.log('Handling CORS preflight request');
+      return new Response(null, { headers: corsHeaders });
+    }
+
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
       apiVersion: '2023-10-16',
     });
@@ -12,13 +25,15 @@ serve(async (req) => {
     const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET');
 
     if (!signature || !webhookSecret) {
+      console.error('Missing required headers:', { signature: !!signature, webhookSecret: !!webhookSecret });
       throw new Error('Missing stripe signature or webhook secret');
     }
 
     // Get the raw body as text
     const body = await req.text();
+    console.log('Received webhook body:', body);
+    
     let event;
-
     try {
       event = stripe.webhooks.constructEvent(
         body,
@@ -26,14 +41,18 @@ serve(async (req) => {
         webhookSecret
       );
     } catch (err) {
-      console.error(`Webhook signature verification failed:`, err.message);
-      return new Response(JSON.stringify({ error: err.message }), { status: 400 });
+      console.error(`⚠️ Webhook signature verification failed:`, err.message);
+      return new Response(JSON.stringify({ error: err.message }), { 
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
     }
 
-    console.log('Received Stripe webhook event:', event.type);
+    console.log('Webhook event type:', event.type);
 
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object;
+      console.log('Processing completed checkout session:', session.id);
       
       // Initialize Supabase client
       const supabaseAdmin = createClient(
@@ -42,44 +61,67 @@ serve(async (req) => {
         { auth: { persistSession: false } }
       );
 
-      // Parse the form data from session metadata
-      const formData = JSON.parse(session.metadata.formData);
+      try {
+        // Parse the form data from session metadata
+        const formData = JSON.parse(session.metadata.formData);
+        console.log('Parsed form data:', formData);
 
-      // Create the lab script after successful payment
-      const { error: labScriptError } = await supabaseAdmin
-        .from('lab_scripts')
-        .insert([{
-          patient_id: formData.patientId,
-          appliance_type: formData.applianceType,
-          arch: formData.arch,
-          treatment_type: formData.treatmentType,
-          screw_type: formData.screwType,
-          other_screw_type: formData.otherScrewType,
-          vdo_details: formData.vdoDetails,
-          needs_nightguard: formData.needsNightguard,
-          shade: formData.shade,
-          due_date: formData.dueDate,
-          specific_instructions: formData.specificInstructions,
-          express_design: formData.expressDesign,
-          user_id: formData.userId,
-          payment_status: 'paid',
-          status: 'pending'
-        }]);
+        // Create the lab script after successful payment
+        const { data: labScript, error: labScriptError } = await supabaseAdmin
+          .from('lab_scripts')
+          .insert([{
+            patient_id: formData.patientId,
+            appliance_type: formData.applianceType,
+            arch: formData.arch,
+            treatment_type: formData.treatmentType,
+            screw_type: formData.screwType,
+            other_screw_type: formData.otherScrewType,
+            vdo_details: formData.vdoDetails,
+            needs_nightguard: formData.needsNightguard,
+            shade: formData.shade,
+            due_date: formData.dueDate,
+            specific_instructions: formData.specificInstructions,
+            express_design: formData.expressDesign,
+            user_id: formData.userId,
+            payment_status: 'paid',
+            status: 'pending'
+          }])
+          .select()
+          .single();
 
-      if (labScriptError) {
-        console.error('Error creating lab script:', labScriptError);
-        throw labScriptError;
+        if (labScriptError) {
+          console.error('Error creating lab script:', labScriptError);
+          throw labScriptError;
+        }
+
+        console.log('Successfully created lab script:', labScript);
+      } catch (error) {
+        console.error('Error processing webhook data:', error);
+        return new Response(
+          JSON.stringify({ error: 'Error processing webhook data' }), 
+          { 
+            status: 500,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          }
+        );
       }
-
-      console.log('Successfully created lab script after payment');
     }
 
-    return new Response(JSON.stringify({ received: true }), { status: 200 });
-  } catch (error) {
-    console.error('Error processing webhook:', error);
     return new Response(
-      JSON.stringify({ error: 'Webhook handler failed' }), 
-      { status: 500 }
+      JSON.stringify({ received: true }), 
+      { 
+        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      }
+    );
+  } catch (error) {
+    console.error('Webhook handler failed:', error);
+    return new Response(
+      JSON.stringify({ error: 'Webhook handler failed', details: error.message }), 
+      { 
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      }
     );
   }
 });
