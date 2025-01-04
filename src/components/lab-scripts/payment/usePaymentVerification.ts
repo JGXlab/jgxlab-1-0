@@ -1,66 +1,54 @@
-import { useToast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+
+interface PaymentDetails {
+  paymentId: string;
+  invoiceUrl: string;
+}
 
 export const usePaymentVerification = () => {
-  const { toast } = useToast();
-  const navigate = useNavigate();
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
-  const [paymentDetails, setPaymentDetails] = useState<{
-    paymentId: string;
-    invoiceUrl?: string;
-  } | null>(null);
+  const [paymentDetails, setPaymentDetails] = useState<PaymentDetails | null>(null);
+  const { toast } = useToast();
 
-  const verifyPayment = async (sessionId: string) => {
-    console.log('Verifying payment for session:', sessionId);
-    
+  const verifyPayment = async (sessionId: string, labScriptId?: string) => {
     try {
+      console.log('Verifying payment for session:', sessionId);
+      
       const { data, error } = await supabase.functions.invoke('get-session-payment', {
-        body: { sessionId }
+        body: { sessionId, labScriptId }
       });
 
-      console.log('Payment verification response:', data);
-
       if (error) {
-        console.error('Error from edge function:', error);
-        throw new Error('Failed to verify payment');
+        console.error('Payment verification error:', error);
+        throw error;
       }
 
-      if (data.status === 'paid') {
-        // Set payment details and show success dialog
+      if (data?.status === 'complete') {
+        console.log('Payment verified successfully:', data);
         setPaymentDetails({
           paymentId: data.paymentId,
           invoiceUrl: data.invoiceUrl
         });
         setShowSuccessDialog(true);
-
-        toast({
-          title: "Payment Successful",
-          description: "Your lab script has been submitted successfully.",
-        });
-
-        return;
       }
-
-      throw new Error('Payment not confirmed');
     } catch (error) {
-      console.error('Payment verification error:', error);
+      console.error('Error verifying payment:', error);
       toast({
-        title: "Payment Verification Error",
-        description: "There was an issue verifying your payment. Please contact support.",
+        title: "Error",
+        description: "Failed to verify payment status",
         variant: "destructive",
       });
-      navigate('/clinic/submittedlabscripts', { replace: true });
     }
   };
 
   const closeSuccessDialog = () => {
     setShowSuccessDialog(false);
-    navigate('/clinic/submittedlabscripts', { replace: true });
+    setPaymentDetails(null);
   };
 
-  return { 
+  return {
     verifyPayment,
     showSuccessDialog,
     paymentDetails,

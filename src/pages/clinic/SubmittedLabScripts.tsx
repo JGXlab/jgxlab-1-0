@@ -101,10 +101,8 @@ export default function SubmittedLabScripts() {
     setIsPreviewOpen(true);
   };
 
-  // Type-safe onSubmit handler
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     console.log('Form values:', values);
-    // Handle form submission logic here
   };
 
   return (
