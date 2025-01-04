@@ -52,7 +52,7 @@ export const Invoice = ({ labScript }: InvoiceProps) => {
   };
 
   return (
-    <div className="bg-white w-[210mm] min-h-[297mm] mx-auto p-12 shadow-lg">
+    <div className="bg-white w-[210mm] mx-auto p-12 shadow-lg">
       {/* Header */}
       <div className="flex justify-between items-start mb-12">
         <div>

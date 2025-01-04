@@ -106,7 +106,7 @@ export const TableRowContent = ({ script, onPreview }: TableRowContentProps) => 
       </TableRow>
 
       <Dialog open={showInvoice} onOpenChange={setShowInvoice}>
-        <DialogContent className="max-w-4xl">
+        <DialogContent className="max-w-4xl h-[90vh] overflow-y-auto">
           <Invoice labScript={script} />
         </DialogContent>
       </Dialog>
