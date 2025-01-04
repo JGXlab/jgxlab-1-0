@@ -37,10 +37,7 @@ export default function ClinicDashboard() {
   return (
     <ClinicLayout>
       <div className="flex flex-col w-[1200px] mx-auto h-screen py-8">
-        <div className="bg-white rounded-t-2xl p-6 mb-1">
-          <h1 className="text-2xl font-semibold">Dashboard Overview</h1>
-        </div>
-        <ScrollArea className="h-full rounded-2xl bg-[#d9dfec] p-8">
+        <ScrollArea className="h-full rounded-2xl bg-[#F6F6F7] p-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
             {/* Client Overview Chart */}
             <Card className="w-full">
