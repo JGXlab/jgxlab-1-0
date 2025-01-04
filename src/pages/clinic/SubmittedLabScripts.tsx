@@ -1,5 +1,5 @@
 import { ClinicLayout } from "@/components/clinic/ClinicLayout";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { LabScriptsHeader } from "@/components/lab-scripts/LabScriptsHeader";
 import { PreviewLabScriptModal } from "@/components/surgical-form/PreviewLabScriptModal";
@@ -17,7 +17,6 @@ import { ApplianceDetailsSection } from "@/components/surgical-form/ApplianceDet
 import { AdditionalInformationSection } from "@/components/surgical-form/AdditionalInformationSection";
 import { PaymentSection } from "@/components/surgical-form/PaymentSection";
 import { useToast } from "@/hooks/use-toast";
-import { useMutation } from "@tanstack/react-query";
 import { z } from "zod";
 import { useSearchParams, useNavigate } from "react-router-dom";
 
@@ -29,46 +28,59 @@ export default function SubmittedLabScripts() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
-  // Handle payment status on component mount
+  // Handle payment status check
   useEffect(() => {
-    const paymentStatus = searchParams.get('payment_status');
-    const labScriptId = searchParams.get('lab_script_id');
+    const checkPaymentStatus = async () => {
+      const sessionId = searchParams.get('session_id');
+      const paymentStatus = searchParams.get('payment_status');
+      const labScriptId = searchParams.get('lab_script_id');
 
-    if (paymentStatus === 'success') {
-      toast({
-        title: "Payment Successful",
-        description: "Your lab script has been submitted successfully.",
-      });
-      
-      // If we have a lab script ID, show its preview
-      if (labScriptId) {
-        const fetchLabScript = async () => {
-          const { data: labScript } = await supabase
-            .from('lab_scripts')
-            .select('*')
-            .eq('id', labScriptId)
-            .single();
+      if (paymentStatus === 'success' && sessionId && labScriptId) {
+        try {
+          const response = await fetch('/functions/v1/get-session-payment', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${process.env.VITE_SUPABASE_ANON_KEY}`
+            },
+            body: JSON.stringify({ sessionId, labScriptId })
+          });
 
-          if (labScript) {
-            setSelectedScript(labScript);
-            setIsPreviewOpen(true);
+          if (!response.ok) {
+            throw new Error('Failed to verify payment');
           }
-        };
-        
-        fetchLabScript();
-      }
-    } else if (paymentStatus === 'failed') {
-      toast({
-        title: "Payment Failed",
-        description: "There was an issue processing your payment. Please try again.",
-        variant: "destructive",
-      });
-    }
 
-    // Clear the URL parameters
-    if (paymentStatus) {
-      navigate('/clinic/submittedlabscripts', { replace: true });
-    }
+          const data = await response.json();
+          console.log('Payment verification response:', data);
+
+          if (data.status === 'paid') {
+            toast({
+              title: "Payment Successful",
+              description: "Your lab script has been submitted successfully.",
+            });
+          }
+        } catch (error) {
+          console.error('Error verifying payment:', error);
+          toast({
+            title: "Payment Verification Error",
+            description: "There was an issue verifying your payment. Please contact support.",
+            variant: "destructive",
+          });
+        }
+
+        // Clear URL parameters
+        navigate('/clinic/submittedlabscripts', { replace: true });
+      } else if (paymentStatus === 'failed') {
+        toast({
+          title: "Payment Failed",
+          description: "There was an issue processing your payment. Please try again.",
+          variant: "destructive",
+        });
+        navigate('/clinic/submittedlabscripts', { replace: true });
+      }
+    };
+
+    checkPaymentStatus();
   }, [searchParams, toast, navigate]);
 
   const form = useForm<z.infer<typeof formSchema>>({
