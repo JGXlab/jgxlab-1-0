@@ -161,12 +161,6 @@ export const Invoice = ({ labScript, onDownload }: InvoiceProps) => {
           </tfoot>
         </table>
       </div>
-
-      {/* Footer */}
-      <div className="text-xs text-gray-500 border-t pt-8">
-        <p>{labScript.payment_id} · ${labScript.amount_paid?.toFixed(2)} USD due {format(new Date(), 'MMMM d, yyyy')}</p>
-        <p className="mt-1">Page 1 of 1</p>
-      </div>
     </div>
   );
 };
