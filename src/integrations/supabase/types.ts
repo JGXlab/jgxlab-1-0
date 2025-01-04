@@ -111,6 +111,7 @@ export type Database = {
           needs_nightguard: string | null
           other_screw_type: string | null
           patient_id: string
+          payment_id: string | null
           payment_status: string
           screw_type: string | null
           shade: string | null
@@ -130,6 +131,7 @@ export type Database = {
           needs_nightguard?: string | null
           other_screw_type?: string | null
           patient_id: string
+          payment_id?: string | null
           payment_status?: string
           screw_type?: string | null
           shade?: string | null
@@ -149,6 +151,7 @@ export type Database = {
           needs_nightguard?: string | null
           other_screw_type?: string | null
           patient_id?: string
+          payment_id?: string | null
           payment_status?: string
           screw_type?: string | null
           shade?: string | null
