@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, Users, FileCheck, UserRound, LogOut, ChevronLeft, ChevronRight, DollarSign } from "lucide-react";
+import { LayoutDashboard, Users, FileCheck, UserRound, LogOut, ChevronLeft, ChevronRight, DollarSign, Bell, Search } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -79,10 +79,10 @@ export function ClinicSidebar({ isCollapsed, setIsCollapsed }: ClinicSidebarProp
         )}>
           {!isCollapsed && (
             <div className="flex flex-col animate-fade-in">
-              <h1 className="text-2xl font-bold text-primary">
+              <h1 className="text-2xl font-bold text-[#0052FF]">
                 JGX Digital Lab
               </h1>
-              <span className="text-sm text-muted-foreground">
+              <span className="text-sm text-gray-500">
                 Clinic Portal
               </span>
             </div>
@@ -90,7 +90,7 @@ export function ClinicSidebar({ isCollapsed, setIsCollapsed }: ClinicSidebarProp
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8 transition-transform duration-300 ease-spring hover:bg-accent"
+            className="h-8 w-8 transition-transform duration-300 ease-spring hover:bg-gray-50"
             onClick={() => setIsCollapsed(!isCollapsed)}
           >
             {isCollapsed ? (
@@ -112,8 +112,8 @@ export function ClinicSidebar({ isCollapsed, setIsCollapsed }: ClinicSidebarProp
                   "flex items-center p-3 rounded-lg transition-all duration-200 ease-spring group",
                   isCollapsed ? "justify-center" : "space-x-3",
                   isActive(item.path) 
-                    ? "bg-accent text-primary shadow-sm" 
-                    : "text-secondary hover:bg-accent/50 hover:text-primary"
+                    ? "bg-[#EEF2FF] text-[#0052FF]" 
+                    : "text-gray-600 hover:bg-gray-50 hover:text-[#0052FF]"
                 )}
               >
                 <Icon className={cn(
@@ -133,7 +133,7 @@ export function ClinicSidebar({ isCollapsed, setIsCollapsed }: ClinicSidebarProp
             variant="ghost"
             className={cn(
               "w-full transition-colors duration-200 ease-spring",
-              "text-destructive hover:text-destructive/90 hover:bg-destructive/10",
+              "text-red-600 hover:text-red-700 hover:bg-red-50",
               isCollapsed ? "justify-center p-3" : "justify-start space-x-3 p-3"
             )}
             onClick={handleLogout}

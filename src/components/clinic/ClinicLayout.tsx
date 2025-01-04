@@ -5,7 +5,7 @@ export function ClinicLayout({ children }: { children: React.ReactNode }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   return (
-    <div className="min-h-screen bg-accent/30 flex relative w-full">
+    <div className="min-h-screen bg-[#F8FAFC] flex relative w-full">
       <ClinicSidebar isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
       <main 
         className={`flex-1 p-8 transition-all duration-300 ease-spring animate-fade-in w-full ${

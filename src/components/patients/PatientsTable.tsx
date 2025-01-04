@@ -91,27 +91,27 @@ export function PatientsTable({ clinicId }: PatientsTableProps) {
   };
 
   if (isLoading) {
-    return <div className="text-center py-4">Loading patients...</div>;
+    return <div className="text-center py-8 text-gray-500">Loading patients...</div>;
   }
 
   return (
     <>
-      <div className="border rounded-lg">
+      <div className="rounded-xl bg-white">
         <Table>
           <TableHeader>
-            <TableRow>
-              <TableHead className="text-foreground font-semibold">Name</TableHead>
-              <TableHead className="text-foreground font-semibold">Gender</TableHead>
-              <TableHead className="text-foreground font-semibold">Date of Birth</TableHead>
-              <TableHead className="text-foreground font-semibold">Created At</TableHead>
-              <TableHead className="text-foreground font-semibold text-right">Actions</TableHead>
+            <TableRow className="bg-gray-50/50 hover:bg-gray-50/50">
+              <TableHead className="text-gray-600 font-medium">Name</TableHead>
+              <TableHead className="text-gray-600 font-medium">Gender</TableHead>
+              <TableHead className="text-gray-600 font-medium">Date of Birth</TableHead>
+              <TableHead className="text-gray-600 font-medium">Created At</TableHead>
+              <TableHead className="text-gray-600 font-medium text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {patients && patients.length > 0 ? (
               patients.map((patient) => (
-                <TableRow key={patient.id}>
-                  <TableCell>
+                <TableRow key={patient.id} className="hover:bg-gray-50/50">
+                  <TableCell className="font-medium">
                     {patient.first_name} {patient.last_name}
                   </TableCell>
                   <TableCell className="capitalize">{patient.gender}</TableCell>
@@ -127,6 +127,7 @@ export function PatientsTable({ clinicId }: PatientsTableProps) {
                         variant="outline"
                         size="sm"
                         onClick={() => setEditingPatient(patient)}
+                        className="text-gray-600 hover:text-gray-900"
                       >
                         <Pencil className="h-4 w-4" />
                       </Button>
@@ -134,6 +135,7 @@ export function PatientsTable({ clinicId }: PatientsTableProps) {
                         variant="outline"
                         size="sm"
                         onClick={() => setDeletingPatient(patient)}
+                        className="text-red-600 hover:text-red-700"
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -143,7 +145,7 @@ export function PatientsTable({ clinicId }: PatientsTableProps) {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-4 text-muted-foreground">
+                <TableCell colSpan={5} className="text-center py-8 text-gray-500">
                   No patients found. Add your first patient to get started.
                 </TableCell>
               </TableRow>
@@ -152,7 +154,6 @@ export function PatientsTable({ clinicId }: PatientsTableProps) {
         </Table>
       </div>
 
-      {/* Edit Patient Dialog */}
       <Dialog open={!!editingPatient} onOpenChange={(open) => !open && setEditingPatient(null)}>
         <DialogContent>
           <DialogHeader>
@@ -167,7 +168,6 @@ export function PatientsTable({ clinicId }: PatientsTableProps) {
         </DialogContent>
       </Dialog>
 
-      {/* Delete Confirmation Dialog */}
       <AlertDialog open={!!deletingPatient} onOpenChange={(open) => !open && setDeletingPatient(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -180,7 +180,7 @@ export function PatientsTable({ clinicId }: PatientsTableProps) {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeletePatient} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+            <AlertDialogAction onClick={handleDeletePatient} className="bg-red-600 text-white hover:bg-red-700">
               Delete
             </AlertDialogAction>
           </AlertDialogFooter>
