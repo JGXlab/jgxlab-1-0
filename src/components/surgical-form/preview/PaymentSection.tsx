@@ -2,7 +2,6 @@ import { PreviewField } from "./PreviewField";
 import { Button } from "@/components/ui/button";
 import { Download, Loader2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Tables } from "@/integrations/supabase/types";
 
 interface PaymentSectionProps {
@@ -57,23 +56,25 @@ export const PaymentSection = ({ labScript }: PaymentSectionProps) => {
         />
         <PreviewField 
           label="Payment ID" 
-          value={paymentInfo?.payment_intent} 
+          value={labScript.payment_id || 'N/A'} 
         />
         <PreviewField 
           label="Payment Date" 
-          value={new Date(paymentInfo?.created * 1000).toLocaleDateString()} 
+          value={paymentInfo?.created ? new Date(paymentInfo.created * 1000).toLocaleDateString() : 'N/A'} 
         />
       </div>
-      <div className="pt-4">
-        <Button 
-          variant="outline" 
-          className="w-full"
-          onClick={() => window.open(paymentInfo?.invoice_url, '_blank')}
-        >
-          <Download className="mr-2 h-4 w-4" />
-          Download Invoice
-        </Button>
-      </div>
+      {paymentInfo?.invoice_url && (
+        <div className="pt-4">
+          <Button 
+            variant="outline" 
+            className="w-full"
+            onClick={() => window.open(paymentInfo.invoice_url, '_blank')}
+          >
+            <Download className="mr-2 h-4 w-4" />
+            Download Invoice
+          </Button>
+        </div>
+      )}
     </div>
   );
 };
