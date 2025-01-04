@@ -15,11 +15,6 @@ export const TableRowContent = ({ script, onPreview }: TableRowContentProps) => 
   const StatusIcon = LucideIcons[script.status === 'pending' ? 'Clock' : 
     script.status === 'completed' ? 'CheckCircle2' : 'Info'];
 
-  console.log('Payment details:', {
-    paymentId: script.payment_id,
-    paymentStatus: script.payment_status
-  });
-
   return (
     <TableRow 
       key={script.id} 
@@ -71,19 +66,13 @@ export const TableRowContent = ({ script, onPreview }: TableRowContentProps) => 
           className={`flex items-center gap-1 w-fit border ${getPaymentStatusColor(script.payment_status)}`}
         >
           <CreditCard className="h-4 w-4" />
-          <span className="capitalize">
-            {script.payment_status === 'unpaid' ? 'Unpaid' : 
-             script.payment_status === 'paid' ? 'Paid' : 
-             script.payment_status || 'Pending'}
-          </span>
+          <span className="capitalize">{script.payment_status}</span>
         </Badge>
       </TableCell>
       <TableCell>
         <div className="flex items-center space-x-2 text-gray-700">
           <Hash className="h-4 w-4" />
-          <span className="text-sm">
-            {script.payment_id ? script.payment_id.slice(0, 12) + '...' : 'N/A'}
-          </span>
+          <span className="text-sm">{script.payment_id || 'N/A'}</span>
         </div>
       </TableCell>
       <TableCell>
