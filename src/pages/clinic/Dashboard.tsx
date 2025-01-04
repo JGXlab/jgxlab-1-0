@@ -38,7 +38,7 @@ export default function ClinicDashboard() {
     <ClinicLayout>
       <div className="flex flex-col w-[1200px] mx-auto h-screen py-8">
         <ScrollArea className="h-full rounded-2xl bg-[#F6F6F7]">
-          <div className="w-full bg-white rounded-t-2xl px-8 py-4 flex items-center justify-between">
+          <div className="w-full bg-white rounded-2xl px-8 py-4 flex items-center justify-between">
             {/* Left side - Logo and nav items */}
             <div className="flex items-center space-x-8">
               <div className="flex items-center space-x-2">
