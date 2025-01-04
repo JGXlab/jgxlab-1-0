@@ -50,15 +50,19 @@ export const usePaymentVerification = () => {
         });
         setShowSuccessDialog(true);
 
+        // Show only one toast notification
         toast({
           title: "Payment Successful",
           description: "Your lab script has been submitted successfully.",
         });
-      } else {
-        throw new Error('Payment not confirmed');
+
+        return; // Exit early after successful payment
       }
+
+      throw new Error('Payment not confirmed');
     } catch (error) {
       console.error('Payment verification error:', error);
+      // Show only one error toast
       toast({
         title: "Payment Verification Error",
         description: "There was an issue verifying your payment. Please contact support.",
