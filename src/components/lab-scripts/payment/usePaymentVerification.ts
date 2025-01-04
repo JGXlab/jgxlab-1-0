@@ -1,7 +1,7 @@
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 
 export const usePaymentVerification = () => {
@@ -13,9 +13,17 @@ export const usePaymentVerification = () => {
     paymentId: string;
     invoiceUrl?: string;
   } | null>(null);
+  const verificationInProgress = useRef(false);
 
   const verifyPayment = async (sessionId: string) => {
+    // Prevent multiple verifications of the same session
+    if (verificationInProgress.current) {
+      console.log('Payment verification already in progress, skipping...');
+      return;
+    }
+
     console.log('Starting payment verification for session:', sessionId);
+    verificationInProgress.current = true;
     
     try {
       const { data, error } = await supabase.functions.invoke('get-session-payment', {
@@ -59,6 +67,8 @@ export const usePaymentVerification = () => {
         variant: "destructive",
       });
       navigate('/clinic/submittedlabscripts', { replace: true });
+    } finally {
+      verificationInProgress.current = false;
     }
   };
 
