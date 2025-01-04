@@ -2,8 +2,8 @@ import React from "react";
 
 export function ClinicLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-white">
-      <main className="mx-auto w-[1200px] min-h-screen">
+    <div className="min-h-screen bg-white flex justify-center">
+      <main className="w-[1200px]">
         {children}
       </main>
     </div>
