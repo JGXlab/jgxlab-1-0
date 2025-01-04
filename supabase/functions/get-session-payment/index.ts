@@ -91,6 +91,55 @@ serve(async (req) => {
       }
 
       console.log('Created lab script after payment:', labScript)
+
+      // Get clinic details
+      const { data: clinic, error: clinicError } = await supabaseAdmin
+        .from('clinics')
+        .select('*')
+        .eq('user_id', formData.userId)
+        .single()
+
+      if (clinicError) {
+        console.error('Error fetching clinic:', clinicError)
+        throw clinicError
+      }
+
+      // Get patient details
+      const { data: patient, error: patientError } = await supabaseAdmin
+        .from('patients')
+        .select('*')
+        .eq('id', formData.patientId)
+        .single()
+
+      if (patientError) {
+        console.error('Error fetching patient:', patientError)
+        throw patientError
+      }
+
+      // Create invoice record
+      const { error: invoiceError } = await supabaseAdmin
+        .from('invoices')
+        .insert([{
+          lab_script_id: labScript.id,
+          clinic_name: clinic.name,
+          clinic_email: clinic.email,
+          clinic_phone: clinic.phone,
+          clinic_address: clinic.address,
+          patient_name: `${patient.first_name} ${patient.last_name}`,
+          appliance_type: formData.applianceType,
+          arch: formData.arch,
+          amount_paid: session.amount_total ? session.amount_total / 100 : 0,
+          payment_id: session.payment_intent?.id,
+          needs_nightguard: formData.needsNightguard,
+          express_design: formData.expressDesign
+        }])
+
+      if (invoiceError) {
+        console.error('Error creating invoice:', invoiceError)
+        throw invoiceError
+      }
+
+      console.log('Created invoice for lab script:', labScript.id)
     }
 
     return new Response(

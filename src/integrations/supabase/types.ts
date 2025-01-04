@@ -100,6 +100,65 @@ export type Database = {
           },
         ]
       }
+      invoices: {
+        Row: {
+          amount_paid: number
+          appliance_type: string
+          arch: string
+          clinic_address: string
+          clinic_email: string
+          clinic_name: string
+          clinic_phone: string
+          created_at: string
+          express_design: string | null
+          id: string
+          lab_script_id: string
+          needs_nightguard: string | null
+          patient_name: string
+          payment_id: string
+        }
+        Insert: {
+          amount_paid: number
+          appliance_type: string
+          arch: string
+          clinic_address: string
+          clinic_email: string
+          clinic_name: string
+          clinic_phone: string
+          created_at?: string
+          express_design?: string | null
+          id?: string
+          lab_script_id: string
+          needs_nightguard?: string | null
+          patient_name: string
+          payment_id: string
+        }
+        Update: {
+          amount_paid?: number
+          appliance_type?: string
+          arch?: string
+          clinic_address?: string
+          clinic_email?: string
+          clinic_name?: string
+          clinic_phone?: string
+          created_at?: string
+          express_design?: string | null
+          id?: string
+          lab_script_id?: string
+          needs_nightguard?: string | null
+          patient_name?: string
+          payment_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoices_lab_script_id_fkey"
+            columns: ["lab_script_id"]
+            isOneToOne: false
+            referencedRelation: "lab_scripts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       lab_scripts: {
         Row: {
           amount_paid: number | null
