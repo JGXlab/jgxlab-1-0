@@ -1,6 +1,6 @@
 import { ClinicLayout } from "@/components/clinic/ClinicLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { ArrowUpRight } from "lucide-react";
@@ -49,9 +49,9 @@ export default function ClinicDashboard() {
               </select>
             </CardHeader>
             <CardContent>
-              <div className="h-[300px]">
+              <div className="h-[300px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={data}>
+                  <LineChart data={data} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="name" />
                     <YAxis />
@@ -73,7 +73,7 @@ export default function ClinicDashboard() {
           <div className="space-y-8 w-full">
             <Card className="bg-primary text-white w-full">
               <CardHeader>
-                <div className="flex justify-between items-center">
+                <div className="flex justify-between items-center w-full">
                   <CardTitle className="text-white flex items-center gap-2">
                     Total Employees
                     <ArrowUpRight className="h-4 w-4" />
@@ -85,7 +85,7 @@ export default function ClinicDashboard() {
 
             <Card className="bg-primary text-white w-full">
               <CardHeader>
-                <div className="flex justify-between items-center">
+                <div className="flex justify-between items-center w-full">
                   <CardTitle className="text-white flex items-center gap-2">
                     Client's Feedback
                     <ArrowUpRight className="h-4 w-4" />
@@ -103,8 +103,8 @@ export default function ClinicDashboard() {
             <CardTitle>Employee List</CardTitle>
             <button className="text-primary hover:underline">View All</button>
           </CardHeader>
-          <CardContent>
-            <div className="rounded-lg">
+          <CardContent className="w-full overflow-x-auto">
+            <div className="w-full min-w-[800px]">
               <table className="w-full">
                 <thead>
                   <tr className="text-left text-muted-foreground">
@@ -147,8 +147,8 @@ export default function ClinicDashboard() {
             <CardTitle>Client List</CardTitle>
             <button className="text-primary hover:underline">View All</button>
           </CardHeader>
-          <CardContent>
-            <div className="rounded-lg">
+          <CardContent className="w-full overflow-x-auto">
+            <div className="w-full min-w-[800px]">
               <table className="w-full">
                 <thead>
                   <tr className="text-left text-muted-foreground">
