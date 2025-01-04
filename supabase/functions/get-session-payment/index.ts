@@ -22,7 +22,7 @@ serve(async (req) => {
     })
 
     const session = await stripe.checkout.sessions.retrieve(sessionId, {
-      expand: ['payment_intent']
+      expand: ['payment_intent', 'invoice']
     })
 
     console.log('Retrieved session:', session)
@@ -30,7 +30,9 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({ 
         status: session.payment_status,
-        paymentId: session.payment_intent?.id || null
+        paymentId: session.payment_intent?.id || null,
+        amount_total: session.amount_total || 0,
+        invoiceUrl: session.invoice?.invoice_pdf || null
       }),
       { 
         headers: { 
