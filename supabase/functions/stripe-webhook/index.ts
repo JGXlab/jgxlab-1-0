@@ -8,6 +8,12 @@ const corsHeaders = {
 }
 
 serve(async (req) => {
+  // Add initial request logging
+  console.log('Webhook received:', {
+    method: req.method,
+    headers: Object.fromEntries(req.headers.entries()),
+  });
+
   if (req.method === 'OPTIONS') {
     return new Response(null, {
       headers: corsHeaders
@@ -17,11 +23,13 @@ serve(async (req) => {
   try {
     const stripeSignature = req.headers.get('stripe-signature')
     if (!stripeSignature) {
+      console.error('No Stripe signature found in request headers');
       throw new Error('No Stripe signature found')
     }
 
     const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET')
     if (!webhookSecret) {
+      console.error('Webhook secret not configured in environment');
       throw new Error('Webhook secret not configured')
     }
 
@@ -31,18 +39,25 @@ serve(async (req) => {
       httpClient: Stripe.createFetchHttpClient(),
     })
 
-    // Get the raw body
+    // Get the raw body and log it
     const body = await req.text()
     console.log('Received webhook body:', body)
 
     // Verify the webhook signature
-    const event = stripe.webhooks.constructEvent(
-      body,
-      stripeSignature,
-      webhookSecret
-    )
+    let event;
+    try {
+      event = stripe.webhooks.constructEvent(
+        body,
+        stripeSignature,
+        webhookSecret
+      )
+      console.log('Webhook signature verified successfully');
+    } catch (err) {
+      console.error('Error verifying webhook signature:', err);
+      throw new Error(`Webhook signature verification failed: ${err.message}`);
+    }
 
-    console.log('Webhook event type:', event.type)
+    console.log('Processing webhook event type:', event.type)
 
     // Initialize Supabase Admin client
     const supabaseAdmin = createClient(
@@ -61,26 +76,29 @@ serve(async (req) => {
       const labScriptId = session.metadata?.lab_script_id
 
       if (!labScriptId) {
+        console.error('No lab script ID found in session metadata:', session);
         throw new Error('No lab script ID found in session metadata')
       }
 
       console.log('Processing successful payment for lab script:', labScriptId)
 
       // Update lab script payment status to 'paid'
-      const { error: updateError } = await supabaseAdmin
+      const { data: updateData, error: updateError } = await supabaseAdmin
         .from('lab_scripts')
         .update({ 
           payment_status: 'paid',
-          status: 'completed' // Also update the status to completed since payment is done
+          status: 'completed'
         })
         .eq('id', labScriptId)
+        .select()
+        .single()
 
       if (updateError) {
         console.error('Error updating lab script:', updateError)
         throw updateError
       }
 
-      console.log('Successfully updated lab script payment status to paid')
+      console.log('Successfully updated lab script:', updateData)
 
       // Fetch lab script details for invoice
       const { data: labScript, error: fetchError } = await supabaseAdmin
@@ -106,29 +124,40 @@ serve(async (req) => {
         throw fetchError || new Error('Lab script not found')
       }
 
-      // Create invoice
-      const invoice = await stripe.invoices.create({
-        customer: session.customer,
-        auto_advance: true,
-        collection_method: 'charge_automatically',
-        metadata: {
-          lab_script_id: labScriptId
-        }
-      })
+      console.log('Fetched lab script details:', labScript)
 
-      // Add invoice items
-      await stripe.invoiceItems.create({
-        customer: session.customer,
-        invoice: invoice.id,
-        amount: session.amount_total,
-        currency: session.currency,
-        description: `Lab Script - ${labScript.appliance_type} (${labScript.arch})`,
-      })
+      try {
+        // Create invoice
+        const invoice = await stripe.invoices.create({
+          customer: session.customer,
+          auto_advance: true,
+          collection_method: 'charge_automatically',
+          metadata: {
+            lab_script_id: labScriptId
+          }
+        })
 
-      // Finalize and pay invoice
-      await stripe.invoices.pay(invoice.id)
+        console.log('Created invoice:', invoice.id)
 
-      console.log('Invoice created and paid:', invoice.id)
+        // Add invoice items
+        const invoiceItem = await stripe.invoiceItems.create({
+          customer: session.customer,
+          invoice: invoice.id,
+          amount: session.amount_total,
+          currency: session.currency,
+          description: `Lab Script - ${labScript.appliance_type} (${labScript.arch})`,
+        })
+
+        console.log('Created invoice item:', invoiceItem.id)
+
+        // Finalize and pay invoice
+        const finalizedInvoice = await stripe.invoices.pay(invoice.id)
+        console.log('Finalized and paid invoice:', finalizedInvoice.id)
+      } catch (invoiceError) {
+        console.error('Error handling invoice creation:', invoiceError)
+        // Don't throw here - we still want to acknowledge the webhook
+        // even if invoice creation fails
+      }
     }
 
     return new Response(JSON.stringify({ received: true }), {
