@@ -4,12 +4,13 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, stripe-signature',
 };
 
 serve(async (req) => {
   try {
     console.log('Webhook received:', req.method);
+    console.log('Headers:', Object.fromEntries(req.headers.entries()));
     
     if (req.method === 'OPTIONS') {
       console.log('Handling CORS preflight request');
@@ -23,13 +24,11 @@ serve(async (req) => {
     const signature = req.headers.get('stripe-signature');
     const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET');
 
-    console.log('Webhook verification details:', {
-      hasSignature: !!signature,
-      hasWebhookSecret: !!webhookSecret,
-    });
-
     if (!signature || !webhookSecret) {
-      console.error('Missing required headers');
+      console.error('Missing required headers:', {
+        hasSignature: !!signature,
+        hasWebhookSecret: !!webhookSecret,
+      });
       return new Response(
         JSON.stringify({ error: 'Missing stripe signature or webhook secret' }), 
         { 
@@ -45,6 +44,7 @@ serve(async (req) => {
     let event;
     try {
       event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+      console.log('Event constructed successfully:', event.type);
     } catch (err) {
       console.error('Webhook signature verification failed:', err.message);
       return new Response(
@@ -55,8 +55,6 @@ serve(async (req) => {
         }
       );
     }
-
-    console.log('Processing webhook event:', event.type);
 
     // Initialize Supabase client
     const supabaseAdmin = createClient(
@@ -77,34 +75,23 @@ serve(async (req) => {
         const formData = JSON.parse(session.metadata.formData);
         console.log('Parsed form data:', formData);
 
-        const { data: labScript, error: labScriptError } = await supabaseAdmin
+        // Update existing lab script instead of creating a new one
+        const { data: labScript, error: updateError } = await supabaseAdmin
           .from('lab_scripts')
-          .insert([{
-            patient_id: formData.patientId,
-            appliance_type: formData.applianceType,
-            arch: formData.arch,
-            treatment_type: formData.treatmentType,
-            screw_type: formData.screwType,
-            other_screw_type: formData.otherScrewType,
-            vdo_details: formData.vdoDetails,
-            needs_nightguard: formData.needsNightguard,
-            shade: formData.shade,
-            due_date: formData.dueDate,
-            specific_instructions: formData.specificInstructions,
-            express_design: formData.expressDesign,
-            user_id: formData.userId,
+          .update({
             payment_status: 'paid',
             status: 'pending'
-          }])
+          })
+          .eq('id', formData.labScriptId)
           .select()
           .single();
 
-        if (labScriptError) {
-          console.error('Error creating lab script:', labScriptError);
-          throw labScriptError;
+        if (updateError) {
+          console.error('Error updating lab script:', updateError);
+          throw updateError;
         }
 
-        console.log('Successfully created lab script:', labScript);
+        console.log('Successfully updated lab script:', labScript);
         
         return new Response(
           JSON.stringify({ received: true, labScript }), 
@@ -124,14 +111,12 @@ serve(async (req) => {
         );
       }
     } else if (event.type === 'checkout.session.expired' || event.type === 'checkout.session.async_payment_failed') {
-      // Handle failed payment
       console.log('Payment failed or expired:', event.type);
       const session = event.data.object;
       
       try {
         if (session.metadata?.formData) {
           const formData = JSON.parse(session.metadata.formData);
-          // Update the lab script status to failed if it exists
           const { error: updateError } = await supabaseAdmin
             .from('lab_scripts')
             .update({ payment_status: 'failed' })
@@ -141,6 +126,8 @@ serve(async (req) => {
             console.error('Error updating lab script payment status:', updateError);
             throw updateError;
           }
+          
+          console.log('Successfully updated lab script payment status to failed');
         }
 
         return new Response(
@@ -162,7 +149,6 @@ serve(async (req) => {
       }
     }
 
-    // Handle other event types
     console.log('Unhandled event type:', event.type);
     return new Response(
       JSON.stringify({ received: true }), 
