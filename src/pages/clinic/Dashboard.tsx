@@ -37,11 +37,11 @@ const clientData = [
 export default function ClinicDashboard() {
   return (
     <ClinicLayout>
-      <div className="flex flex-col w-[1200px] mx-auto h-screen py-8">
+      <div className="flex flex-col max-w-[1200px] w-full mx-auto h-screen py-8">
         <ScrollArea className="h-full rounded-2xl bg-[#F6F6F7]">
           <ClinicNavHeader />
-          <div className="p-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
+          <div className="p-4 sm:p-6 lg:p-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 w-full">
               {/* Client Overview Chart */}
               <Card className="w-full">
                 <CardHeader className="flex flex-row items-center justify-between">
@@ -74,7 +74,7 @@ export default function ClinicDashboard() {
               </Card>
 
               {/* Stats Cards */}
-              <div className="space-y-8 w-full">
+              <div className="space-y-4 sm:space-y-6 lg:space-y-8 w-full">
                 <Card className="bg-primary text-white w-full">
                   <CardHeader>
                     <div className="flex justify-between items-center w-full">
@@ -102,7 +102,7 @@ export default function ClinicDashboard() {
             </div>
 
             {/* Employee List */}
-            <Card className="w-full mt-8">
+            <Card className="w-full mt-4 sm:mt-6 lg:mt-8">
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle>Employee List</CardTitle>
                 <button className="text-primary hover:underline">View All</button>
@@ -146,7 +146,7 @@ export default function ClinicDashboard() {
             </Card>
 
             {/* Client List */}
-            <Card className="w-full mt-8">
+            <Card className="w-full mt-4 sm:mt-6 lg:mt-8">
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle>Client List</CardTitle>
                 <button className="text-primary hover:underline">View All</button>
