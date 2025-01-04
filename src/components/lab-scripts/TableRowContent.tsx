@@ -1,7 +1,7 @@
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { User, Eye, CreditCard } from "lucide-react";
+import { User, Eye, CreditCard, Calendar } from "lucide-react";
 import { format } from "date-fns";
 import { getStatusColor, getPaymentStatusColor, getApplianceTypeDisplay } from "./utils/statusStyles";
 import * as LucideIcons from "lucide-react";
