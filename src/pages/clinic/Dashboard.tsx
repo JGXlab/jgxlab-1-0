@@ -35,7 +35,7 @@ const clientData = [
 export default function ClinicDashboard() {
   return (
     <ClinicLayout>
-      <div className="flex flex-col w-full py-8 space-y-8">
+      <div className="flex flex-col w-[1200px] mx-auto py-8 space-y-8">
         {/* Top Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
           {/* Client Overview Chart */}
