@@ -18,6 +18,7 @@ import { AdditionalInformationSection } from "@/components/surgical-form/Additio
 import { PaymentSection } from "@/components/surgical-form/PaymentSection";
 import { useSearchParams } from "react-router-dom";
 import { usePaymentVerification } from "@/components/lab-scripts/payment/usePaymentVerification";
+import { z } from "zod"; // Added missing import
 
 export default function SubmittedLabScripts() {
   const [selectedScript, setSelectedScript] = useState<any>(null);
@@ -94,6 +95,12 @@ export default function SubmittedLabScripts() {
     setIsPreviewOpen(true);
   };
 
+  // Type-safe onSubmit handler
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
+    console.log('Form values:', values);
+    // Handle form submission
+  };
+
   return (
     <ClinicLayout>
       <div className="p-6 space-y-6">
@@ -142,7 +149,7 @@ export default function SubmittedLabScripts() {
                   archType={form.watch('arch')}
                   needsNightguard={form.watch('needsNightguard')}
                   expressDesign={form.watch('expressDesign')}
-                  onSubmit={form.handleSubmit}
+                  onSubmit={onSubmit}
                   isSubmitting={false}
                   form={form}
                 />
