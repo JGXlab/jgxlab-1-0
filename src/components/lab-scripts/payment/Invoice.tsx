@@ -3,12 +3,15 @@ import { Tables } from "@/integrations/supabase/types";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Download } from "lucide-react";
 
 interface InvoiceProps {
   labScript: Tables<"lab_scripts">;
+  onDownload?: () => void;
 }
 
-export const Invoice = ({ labScript }: InvoiceProps) => {
+export const Invoice = ({ labScript, onDownload }: InvoiceProps) => {
   const { data: clinic, isLoading: isLoadingClinic } = useQuery({
     queryKey: ['clinic', labScript.user_id],
     queryFn: async () => {

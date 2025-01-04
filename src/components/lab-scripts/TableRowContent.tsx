@@ -1,13 +1,15 @@
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { User, Eye, CreditCard, Calendar, FileText } from "lucide-react";
+import { User, Eye, CreditCard, Calendar, FileText, Download } from "lucide-react";
 import { format } from "date-fns";
 import { getStatusColor, getPaymentStatusColor, getApplianceTypeDisplay } from "./utils/statusStyles";
 import * as LucideIcons from "lucide-react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { useState } from "react";
 import { Invoice } from "./payment/Invoice";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
 interface TableRowContentProps {
   script: any;
@@ -18,6 +20,27 @@ export const TableRowContent = ({ script, onPreview }: TableRowContentProps) => 
   const [showInvoice, setShowInvoice] = useState(false);
   const StatusIcon = LucideIcons[script.status === 'pending' ? 'Clock' : 
     script.status === 'completed' ? 'CheckCircle2' : 'Info'];
+
+  const handleDownloadInvoice = async () => {
+    const invoiceElement = document.getElementById('invoice-content');
+    if (!invoiceElement) return;
+
+    const canvas = await html2canvas(invoiceElement);
+    const imgData = canvas.toDataURL('image/png');
+    
+    const pdf = new jsPDF({
+      orientation: 'portrait',
+      unit: 'mm',
+      format: 'a4'
+    });
+
+    const imgProps = pdf.getImageProperties(imgData);
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+    
+    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+    pdf.save(`invoice-${script.payment_id}.pdf`);
+  };
 
   return (
     <>
@@ -107,7 +130,21 @@ export const TableRowContent = ({ script, onPreview }: TableRowContentProps) => 
 
       <Dialog open={showInvoice} onOpenChange={setShowInvoice}>
         <DialogContent className="max-w-4xl h-[90vh] overflow-y-auto">
-          <Invoice labScript={script} />
+          <DialogHeader>
+            <DialogTitle>Invoice</DialogTitle>
+          </DialogHeader>
+          <div id="invoice-content">
+            <Invoice labScript={script} />
+          </div>
+          <DialogFooter className="mt-4">
+            <Button
+              onClick={handleDownloadInvoice}
+              className="flex items-center gap-2"
+            >
+              <Download className="h-4 w-4" />
+              Download Invoice
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </>
