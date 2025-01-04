@@ -1,7 +1,7 @@
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { User, Eye, CreditCard, Calendar, Hash, FileText } from "lucide-react";
+import { User, Eye, CreditCard, Calendar, FileText } from "lucide-react";
 import { format } from "date-fns";
 import { getStatusColor, getPaymentStatusColor, getApplianceTypeDisplay } from "./utils/statusStyles";
 import * as LucideIcons from "lucide-react";
@@ -73,12 +73,6 @@ export const TableRowContent = ({ script, onPreview }: TableRowContentProps) => 
             <CreditCard className="h-4 w-4" />
             <span className="capitalize">{script.payment_status}</span>
           </Badge>
-        </TableCell>
-        <TableCell>
-          <div className="flex items-center space-x-2 text-gray-700">
-            <Hash className="h-4 w-4" />
-            <span className="text-sm">{script.payment_id || 'N/A'}</span>
-          </div>
         </TableCell>
         <TableCell>
           <div className="text-sm text-gray-600">

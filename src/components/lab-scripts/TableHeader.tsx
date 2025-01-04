@@ -1,5 +1,5 @@
 import { TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { User, FileText, Calendar, Database, CreditCard, Clock, Hash } from "lucide-react";
+import { User, FileText, Calendar, Database, CreditCard, Clock } from "lucide-react";
 
 export const LabScriptsTableHeader = () => {
   return (
@@ -33,12 +33,6 @@ export const LabScriptsTableHeader = () => {
           <div className="flex items-center space-x-2 text-gray-700">
             <CreditCard className="h-4 w-4" />
             <span>Payment</span>
-          </div>
-        </TableHead>
-        <TableHead>
-          <div className="flex items-center space-x-2 text-gray-700">
-            <Hash className="h-4 w-4" />
-            <span>Payment ID</span>
           </div>
         </TableHead>
         <TableHead>
