@@ -66,16 +66,21 @@ serve(async (req) => {
 
       console.log('Processing successful payment for lab script:', labScriptId)
 
-      // Update lab script payment status
+      // Update lab script payment status to 'paid'
       const { error: updateError } = await supabaseAdmin
         .from('lab_scripts')
-        .update({ payment_status: 'paid' })
+        .update({ 
+          payment_status: 'paid',
+          status: 'completed' // Also update the status to completed since payment is done
+        })
         .eq('id', labScriptId)
 
       if (updateError) {
         console.error('Error updating lab script:', updateError)
         throw updateError
       }
+
+      console.log('Successfully updated lab script payment status to paid')
 
       // Fetch lab script details for invoice
       const { data: labScript, error: fetchError } = await supabaseAdmin
@@ -104,7 +109,7 @@ serve(async (req) => {
       // Create invoice
       const invoice = await stripe.invoices.create({
         customer: session.customer,
-        auto_advance: true, // Auto-finalize the draft
+        auto_advance: true,
         collection_method: 'charge_automatically',
         metadata: {
           lab_script_id: labScriptId
