@@ -11,7 +11,6 @@ const corsHeaders = {
 serve(async (req) => {
   console.log('Webhook request received');
 
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     console.log('Handling CORS preflight request');
     return new Response(null, {
@@ -20,7 +19,6 @@ serve(async (req) => {
     });
   }
 
-  // Ensure we only accept POST requests
   if (req.method !== 'POST') {
     console.error(`Invalid method: ${req.method}`);
     return new Response('Method not allowed', {
@@ -30,11 +28,9 @@ serve(async (req) => {
   }
 
   try {
-    // Get the raw body first for signature verification
     const rawBody = await req.text();
     console.log('Raw body received, length:', rawBody.length);
 
-    // Get the stripe signature from headers
     const stripeSignature = req.headers.get('stripe-signature');
     console.log('Stripe signature:', stripeSignature ? 'Present' : 'Missing');
 
@@ -42,19 +38,16 @@ serve(async (req) => {
       throw new Error('No stripe signature found in request headers');
     }
 
-    // Get the webhook secret
     const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET');
     if (!webhookSecret) {
       throw new Error('Webhook secret not configured in environment');
     }
 
-    // Initialize Stripe
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
       apiVersion: '2023-10-16',
       httpClient: Stripe.createFetchHttpClient(),
     });
 
-    // Verify the webhook signature
     let event;
     try {
       event = stripe.webhooks.constructEvent(
@@ -75,7 +68,6 @@ serve(async (req) => {
       );
     }
 
-    // Initialize Supabase client
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
@@ -87,7 +79,6 @@ serve(async (req) => {
       }
     );
 
-    // Handle the checkout.session.completed event
     if (event.type === 'checkout.session.completed') {
       console.log('Processing checkout.session.completed event');
       const session = event.data.object;
@@ -98,18 +89,27 @@ serve(async (req) => {
         customer: session.customer,
         labScriptId: labScriptId,
         paymentStatus: session.payment_status,
-        amount: session.amount_total
+        paymentIntent: session.payment_intent
       });
 
       if (!labScriptId) {
         throw new Error('No lab script ID found in session metadata');
       }
 
-      // Update lab script payment status
+      // Get payment intent details
+      const paymentIntent = await stripe.paymentIntents.retrieve(session.payment_intent);
+      console.log('Payment Intent details:', {
+        id: paymentIntent.id,
+        status: paymentIntent.status,
+        amount: paymentIntent.amount
+      });
+
+      // Update lab script with payment details
       const { data: updateData, error: updateError } = await supabaseAdmin
         .from('lab_scripts')
         .update({ 
-          payment_status: 'paid',
+          payment_status: session.payment_status,
+          payment_id: paymentIntent.id,
           status: 'pending'
         })
         .eq('id', labScriptId)
@@ -117,13 +117,13 @@ serve(async (req) => {
         .single();
 
       if (updateError) {
+        console.error('Database update failed:', updateError);
         throw new Error(`Database update failed: ${updateError.message}`);
       }
 
       console.log('Successfully updated lab script:', updateData);
     }
 
-    // Return a successful response
     return new Response(
       JSON.stringify({ received: true }),
       { 
