@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface PaymentDetails {
   paymentId: string;
@@ -11,6 +12,7 @@ export const usePaymentVerification = () => {
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [paymentDetails, setPaymentDetails] = useState<PaymentDetails | null>(null);
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const verifyPayment = async (sessionId: string, labScriptId?: string) => {
     try {
@@ -32,6 +34,14 @@ export const usePaymentVerification = () => {
           invoiceUrl: data.invoiceUrl
         });
         setShowSuccessDialog(true);
+        
+        // Invalidate and refetch the lab scripts query to show the new entry
+        await queryClient.invalidateQueries({ queryKey: ['labScripts'] });
+        
+        toast({
+          title: "Success",
+          description: "Lab script has been created successfully",
+        });
       }
     } catch (error) {
       console.error('Error verifying payment:', error);
