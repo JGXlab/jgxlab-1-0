@@ -19,15 +19,29 @@ serve(async (req) => {
     });
   }
 
+  if (req.method !== 'POST') {
+    console.error(`Invalid method: ${req.method}`);
+    return new Response('Method not allowed', {
+      status: 405,
+      headers: corsHeaders
+    });
+  }
+
   try {
     const rawBody = await req.text();
     console.log('Raw body received, length:', rawBody.length);
 
     const stripeSignature = req.headers.get('stripe-signature');
-    console.log('Stripe signature:', stripeSignature);
+    console.log('Stripe signature:', stripeSignature ? 'Present' : 'Missing');
+
+    if (!stripeSignature) {
+      throw new Error('No stripe signature found in request headers');
+    }
 
     const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET');
-    console.log('Webhook secret exists:', !!webhookSecret);
+    if (!webhookSecret) {
+      throw new Error('Webhook secret not configured in environment');
+    }
 
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
       apiVersion: '2023-10-16',
@@ -36,34 +50,22 @@ serve(async (req) => {
 
     let event;
     try {
-      // Temporarily bypass signature verification for testing
-      if (!stripeSignature || !webhookSecret) {
-        console.log('Missing signature or webhook secret - parsing raw body');
-        event = JSON.parse(rawBody);
-      } else {
-        event = stripe.webhooks.constructEvent(
-          rawBody,
-          stripeSignature,
-          webhookSecret
-        );
-      }
-      console.log('Event parsed successfully:', event.type);
+      event = stripe.webhooks.constructEvent(
+        rawBody,
+        stripeSignature,
+        webhookSecret
+      );
+      console.log('Webhook signature verified successfully');
+      console.log('Event type:', event.type);
     } catch (err) {
-      console.error('Error parsing webhook:', err.message);
-      // Continue processing even if signature verification fails
-      console.log('Attempting to parse raw body');
-      try {
-        event = JSON.parse(rawBody);
-      } catch (parseErr) {
-        console.error('Failed to parse raw body:', parseErr.message);
-        return new Response(
-          JSON.stringify({ error: `Failed to parse webhook body: ${parseErr.message}` }),
-          { 
-            status: 400,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          }
-        );
-      }
+      console.error('Webhook signature verification failed:', err.message);
+      return new Response(
+        JSON.stringify({ error: `Webhook signature verification failed: ${err.message}` }),
+        { 
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      );
     }
 
     const supabaseAdmin = createClient(
@@ -91,47 +93,35 @@ serve(async (req) => {
       });
 
       if (!labScriptId) {
-        console.warn('No lab script ID found in session metadata');
-        return new Response(
-          JSON.stringify({ received: true, warning: 'No lab script ID in metadata' }),
-          { 
-            status: 200,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          }
-        );
+        throw new Error('No lab script ID found in session metadata');
       }
 
-      try {
-        // Get payment intent details
-        const paymentIntent = await stripe.paymentIntents.retrieve(session.payment_intent);
-        console.log('Payment Intent details:', {
-          id: paymentIntent.id,
-          status: paymentIntent.status,
-          amount: paymentIntent.amount
-        });
+      // Get payment intent details
+      const paymentIntent = await stripe.paymentIntents.retrieve(session.payment_intent);
+      console.log('Payment Intent details:', {
+        id: paymentIntent.id,
+        status: paymentIntent.status,
+        amount: paymentIntent.amount
+      });
 
-        // Update lab script with payment details
-        const { data: updateData, error: updateError } = await supabaseAdmin
-          .from('lab_scripts')
-          .update({ 
-            payment_status: session.payment_status,
-            payment_id: paymentIntent.id,
-            status: 'pending'
-          })
-          .eq('id', labScriptId)
-          .select()
-          .single();
+      // Update lab script with payment details
+      const { data: updateData, error: updateError } = await supabaseAdmin
+        .from('lab_scripts')
+        .update({ 
+          payment_status: session.payment_status,
+          payment_id: paymentIntent.id,
+          status: 'pending'
+        })
+        .eq('id', labScriptId)
+        .select()
+        .single();
 
-        if (updateError) {
-          console.error('Database update failed:', updateError);
-          throw updateError;
-        }
-
-        console.log('Successfully updated lab script:', updateData);
-      } catch (error) {
-        console.error('Error processing payment details:', error);
-        // Continue processing - don't fail the webhook
+      if (updateError) {
+        console.error('Database update failed:', updateError);
+        throw new Error(`Database update failed: ${updateError.message}`);
       }
+
+      console.log('Successfully updated lab script:', updateData);
     }
 
     return new Response(
@@ -142,12 +132,11 @@ serve(async (req) => {
       }
     );
   } catch (error) {
-    console.error('Error processing webhook:', error);
-    // Return 200 instead of 500 to prevent Stripe from retrying
+    console.error('Error processing webhook:', error.message);
     return new Response(
-      JSON.stringify({ received: true, error: error.message }),
+      JSON.stringify({ error: error.message }),
       { 
-        status: 200,
+        status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       }
     );
