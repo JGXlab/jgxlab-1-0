@@ -29,17 +29,19 @@ export const TableRowContent = ({ script, onPreview }: TableRowContentProps) => 
     queryFn: async () => {
       if (script.payment_status !== 'paid') return null;
       
+      console.log('Fetching invoice for lab script:', script.id);
       const { data, error } = await supabase
         .from('invoices')
         .select('*')
         .eq('lab_script_id', script.id)
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error('Error fetching invoice:', error);
         return null;
       }
 
+      console.log('Found invoice:', data);
       return data;
     },
     enabled: script.payment_status === 'paid'
