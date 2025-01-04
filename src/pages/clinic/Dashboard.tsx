@@ -35,9 +35,9 @@ const clientData = [
 export default function ClinicDashboard() {
   return (
     <ClinicLayout>
-      <div className="flex flex-col items-center w-full py-6 space-y-6">
+      <div className="flex flex-col w-full py-8 space-y-8">
         {/* Top Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
           {/* Client Overview Chart */}
           <Card className="w-full">
             <CardHeader className="flex flex-row items-center justify-between">
@@ -70,7 +70,7 @@ export default function ClinicDashboard() {
           </Card>
 
           {/* Stats Cards */}
-          <div className="space-y-6 w-full">
+          <div className="space-y-8 w-full">
             <Card className="bg-primary text-white w-full">
               <CardHeader>
                 <div className="flex justify-between items-center">
