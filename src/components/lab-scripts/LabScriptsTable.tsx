@@ -1,6 +1,6 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, User, FileText, CheckCircle2, Clock, Info, Database, Eye } from "lucide-react";
+import { Calendar, User, FileText, CheckCircle2, Clock, Info, Database, Eye, CreditCard } from "lucide-react";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -15,6 +15,19 @@ const getStatusColor = (status: string) => {
       return 'bg-green-100 text-green-800 border-green-300';
     case 'rejected':
       return 'bg-red-100 text-red-800 border-red-300';
+    default:
+      return 'bg-gray-100 text-gray-800 border-gray-300';
+  }
+};
+
+const getPaymentStatusColor = (status: string) => {
+  switch (status) {
+    case 'paid':
+      return 'bg-green-100 text-green-800 border-green-300';
+    case 'failed':
+      return 'bg-red-100 text-red-800 border-red-300';
+    case 'unpaid':
+      return 'bg-yellow-100 text-yellow-800 border-yellow-300';
     default:
       return 'bg-gray-100 text-gray-800 border-gray-300';
   }
@@ -79,6 +92,12 @@ export function LabScriptsTable({ labScripts, isLoading, onPreview, onStatusUpda
           </TableHead>
           <TableHead>
             <div className="flex items-center space-x-2 text-gray-700">
+              <CreditCard className="h-4 w-4" />
+              <span>Payment</span>
+            </div>
+          </TableHead>
+          <TableHead>
+            <div className="flex items-center space-x-2 text-gray-700">
               <Clock className="h-4 w-4" />
               <span>Created</span>
             </div>
@@ -91,13 +110,13 @@ export function LabScriptsTable({ labScripts, isLoading, onPreview, onStatusUpda
       <TableBody>
         {isLoading ? (
           <TableRow>
-            <TableCell colSpan={6}>
+            <TableCell colSpan={7}>
               <LoadingLabScripts />
             </TableCell>
           </TableRow>
         ) : labScripts.length === 0 ? (
           <TableRow>
-            <TableCell colSpan={6}>
+            <TableCell colSpan={7}>
               <EmptyLabScripts />
             </TableCell>
           </TableRow>
@@ -146,6 +165,15 @@ export function LabScriptsTable({ labScripts, isLoading, onPreview, onStatusUpda
                 >
                   {getStatusIcon(script.status)}
                   <span className="capitalize">{script.status}</span>
+                </Badge>
+              </TableCell>
+              <TableCell>
+                <Badge 
+                  variant="secondary"
+                  className={`flex items-center gap-1 w-fit border ${getPaymentStatusColor(script.payment_status)}`}
+                >
+                  <CreditCard className="h-4 w-4" />
+                  <span className="capitalize">{script.payment_status}</span>
                 </Badge>
               </TableCell>
               <TableCell>
