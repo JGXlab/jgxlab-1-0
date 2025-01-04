@@ -35,11 +35,11 @@ const clientData = [
 export default function ClinicDashboard() {
   return (
     <ClinicLayout>
-      <div className="py-6 space-y-6">
+      <div className="flex flex-col items-center w-full py-6 space-y-6">
         {/* Top Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
           {/* Client Overview Chart */}
-          <Card>
+          <Card className="w-full">
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>Client Overview</CardTitle>
               <select className="border rounded-md px-2 py-1">
@@ -70,8 +70,8 @@ export default function ClinicDashboard() {
           </Card>
 
           {/* Stats Cards */}
-          <div className="space-y-6">
-            <Card className="bg-primary text-white">
+          <div className="space-y-6 w-full">
+            <Card className="bg-primary text-white w-full">
               <CardHeader>
                 <div className="flex justify-between items-center">
                   <CardTitle className="text-white flex items-center gap-2">
@@ -83,7 +83,7 @@ export default function ClinicDashboard() {
               </CardHeader>
             </Card>
 
-            <Card className="bg-primary text-white">
+            <Card className="bg-primary text-white w-full">
               <CardHeader>
                 <div className="flex justify-between items-center">
                   <CardTitle className="text-white flex items-center gap-2">
@@ -98,7 +98,7 @@ export default function ClinicDashboard() {
         </div>
 
         {/* Employee List */}
-        <Card>
+        <Card className="w-full">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>Employee List</CardTitle>
             <button className="text-primary hover:underline">View All</button>
@@ -142,7 +142,7 @@ export default function ClinicDashboard() {
         </Card>
 
         {/* Client List */}
-        <Card>
+        <Card className="w-full">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>Client List</CardTitle>
             <button className="text-primary hover:underline">View All</button>
