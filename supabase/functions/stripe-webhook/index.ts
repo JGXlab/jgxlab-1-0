@@ -9,6 +9,8 @@ const corsHeaders = {
 }
 
 serve(async (req) => {
+  console.log('Webhook request received');
+
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     console.log('Handling CORS preflight request');
@@ -18,8 +20,9 @@ serve(async (req) => {
     });
   }
 
+  // Ensure we only accept POST requests
   if (req.method !== 'POST') {
-    console.log(`Invalid method: ${req.method}`);
+    console.error(`Invalid method: ${req.method}`);
     return new Response('Method not allowed', {
       status: 405,
       headers: corsHeaders
@@ -27,26 +30,22 @@ serve(async (req) => {
   }
 
   try {
+    // Get the raw body first for signature verification
+    const rawBody = await req.text();
+    console.log('Raw body received, length:', rawBody.length);
+
     // Get the stripe signature from headers
     const stripeSignature = req.headers.get('stripe-signature');
-    console.log('Received webhook with signature:', stripeSignature ? 'present' : 'missing');
+    console.log('Stripe signature:', stripeSignature ? 'Present' : 'Missing');
 
     if (!stripeSignature) {
-      console.error('No Stripe signature found in request headers');
-      return new Response('No Stripe signature found', { 
-        status: 401,
-        headers: corsHeaders
-      });
+      throw new Error('No stripe signature found in request headers');
     }
 
-    // Get the webhook secret from environment variables
+    // Get the webhook secret
     const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET');
     if (!webhookSecret) {
-      console.error('Webhook secret not configured in environment');
-      return new Response('Webhook secret not configured', { 
-        status: 500,
-        headers: corsHeaders
-      });
+      throw new Error('Webhook secret not configured in environment');
     }
 
     // Initialize Stripe
@@ -54,10 +53,6 @@ serve(async (req) => {
       apiVersion: '2023-10-16',
       httpClient: Stripe.createFetchHttpClient(),
     });
-
-    // Get the raw body as text for signature verification
-    const rawBody = await req.text();
-    console.log('Raw webhook body received, length:', rawBody.length);
 
     // Verify the webhook signature
     let event;
@@ -67,7 +62,8 @@ serve(async (req) => {
         stripeSignature,
         webhookSecret
       );
-      console.log('Webhook signature verified successfully. Event type:', event.type);
+      console.log('Webhook signature verified successfully');
+      console.log('Event type:', event.type);
     } catch (err) {
       console.error('Webhook signature verification failed:', err.message);
       return new Response(
@@ -91,7 +87,7 @@ serve(async (req) => {
       }
     );
 
-    // Handle the event
+    // Handle the checkout.session.completed event
     if (event.type === 'checkout.session.completed') {
       console.log('Processing checkout.session.completed event');
       const session = event.data.object;
@@ -106,37 +102,22 @@ serve(async (req) => {
       });
 
       if (!labScriptId) {
-        console.error('No lab script ID found in session metadata');
-        return new Response(
-          JSON.stringify({ error: 'No lab script ID found in session metadata' }),
-          { 
-            status: 400,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          }
-        );
+        throw new Error('No lab script ID found in session metadata');
       }
 
       // Update lab script payment status
-      console.log('Updating lab script payment status for ID:', labScriptId);
       const { data: updateData, error: updateError } = await supabaseAdmin
         .from('lab_scripts')
         .update({ 
           payment_status: 'paid',
-          status: 'pending'  // Set to pending since it needs to be processed
+          status: 'pending'
         })
         .eq('id', labScriptId)
         .select()
         .single();
 
       if (updateError) {
-        console.error('Error updating lab script:', updateError);
-        return new Response(
-          JSON.stringify({ error: `Database update failed: ${updateError.message}` }),
-          { 
-            status: 500,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          }
-        );
+        throw new Error(`Database update failed: ${updateError.message}`);
       }
 
       console.log('Successfully updated lab script:', updateData);
@@ -151,7 +132,7 @@ serve(async (req) => {
       }
     );
   } catch (error) {
-    console.error('Error processing webhook:', error);
+    console.error('Error processing webhook:', error.message);
     return new Response(
       JSON.stringify({ error: error.message }),
       { 
