@@ -1,12 +1,13 @@
 import { DesignLayout } from "@/components/design/DesignLayout";
 import { Card } from "@/components/ui/card";
-import { Bell, Search, LayoutDashboard, FileCheck, Clock, AlertCircle, Settings, UserRound } from "lucide-react";
+import { Bell, Search, LayoutDashboard, FileCheck, Clock, AlertCircle, Settings, UserRound, LogOut } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,6 +19,26 @@ export default function DesignDashboard() {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const { toast } = useToast();
+
+  const handleLogout = async () => {
+    try {
+      console.log("Designer logging out...");
+      await supabase.auth.signOut();
+      toast({
+        title: "Logged out successfully",
+        description: "You have been logged out of your designer account.",
+      });
+      navigate("/design/login");
+    } catch (error) {
+      console.error("Error logging out:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to log out. Please try again.",
+      });
+    }
+  };
 
   const isActivePath = (path: string) => {
     return location.pathname === path;
@@ -135,15 +156,21 @@ export default function DesignDashboard() {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Avatar className="h-8 w-8 ring-2 ring-[#8B5CF6]/20 ring-offset-2 ring-offset-white transition-all duration-200 hover:ring-[#8B5CF6]/40 cursor-pointer">
-                    <AvatarFallback className="bg-[#8B5CF6]/10 text-[#8B5CF6]">D</AvatarFallback>
+                    <AvatarFallback className="bg-[#8B5CF6]/10 text-[#8B5CF6]">
+                      <UserRound className="h-4 w-4" />
+                    </AvatarFallback>
                   </Avatar>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
-                  <DropdownMenuItem onClick={() => navigate('/design/myprofile')}>
-                    My Profile
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate('/design/settings')}>
-                    Settings
+                <DropdownMenuContent 
+                  align="end" 
+                  className="w-48 bg-white border border-gray-200 shadow-lg rounded-lg py-1 mt-1"
+                >
+                  <DropdownMenuItem 
+                    onClick={handleLogout}
+                    className="flex items-center space-x-2 cursor-pointer text-sm font-medium text-gray-700 hover:text-[#8B5CF6] hover:bg-gray-50 focus:text-[#8B5CF6] focus:bg-gray-50 px-4 py-2"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    <span>Logout</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
