@@ -6,7 +6,7 @@ import { PreviewLabScriptModal } from "@/components/surgical-form/PreviewLabScri
 import { useState, useEffect } from "react";
 import { LabScriptsTable } from "@/components/lab-scripts/LabScriptsTable";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Form } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
@@ -23,11 +23,13 @@ import { z } from "zod";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ClinicNavHeader } from "@/components/clinic/ClinicNavHeader";
 import { Card } from "@/components/ui/card";
+import { StatusCardsGrid } from "@/components/lab-scripts/StatusCardsGrid";
 
 export default function SubmittedLabScripts() {
   const [selectedScript, setSelectedScript] = useState<any>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [isNewLabScriptOpen, setIsNewLabScriptOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const [searchParams] = useSearchParams();
   const { 
     verifyPayment, 
@@ -107,6 +109,17 @@ export default function SubmittedLabScripts() {
     console.log('Form values:', values);
   };
 
+  // Calculate status counts
+  const statusCounts = {
+    new: labScripts.filter(script => script.status === 'pending').length,
+    inProcess: labScripts.filter(script => script.status === 'in_progress').length,
+    paused: labScripts.filter(script => script.status === 'paused').length,
+    onHold: labScripts.filter(script => script.status === 'on_hold').length,
+    incomplete: labScripts.filter(script => script.status === 'incomplete').length,
+    completed: labScripts.filter(script => script.status === 'completed').length,
+    all: labScripts.length
+  };
+
   return (
     <ClinicLayout>
       <div className="flex flex-col max-w-[1200px] w-full mx-auto h-screen py-8">
@@ -118,18 +131,39 @@ export default function SubmittedLabScripts() {
                 <h1 className="text-2xl font-bold text-gray-900">Lab Scripts</h1>
                 <p className="text-sm text-gray-500">Manage and track your lab script submissions</p>
               </div>
-              <Button
-                onClick={() => setIsNewLabScriptOpen(true)}
-                className="bg-primary hover:bg-primary/90 text-white flex items-center gap-2"
-              >
-                <Plus className="h-4 w-4" />
-                Add Lab Script
-              </Button>
+              <div className="flex items-center gap-4">
+                <div className="relative group">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 group-hover:text-gray-600 z-10" />
+                  <input
+                    type="text"
+                    placeholder="Search lab scripts..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10 pr-4 py-2 rounded-full border border-gray-200 w-64 focus:outline-none focus:ring-2 focus:ring-primary bg-white/50 backdrop-blur-sm transition-all duration-200 hover:bg-white"
+                  />
+                </div>
+                <Button
+                  onClick={() => setIsNewLabScriptOpen(true)}
+                  className="bg-primary hover:bg-primary/90 text-white flex items-center gap-2"
+                >
+                  <Plus className="h-4 w-4" />
+                  Add Lab Script
+                </Button>
+              </div>
             </div>
+
+            <StatusCardsGrid 
+              statusCounts={statusCounts}
+              selectedStatus={null}
+              onStatusSelect={() => {}}
+            />
 
             <Card className="bg-gradient-to-br from-white to-accent/30 border-none shadow-lg">
               <LabScriptsTable
-                labScripts={labScripts}
+                labScripts={labScripts.filter(script => {
+                  const patientName = `${script.patients?.first_name} ${script.patients?.last_name}`.toLowerCase();
+                  return patientName.includes(searchTerm.toLowerCase());
+                })}
                 isLoading={isLoading}
                 onPreview={handlePreview}
               />
