@@ -1,10 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2 } from "lucide-react";
+import { Loader2, Download } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { InvoiceHeader } from "./InvoiceHeader";
 import { BillingAddresses } from "./BillingAddresses";
 import { InvoiceTable } from "./InvoiceTable";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import { InvoicePDF } from "./InvoicePDF";
 
 interface InvoiceProps {
   labScript: any;
@@ -49,12 +52,27 @@ export const Invoice = ({ labScript }: InvoiceProps) => {
   }
 
   return (
-    <Card className="w-[210mm] h-[297mm] mx-auto shadow-none border-none bg-white">
-      <div className="p-6 space-y-6 h-full">
-        <InvoiceHeader labScript={labScript} />
-        <BillingAddresses invoice={invoice} />
-        <InvoiceTable invoice={invoice} />
+    <div className="space-y-4">
+      <Card className="w-[210mm] mx-auto shadow-none border-none bg-white">
+        <div className="p-6 space-y-6">
+          <InvoiceHeader labScript={labScript} />
+          <BillingAddresses invoice={invoice} />
+          <InvoiceTable invoice={invoice} />
+        </div>
+      </Card>
+      <div className="flex justify-end">
+        <PDFDownloadLink
+          document={<InvoicePDF labScript={labScript} invoice={invoice} />}
+          fileName={`invoice-${labScript.payment_id}.pdf`}
+        >
+          {({ loading }) => (
+            <Button variant="outline" disabled={loading}>
+              <Download className="mr-2 h-4 w-4" />
+              {loading ? "Preparing PDF..." : "Download Invoice"}
+            </Button>
+          )}
+        </PDFDownloadLink>
       </div>
-    </Card>
+    </div>
   );
 };
