@@ -1,4 +1,6 @@
 import { ClinicLayout } from "@/components/clinic/ClinicLayout";
+import { ClinicProfileForm } from "@/components/clinic/ClinicProfileForm";
+import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ClinicNavHeader } from "@/components/clinic/ClinicNavHeader";
 
@@ -14,10 +16,14 @@ export default function Settings() {
                 <div>
                   <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
                   <p className="text-sm text-gray-500 mt-1">
-                    Configure your application settings
+                    Manage your clinic settings and preferences
                   </p>
                 </div>
               </div>
+
+              <Card className="bg-gradient-to-br from-white to-accent/30 border-none shadow-lg p-6">
+                <ClinicProfileForm />
+              </Card>
             </div>
           </div>
         </ScrollArea>
