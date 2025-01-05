@@ -20,7 +20,12 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-export const AdminNavbar = () => {
+interface AdminNavbarProps {
+  isCollapsed?: boolean;
+  setIsCollapsed?: (value: boolean) => void;
+}
+
+export const AdminNavbar = ({ isCollapsed, setIsCollapsed }: AdminNavbarProps) => {
   const location = useLocation();
   const navigate = useNavigate();
   
