@@ -1,6 +1,14 @@
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Bell, LayoutDashboard, Users, FileText, Settings, UserRound } from "lucide-react";
+import { Bell, LayoutDashboard, Users, FileText, Settings, UserRound, LogOut } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export function ClinicNavHeader() {
   const navigate = useNavigate();
@@ -8,6 +16,18 @@ export function ClinicNavHeader() {
 
   const isActivePath = (path: string) => {
     return location.pathname === path;
+  };
+
+  const handleLogout = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      navigate("/");
+      toast.success("Logged out successfully");
+    } catch (error) {
+      console.error("Error logging out:", error);
+      toast.error("Failed to log out");
+    }
   };
 
   return (
@@ -78,11 +98,32 @@ export function ClinicNavHeader() {
             2
           </span>
         </button>
-        <Avatar className="h-8 w-8 ring-2 ring-[#8B5CF6]/20 ring-offset-2 ring-offset-white transition-all duration-200 hover:ring-[#8B5CF6]/40">
-          <AvatarFallback className="bg-[#8B5CF6]/10 text-[#8B5CF6]">
-            <UserRound className="h-4 w-4" />
-          </AvatarFallback>
-        </Avatar>
+        
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Avatar className="h-8 w-8 ring-2 ring-[#8B5CF6]/20 ring-offset-2 ring-offset-white transition-all duration-200 hover:ring-[#8B5CF6]/40 cursor-pointer">
+              <AvatarFallback className="bg-[#8B5CF6]/10 text-[#8B5CF6]">
+                <UserRound className="h-4 w-4" />
+              </AvatarFallback>
+            </Avatar>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuItem 
+              onClick={() => navigate("/clinic/myaccount")}
+              className="flex items-center space-x-2 cursor-pointer text-sm font-medium text-gray-700 hover:text-[#8B5CF6] focus:text-[#8B5CF6]"
+            >
+              <UserRound className="h-4 w-4" />
+              <span>My Profile</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem 
+              onClick={handleLogout}
+              className="flex items-center space-x-2 cursor-pointer text-sm font-medium text-gray-700 hover:text-[#8B5CF6] focus:text-[#8B5CF6]"
+            >
+              <LogOut className="h-4 w-4" />
+              <span>Logout</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </div>
   );
