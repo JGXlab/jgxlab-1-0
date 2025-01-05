@@ -27,9 +27,10 @@ import { useToast } from "@/hooks/use-toast";
 
 interface PatientsTableProps {
   clinicId?: string;
+  searchTerm?: string;
 }
 
-export function PatientsTable({ clinicId }: PatientsTableProps) {
+export function PatientsTable({ clinicId, searchTerm = "" }: PatientsTableProps) {
   const [editingPatient, setEditingPatient] = useState(null);
   const [deletingPatient, setDeletingPatient] = useState(null);
   const { toast } = useToast();
@@ -59,6 +60,11 @@ export function PatientsTable({ clinicId }: PatientsTableProps) {
       return data;
     },
     enabled: !!clinicId
+  });
+
+  const filteredPatients = patients?.filter(patient => {
+    const fullName = `${patient.first_name} ${patient.last_name}`.toLowerCase();
+    return fullName.includes(searchTerm.toLowerCase());
   });
 
   const handleDeletePatient = async () => {
@@ -108,8 +114,8 @@ export function PatientsTable({ clinicId }: PatientsTableProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {patients && patients.length > 0 ? (
-              patients.map((patient) => (
+            {filteredPatients && filteredPatients.length > 0 ? (
+              filteredPatients.map((patient) => (
                 <TableRow key={patient.id} className="hover:bg-gray-50/50 transition-colors duration-200">
                   <TableCell className="font-medium text-gray-900">
                     {patient.first_name} {patient.last_name}
@@ -146,7 +152,7 @@ export function PatientsTable({ clinicId }: PatientsTableProps) {
             ) : (
               <TableRow>
                 <TableCell colSpan={5} className="text-center py-8 text-gray-500">
-                  No patients found. Add your first patient to get started.
+                  {searchTerm ? "No patients found matching your search." : "No patients found. Add your first patient to get started."}
                 </TableCell>
               </TableRow>
             )}

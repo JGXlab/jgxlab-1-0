@@ -23,6 +23,7 @@ import { ClinicNavHeader } from "@/components/clinic/ClinicNavHeader";
 
 export default function ClinicPatients() {
   const [createOpen, setCreateOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const { toast } = useToast();
 
   const { data: clinicData, isLoading: isLoadingClinic } = useQuery({
@@ -48,6 +49,10 @@ export default function ClinicPatients() {
     }
   });
 
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+  };
+
   return (
     <ClinicLayout>
       <div className="flex flex-col max-w-[1200px] w-full mx-auto h-screen py-8">
@@ -65,6 +70,8 @@ export default function ClinicPatients() {
                     <input
                       type="text"
                       placeholder="Search patients..."
+                      value={searchTerm}
+                      onChange={handleSearch}
                       className="pl-10 pr-4 py-2 rounded-full border border-gray-200 w-64 focus:outline-none focus:ring-2 focus:ring-primary bg-white/50 backdrop-blur-sm transition-all duration-200 hover:bg-white"
                     />
                   </div>
@@ -98,7 +105,7 @@ export default function ClinicPatients() {
                     <p className="text-gray-500">Loading clinic data...</p>
                   </div>
                 ) : (
-                  <PatientsTable clinicId={clinicData?.id} />
+                  <PatientsTable clinicId={clinicData?.id} searchTerm={searchTerm} />
                 )}
               </Card>
             </div>
