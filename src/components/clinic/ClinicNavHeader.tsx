@@ -19,7 +19,7 @@ export function ClinicNavHeader() {
           <span className="text-xs text-muted-foreground">Clinic Portal</span>
         </div>
         
-        <nav className="flex items-center space-x-3 border border-gray-200 rounded-full px-1.5 py-1">
+        <nav className="flex items-center space-x-3 border border-gray-200 rounded-full px-1.5 py-2">
           <button 
             onClick={() => navigate("/clinic/dashboard")}
             className={`flex items-center space-x-1.5 px-3 py-0 rounded-full transition-all duration-200 ${
