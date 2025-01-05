@@ -9,7 +9,6 @@ import { useState } from "react";
 
 export default function DesignMyProfile() {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  
   const { data: designerProfile, isLoading } = useQuery({
     queryKey: ['designerProfile'],
     queryFn: async () => {
