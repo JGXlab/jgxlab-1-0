@@ -108,6 +108,7 @@ export default function SubmittedLabScripts() {
                 })}
                 isLoading={isLoading}
                 onPreview={handlePreview}
+                hideClinicColumn={true} // Add this prop to hide clinic column in clinic portal
               />
             </Card>
 
