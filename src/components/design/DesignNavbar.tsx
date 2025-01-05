@@ -1,24 +1,17 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, FileCheck, Settings, UserRound, LogOut, ChevronLeft, ChevronRight, Bell, Search } from "lucide-react";
+import { LayoutDashboard, FileCheck, Settings, UserRound, LogOut, Bell } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
-interface DesignNavbarProps {
-  isCollapsed: boolean;
-  setIsCollapsed: (value: boolean) => void;
-}
-
-export const DesignNavbar = ({ isCollapsed, setIsCollapsed }: DesignNavbarProps) => {
+export const DesignNavbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -43,108 +36,104 @@ export const DesignNavbar = ({ isCollapsed, setIsCollapsed }: DesignNavbarProps)
     }
   };
 
-  const navItems = [
-    {
-      icon: LayoutDashboard,
-      label: "Dashboard",
-      path: "/design/dashboard",
-    },
-    {
-      icon: FileCheck,
-      label: "Lab Scripts",
-      path: "/design/labscripts",
-    },
-    {
-      icon: Settings,
-      label: "Settings",
-      path: "/design/settings",
-    },
-    {
-      icon: UserRound,
-      label: "My Profile",
-      path: "/design/myprofile",
-    },
-  ];
-
   return (
-    <div 
-      className={cn(
-        "fixed left-0 top-0 h-full flex transition-all duration-300 ease-spring z-50",
-        isCollapsed ? "w-[60px]" : "w-full sm:w-64"
-      )}
-    >
-      <nav className="w-full bg-white p-4 relative shadow-sm">
-        <div className={cn(
-          "mb-8 flex items-center transition-all duration-300 ease-spring",
-          isCollapsed ? "justify-center" : "justify-between"
-        )}>
-          {!isCollapsed && (
-            <div className="flex flex-col animate-fade-in">
-              <h1 className="text-2xl font-bold text-[#8B5CF6]">
-                JGX Digital Lab
-              </h1>
-              <span className="text-sm text-gray-500">
-                Designer Portal
-              </span>
-            </div>
-          )}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 transition-transform duration-300 ease-spring hover:bg-gray-50"
-            onClick={() => setIsCollapsed(!isCollapsed)}
-          >
-            {isCollapsed ? (
-              <ChevronRight className="h-4 w-4" />
-            ) : (
-              <ChevronLeft className="h-4 w-4" />
-            )}
-          </Button>
+    <div className="sticky top-0 w-full bg-white rounded-t-2xl px-6 py-3 flex items-center justify-between z-10">
+      {/* Left side - Logo and nav items */}
+      <div className="flex items-center space-x-6">
+        <div className="flex flex-col">
+          <span className="text-xl font-bold tracking-tight font-inter">JGX Digital Lab</span>
+          <span className="text-xs text-muted-foreground">Designer Portal</span>
         </div>
         
-        <div className="space-y-1">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            return (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={cn(
-                  "flex items-center p-3 rounded-lg transition-all duration-200 ease-spring group",
-                  isCollapsed ? "justify-center" : "space-x-3",
-                  isActive(item.path) 
-                    ? "bg-[#EEF2FF] text-[#8B5CF6]" 
-                    : "text-gray-600 hover:bg-gray-50 hover:text-[#8B5CF6]"
-                )}
-              >
-                <Icon className={cn(
-                  "h-5 w-5 flex-shrink-0 transition-transform duration-200 ease-spring",
-                  !isActive(item.path) && "group-hover:scale-110"
-                )} />
-                {!isCollapsed && (
-                  <span className="font-medium text-sm">{item.label}</span>
-                )}
-              </Link>
-            );
-          })}
-        </div>
-
-        <div className="absolute bottom-4 left-0 right-0 px-4">
-          <Button
-            variant="ghost"
-            className={cn(
-              "w-full transition-colors duration-200 ease-spring",
-              "text-red-600 hover:text-red-700 hover:bg-red-50",
-              isCollapsed ? "justify-center p-3" : "justify-start space-x-3 p-3"
-            )}
-            onClick={handleLogout}
+        <nav className="flex items-center space-x-3 border border-gray-200 rounded-full py-2 h-10">
+          <button 
+            onClick={() => navigate("/design/dashboard")}
+            className={`flex items-center space-x-1.5 px-4 h-10 rounded-full transition-all duration-200 ${
+              isActive("/design/dashboard") 
+                ? "bg-[#8B5CF6] text-white shadow-sm" 
+                : "text-gray-500 hover:bg-gray-100"
+            }`}
           >
-            <LogOut className="h-5 w-5 flex-shrink-0" />
-            {!isCollapsed && <span>Logout</span>}
-          </Button>
-        </div>
-      </nav>
-      <Separator orientation="vertical" className="h-full" />
+            <LayoutDashboard className="h-3.5 w-3.5" />
+            <span className="font-medium text-sm">Dashboard</span>
+          </button>
+          
+          <button 
+            onClick={() => navigate("/design/labscripts")}
+            className={`flex items-center space-x-1.5 px-4 h-10 rounded-full transition-all duration-200 ${
+              isActive("/design/labscripts") 
+                ? "bg-[#8B5CF6] text-white shadow-sm" 
+                : "text-gray-500 hover:bg-gray-100"
+            }`}
+          >
+            <FileCheck className="h-3.5 w-3.5" />
+            <span className="font-medium text-sm">Lab Scripts</span>
+          </button>
+          
+          <button 
+            onClick={() => navigate("/design/settings")}
+            className={`flex items-center space-x-1.5 px-4 h-10 rounded-full transition-all duration-200 ${
+              isActive("/design/settings") 
+                ? "bg-[#8B5CF6] text-white shadow-sm" 
+                : "text-gray-500 hover:bg-gray-100"
+            }`}
+          >
+            <Settings className="h-3.5 w-3.5" />
+            <span className="font-medium text-sm">Settings</span>
+          </button>
+          
+          <button 
+            onClick={() => navigate("/design/myprofile")}
+            className={`flex items-center space-x-1.5 px-4 h-10 rounded-full transition-all duration-200 ${
+              isActive("/design/myprofile") 
+                ? "bg-[#8B5CF6] text-white shadow-sm" 
+                : "text-gray-500 hover:bg-gray-100"
+            }`}
+          >
+            <UserRound className="h-3.5 w-3.5" />
+            <span className="font-medium text-sm">My Profile</span>
+          </button>
+        </nav>
+      </div>
+
+      {/* Right side - notifications and profile */}
+      <div className="flex items-center space-x-4">
+        <button className="relative p-2 rounded-full bg-[#8B5CF6]/10 text-[#8B5CF6] hover:bg-[#8B5CF6]/20 transition-all duration-200">
+          <Bell className="h-4 w-4" />
+          <span className="absolute -top-0.5 -right-0.5 h-4 w-4 bg-red-500 rounded-full text-white text-[10px] flex items-center justify-center border-2 border-white">
+            2
+          </span>
+        </button>
+        
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Avatar className="h-8 w-8 ring-2 ring-[#8B5CF6]/20 ring-offset-2 ring-offset-white transition-all duration-200 hover:ring-[#8B5CF6]/40 cursor-pointer">
+              <AvatarFallback className="bg-[#8B5CF6]/10 text-[#8B5CF6]">
+                <UserRound className="h-4 w-4" />
+              </AvatarFallback>
+            </Avatar>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent 
+            align="end" 
+            className="w-48 bg-white border border-gray-200 shadow-lg rounded-lg py-1 mt-1"
+          >
+            <DropdownMenuItem 
+              onClick={() => navigate("/design/myprofile")}
+              className="flex items-center space-x-2 cursor-pointer text-sm font-medium text-gray-700 hover:text-[#8B5CF6] hover:bg-gray-50 focus:text-[#8B5CF6] focus:bg-gray-50 px-4 py-2"
+            >
+              <UserRound className="h-4 w-4" />
+              <span>My Profile</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem 
+              onClick={handleLogout}
+              className="flex items-center space-x-2 cursor-pointer text-sm font-medium text-gray-700 hover:text-[#8B5CF6] hover:bg-gray-50 focus:text-[#8B5CF6] focus:bg-gray-50 px-4 py-2"
+            >
+              <LogOut className="h-4 w-4" />
+              <span>Logout</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
     </div>
   );
 };
