@@ -5,11 +5,9 @@ import { Card } from "@/components/ui/card";
 import { InvoiceHeader } from "./InvoiceHeader";
 import { BillingAddresses } from "./BillingAddresses";
 import { InvoiceTable } from "./InvoiceTable";
-import { InvoiceActions } from "./InvoiceActions";
-import { Tables } from "@/integrations/supabase/types";
 
 interface InvoiceProps {
-  labScript: Tables<"lab_scripts">;
+  labScript: any;
 }
 
 export const Invoice = ({ labScript }: InvoiceProps) => {
@@ -51,16 +49,12 @@ export const Invoice = ({ labScript }: InvoiceProps) => {
   }
 
   return (
-    <div className="space-y-4">
-      <InvoiceActions labScript={labScript} invoice={invoice} />
-      
-      <Card id="invoice-content" className="w-[210mm] h-[297mm] mx-auto shadow-none border-none bg-white">
-        <div className="p-6 space-y-6 h-full">
-          <InvoiceHeader labScript={labScript} />
-          <BillingAddresses invoice={invoice} />
-          <InvoiceTable invoice={invoice} />
-        </div>
-      </Card>
-    </div>
+    <Card className="w-[210mm] h-[297mm] mx-auto shadow-none border-none bg-white">
+      <div className="p-6 space-y-6 h-full">
+        <InvoiceHeader labScript={labScript} />
+        <BillingAddresses invoice={invoice} />
+        <InvoiceTable invoice={invoice} />
+      </div>
+    </Card>
   );
 };
