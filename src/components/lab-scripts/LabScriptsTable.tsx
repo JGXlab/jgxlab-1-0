@@ -10,6 +10,7 @@ interface LabScriptsTableProps {
   onPreview: (script: any, e: React.MouseEvent) => void;
   onStatusUpdate?: (id: string, status: string) => void;
   isDesignPortal?: boolean;
+  hideClinicColumn?: boolean; // Add this new prop
 }
 
 export const LabScriptsTable = ({ 
@@ -17,7 +18,8 @@ export const LabScriptsTable = ({
   isLoading, 
   onPreview, 
   onStatusUpdate,
-  isDesignPortal = false 
+  isDesignPortal = false,
+  hideClinicColumn = false // Add default value
 }: LabScriptsTableProps) => {
   if (isLoading) {
     return <LoadingLabScripts />;
@@ -29,7 +31,10 @@ export const LabScriptsTable = ({
 
   return (
     <Table>
-      <LabScriptsTableHeader isDesignPortal={isDesignPortal} />
+      <LabScriptsTableHeader 
+        isDesignPortal={isDesignPortal} 
+        hideClinicColumn={hideClinicColumn} 
+      />
       <TableBody>
         {labScripts.map((script) => (
           <TableRowContent 
@@ -38,6 +43,7 @@ export const LabScriptsTable = ({
             onPreview={onPreview}
             onStatusUpdate={onStatusUpdate}
             isDesignPortal={isDesignPortal}
+            hideClinicColumn={hideClinicColumn}
           />
         ))}
       </TableBody>
