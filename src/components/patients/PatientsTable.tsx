@@ -1,7 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, User } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -24,6 +24,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { useState } from "react";
 import { EditPatientForm } from "./EditPatientForm";
 import { useToast } from "@/hooks/use-toast";
+import { Badge } from "@/components/ui/badge";
 
 interface PatientsTableProps {
   clinicId?: string;
@@ -117,10 +118,26 @@ export function PatientsTable({ clinicId, searchTerm = "" }: PatientsTableProps)
             {filteredPatients && filteredPatients.length > 0 ? (
               filteredPatients.map((patient) => (
                 <TableRow key={patient.id} className="hover:bg-gray-50/50 transition-colors duration-200">
-                  <TableCell className="font-medium text-gray-900">
-                    {patient.first_name} {patient.last_name}
+                  <TableCell>
+                    <div className="flex items-center space-x-3">
+                      <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                        <User className="h-4 w-4 text-primary" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-900">
+                          {patient.first_name} {patient.last_name}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          ID: {patient.id.slice(0, 8)}
+                        </p>
+                      </div>
+                    </div>
                   </TableCell>
-                  <TableCell className="capitalize text-gray-600">{patient.gender}</TableCell>
+                  <TableCell>
+                    <Badge variant="secondary" className="capitalize bg-accent text-accent-foreground">
+                      {patient.gender}
+                    </Badge>
+                  </TableCell>
                   <TableCell className="text-gray-600">
                     {patient.date_of_birth ? new Date(patient.date_of_birth).toLocaleDateString() : 'Not set'}
                   </TableCell>
