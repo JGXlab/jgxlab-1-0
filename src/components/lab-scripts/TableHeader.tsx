@@ -1,11 +1,7 @@
 import { TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { User, FileText, Calendar, Database, CreditCard, Clock, Building2 } from "lucide-react";
 
-interface LabScriptsTableHeaderProps {
-  showClinicColumn?: boolean;
-}
-
-export const LabScriptsTableHeader = ({ showClinicColumn = true }: LabScriptsTableHeaderProps) => {
+export const LabScriptsTableHeader = () => {
   return (
     <TableHeader>
       <TableRow className="bg-gray-50/50 hover:bg-gray-50/50 border-none">
@@ -15,14 +11,12 @@ export const LabScriptsTableHeader = ({ showClinicColumn = true }: LabScriptsTab
             <span>Patient</span>
           </div>
         </TableHead>
-        {showClinicColumn && (
-          <TableHead className="text-primary/80 font-semibold">
-            <div className="flex items-center space-x-2">
-              <Building2 className="h-4 w-4" />
-              <span>Clinic</span>
-            </div>
-          </TableHead>
-        )}
+        <TableHead className="text-primary/80 font-semibold">
+          <div className="flex items-center space-x-2">
+            <Building2 className="h-4 w-4" />
+            <span>Clinic</span>
+          </div>
+        </TableHead>
         <TableHead className="text-primary/80 font-semibold">
           <div className="flex items-center space-x-2">
             <FileText className="h-4 w-4" />

@@ -10,15 +10,13 @@ interface LabScriptsTableProps {
   isLoading: boolean;
   onPreview: (script: any, e: React.MouseEvent) => void;
   onStatusUpdate?: (id: string, status: string) => void;
-  showClinicColumn?: boolean;
 }
 
 export function LabScriptsTable({ 
   labScripts, 
   isLoading, 
   onPreview,
-  onStatusUpdate,
-  showClinicColumn = true
+  onStatusUpdate 
 }: LabScriptsTableProps) {
   if (isLoading) {
     return (
@@ -42,7 +40,7 @@ export function LabScriptsTable({
   return (
     <div className="rounded-xl bg-white">
       <Table>
-        <LabScriptsTableHeader showClinicColumn={showClinicColumn} />
+        <LabScriptsTableHeader />
         <TableBody>
           {labScripts.map((script) => (
             <TableRowContent 
@@ -50,7 +48,6 @@ export function LabScriptsTable({
               script={script} 
               onPreview={onPreview}
               onStatusUpdate={onStatusUpdate}
-              showClinicColumn={showClinicColumn}
             />
           ))}
         </TableBody>

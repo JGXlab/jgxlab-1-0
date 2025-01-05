@@ -14,10 +14,9 @@ interface TableRowContentProps {
   script: any;
   onPreview: (script: any, e: React.MouseEvent) => void;
   onStatusUpdate?: (id: string, status: string) => void;
-  showClinicColumn?: boolean;
 }
 
-export const TableRowContent = ({ script, onPreview, onStatusUpdate, showClinicColumn = true }: TableRowContentProps) => {
+export const TableRowContent = ({ script, onPreview, onStatusUpdate }: TableRowContentProps) => {
   const [showInvoiceDialog, setShowInvoiceDialog] = useState(false);
 
   const handleViewInvoice = (e: React.MouseEvent) => {
@@ -43,23 +42,21 @@ export const TableRowContent = ({ script, onPreview, onStatusUpdate, showClinicC
             </div>
           </div>
         </TableCell>
-        {showClinicColumn && (
-          <TableCell>
-            <div className="flex items-center space-x-2">
-              <div className="h-8 w-8 rounded-full bg-emerald-50 flex items-center justify-center">
-                <Building2 className="h-4 w-4 text-emerald-600" />
-              </div>
-              <div>
-                <p className="font-medium text-gray-900">
-                  {script.patients?.clinics?.name || 'N/A'}
-                </p>
-                <p className="text-sm text-gray-600">
-                  Dr. {script.patients?.clinics?.doctor_name || 'N/A'}
-                </p>
-              </div>
+        <TableCell>
+          <div className="flex items-center space-x-2">
+            <div className="h-8 w-8 rounded-full bg-emerald-50 flex items-center justify-center">
+              <Building2 className="h-4 w-4 text-emerald-600" />
             </div>
-          </TableCell>
-        )}
+            <div>
+              <p className="font-medium text-gray-900">
+                {script.patients?.clinics?.name || 'N/A'}
+              </p>
+              <p className="text-sm text-gray-600">
+                Dr. {script.patients?.clinics?.doctor_name || 'N/A'}
+              </p>
+            </div>
+          </div>
+        </TableCell>
         <TableCell>
           <div className="space-y-1">
             <p className="font-medium text-gray-900">
