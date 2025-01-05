@@ -15,14 +15,12 @@ export const LabScriptsTableHeader = ({ isDesignPortal = false }: LabScriptsTabl
             <span>Patient</span>
           </div>
         </TableHead>
-        {isDesignPortal && (
-          <TableHead className="text-primary/80 font-semibold">
-            <div className="flex items-center space-x-2">
-              <Building2 className="h-4 w-4" />
-              <span>Clinic</span>
-            </div>
-          </TableHead>
-        )}
+        <TableHead className="text-primary/80 font-semibold">
+          <div className="flex items-center space-x-2">
+            <Building2 className="h-4 w-4" />
+            <span>Clinic</span>
+          </div>
+        </TableHead>
         <TableHead className="text-primary/80 font-semibold">
           <div className="flex items-center space-x-2">
             <FileText className="h-4 w-4" />

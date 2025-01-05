@@ -54,23 +54,21 @@ export const TableRowContent = ({
             </div>
           </div>
         </TableCell>
-        {isDesignPortal && (
-          <TableCell>
-            <div className="flex items-center space-x-2">
-              <div className="h-8 w-8 rounded-full bg-emerald-50 flex items-center justify-center">
-                <Building2 className="h-4 w-4 text-emerald-600" />
-              </div>
-              <div>
-                <p className="font-medium text-gray-900">
-                  {script.patients?.clinics?.name || 'N/A'}
-                </p>
-                <p className="text-sm text-gray-600">
-                  Dr. {script.patients?.clinics?.doctor_name || 'N/A'}
-                </p>
-              </div>
+        <TableCell>
+          <div className="flex items-center space-x-2">
+            <div className="h-8 w-8 rounded-full bg-emerald-50 flex items-center justify-center">
+              <Building2 className="h-4 w-4 text-emerald-600" />
             </div>
-          </TableCell>
-        )}
+            <div>
+              <p className="font-medium text-gray-900">
+                {script.patients?.clinics?.name || 'N/A'}
+              </p>
+              <p className="text-sm text-gray-600">
+                Dr. {script.patients?.clinics?.doctor_name || 'N/A'}
+              </p>
+            </div>
+          </div>
+        </TableCell>
         <TableCell>
           <div className="space-y-1">
             <p className="font-medium text-gray-900">
