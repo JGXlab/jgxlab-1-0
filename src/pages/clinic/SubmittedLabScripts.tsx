@@ -113,15 +113,13 @@ export default function SubmittedLabScripts() {
     console.log('Form values:', values);
   };
 
-  // Calculate status counts with updated incomplete logic
+  // Calculate status counts
   const statusCounts = {
     new: labScripts.filter(script => script.status === 'pending').length,
     inProcess: labScripts.filter(script => script.status === 'in_progress').length,
     paused: labScripts.filter(script => script.status === 'paused').length,
     onHold: labScripts.filter(script => script.status === 'on_hold').length,
-    incomplete: labScripts.filter(script => 
-      ['pending', 'in_progress', 'paused', 'on_hold'].includes(script.status)
-    ).length,
+    incomplete: labScripts.filter(script => script.status === 'incomplete').length,
     completed: labScripts.filter(script => script.status === 'completed').length,
     all: labScripts.length
   };
