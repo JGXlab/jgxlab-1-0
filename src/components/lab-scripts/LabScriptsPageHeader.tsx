@@ -21,7 +21,7 @@ export function LabScriptsPageHeader({
 }: LabScriptsPageHeaderProps) {
   return (
     <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 min-w-0">
-      <div className="w-full lg:w-auto overflow-x-auto pb-2 lg:pb-0">
+      <div className="w-full lg:w-auto overflow-x-auto pb-2 lg:pb-0 -mx-2 px-2">
         <StatusCardsGrid 
           statusCounts={statusCounts}
           selectedStatus={selectedStatus}
