@@ -1,73 +1,57 @@
-import { Table, TableBody, TableHead } from "@/components/ui/table";
-import { TableHeader } from "./TableHeader";
+import { Table, TableBody } from "@/components/ui/table";
+import { LabScriptsTableHeader } from "./TableHeader";
 import { TableRowContent } from "./TableRowContent";
-import { LoadingLabScripts } from "./LoadingLabScripts";
 import { EmptyLabScripts } from "./EmptyLabScripts";
-import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
-import { useQueryClient } from "@tanstack/react-query";
+import { LoadingLabScripts } from "./LoadingLabScripts";
+import { Users } from "lucide-react";
 
 interface LabScriptsTableProps {
   labScripts: any[];
-  isLoading?: boolean;
+  isLoading: boolean;
   onPreview: (script: any, e: React.MouseEvent) => void;
+  onStatusUpdate?: (id: string, status: string) => void;
 }
 
-export const LabScriptsTable = ({ labScripts, isLoading, onPreview }: LabScriptsTableProps) => {
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-
-  const handleStatusUpdate = async (id: string, status: string) => {
-    console.log('Updating status:', { id, status });
-    try {
-      const { error } = await supabase
-        .from('lab_scripts')
-        .update({ status })
-        .eq('id', id);
-
-      if (error) throw error;
-
-      await queryClient.invalidateQueries({ queryKey: ['design-lab-scripts'] });
-      
-      toast({
-        title: "Status Updated",
-        description: `Lab script status updated to ${status}`,
-      });
-    } catch (error) {
-      console.error('Error updating status:', error);
-      toast({
-        title: "Error",
-        description: "Failed to update status",
-        variant: "destructive",
-      });
-    }
-  };
-
+export function LabScriptsTable({ 
+  labScripts, 
+  isLoading, 
+  onPreview, 
+  onStatusUpdate 
+}: LabScriptsTableProps) {
   if (isLoading) {
-    return <LoadingLabScripts />;
+    return (
+      <div className="flex items-center justify-center h-40">
+        <p className="text-gray-500">Loading lab scripts...</p>
+      </div>
+    );
   }
 
-  if (!labScripts.length) {
-    return <EmptyLabScripts />;
+  if (!labScripts?.length) {
+    return (
+      <div className="flex items-center justify-center h-40 text-gray-400">
+        <div className="text-center">
+          <Users className="w-12 h-12 mx-auto mb-4" />
+          <p>No lab scripts found</p>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="rounded-md border">
+    <div className="rounded-xl bg-white">
       <Table>
-        <TableHead>
-          <TableHeader />
-        </TableHead>
+        <LabScriptsTableHeader />
         <TableBody>
           {labScripts.map((script) => (
-            <TableRowContent
-              key={script.id}
-              script={script}
+            <TableRowContent 
+              key={script.id} 
+              script={script} 
               onPreview={onPreview}
-              onStatusUpdate={handleStatusUpdate}
+              onStatusUpdate={onStatusUpdate}
             />
           ))}
         </TableBody>
       </Table>
     </div>
   );
-};
+}
