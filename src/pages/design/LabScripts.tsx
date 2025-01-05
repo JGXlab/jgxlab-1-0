@@ -16,7 +16,7 @@ const DesignLabScripts = () => {
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
   const { toast } = useToast();
 
-  const { data: labScripts, isLoading } = useQuery({
+  const { data: labScripts, isLoading, refetch } = useQuery({
     queryKey: ['design-lab-scripts'],
     queryFn: async () => {
       console.log('Fetching all clinic lab scripts...');
@@ -48,6 +48,37 @@ const DesignLabScripts = () => {
     }
   });
 
+  const handlePreview = (script: any, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedScript(script);
+    setIsPreviewOpen(true);
+  };
+
+  const handleStatusUpdate = async (id: string, newStatus: string) => {
+    try {
+      const { error } = await supabase
+        .from('lab_scripts')
+        .update({ status: newStatus })
+        .eq('id', id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Status updated",
+        description: `Lab script status has been updated to ${newStatus}`,
+      });
+
+      refetch();
+    } catch (error) {
+      console.error('Error updating status:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update status. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const filteredLabScripts = selectedStatus === 'incomplete'
     ? labScripts?.filter(script => 
         ['pending', 'in_progress', 'paused', 'on_hold'].includes(script.status)
@@ -68,29 +99,6 @@ const DesignLabScripts = () => {
     all: labScripts?.length || 0,
   };
 
-  const handlePreview = (script: any, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setSelectedScript(script);
-    setIsPreviewOpen(true);
-  };
-
-  const handleStatusSelect = (status: string | null) => {
-    setSelectedStatus(status);
-    let toastMessage = "";
-    if (status === 'incomplete') {
-      toastMessage = "Showing all incomplete lab scripts (New, In Process, Paused, and On Hold)";
-    } else if (status) {
-      toastMessage = `Filtered by ${status.replace('_', ' ')}`;
-    } else {
-      toastMessage = "Showing all lab scripts";
-    }
-    
-    toast({
-      title: toastMessage,
-      description: "Click 'All Scripts' to clear filter",
-    });
-  };
-
   return (
     <DesignLayout>
       <div className="flex flex-col max-w-[1400px] w-full mx-auto h-screen py-8">
@@ -101,7 +109,7 @@ const DesignLabScripts = () => {
               <StatusCardsGrid 
                 statusCounts={statusCounts} 
                 selectedStatus={selectedStatus}
-                onStatusSelect={handleStatusSelect}
+                onStatusSelect={setSelectedStatus}
               />
             </div>
 
@@ -110,6 +118,7 @@ const DesignLabScripts = () => {
                 labScripts={filteredLabScripts || []}
                 isLoading={isLoading}
                 onPreview={handlePreview}
+                onStatusUpdate={handleStatusUpdate}
               />
             </Card>
 

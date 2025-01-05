@@ -15,7 +15,7 @@ interface LabScriptsTableProps {
 export function LabScriptsTable({ 
   labScripts, 
   isLoading, 
-  onPreview, 
+  onPreview,
   onStatusUpdate 
 }: LabScriptsTableProps) {
   if (isLoading) {
