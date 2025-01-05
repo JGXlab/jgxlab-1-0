@@ -77,9 +77,9 @@ export function ClinicNavHeader() {
           </button>
           
           <button 
-            onClick={() => navigate("/clinic/settings")}
+            onClick={() => navigate("/clinic/myaccount")}
             className={`flex items-center space-x-1.5 px-4 h-10 rounded-full transition-all duration-200 ${
-              isActivePath("/clinic/settings") 
+              isActivePath("/clinic/myaccount") 
                 ? "bg-primary text-white shadow-sm" 
                 : "text-gray-500 hover:bg-gray-100"
             }`}
@@ -109,7 +109,7 @@ export function ClinicNavHeader() {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48">
             <DropdownMenuItem 
-              onClick={() => navigate("/clinic/profile")}
+              onClick={() => navigate("/clinic/myaccount")}
               className="flex items-center space-x-2 cursor-pointer text-sm font-medium text-gray-700 hover:text-[#8B5CF6] focus:text-[#8B5CF6]"
             >
               <UserRound className="h-4 w-4" />
