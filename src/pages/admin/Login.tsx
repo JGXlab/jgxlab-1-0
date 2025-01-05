@@ -22,7 +22,6 @@ const AdminLogin = () => {
     try {
       console.log("Attempting admin login with email:", email);
       
-      // First attempt to sign in
       const { data: { user }, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -48,7 +47,6 @@ const AdminLogin = () => {
         return;
       }
 
-      // Check if user is admin
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('role')
@@ -97,32 +95,34 @@ const AdminLogin = () => {
   };
 
   return (
-    <div className="h-screen w-screen flex items-center justify-center bg-gray-50">
-      <Card className="w-full max-w-[420px] mx-auto bg-white shadow-lg rounded-3xl border-0">
+    <div className="min-h-screen w-full flex items-center justify-center bg-[#F6F6F7]">
+      <Card className="w-full max-w-[420px] mx-auto bg-gradient-to-br from-white to-accent/30 border-none shadow-lg rounded-2xl">
         <CardContent className="p-8">
           <div className="text-center space-y-4 mb-8">
             <div className="flex justify-center">
-              <Shield className="h-12 w-12 text-primary" />
+              <Shield className="h-12 w-12 text-[#8B5CF6]" />
             </div>
-            <h1 className="text-2xl font-semibold text-gray-900">Admin Login</h1>
-            <p className="text-gray-500">Enter your credentials to access the admin panel</p>
+            <h1 className="text-2xl font-semibold text-gray-900">Admin Portal</h1>
+            <p className="text-sm text-gray-500">Enter your credentials to access the admin panel</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <label className="text-sm text-gray-600">Email</label>
-              <Input
-                type="email"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="h-12 rounded-xl bg-gray-50/50 border-gray-200"
-              />
+              <label className="text-sm font-medium text-gray-600">Email</label>
+              <div className="relative">
+                <Input
+                  type="email"
+                  placeholder="Enter your email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="h-12 rounded-xl bg-white/50 backdrop-blur-sm border-gray-200 transition-all duration-200 hover:bg-white focus:border-[#8B5CF6] focus:ring-[#8B5CF6]"
+                />
+              </div>
             </div>
             
             <div className="space-y-2">
-              <label className="text-sm text-gray-600">Password</label>
+              <label className="text-sm font-medium text-gray-600">Password</label>
               <div className="relative">
                 <Input
                   type={showPassword ? "text" : "password"}
@@ -130,7 +130,7 @@ const AdminLogin = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="h-12 rounded-xl bg-gray-50/50 border-gray-200 pr-10"
+                  className="h-12 rounded-xl bg-white/50 backdrop-blur-sm border-gray-200 pr-10 transition-all duration-200 hover:bg-white focus:border-[#8B5CF6] focus:ring-[#8B5CF6]"
                 />
                 <button
                   type="button"
@@ -144,7 +144,7 @@ const AdminLogin = () => {
 
             <Button
               type="submit"
-              className="w-full h-12 bg-primary hover:bg-primary/90 text-white rounded-xl font-medium"
+              className="w-full h-12 bg-[#8B5CF6] hover:bg-[#7C3AED] text-white rounded-xl font-medium shadow-lg shadow-[#8B5CF6]/20 transition-all duration-200"
               disabled={isLoading}
             >
               {isLoading ? "Signing in..." : "Sign in"}
