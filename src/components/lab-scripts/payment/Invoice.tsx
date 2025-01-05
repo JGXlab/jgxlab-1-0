@@ -66,10 +66,10 @@ export const Invoice = ({ labScript }: InvoiceProps) => {
           document={<InvoicePDF labScript={labScript} invoice={invoice} />}
           fileName={`invoice-${labScript.payment_id}.pdf`}
         >
-          {(props: { loading: boolean }) => (
-            <Button variant="outline" disabled={props.loading}>
+          {({ loading }: { loading: boolean }) => (
+            <Button variant="outline" disabled={loading}>
               <Download className="mr-2 h-4 w-4" />
-              {props.loading ? "Preparing PDF..." : "Download Invoice"}
+              {loading ? "Preparing PDF..." : "Download Invoice"}
             </Button>
           )}
         </PDFDownloadLink>
