@@ -1,6 +1,4 @@
 import { ClinicLayout } from "@/components/clinic/ClinicLayout";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { PreviewLabScriptModal } from "@/components/surgical-form/PreviewLabScriptModal";
 import { useState, useEffect } from "react";
 import { LabScriptsTable } from "@/components/lab-scripts/LabScriptsTable";
@@ -20,8 +18,8 @@ import { z } from "zod";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ClinicNavHeader } from "@/components/clinic/ClinicNavHeader";
 import { Card } from "@/components/ui/card";
-import { StatusCardsGrid } from "@/components/lab-scripts/StatusCardsGrid";
 import { LabScriptsPageHeader } from "@/components/lab-scripts/LabScriptsPageHeader";
+import { useLabScripts } from "@/hooks/use-lab-scripts";
 
 export default function SubmittedLabScripts() {
   const [selectedScript, setSelectedScript] = useState<any>(null);
@@ -30,6 +28,7 @@ export default function SubmittedLabScripts() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
   const [searchParams] = useSearchParams();
+  
   const { 
     verifyPayment, 
     showSuccessDialog, 
@@ -55,6 +54,8 @@ export default function SubmittedLabScripts() {
     },
   });
 
+  const { labScripts, statusCounts, isLoading } = useLabScripts(selectedStatus);
+
   useEffect(() => {
     const checkPayment = async () => {
       const sessionId = searchParams.get('session_id');
@@ -69,40 +70,6 @@ export default function SubmittedLabScripts() {
     checkPayment();
   }, [searchParams, verifyPayment]);
 
-  const { data: labScripts = [], isLoading } = useQuery({
-    queryKey: ['labScripts', selectedStatus],
-    queryFn: async () => {
-      console.log('Fetching lab scripts...');
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("No user found");
-
-      let query = supabase
-        .from('lab_scripts')
-        .select(`
-          *,
-          patients (
-            first_name,
-            last_name
-          )
-        `)
-        .order('created_at', { ascending: false });
-
-      if (selectedStatus) {
-        query = query.eq('status', selectedStatus);
-      }
-
-      const { data, error } = await query;
-
-      if (error) {
-        console.error('Error fetching lab scripts:', error);
-        throw error;
-      }
-
-      console.log('Fetched lab scripts:', data);
-      return data || [];
-    },
-  });
-
   const handlePreview = (script: any, e: React.MouseEvent) => {
     e.stopPropagation();
     setSelectedScript(script);
@@ -111,17 +78,6 @@ export default function SubmittedLabScripts() {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     console.log('Form values:', values);
-  };
-
-  // Calculate status counts
-  const statusCounts = {
-    new: labScripts.filter(script => script.status === 'pending').length,
-    inProcess: labScripts.filter(script => script.status === 'in_progress').length,
-    paused: labScripts.filter(script => script.status === 'paused').length,
-    onHold: labScripts.filter(script => script.status === 'on_hold').length,
-    incomplete: labScripts.filter(script => script.status === 'incomplete').length,
-    completed: labScripts.filter(script => script.status === 'completed').length,
-    all: labScripts.length
   };
 
   const handleStatusSelect = (status: string | null) => {
