@@ -85,23 +85,29 @@ export const TableRowContent = ({ script, onPreview, onStatusUpdate }: TableRowC
             )}
             {script.payment_status === 'paid' && (
               <Button
-                variant="outline"
-                size="sm"
+                variant="ghost"
+                size="icon"
                 onClick={handleViewInvoice}
-                className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 border-emerald-200"
+                className="h-8 w-8 rounded-full text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 border-emerald-200 transition-all duration-300 hover:scale-105 group relative"
               >
-                <Receipt className="h-4 w-4 mr-2" />
-                <span>Invoice</span>
+                <Receipt className="h-4 w-4 transition-transform duration-300 group-hover:scale-110" />
+                <span className="sr-only">View Invoice</span>
+                <span className="absolute -bottom-8 scale-0 transition-all duration-200 group-hover:scale-100 text-xs bg-gray-900 text-white px-2 py-1 rounded whitespace-nowrap">
+                  View Invoice
+                </span>
               </Button>
             )}
             <Button
-              variant="outline"
-              size="sm"
+              variant="ghost"
+              size="icon"
               onClick={(e) => onPreview(script, e)}
-              className="text-primary hover:text-primary hover:bg-primary/10 border-primary/20"
+              className="h-8 w-8 rounded-full text-primary hover:text-primary hover:bg-primary/10 border-primary/20 transition-all duration-300 hover:scale-105 group relative"
             >
-              <Eye className="h-4 w-4 mr-2" />
-              <span>Preview</span>
+              <Eye className="h-4 w-4 transition-transform duration-300 group-hover:scale-110" />
+              <span className="sr-only">Preview</span>
+              <span className="absolute -bottom-8 scale-0 transition-all duration-200 group-hover:scale-100 text-xs bg-gray-900 text-white px-2 py-1 rounded whitespace-nowrap">
+                Preview Script
+              </span>
             </Button>
           </div>
         </TableCell>
