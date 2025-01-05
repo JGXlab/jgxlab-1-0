@@ -84,12 +84,7 @@ export function CreatePatientForm({ onSuccess, clinicId }: { onSuccess: () => vo
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         <div className="space-y-6">
-          <div className="p-6 rounded-xl bg-white/30 backdrop-blur-lg border border-white/20 shadow-xl">
-            <div className="mb-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-1">Patient Information</h3>
-              <p className="text-sm text-gray-500">Enter the patient's basic information below.</p>
-            </div>
-            
+          <div className="p-6 rounded-xl bg-white/30 backdrop-blur-lg border border-white/20 shadow-xl">            
             <div className="space-y-6">
               <div className="bg-white/50 backdrop-blur-sm rounded-lg p-5 shadow-sm border border-gray-100">
                 <PatientNameFields form={form} />
