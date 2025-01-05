@@ -7,6 +7,7 @@ import { Button } from "../ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import { CreatePatientForm } from "../patients/CreatePatientForm";
 import { useState } from "react";
+import { FormSection } from "./FormSection";
 
 interface PatientInformationSectionProps {
   form: UseFormReturn<z.infer<typeof formSchema>>;
