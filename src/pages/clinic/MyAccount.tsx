@@ -1,5 +1,4 @@
 import { ClinicLayout } from "@/components/clinic/ClinicLayout";
-import { ClinicProfileForm } from "@/components/clinic/ClinicProfileForm";
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ClinicNavHeader } from "@/components/clinic/ClinicNavHeader";
@@ -14,15 +13,15 @@ export default function MyAccount() {
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <h1 className="text-2xl font-bold text-gray-900">My Profile</h1>
+                  <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
                   <p className="text-sm text-gray-500 mt-1">
-                    Manage your clinic profile and preferences
+                    Manage your preferences
                   </p>
                 </div>
               </div>
 
               <Card className="bg-gradient-to-br from-white to-accent/30 border-none shadow-lg p-6">
-                <ClinicProfileForm />
+                {/* Settings content will go here */}
               </Card>
             </div>
           </div>
