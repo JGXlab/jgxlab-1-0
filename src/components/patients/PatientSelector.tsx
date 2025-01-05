@@ -14,9 +14,10 @@ interface PatientSelectorProps {
   value: string;
   onChange: (value: string) => void;
   clinicId?: string;
+  className?: string; // Added className prop
 }
 
-export function PatientSelector({ value, onChange, clinicId }: PatientSelectorProps) {
+export function PatientSelector({ value, onChange, clinicId, className }: PatientSelectorProps) {
   const [open, setOpen] = useState(false);
   const [createPatientOpen, setCreatePatientOpen] = useState(false);
 
@@ -48,7 +49,7 @@ export function PatientSelector({ value, onChange, clinicId }: PatientSelectorPr
   const selectedPatient = patients.find((patient) => patient.id === value);
 
   return (
-    <div className="flex gap-2">
+    <div className={cn("flex gap-2", className)}>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <FormControl>
