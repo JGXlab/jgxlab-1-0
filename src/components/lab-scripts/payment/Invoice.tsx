@@ -52,13 +52,6 @@ export const Invoice = ({ labScript }: InvoiceProps) => {
     );
   }
 
-  const renderDownloadButton = () => (
-    <Button variant="outline" disabled={false}>
-      <Download className="mr-2 h-4 w-4" />
-      Download Invoice
-    </Button>
-  );
-
   return (
     <div className="space-y-4">
       <Card className="w-[210mm] mx-auto shadow-none border-none bg-white">
@@ -73,7 +66,12 @@ export const Invoice = ({ labScript }: InvoiceProps) => {
           document={<InvoicePDF labScript={labScript} invoice={invoice} />}
           fileName={`invoice-${labScript.payment_id}.pdf`}
         >
-          {renderDownloadButton}
+          {({ loading }) => (
+            <Button variant="outline" disabled={loading}>
+              <Download className="mr-2 h-4 w-4" />
+              {loading ? "Preparing PDF..." : "Download Invoice"}
+            </Button>
+          )}
         </PDFDownloadLink>
       </div>
     </div>
