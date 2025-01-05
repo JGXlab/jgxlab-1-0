@@ -107,17 +107,25 @@ export function ClinicNavHeader() {
               </AvatarFallback>
             </Avatar>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-48">
+          <DropdownMenuContent 
+            align="end" 
+            className="w-48 bg-white border border-gray-200 shadow-lg rounded-lg py-1 mt-1"
+            style={{
+              zIndex: 50,
+              backgroundColor: 'white',
+              position: 'relative',
+            }}
+          >
             <DropdownMenuItem 
               onClick={() => navigate("/clinic/myaccount")}
-              className="flex items-center space-x-2 cursor-pointer text-sm font-medium text-gray-700 hover:text-[#8B5CF6] focus:text-[#8B5CF6]"
+              className="flex items-center space-x-2 cursor-pointer text-sm font-medium text-gray-700 hover:text-[#8B5CF6] hover:bg-gray-50 focus:text-[#8B5CF6] focus:bg-gray-50 px-4 py-2"
             >
               <UserRound className="h-4 w-4" />
               <span>My Profile</span>
             </DropdownMenuItem>
             <DropdownMenuItem 
               onClick={handleLogout}
-              className="flex items-center space-x-2 cursor-pointer text-sm font-medium text-gray-700 hover:text-[#8B5CF6] focus:text-[#8B5CF6]"
+              className="flex items-center space-x-2 cursor-pointer text-sm font-medium text-gray-700 hover:text-[#8B5CF6] hover:bg-gray-50 focus:text-[#8B5CF6] focus:bg-gray-50 px-4 py-2"
             >
               <LogOut className="h-4 w-4" />
               <span>Logout</span>
