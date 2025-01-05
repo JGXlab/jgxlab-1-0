@@ -48,20 +48,25 @@ export const DashboardContent = ({ labScripts, isLoading, stats, onPreview }: Da
 
     return Object.entries(statusCounts).map(([status, count]) => ({
       name: status.charAt(0).toUpperCase() + status.slice(1),
-      value: count,
-      percentage: (count / labScripts.length * 100).toFixed(0) + '%'
+      value: Number(count),
+      percentage: ((Number(count) / labScripts.length) * 100).toFixed(0) + '%'
     }));
   };
 
-  const COLORS = ['#375bdc', '#f59e0b', '#ef4444', '#22c55e', '#64748b'];
+  const COLORS = ['#9b87f5', '#D6BCFA', '#7E69AB', '#6E59A5', '#1A1F2C'];
 
   const renderContent = () => {
     if (currentView === 'stats') {
       const data = getStatusStats();
       return (
-        <div className="h-full flex flex-col items-center justify-center">
+        <motion.div 
+          className="h-full flex flex-col items-center justify-center p-4"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+        >
           <h3 className="text-lg font-semibold mb-6">Lab Script Status Distribution</h3>
-          <div className="w-full h-[300px]">
+          <div className="w-full h-[250px]">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
@@ -72,35 +77,58 @@ export const DashboardContent = ({ labScripts, isLoading, stats, onPreview }: Da
                   outerRadius={80}
                   paddingAngle={5}
                   dataKey="value"
+                  animationBegin={0}
+                  animationDuration={800}
                 >
                   {data.map((entry, index) => (
                     <Cell 
                       key={`cell-${index}`}
                       fill={COLORS[index % COLORS.length]}
+                      className="transition-all duration-300 hover:opacity-80"
                     />
                   ))}
                 </Pie>
                 <Tooltip 
-                  formatter={(value: number, name: string) => [`${value} (${(value / labScripts.length * 100).toFixed(0)}%)`, name]}
+                  formatter={(value: number, name: string) => [
+                    `${value} (${((value / labScripts.length) * 100).toFixed(0)}%)`,
+                    name
+                  ]}
+                  contentStyle={{
+                    backgroundColor: 'white',
+                    border: '1px solid #e2e8f0',
+                    borderRadius: '0.5rem',
+                    padding: '0.5rem'
+                  }}
                 />
               </PieChart>
             </ResponsiveContainer>
           </div>
-          <div className="mt-6 space-y-2 w-full max-w-sm">
+          <motion.div 
+            className="mt-4 grid grid-cols-2 gap-3 w-full"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
+          >
             {data.map((item, index) => (
-              <div key={item.name} className="flex items-center justify-between p-2 rounded-lg bg-gray-50">
+              <motion.div 
+                key={item.name}
+                className="flex items-center justify-between p-2.5 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+              >
                 <div className="flex items-center gap-2">
                   <div 
                     className="w-3 h-3 rounded-full" 
                     style={{ backgroundColor: COLORS[index % COLORS.length] }}
                   />
-                  <span className="font-medium">{item.name}</span>
+                  <span className="font-medium text-sm">{item.name}</span>
                 </div>
                 <span className="text-sm text-gray-600">{item.percentage}</span>
-              </div>
+              </motion.div>
             ))}
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       );
     }
 
@@ -131,7 +159,7 @@ export const DashboardContent = ({ labScripts, isLoading, stats, onPreview }: Da
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.3, delay: 0.1 }}
         >
-          <Card className="bg-white h-[500px] overflow-hidden">
+          <Card className="bg-white h-[500px]">
             <div className="p-6">
               <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
                 <Button 
@@ -163,9 +191,9 @@ export const DashboardContent = ({ labScripts, isLoading, stats, onPreview }: Da
                   Status Stats
                 </Button>
               </div>
-              <ScrollArea className="h-[400px] pr-4">
+              <div className="h-[400px]">
                 {renderContent()}
-              </ScrollArea>
+              </div>
             </div>
           </Card>
         </motion.div>
