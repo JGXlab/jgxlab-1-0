@@ -48,8 +48,15 @@ export const Invoice = ({ labScript, onDownload }: InvoiceProps) => {
     ).join(' ');
   };
 
-  // The total amount paid already includes add-ons
+  // Calculate individual prices based on the total amount
   const totalAmount = invoice.amount_paid || 0;
+  const hasNightguard = invoice.needs_nightguard === 'yes';
+  const hasExpressDesign = invoice.express_design === 'yes';
+  
+  // Base price calculation (working backwards from total)
+  let basePrice = totalAmount;
+  if (hasNightguard) basePrice -= 50; // Subtract nightguard price
+  if (hasExpressDesign) basePrice -= 50; // Subtract express design price
 
   return (
     <Card className="bg-white w-full max-w-[210mm] mx-auto shadow-none border-none">
@@ -111,14 +118,26 @@ export const Invoice = ({ labScript, onDownload }: InvoiceProps) => {
                   {formatApplianceType(invoice.appliance_type)}
                   {invoice.arch === 'dual' && " (Dual Arch)"} - 
                   Patient: {invoice.patient_name}
-                  {invoice.needs_nightguard === 'yes' && " (Includes Nightguard)"}
-                  {invoice.express_design === 'yes' && " (Includes Express Design)"}
                 </td>
                 <td className="py-4 text-center text-gray-600">1</td>
                 <td className="py-4 text-right text-gray-900 font-medium">
-                  ${totalAmount.toFixed(2)}
+                  ${basePrice.toFixed(2)}
                 </td>
               </tr>
+              {hasNightguard && (
+                <tr>
+                  <td className="py-4 text-gray-900">Additional Nightguard</td>
+                  <td className="py-4 text-center text-gray-600">1</td>
+                  <td className="py-4 text-right text-gray-900 font-medium">$50.00</td>
+                </tr>
+              )}
+              {hasExpressDesign && (
+                <tr>
+                  <td className="py-4 text-gray-900">Express Design Service</td>
+                  <td className="py-4 text-center text-gray-600">1</td>
+                  <td className="py-4 text-right text-gray-900 font-medium">$50.00</td>
+                </tr>
+              )}
             </tbody>
             <tfoot className="border-t border-gray-200">
               <tr>
