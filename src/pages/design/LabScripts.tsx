@@ -27,9 +27,7 @@ const DesignLabScripts = () => {
           patients (
             first_name,
             last_name,
-            user_id
-          ),
-          clinics:patients!inner(
+            user_id,
             clinics (
               name,
               doctor_name

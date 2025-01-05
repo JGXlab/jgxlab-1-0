@@ -1,7 +1,7 @@
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { User, Eye, Receipt } from "lucide-react";
+import { User, Eye, Receipt, Building2 } from "lucide-react";
 import { format } from "date-fns";
 import { getStatusColor, getPaymentStatusColor } from "./utils/statusStyles";
 import { StatusUpdateButtons } from "./StatusUpdateButtons";
@@ -38,6 +38,21 @@ export const TableRowContent = ({ script, onPreview, onStatusUpdate }: TableRowC
               </p>
               <p className="text-sm text-gray-600">
                 ID: {script.patient_id.slice(0, 8)}
+              </p>
+            </div>
+          </div>
+        </TableCell>
+        <TableCell>
+          <div className="flex items-center space-x-2">
+            <div className="h-8 w-8 rounded-full bg-emerald-50 flex items-center justify-center">
+              <Building2 className="h-4 w-4 text-emerald-600" />
+            </div>
+            <div>
+              <p className="font-medium text-gray-900">
+                {script.patients?.clinics?.name || 'N/A'}
+              </p>
+              <p className="text-sm text-gray-600">
+                Dr. {script.patients?.clinics?.doctor_name || 'N/A'}
               </p>
             </div>
           </div>
