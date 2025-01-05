@@ -41,10 +41,10 @@ export function LabScriptsPageHeader({
         </div>
         <Button
           onClick={onNewLabScript}
-          className="whitespace-nowrap bg-[#8B5CF6] hover:bg-[#7C3AED] text-white rounded-full px-3 sm:px-6 py-1.5 sm:py-2 flex items-center gap-1.5 sm:gap-2 transition-all duration-200 shadow-sm hover:shadow-md text-sm shrink-0"
+          className="whitespace-nowrap bg-primary hover:bg-primary-hover text-white rounded-full px-3 sm:px-6 py-1.5 sm:py-2 flex items-center gap-1.5 sm:gap-2 transition-all duration-200 shadow-sm hover:shadow-md text-sm shrink-0"
         >
           <Plus className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-          Add Lab Script
+          New Lab Script
         </Button>
       </div>
     </div>
