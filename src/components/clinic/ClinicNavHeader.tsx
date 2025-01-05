@@ -22,7 +22,7 @@ export function ClinicNavHeader() {
         <nav className="flex items-center space-x-3 border border-gray-200 rounded-full px-1.5 py-1">
           <button 
             onClick={() => navigate("/clinic/dashboard")}
-            className={`flex items-center space-x-1.5 px-3 py-1 rounded-full transition-all duration-200 ${
+            className={`flex items-center space-x-1.5 px-3 py-0.5 rounded-full transition-all duration-200 ${
               isActivePath("/clinic/dashboard") 
                 ? "bg-primary text-white shadow-sm" 
                 : "text-gray-500 hover:bg-gray-100"
@@ -34,7 +34,7 @@ export function ClinicNavHeader() {
           
           <button 
             onClick={() => navigate("/clinic/patients")}
-            className={`flex items-center space-x-1.5 px-3 py-1 rounded-full transition-all duration-200 ${
+            className={`flex items-center space-x-1.5 px-3 py-0.5 rounded-full transition-all duration-200 ${
               isActivePath("/clinic/patients") 
                 ? "bg-primary text-white shadow-sm" 
                 : "text-gray-500 hover:bg-gray-100"
@@ -46,7 +46,7 @@ export function ClinicNavHeader() {
           
           <button 
             onClick={() => navigate("/clinic/submittedlabscripts")}
-            className={`flex items-center space-x-1.5 px-3 py-1 rounded-full transition-all duration-200 ${
+            className={`flex items-center space-x-1.5 px-3 py-0.5 rounded-full transition-all duration-200 ${
               isActivePath("/clinic/submittedlabscripts") 
                 ? "bg-primary text-white shadow-sm" 
                 : "text-gray-500 hover:bg-gray-100"
@@ -58,7 +58,7 @@ export function ClinicNavHeader() {
           
           <button 
             onClick={() => navigate("/clinic/myaccount")}
-            className={`flex items-center space-x-1.5 px-3 py-1 rounded-full transition-all duration-200 ${
+            className={`flex items-center space-x-1.5 px-3 py-0.5 rounded-full transition-all duration-200 ${
               isActivePath("/clinic/myaccount") 
                 ? "bg-primary text-white shadow-sm" 
                 : "text-gray-500 hover:bg-gray-100"
