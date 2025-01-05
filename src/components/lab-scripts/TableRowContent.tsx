@@ -123,14 +123,23 @@ export const TableRowContent = ({
                   <span className="sr-only">More options</span>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuContent 
+                align="end" 
+                className="w-48 bg-white border border-gray-200 shadow-lg rounded-md"
+              >
                 {script.payment_status === 'paid' && (
-                  <DropdownMenuItem onClick={handleViewInvoice}>
+                  <DropdownMenuItem 
+                    onClick={handleViewInvoice}
+                    className="cursor-pointer hover:bg-gray-100"
+                  >
                     <Receipt className="mr-2 h-4 w-4" />
                     View Invoice
                   </DropdownMenuItem>
                 )}
-                <DropdownMenuItem onClick={(e) => onPreview(script, e)}>
+                <DropdownMenuItem 
+                  onClick={(e) => onPreview(script, e)}
+                  className="cursor-pointer hover:bg-gray-100"
+                >
                   <Eye className="mr-2 h-4 w-4" />
                   Preview Script
                 </DropdownMenuItem>
