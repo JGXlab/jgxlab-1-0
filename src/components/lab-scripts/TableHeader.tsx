@@ -1,9 +1,9 @@
-import { TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { TableHead, TableHeader as TableHeaderUI, TableRow } from "@/components/ui/table";
 import { User, FileText, Calendar, Database, CreditCard, Clock } from "lucide-react";
 
-export const LabScriptsTableHeader = () => {
+export const TableHeader = () => {
   return (
-    <TableHeader>
+    <TableHeaderUI>
       <TableRow className="bg-gray-50/50 hover:bg-gray-50/50 border-none">
         <TableHead className="text-primary/80 font-semibold">
           <div className="flex items-center space-x-2">
@@ -45,6 +45,6 @@ export const LabScriptsTableHeader = () => {
           <span>Actions</span>
         </TableHead>
       </TableRow>
-    </TableHeader>
+    </TableHeaderUI>
   );
 };

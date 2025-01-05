@@ -11,13 +11,24 @@ interface LabScriptsTableProps {
   labScripts: any[];
   isLoading?: boolean;
   onPreview: (script: any, e: React.MouseEvent) => void;
+  onStatusUpdate?: (id: string, status: string) => void;
 }
 
-export const LabScriptsTable = ({ labScripts, isLoading, onPreview }: LabScriptsTableProps) => {
+export const LabScriptsTable = ({ 
+  labScripts, 
+  isLoading, 
+  onPreview,
+  onStatusUpdate: externalStatusUpdate 
+}: LabScriptsTableProps) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const handleStatusUpdate = async (id: string, status: string) => {
+    if (externalStatusUpdate) {
+      externalStatusUpdate(id, status);
+      return;
+    }
+
     console.log('Updating status:', { id, status });
     try {
       const { error } = await supabase
