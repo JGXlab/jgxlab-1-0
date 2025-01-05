@@ -11,6 +11,7 @@ import { Invoice } from "./payment/Invoice";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import { InvoicePDF } from "./payment/InvoicePDF";
+import { BlobProvider } from '@react-pdf/renderer';
 
 interface TableRowContentProps {
   script: any;
@@ -114,22 +115,20 @@ export const TableRowContent = ({ script, onPreview, onStatusUpdate }: TableRowC
                 </span>
               </Button>
             )}
-            <PDFDownloadLink
-              document={<InvoicePDF labScript={script} invoice={null} />}
-              fileName={`invoice-${script.id}.pdf`}
-            >
-              {({ loading }) => (
+            <BlobProvider document={<InvoicePDF labScript={script} invoice={null} />}>
+              {({ url, loading }) => (
                 <Button
                   variant="ghost"
                   size="icon"
                   className="h-8 w-8 rounded-full text-gray-500 hover:text-gray-700 hover:bg-gray-100"
                   disabled={loading}
+                  onClick={() => url && window.open(url, '_blank')}
                 >
                   <Download className="h-4 w-4" />
                   <span className="sr-only">Download Invoice</span>
                 </Button>
               )}
-            </PDFDownloadLink>
+            </BlobProvider>
             <Button
               variant="ghost"
               size="icon"
@@ -151,21 +150,20 @@ export const TableRowContent = ({ script, onPreview, onStatusUpdate }: TableRowC
           <DialogHeader className="px-2 py-3 border-b flex flex-row items-center justify-between">
             <DialogTitle>Invoice Preview</DialogTitle>
             <div className="flex items-center gap-2">
-              <PDFDownloadLink
-                document={<InvoicePDF labScript={script} invoice={null} />}
-                fileName={`invoice-${script.id}.pdf`}
-              >
-                {() => (
+              <BlobProvider document={<InvoicePDF labScript={script} invoice={null} />}>
+                {({ url, loading }) => (
                   <Button
                     variant="ghost"
                     size="icon"
                     className="h-8 w-8 rounded-full text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+                    disabled={loading}
+                    onClick={() => url && window.open(url, '_blank')}
                   >
                     <Download className="h-4 w-4" />
                     <span className="sr-only">Download Invoice</span>
                   </Button>
                 )}
-              </PDFDownloadLink>
+              </BlobProvider>
               <DialogClose className="h-8 w-8 rounded-full text-gray-500 hover:text-gray-700 hover:bg-gray-100">
                 <span className="sr-only">Close</span>
               </DialogClose>
