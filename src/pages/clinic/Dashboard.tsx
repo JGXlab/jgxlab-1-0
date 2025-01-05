@@ -1,69 +1,161 @@
 import { ClinicLayout } from "@/components/clinic/ClinicLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { ArrowUpRight } from "lucide-react";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { Activity, TestTube, Clock, AlertCircle } from "lucide-react";
 import { ClinicNavHeader } from "@/components/clinic/ClinicNavHeader";
-
-const data = [
-  { name: 'Jan', value: 2 },
-  { name: 'Feb', value: 4 },
-  { name: 'Mar', value: 3 },
-  { name: 'Apr', value: 5 },
-  { name: 'May', value: 7 },
-  { name: 'Jun', value: 8 },
-  { name: 'Jul', value: 6 },
-  { name: 'Aug', value: 4 },
-  { name: 'Sep', value: 5 },
-  { name: 'Oct', value: 6 },
-  { name: 'Nov', value: 7 },
-  { name: 'Dec', value: 6 },
-];
-
-const employeeData = [
-  { id: '1020', name: 'Norma Troy', role: 'UI/UX Designer', performance: 75, notes: 'Very Much Appreciate' },
-  { id: '1021', name: 'Thomas Poston', role: 'Web Designer', performance: 65, notes: 'No Complaints Here' },
-  { id: '1022', name: 'Kimberly Andersen', role: 'React Native Developer', performance: 50, notes: 'Found Critical Error' },
-];
-
-const clientData = [
-  { name: 'William Olguin', project: 'Security Camera App', status: 'Completed' },
-  { name: 'Douglas Gonzales', project: 'Onlyfans Website', status: 'Planed' },
-  { name: 'Marcus Roddy', project: 'Storage Unit Rent Website', status: 'Active' },
-];
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { format, subDays } from "date-fns";
 
 export default function ClinicDashboard() {
+  // Fetch lab scripts data
+  const { data: labScripts = [], isLoading } = useQuery({
+    queryKey: ['dashboardLabScripts'],
+    queryFn: async () => {
+      console.log('Fetching lab scripts for dashboard...');
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("No user found");
+
+      const { data, error } = await supabase
+        .from('lab_scripts')
+        .select(`
+          *,
+          patients (
+            first_name,
+            last_name
+          )
+        `)
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching lab scripts:', error);
+        throw error;
+      }
+
+      console.log('Fetched lab scripts:', data);
+      return data || [];
+    },
+  });
+
+  // Calculate status counts for the pie chart
+  const statusCounts = labScripts.reduce((acc, script) => {
+    acc[script.status] = (acc[script.status] || 0) + 1;
+    return acc;
+  }, {});
+
+  const pieChartData = Object.entries(statusCounts).map(([status, count]) => ({
+    name: status.charAt(0).toUpperCase() + status.slice(1),
+    value: count,
+  }));
+
+  // Calculate daily submissions for the line chart
+  const last30Days = Array.from({ length: 30 }, (_, i) => {
+    const date = subDays(new Date(), i);
+    return format(date, 'MMM dd');
+  }).reverse();
+
+  const dailySubmissions = last30Days.map(date => {
+    const count = labScripts.filter(script => 
+      format(new Date(script.created_at), 'MMM dd') === date
+    ).length;
+    return { date, count };
+  });
+
+  // Colors for the pie chart
+  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
+
+  // Calculate key metrics
+  const totalScripts = labScripts.length;
+  const pendingScripts = labScripts.filter(script => script.status === 'pending').length;
+  const urgentScripts = labScripts.filter(script => {
+    const dueDate = new Date(script.due_date);
+    const today = new Date();
+    return dueDate <= today && script.status !== 'completed';
+  }).length;
+  const completedScripts = labScripts.filter(script => script.status === 'completed').length;
+
   return (
     <ClinicLayout>
       <div className="flex flex-col max-w-[1200px] w-full mx-auto h-screen py-8">
         <ScrollArea className="h-full rounded-2xl bg-[#F6F6F7]">
           <ClinicNavHeader />
-          <div className="p-4 sm:p-6 lg:p-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 w-full">
-              {/* Client Overview Chart */}
-              <Card className="w-full overflow-hidden">
-                <CardHeader className="flex flex-row items-center justify-between p-4 sm:p-6">
-                  <CardTitle className="text-lg sm:text-xl">Client Overview</CardTitle>
-                  <select className="border rounded-md px-2 py-1 text-sm sm:text-base">
-                    <option>Monthly</option>
-                    <option>Weekly</option>
-                    <option>Daily</option>
-                  </select>
+          <div className="p-4 sm:p-6 lg:p-8 space-y-6">
+            {/* Key Metrics */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <Card className="bg-white">
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">
+                    Total Lab Scripts
+                  </CardTitle>
+                  <TestTube className="h-4 w-4 text-primary" />
                 </CardHeader>
-                <CardContent className="p-4 sm:p-6">
-                  <div className="h-[250px] sm:h-[300px] w-full">
+                <CardContent>
+                  <div className="text-2xl font-bold">{totalScripts}</div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-white">
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">
+                    Pending Review
+                  </CardTitle>
+                  <Clock className="h-4 w-4 text-yellow-500" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{pendingScripts}</div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-white">
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">
+                    Urgent Attention
+                  </CardTitle>
+                  <AlertCircle className="h-4 w-4 text-red-500" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{urgentScripts}</div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-white">
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">
+                    Completed Scripts
+                  </CardTitle>
+                  <Activity className="h-4 w-4 text-green-500" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{completedScripts}</div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Charts */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {/* Submissions Trend */}
+              <Card className="bg-white">
+                <CardHeader>
+                  <CardTitle>Lab Script Submissions Trend</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[300px]">
                     <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={data} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+                      <LineChart data={dailySubmissions}>
                         <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="name" />
-                        <YAxis />
+                        <XAxis 
+                          dataKey="date" 
+                          tick={{ fontSize: 12 }}
+                          interval={6}
+                        />
+                        <YAxis tick={{ fontSize: 12 }} />
                         <Tooltip />
                         <Line 
                           type="monotone" 
-                          dataKey="value" 
-                          stroke="#375bdc" 
+                          dataKey="count" 
+                          stroke="#8884d8" 
                           strokeWidth={2}
                           dot={false}
                         />
@@ -73,120 +165,42 @@ export default function ClinicDashboard() {
                 </CardContent>
               </Card>
 
-              {/* Stats Cards */}
-              <div className="space-y-4 sm:space-y-6 lg:space-y-8 w-full">
-                <Card className="bg-primary text-white w-full">
-                  <CardHeader className="p-4 sm:p-6">
-                    <div className="flex justify-between items-center w-full">
-                      <CardTitle className="text-white flex items-center gap-2 text-lg sm:text-xl">
-                        Total Employees
-                        <ArrowUpRight className="h-4 w-4 sm:h-5 sm:w-5" />
-                      </CardTitle>
-                      <span className="text-3xl sm:text-4xl font-bold">550</span>
-                    </div>
-                  </CardHeader>
-                </Card>
-
-                <Card className="bg-primary text-white w-full">
-                  <CardHeader className="p-4 sm:p-6">
-                    <div className="flex justify-between items-center w-full">
-                      <CardTitle className="text-white flex items-center gap-2 text-lg sm:text-xl">
-                        Client's Feedback
-                        <ArrowUpRight className="h-4 w-4 sm:h-5 sm:w-5" />
-                      </CardTitle>
-                      <span className="text-3xl sm:text-4xl font-bold">120</span>
-                    </div>
-                  </CardHeader>
-                </Card>
-              </div>
+              {/* Status Distribution */}
+              <Card className="bg-white">
+                <CardHeader>
+                  <CardTitle>Lab Script Status Distribution</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[300px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={pieChartData}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={60}
+                          outerRadius={80}
+                          fill="#8884d8"
+                          paddingAngle={5}
+                          dataKey="value"
+                          label={({ name, percent }) => 
+                            `${name} ${(percent * 100).toFixed(0)}%`
+                          }
+                        >
+                          {pieChartData.map((entry, index) => (
+                            <Cell 
+                              key={`cell-${index}`} 
+                              fill={COLORS[index % COLORS.length]} 
+                            />
+                          ))}
+                        </Pie>
+                        <Tooltip />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
-
-            {/* Employee List */}
-            <Card className="w-full mt-4 sm:mt-6 lg:mt-8">
-              <CardHeader className="flex flex-row items-center justify-between p-4 sm:p-6">
-                <CardTitle className="text-lg sm:text-xl">Employee List</CardTitle>
-                <button className="text-primary hover:underline text-sm sm:text-base">View All</button>
-              </CardHeader>
-              <CardContent className="w-full overflow-x-auto p-4 sm:p-6">
-                <div className="w-full min-w-[800px]">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="text-left text-muted-foreground">
-                        <th className="p-3 sm:p-4">Id</th>
-                        <th className="p-3 sm:p-4">Employee</th>
-                        <th className="p-3 sm:p-4">Designation</th>
-                        <th className="p-3 sm:p-4">Work Performance</th>
-                        <th className="p-3 sm:p-4">Notes</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {employeeData.map((employee) => (
-                        <tr key={employee.id} className="border-t">
-                          <td className="p-3 sm:p-4">{employee.id}</td>
-                          <td className="p-3 sm:p-4 flex items-center gap-2">
-                            <Avatar className="h-8 w-8">
-                              <AvatarFallback>{employee.name[0]}</AvatarFallback>
-                            </Avatar>
-                            <span className="text-sm sm:text-base">{employee.name}</span>
-                          </td>
-                          <td className="p-3 sm:p-4 text-sm sm:text-base">{employee.role}</td>
-                          <td className="p-3 sm:p-4 w-[200px]">
-                            <Progress value={employee.performance} className="h-2" />
-                            <span className="text-xs sm:text-sm text-muted-foreground ml-2">
-                              {employee.performance}%
-                            </span>
-                          </td>
-                          <td className="p-3 sm:p-4 text-sm sm:text-base">{employee.notes}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Client List */}
-            <Card className="w-full mt-4 sm:mt-6 lg:mt-8">
-              <CardHeader className="flex flex-row items-center justify-between p-4 sm:p-6">
-                <CardTitle className="text-lg sm:text-xl">Client List</CardTitle>
-                <button className="text-primary hover:underline text-sm sm:text-base">View All</button>
-              </CardHeader>
-              <CardContent className="w-full overflow-x-auto p-4 sm:p-6">
-                <div className="w-full min-w-[800px]">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="text-left text-muted-foreground">
-                        <th className="p-3 sm:p-4">Client</th>
-                        <th className="p-3 sm:p-4">Project</th>
-                        <th className="p-3 sm:p-4">Project Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {clientData.map((client, index) => (
-                        <tr key={index} className="border-t">
-                          <td className="p-3 sm:p-4 flex items-center gap-2">
-                            <Avatar className="h-8 w-8">
-                              <AvatarFallback>{client.name[0]}</AvatarFallback>
-                            </Avatar>
-                            <span className="text-sm sm:text-base">{client.name}</span>
-                          </td>
-                          <td className="p-3 sm:p-4 text-sm sm:text-base">{client.project}</td>
-                          <td className="p-3 sm:p-4">
-                            <span className={`px-3 py-1 rounded-full text-xs sm:text-sm ${
-                              client.status === 'Completed' ? 'bg-green-100 text-green-800' :
-                              client.status === 'Active' ? 'bg-blue-100 text-blue-800' :
-                              'bg-yellow-100 text-yellow-800'
-                            }`}>
-                              {client.status}
-                            </span>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </CardContent>
-            </Card>
           </div>
         </ScrollArea>
       </div>
