@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { NIGHTGUARD_PRICE, EXPRESS_DESIGN_PRICE } from "@/components/surgical-form/utils/priceCalculations";
 
 interface InvoiceProps {
   labScript: Tables<"lab_scripts">;
@@ -47,6 +48,12 @@ export const Invoice = ({ labScript, onDownload }: InvoiceProps) => {
       word.charAt(0).toUpperCase() + word.slice(1)
     ).join(' ');
   };
+
+  // Calculate subtotal (base price)
+  const basePrice = invoice.amount_paid || 0;
+  const nightguardPrice = invoice.needs_nightguard === 'yes' ? NIGHTGUARD_PRICE : 0;
+  const expressDesignPrice = invoice.express_design === 'yes' ? EXPRESS_DESIGN_PRICE : 0;
+  const totalPrice = basePrice + nightguardPrice + expressDesignPrice;
 
   return (
     <Card className="bg-white w-full max-w-[210mm] mx-auto shadow-none border-none">
@@ -112,26 +119,26 @@ export const Invoice = ({ labScript, onDownload }: InvoiceProps) => {
                 </td>
                 <td className="py-4 text-center text-gray-600">1</td>
                 <td className="py-4 text-right text-gray-600">
-                  ${invoice.amount_paid?.toFixed(2)}
+                  ${basePrice.toFixed(2)}
                 </td>
                 <td className="py-4 text-right text-gray-900 font-medium">
-                  ${invoice.amount_paid?.toFixed(2)}
+                  ${basePrice.toFixed(2)}
                 </td>
               </tr>
               {invoice.needs_nightguard === 'yes' && (
                 <tr>
                   <td className="py-4 text-gray-900">Additional Nightguard</td>
                   <td className="py-4 text-center text-gray-600">1</td>
-                  <td className="py-4 text-right text-gray-600">Included</td>
-                  <td className="py-4 text-right text-gray-900 font-medium">$0.00</td>
+                  <td className="py-4 text-right text-gray-600">${NIGHTGUARD_PRICE.toFixed(2)}</td>
+                  <td className="py-4 text-right text-gray-900 font-medium">${NIGHTGUARD_PRICE.toFixed(2)}</td>
                 </tr>
               )}
               {invoice.express_design === 'yes' && (
                 <tr>
                   <td className="py-4 text-gray-900">Express Design Service</td>
                   <td className="py-4 text-center text-gray-600">1</td>
-                  <td className="py-4 text-right text-gray-600">Included</td>
-                  <td className="py-4 text-right text-gray-900 font-medium">$0.00</td>
+                  <td className="py-4 text-right text-gray-600">${EXPRESS_DESIGN_PRICE.toFixed(2)}</td>
+                  <td className="py-4 text-right text-gray-900 font-medium">${EXPRESS_DESIGN_PRICE.toFixed(2)}</td>
                 </tr>
               )}
             </tbody>
@@ -140,21 +147,21 @@ export const Invoice = ({ labScript, onDownload }: InvoiceProps) => {
                 <td colSpan={2}></td>
                 <td className="py-4 text-right font-medium text-gray-900">Subtotal</td>
                 <td className="py-4 text-right font-medium text-gray-900">
-                  ${invoice.amount_paid?.toFixed(2)}
+                  ${totalPrice.toFixed(2)}
                 </td>
               </tr>
               <tr>
                 <td colSpan={2}></td>
                 <td className="py-4 text-right font-medium text-gray-900">Total</td>
                 <td className="py-4 text-right font-medium text-gray-900">
-                  ${invoice.amount_paid?.toFixed(2)}
+                  ${totalPrice.toFixed(2)}
                 </td>
               </tr>
               <tr>
                 <td colSpan={2}></td>
                 <td className="py-4 text-right font-medium text-gray-900">Amount due</td>
                 <td className="py-4 text-right font-medium text-primary">
-                  ${invoice.amount_paid?.toFixed(2)} USD
+                  ${totalPrice.toFixed(2)} USD
                 </td>
               </tr>
             </tfoot>
