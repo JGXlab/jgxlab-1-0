@@ -1,7 +1,7 @@
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { User, Eye } from "lucide-react";
+import { User, Eye, Receipt } from "lucide-react";
 import { format } from "date-fns";
 import { getStatusColor, getPaymentStatusColor } from "./utils/statusStyles";
 import { StatusUpdateButtons } from "./StatusUpdateButtons";
@@ -13,6 +13,15 @@ interface TableRowContentProps {
 }
 
 export const TableRowContent = ({ script, onPreview, onStatusUpdate }: TableRowContentProps) => {
+  const handleViewInvoice = (e: React.MouseEvent) => {
+    e.preventDefault();
+    // Get the invoice URL from the payment details
+    const invoiceUrl = script.invoice_url;
+    if (invoiceUrl) {
+      window.open(invoiceUrl, '_blank');
+    }
+  };
+
   return (
     <TableRow className="hover:bg-gray-50/50 transition-colors duration-200">
       <TableCell>
@@ -70,6 +79,17 @@ export const TableRowContent = ({ script, onPreview, onStatusUpdate }: TableRowC
         <div className="flex items-center justify-end gap-2">
           {onStatusUpdate && (
             <StatusUpdateButtons script={script} onStatusUpdate={onStatusUpdate} />
+          )}
+          {script.payment_status === 'paid' && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleViewInvoice}
+              className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 border-emerald-200"
+            >
+              <Receipt className="h-4 w-4" />
+              <span>Invoice</span>
+            </Button>
           )}
           <Button
             variant="outline"
