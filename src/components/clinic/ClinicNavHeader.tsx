@@ -6,10 +6,7 @@ export function ClinicNavHeader() {
     <div className="sticky top-0 w-full bg-white rounded-t-2xl px-8 py-4 flex items-center justify-between z-10">
       {/* Left side - Logo and nav items */}
       <div className="flex items-center space-x-8">
-        <div className="flex items-center space-x-2">
-          <div className="h-8 w-8 bg-primary rounded-full flex items-center justify-center" />
-          <span className="font-semibold text-lg">JGX Digital Lab</span>
-        </div>
+        <span className="font-semibold text-lg">JGX Digital Lab</span>
         
         <nav className="flex items-center space-x-6">
           <button className="flex items-center space-x-2 bg-primary text-white px-4 py-2 rounded-lg">
