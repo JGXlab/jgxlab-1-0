@@ -1,12 +1,9 @@
 import { ClinicLayout } from "@/components/clinic/ClinicLayout";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { LabScriptsHeader } from "@/components/lab-scripts/LabScriptsHeader";
 import { PreviewLabScriptModal } from "@/components/surgical-form/PreviewLabScriptModal";
 import { useState, useEffect } from "react";
 import { LabScriptsTable } from "@/components/lab-scripts/LabScriptsTable";
-import { Button } from "@/components/ui/button";
-import { Plus, Search } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Form } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
@@ -24,6 +21,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { ClinicNavHeader } from "@/components/clinic/ClinicNavHeader";
 import { Card } from "@/components/ui/card";
 import { StatusCardsGrid } from "@/components/lab-scripts/StatusCardsGrid";
+import { LabScriptsPageHeader } from "@/components/lab-scripts/LabScriptsPageHeader";
 
 export default function SubmittedLabScripts() {
   const [selectedScript, setSelectedScript] = useState<any>(null);
@@ -56,7 +54,6 @@ export default function SubmittedLabScripts() {
     },
   });
 
-  // Handle payment status check
   useEffect(() => {
     const checkPayment = async () => {
       const sessionId = searchParams.get('session_id');
@@ -126,31 +123,11 @@ export default function SubmittedLabScripts() {
         <ScrollArea className="h-full rounded-2xl bg-[#F6F6F7]">
           <ClinicNavHeader />
           <div className="p-4 sm:p-6 lg:p-8 space-y-6">
-            <div className="flex justify-between items-center">
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">Lab Scripts</h1>
-                <p className="text-sm text-gray-500">Manage and track your lab script submissions</p>
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="relative group">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 group-hover:text-gray-600 z-10" />
-                  <input
-                    type="text"
-                    placeholder="Search lab scripts..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 pr-4 py-2 rounded-full border border-gray-200 w-64 focus:outline-none focus:ring-2 focus:ring-primary bg-white/50 backdrop-blur-sm transition-all duration-200 hover:bg-white"
-                  />
-                </div>
-                <Button
-                  onClick={() => setIsNewLabScriptOpen(true)}
-                  className="bg-primary hover:bg-primary/90 text-white flex items-center gap-2"
-                >
-                  <Plus className="h-4 w-4" />
-                  Add Lab Script
-                </Button>
-              </div>
-            </div>
+            <LabScriptsPageHeader
+              searchTerm={searchTerm}
+              onSearchChange={setSearchTerm}
+              onNewLabScript={() => setIsNewLabScriptOpen(true)}
+            />
 
             <StatusCardsGrid 
               statusCounts={statusCounts}
