@@ -77,9 +77,9 @@ export function ClinicNavHeader() {
           </button>
           
           <button 
-            onClick={() => navigate("/clinic/settings")}
+            onClick={() => navigate("/clinic/myaccount")}
             className={`flex items-center space-x-1.5 px-4 h-10 rounded-full transition-all duration-200 ${
-              isActivePath("/clinic/settings") 
+              isActivePath("/clinic/myaccount") 
                 ? "bg-primary text-white shadow-sm" 
                 : "text-gray-500 hover:bg-gray-100"
             }`}
