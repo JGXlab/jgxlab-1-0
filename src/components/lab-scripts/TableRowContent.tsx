@@ -114,6 +114,22 @@ export const TableRowContent = ({ script, onPreview, onStatusUpdate }: TableRowC
                 </span>
               </Button>
             )}
+            <PDFDownloadLink
+              document={<InvoicePDF labScript={script} invoice={null} />}
+              fileName={`invoice-${script.id}.pdf`}
+            >
+              {({ loading }) => (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 rounded-full text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+                  disabled={loading}
+                >
+                  <Download className="h-4 w-4" />
+                  <span className="sr-only">Download Invoice</span>
+                </Button>
+              )}
+            </PDFDownloadLink>
             <Button
               variant="ghost"
               size="icon"
@@ -139,12 +155,11 @@ export const TableRowContent = ({ script, onPreview, onStatusUpdate }: TableRowC
                 document={<InvoicePDF labScript={script} invoice={null} />}
                 fileName={`invoice-${script.id}.pdf`}
               >
-                {({ blob, url, loading, error }) => (
+                {() => (
                   <Button
                     variant="ghost"
                     size="icon"
                     className="h-8 w-8 rounded-full text-gray-500 hover:text-gray-700 hover:bg-gray-100"
-                    disabled={loading}
                   >
                     <Download className="h-4 w-4" />
                     <span className="sr-only">Download Invoice</span>
