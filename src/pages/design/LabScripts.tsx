@@ -16,6 +16,7 @@ const DesignLabScripts = () => {
   const [selectedScript, setSelectedScript] = useState<any>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -128,7 +129,10 @@ const DesignLabScripts = () => {
     <DesignLayout>
       <div className="flex flex-col max-w-[1400px] w-full mx-auto h-screen py-8">
         <ScrollArea className="h-full rounded-2xl bg-[#F6F6F7]">
-          <DesignNavbar />
+          <DesignNavbar 
+            isCollapsed={isCollapsed}
+            setIsCollapsed={setIsCollapsed}
+          />
           <div className="p-4 sm:p-6 lg:p-8 space-y-6">
             <StatusCardsGrid 
               statusCounts={statusCounts} 

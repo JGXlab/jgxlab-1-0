@@ -5,8 +5,10 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { DesignNavbar } from "@/components/design/DesignNavbar";
+import { useState } from "react";
 
 export default function DesignMyProfile() {
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const { data: designerProfile, isLoading } = useQuery({
     queryKey: ['designerProfile'],
     queryFn: async () => {
@@ -28,7 +30,10 @@ export default function DesignMyProfile() {
       <DesignLayout>
         <div className="flex flex-col max-w-[1400px] w-full mx-auto h-screen py-8">
           <ScrollArea className="h-full rounded-2xl bg-[#F6F6F7]">
-            <DesignNavbar />
+            <DesignNavbar 
+              isCollapsed={isCollapsed}
+              setIsCollapsed={setIsCollapsed}
+            />
             <div className="p-4 sm:p-6 lg:p-8">
               <div className="animate-pulse space-y-4">
                 <div className="h-8 w-32 bg-gray-200 rounded"></div>
@@ -45,7 +50,10 @@ export default function DesignMyProfile() {
     <DesignLayout>
       <div className="flex flex-col max-w-[1400px] w-full mx-auto h-screen py-8">
         <ScrollArea className="h-full rounded-2xl bg-[#F6F6F7]">
-          <DesignNavbar />
+          <DesignNavbar 
+            isCollapsed={isCollapsed}
+            setIsCollapsed={setIsCollapsed}
+          />
           <div className="p-4 sm:p-6 lg:p-8">
             <h1 className="text-2xl font-bold mb-6">Profile</h1>
             

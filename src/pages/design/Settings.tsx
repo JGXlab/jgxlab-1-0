@@ -20,6 +20,7 @@ export default function DesignSettings() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [language, setLanguage] = useState('English (US)');
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   // Wait for component to mount to avoid hydration mismatch
   useEffect(() => {
@@ -69,7 +70,10 @@ export default function DesignSettings() {
     <DesignLayout>
       <div className="flex flex-col max-w-[1400px] w-full mx-auto h-screen py-8">
         <ScrollArea className="h-full rounded-2xl bg-[#F6F6F7]">
-          <DesignNavbar />
+          <DesignNavbar 
+            isCollapsed={isCollapsed}
+            setIsCollapsed={setIsCollapsed}
+          />
           <div className="p-4 sm:p-6 lg:p-8">
             <h1 className="text-2xl font-bold mb-6">Settings</h1>
 
