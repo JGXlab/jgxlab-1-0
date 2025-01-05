@@ -1,4 +1,5 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
+import { Card, CardContent } from "@/components/ui/card";
 import { motion } from "framer-motion";
 
 interface StatusDistributionChartProps {
@@ -17,7 +18,7 @@ export const StatusDistributionChart = ({ data, colors, totalScripts }: StatusDi
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="h-[400px]"
+      className="h-[300px]"
     >
       <ResponsiveContainer width="100%" height="100%">
         <PieChart>
@@ -25,8 +26,8 @@ export const StatusDistributionChart = ({ data, colors, totalScripts }: StatusDi
             data={data}
             cx="50%"
             cy="50%"
-            innerRadius={80}
-            outerRadius={120}
+            innerRadius={60}
+            outerRadius={80}
             fill="#8884d8"
             paddingAngle={5}
             dataKey="value"
