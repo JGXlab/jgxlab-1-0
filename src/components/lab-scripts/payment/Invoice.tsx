@@ -49,8 +49,8 @@ export const Invoice = ({ labScript }: InvoiceProps) => {
   }
 
   return (
-    <Card className="bg-white w-full max-w-[210mm] mx-auto shadow-none border-none">
-      <div className="p-8 space-y-8">
+    <Card className="w-[210mm] h-[297mm] mx-auto shadow-none border-none bg-white">
+      <div className="p-6 space-y-6 h-full">
         <InvoiceHeader labScript={labScript} />
         <BillingAddresses invoice={invoice} />
         <InvoiceTable invoice={invoice} />
