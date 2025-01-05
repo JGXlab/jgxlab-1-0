@@ -30,10 +30,15 @@ export const useLabScripts = (selectedStatus: string | null) => {
     },
   });
 
+  // Define incomplete statuses
+  const incompleteStatuses = ['pending', 'in_progress', 'paused', 'on_hold'];
+
   // Filter lab scripts based on selected status
-  const filteredLabScripts = selectedStatus
-    ? allLabScripts.filter(script => script.status === selectedStatus)
-    : allLabScripts;
+  const filteredLabScripts = selectedStatus === 'incomplete'
+    ? allLabScripts.filter(script => incompleteStatuses.includes(script.status))
+    : selectedStatus
+      ? allLabScripts.filter(script => script.status === selectedStatus)
+      : allLabScripts;
 
   // Calculate status counts from all lab scripts
   const statusCounts = {
@@ -42,7 +47,7 @@ export const useLabScripts = (selectedStatus: string | null) => {
     paused: allLabScripts.filter(script => script.status === 'paused').length,
     onHold: allLabScripts.filter(script => script.status === 'on_hold').length,
     incomplete: allLabScripts.filter(script => 
-      ['pending', 'in_progress', 'paused', 'on_hold'].includes(script.status)
+      incompleteStatuses.includes(script.status)
     ).length,
     completed: allLabScripts.filter(script => script.status === 'completed').length,
     all: allLabScripts.length
