@@ -20,13 +20,19 @@ export const Invoice = ({ labScript }: InvoiceProps) => {
   const { data: invoice, isLoading: isLoadingInvoice } = useQuery({
     queryKey: ['invoice', labScript.id],
     queryFn: async () => {
+      console.log('Fetching invoice for lab script:', labScript.id);
       const { data, error } = await supabase
         .from('invoices')
         .select('*')
         .eq('lab_script_id', labScript.id)
-        .single();
+        .maybeSingle();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching invoice:', error);
+        throw error;
+      }
+
+      console.log('Fetched invoice:', data);
       return data;
     },
     enabled: !!labScript.id,
