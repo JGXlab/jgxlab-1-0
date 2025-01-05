@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { format, isToday, isPast } from "date-fns";
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 
 interface DashboardContentProps {
   labScripts: any[];
@@ -46,21 +47,59 @@ export const DashboardContent = ({ labScripts, isLoading, stats, onPreview }: Da
     }, {} as Record<string, number>);
 
     return Object.entries(statusCounts).map(([status, count]) => ({
-      status: status.charAt(0).toUpperCase() + status.slice(1),
-      count
+      name: status.charAt(0).toUpperCase() + status.slice(1),
+      value: count,
+      percentage: (count / labScripts.length * 100).toFixed(0) + '%'
     }));
   };
 
+  const COLORS = ['#375bdc', '#f59e0b', '#ef4444', '#22c55e', '#64748b'];
+
   const renderContent = () => {
     if (currentView === 'stats') {
+      const data = getStatusStats();
       return (
-        <div className="space-y-4">
-          {getStatusStats().map(({ status, count }) => (
-            <div key={status} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-              <span className="font-medium">{status}</span>
-              <span className="text-lg font-semibold">{count}</span>
-            </div>
-          ))}
+        <div className="h-full flex flex-col items-center justify-center">
+          <h3 className="text-lg font-semibold mb-6">Lab Script Status Distribution</h3>
+          <div className="w-full h-[300px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={data}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60}
+                  outerRadius={80}
+                  paddingAngle={5}
+                  dataKey="value"
+                >
+                  {data.map((entry, index) => (
+                    <Cell 
+                      key={`cell-${index}`}
+                      fill={COLORS[index % COLORS.length]}
+                    />
+                  ))}
+                </Pie>
+                <Tooltip 
+                  formatter={(value: number, name: string) => [`${value} (${(value / labScripts.length * 100).toFixed(0)}%)`, name]}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+          <div className="mt-6 space-y-2 w-full max-w-sm">
+            {data.map((item, index) => (
+              <div key={item.name} className="flex items-center justify-between p-2 rounded-lg bg-gray-50">
+                <div className="flex items-center gap-2">
+                  <div 
+                    className="w-3 h-3 rounded-full" 
+                    style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                  />
+                  <span className="font-medium">{item.name}</span>
+                </div>
+                <span className="text-sm text-gray-600">{item.percentage}</span>
+              </div>
+            ))}
+          </div>
         </div>
       );
     }
