@@ -4,6 +4,9 @@ import { RecentActivity } from "./RecentActivity";
 import { LabScriptsTable } from "@/components/lab-scripts/LabScriptsTable";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import { format, isToday, isPast } from "date-fns";
 
 interface DashboardContentProps {
   labScripts: any[];
@@ -17,7 +20,62 @@ interface DashboardContentProps {
   onPreview: (script: any, e: React.MouseEvent) => void;
 }
 
+type ViewType = 'recent' | 'dueToday' | 'overdue' | 'stats';
+
 export const DashboardContent = ({ labScripts, isLoading, stats, onPreview }: DashboardContentProps) => {
+  const [currentView, setCurrentView] = useState<ViewType>('recent');
+
+  const getFilteredScripts = () => {
+    switch (currentView) {
+      case 'dueToday':
+        return labScripts.filter(script => isToday(new Date(script.due_date)));
+      case 'overdue':
+        return labScripts.filter(script => 
+          isPast(new Date(script.due_date)) && !isToday(new Date(script.due_date)) && script.status !== 'completed'
+        );
+      case 'recent':
+      default:
+        return labScripts.slice(0, 5);
+    }
+  };
+
+  const getStatusStats = () => {
+    const statusCounts = labScripts.reduce((acc, script) => {
+      acc[script.status] = (acc[script.status] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+    return Object.entries(statusCounts).map(([status, count]) => ({
+      status: status.charAt(0).toUpperCase() + status.slice(1),
+      count
+    }));
+  };
+
+  const renderContent = () => {
+    if (currentView === 'stats') {
+      return (
+        <div className="space-y-4">
+          {getStatusStats().map(({ status, count }) => (
+            <div key={status} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+              <span className="font-medium">{status}</span>
+              <span className="text-lg font-semibold">{count}</span>
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    return (
+      <LabScriptsTable 
+        labScripts={getFilteredScripts()}
+        isLoading={isLoading}
+        onPreview={onPreview}
+        isDesignPortal={true}
+        hideClinicColumn={false}
+      />
+    );
+  };
+
   return (
     <motion.div 
       className="p-4 sm:p-6 lg:p-8 space-y-6"
@@ -28,7 +86,7 @@ export const DashboardContent = ({ labScripts, isLoading, stats, onPreview }: Da
       <StatsCards stats={stats} />
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Left Column - Recent Lab Scripts */}
+        {/* Left Column - Lab Scripts Views */}
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -36,15 +94,38 @@ export const DashboardContent = ({ labScripts, isLoading, stats, onPreview }: Da
         >
           <Card className="bg-white h-[500px] overflow-hidden">
             <div className="p-6">
-              <h3 className="text-lg font-semibold mb-4">Recent Lab Scripts</h3>
+              <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
+                <Button 
+                  variant={currentView === 'recent' ? 'default' : 'outline'}
+                  onClick={() => setCurrentView('recent')}
+                  size="sm"
+                >
+                  Recent
+                </Button>
+                <Button 
+                  variant={currentView === 'dueToday' ? 'default' : 'outline'}
+                  onClick={() => setCurrentView('dueToday')}
+                  size="sm"
+                >
+                  Due Today
+                </Button>
+                <Button 
+                  variant={currentView === 'overdue' ? 'default' : 'outline'}
+                  onClick={() => setCurrentView('overdue')}
+                  size="sm"
+                >
+                  Overdue
+                </Button>
+                <Button 
+                  variant={currentView === 'stats' ? 'default' : 'outline'}
+                  onClick={() => setCurrentView('stats')}
+                  size="sm"
+                >
+                  Status Stats
+                </Button>
+              </div>
               <ScrollArea className="h-[400px] pr-4">
-                <LabScriptsTable 
-                  labScripts={labScripts.slice(0, 5)}
-                  isLoading={isLoading}
-                  onPreview={onPreview}
-                  isDesignPortal={true}
-                  hideClinicColumn={false}
-                />
+                {renderContent()}
               </ScrollArea>
             </div>
           </Card>
