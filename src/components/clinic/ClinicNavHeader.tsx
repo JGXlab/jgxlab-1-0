@@ -20,53 +20,53 @@ export function ClinicNavHeader() {
           <span className="text-xs text-muted-foreground">Clinic Portal</span>
         </div>
         
-        <nav className="flex items-center space-x-6">
+        <nav className="flex items-center space-x-4">
           <button 
             onClick={() => navigate("/clinic/dashboard")}
-            className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
+            className={`flex items-center space-x-2 px-6 py-2.5 rounded-full transition-all duration-200 ${
               isActivePath("/clinic/dashboard") 
-                ? "bg-primary text-white" 
-                : "text-gray-500 hover:text-gray-700"
+                ? "bg-primary text-white shadow-md" 
+                : "text-gray-500 hover:bg-gray-100"
             }`}
           >
             <LayoutDashboard className="h-4 w-4" />
-            <span>Dashboard</span>
+            <span className="font-medium">Dashboard</span>
           </button>
           
           <button 
             onClick={() => navigate("/clinic/patients")}
-            className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
+            className={`flex items-center space-x-2 px-6 py-2.5 rounded-full transition-all duration-200 ${
               isActivePath("/clinic/patients") 
-                ? "bg-primary text-white" 
-                : "text-gray-500 hover:text-gray-700"
+                ? "bg-primary text-white shadow-md" 
+                : "text-gray-500 hover:bg-gray-100"
             }`}
           >
             <Users className="h-4 w-4" />
-            <span>Patients</span>
+            <span className="font-medium">Patients</span>
           </button>
           
           <button 
             onClick={() => navigate("/clinic/submittedlabscripts")}
-            className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
+            className={`flex items-center space-x-2 px-6 py-2.5 rounded-full transition-all duration-200 ${
               isActivePath("/clinic/submittedlabscripts") 
-                ? "bg-primary text-white" 
-                : "text-gray-500 hover:text-gray-700"
+                ? "bg-primary text-white shadow-md" 
+                : "text-gray-500 hover:bg-gray-100"
             }`}
           >
             <FileText className="h-4 w-4" />
-            <span>Lab Scripts</span>
+            <span className="font-medium">Lab Scripts</span>
           </button>
           
           <button 
             onClick={() => navigate("/clinic/myaccount")}
-            className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
+            className={`flex items-center space-x-2 px-6 py-2.5 rounded-full transition-all duration-200 ${
               isActivePath("/clinic/myaccount") 
-                ? "bg-primary text-white" 
-                : "text-gray-500 hover:text-gray-700"
+                ? "bg-primary text-white shadow-md" 
+                : "text-gray-500 hover:bg-gray-100"
             }`}
           >
             <Settings className="h-4 w-4" />
-            <span>Settings</span>
+            <span className="font-medium">Settings</span>
           </button>
         </nav>
       </div>
