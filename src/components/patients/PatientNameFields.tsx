@@ -4,7 +4,7 @@ import { User, Users } from "lucide-react";
 
 export function PatientNameFields({ form }) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div className="flex flex-col gap-6">
       <FormField
         control={form.control}
         name="first_name"
