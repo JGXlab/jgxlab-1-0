@@ -1,5 +1,5 @@
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Bell, Grid, MessageSquare, Search, Settings, User, Users } from "lucide-react";
+import { Bell, LayoutDashboard, Users, FileText, Settings } from "lucide-react";
 
 export function ClinicNavHeader() {
   return (
@@ -13,20 +13,16 @@ export function ClinicNavHeader() {
         
         <nav className="flex items-center space-x-6">
           <button className="flex items-center space-x-2 bg-primary text-white px-4 py-2 rounded-lg">
-            <Grid className="h-4 w-4" />
+            <LayoutDashboard className="h-4 w-4" />
             <span>Dashboard</span>
           </button>
           <button className="flex items-center space-x-2 text-gray-500 hover:text-gray-700">
             <Users className="h-4 w-4" />
-            <span>Employees</span>
+            <span>Patients</span>
           </button>
           <button className="flex items-center space-x-2 text-gray-500 hover:text-gray-700">
-            <User className="h-4 w-4" />
-            <span>Client</span>
-          </button>
-          <button className="flex items-center space-x-2 text-gray-500 hover:text-gray-700">
-            <MessageSquare className="h-4 w-4" />
-            <span>Feedback</span>
+            <FileText className="h-4 w-4" />
+            <span>Lab Scripts</span>
           </button>
           <button className="flex items-center space-x-2 text-gray-500 hover:text-gray-700">
             <Settings className="h-4 w-4" />
