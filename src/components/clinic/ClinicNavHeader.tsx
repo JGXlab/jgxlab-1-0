@@ -109,7 +109,7 @@ export function ClinicNavHeader() {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48">
             <DropdownMenuItem 
-              onClick={() => navigate("/clinic/myprofile")}
+              onClick={() => navigate("/clinic/myaccount")}
               className="flex items-center space-x-2 cursor-pointer text-sm font-medium text-gray-700 hover:text-[#8B5CF6] focus:text-[#8B5CF6]"
             >
               <UserRound className="h-4 w-4" />
