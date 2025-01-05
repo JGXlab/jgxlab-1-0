@@ -132,13 +132,6 @@ export function PatientSelector({ value, onChange, clinicId, className }: Patien
           </Command>
         </PopoverContent>
       </Popover>
-      <Button 
-        type="button" 
-        variant="outline"
-        onClick={() => setCreatePatientOpen(true)}
-      >
-        Add Patient
-      </Button>
       <Dialog open={createPatientOpen} onOpenChange={setCreatePatientOpen}>
         <DialogContent>
           <DialogHeader>
