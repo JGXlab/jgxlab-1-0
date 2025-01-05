@@ -17,6 +17,7 @@ import {
 import { StatsCards } from "@/components/design/dashboard/StatsCards";
 import { RecentActivity } from "@/components/design/dashboard/RecentActivity";
 import { motion } from "framer-motion";
+import { LabScriptsTable } from "@/components/lab-scripts/LabScriptsTable";
 
 export default function DesignDashboard() {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -79,6 +80,11 @@ export default function DesignDashboard() {
       const today = new Date();
       return dueDate <= today && script.status !== 'completed';
     }).length,
+  };
+
+  const handlePreview = (script: any, e: React.MouseEvent) => {
+    // Add preview handler if needed
+    console.log("Preview script:", script);
   };
 
   return (
@@ -157,7 +163,39 @@ export default function DesignDashboard() {
             transition={{ duration: 0.3 }}
           >
             <StatsCards stats={stats} />
-            <RecentActivity labScripts={labScripts} />
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Left Column - Recent Lab Scripts */}
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3, delay: 0.1 }}
+              >
+                <Card className="bg-white h-[600px] overflow-hidden">
+                  <div className="p-6">
+                    <h3 className="text-lg font-semibold mb-4">Recent Lab Scripts</h3>
+                    <ScrollArea className="h-[500px] pr-4">
+                      <LabScriptsTable 
+                        labScripts={labScripts.slice(0, 5)}
+                        isLoading={isLoading}
+                        onPreview={handlePreview}
+                        isDesignPortal={true}
+                        hideClinicColumn={false}
+                      />
+                    </ScrollArea>
+                  </div>
+                </Card>
+              </motion.div>
+
+              {/* Right Column - Recent Activity */}
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3, delay: 0.2 }}
+              >
+                <RecentActivity labScripts={labScripts} />
+              </motion.div>
+            </div>
           </motion.div>
         </ScrollArea>
       </div>
