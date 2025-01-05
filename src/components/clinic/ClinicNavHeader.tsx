@@ -35,7 +35,7 @@ export function ClinicNavHeader() {
       {/* Left side - Logo and nav items */}
       <div className="flex items-center space-x-6">
         <div className="flex flex-col">
-          <span className="font-semibold text-base">JGX Digital Lab</span>
+          <span className="text-xl font-bold tracking-tight font-inter">JGX Digital Lab</span>
           <span className="text-xs text-muted-foreground">Clinic Portal</span>
         </div>
         
