@@ -9,7 +9,8 @@ import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { LabScriptsTable } from "@/components/lab-scripts/LabScriptsTable";
 import { StatusCardsGrid } from "@/components/lab-scripts/StatusCardsGrid";
-import { LabScriptsHeader } from "@/components/lab-scripts/LabScriptsHeader";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { DesignNavbar } from "@/components/design/DesignNavbar";
 
 const DesignLabScripts = () => {
   const [selectedScript, setSelectedScript] = useState<any>(null);
@@ -125,34 +126,37 @@ const DesignLabScripts = () => {
 
   return (
     <DesignLayout>
-      <div className="space-y-8 p-8 animate-fade-in">
-        <LabScriptsHeader />
-        
-        <StatusCardsGrid 
-          statusCounts={statusCounts} 
-          selectedStatus={selectedStatus}
-          onStatusSelect={handleStatusSelect}
-        />
+      <div className="flex flex-col max-w-[1400px] w-full mx-auto h-screen py-8">
+        <ScrollArea className="h-full rounded-2xl bg-[#F6F6F7]">
+          <DesignNavbar />
+          <div className="p-4 sm:p-6 lg:p-8 space-y-6">
+            <StatusCardsGrid 
+              statusCounts={statusCounts} 
+              selectedStatus={selectedStatus}
+              onStatusSelect={handleStatusSelect}
+            />
 
-        <Card className="p-6 backdrop-blur-sm bg-white/50 shadow-lg">
-          <LabScriptsTable
-            labScripts={filteredLabScripts || []}
-            isLoading={isLoading}
-            onPreview={handlePreview}
-            onStatusUpdate={handleStatusUpdate}
-          />
-        </Card>
+            <Card className="bg-gradient-to-br from-white to-accent/30 border-none shadow-lg">
+              <LabScriptsTable
+                labScripts={filteredLabScripts || []}
+                isLoading={isLoading}
+                onPreview={handlePreview}
+                onStatusUpdate={handleStatusUpdate}
+              />
+            </Card>
 
-        {selectedScript && (
-          <PreviewLabScriptModal
-            isOpen={isPreviewOpen}
-            onClose={() => {
-              setIsPreviewOpen(false);
-              setSelectedScript(null);
-            }}
-            labScriptId={selectedScript.id}
-          />
-        )}
+            {selectedScript && (
+              <PreviewLabScriptModal
+                isOpen={isPreviewOpen}
+                onClose={() => {
+                  setIsPreviewOpen(false);
+                  setSelectedScript(null);
+                }}
+                labScriptId={selectedScript.id}
+              />
+            )}
+          </div>
+        </ScrollArea>
       </div>
     </DesignLayout>
   );
