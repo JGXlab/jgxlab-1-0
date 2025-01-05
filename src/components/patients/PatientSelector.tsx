@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { CreatePatientForm } from "@/components/patients/CreatePatientForm";
 import { FormControl } from "@/components/ui/form";
 import { useQuery } from "@tanstack/react-query";
@@ -14,7 +14,7 @@ interface PatientSelectorProps {
   value: string;
   onChange: (value: string) => void;
   clinicId?: string;
-  className?: string; // Added className prop
+  className?: string;
 }
 
 export function PatientSelector({ value, onChange, clinicId, className }: PatientSelectorProps) {
@@ -145,11 +145,6 @@ export function PatientSelector({ value, onChange, clinicId, className }: Patien
         </PopoverContent>
       </Popover>
       <Dialog open={createPatientOpen} onOpenChange={setCreatePatientOpen}>
-        <DialogTrigger asChild>
-          <Button type="button" variant="outline">
-            New Patient
-          </Button>
-        </DialogTrigger>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Create New Patient</DialogTitle>
