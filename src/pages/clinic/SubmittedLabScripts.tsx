@@ -108,6 +108,7 @@ export default function SubmittedLabScripts() {
                 })}
                 isLoading={isLoading}
                 onPreview={handlePreview}
+                showClinicColumn={false}
               />
             </Card>
 
