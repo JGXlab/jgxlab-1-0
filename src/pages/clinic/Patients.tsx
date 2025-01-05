@@ -83,17 +83,19 @@ export default function ClinicPatients() {
                         Add New Patient
                       </Button>
                     </DialogTrigger>
-                    <DialogContent className="sm:max-w-[425px]">
-                      <DialogHeader>
-                        <DialogTitle>Add New Patient</DialogTitle>
-                        <DialogDescription>
+                    <DialogContent className="sm:max-w-[600px] w-[95%] p-0 bg-transparent border-none shadow-2xl">
+                      <DialogHeader className="bg-white/80 backdrop-blur-lg p-6 rounded-t-xl border-b border-gray-100">
+                        <DialogTitle className="text-2xl font-semibold text-gray-800">Add New Patient</DialogTitle>
+                        <DialogDescription className="text-gray-600">
                           Create a new patient record in your clinic.
                         </DialogDescription>
                       </DialogHeader>
-                      <CreatePatientForm 
-                        onSuccess={() => setCreateOpen(false)} 
-                        clinicId={clinicData?.id}
-                      />
+                      <div className="bg-white/80 backdrop-blur-lg p-6 rounded-b-xl">
+                        <CreatePatientForm 
+                          onSuccess={() => setCreateOpen(false)} 
+                          clinicId={clinicData?.id}
+                        />
+                      </div>
                     </DialogContent>
                   </Dialog>
                 </div>
