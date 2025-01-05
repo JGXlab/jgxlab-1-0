@@ -6,37 +6,37 @@ export const LabScriptsTableHeader = () => {
     <TableHeader>
       <TableRow className="bg-gray-50/50">
         <TableHead className="w-[250px]">
-          <div className="flex items-center space-x-2 text-gray-700">
+          <div className="flex items-center space-x-2 text-primary/80 font-semibold">
             <User className="h-4 w-4" />
             <span>Patient</span>
           </div>
         </TableHead>
         <TableHead>
-          <div className="flex items-center space-x-2 text-gray-700">
+          <div className="flex items-center space-x-2 text-primary/80 font-semibold">
             <FileText className="h-4 w-4" />
             <span>Appliance Details</span>
           </div>
         </TableHead>
         <TableHead>
-          <div className="flex items-center space-x-2 text-gray-700">
+          <div className="flex items-center space-x-2 text-primary/80 font-semibold">
             <Calendar className="h-4 w-4" />
             <span>Due Date</span>
           </div>
         </TableHead>
         <TableHead>
-          <div className="flex items-center space-x-2 text-gray-700">
+          <div className="flex items-center space-x-2 text-primary/80 font-semibold">
             <Database className="h-4 w-4" />
             <span>Status</span>
           </div>
         </TableHead>
         <TableHead>
-          <div className="flex items-center space-x-2 text-gray-700">
+          <div className="flex items-center space-x-2 text-primary/80 font-semibold">
             <CreditCard className="h-4 w-4" />
             <span>Payment</span>
           </div>
         </TableHead>
         <TableHead>
-          <div className="flex items-center space-x-2 text-gray-700">
+          <div className="flex items-center space-x-2 text-primary/80 font-semibold">
             <Clock className="h-4 w-4" />
             <span>Created</span>
           </div>

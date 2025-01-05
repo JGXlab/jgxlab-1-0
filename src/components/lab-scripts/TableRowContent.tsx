@@ -76,12 +76,12 @@ export const TableRowContent = ({ script, onPreview }: TableRowContentProps) => 
     <>
       <TableRow 
         key={script.id} 
-        className="cursor-pointer hover:bg-gray-50/50 transition-colors"
+        className="cursor-pointer hover:bg-gray-50/50 transition-colors duration-200"
       >
         <TableCell>
           <div className="flex items-center space-x-3">
-            <div className="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center">
-              <User className="h-4 w-4 text-gray-600" />
+            <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+              <User className="h-4 w-4 text-primary" />
             </div>
             <div>
               <p className="font-medium text-gray-900">
@@ -112,7 +112,7 @@ export const TableRowContent = ({ script, onPreview }: TableRowContentProps) => 
         <TableCell>
           <Badge 
             variant="secondary"
-            className={`flex items-center gap-1 w-fit border ${getStatusColor(script.status)}`}
+            className={`flex items-center gap-1 w-fit bg-accent text-accent-foreground ${getStatusColor(script.status)}`}
           >
             <StatusIcon className="h-4 w-4" />
             <span className="capitalize">{script.status}</span>
@@ -121,7 +121,7 @@ export const TableRowContent = ({ script, onPreview }: TableRowContentProps) => 
         <TableCell>
           <Badge 
             variant="secondary"
-            className={`flex items-center gap-1 w-fit border ${getPaymentStatusColor(script.payment_status)}`}
+            className={`flex items-center gap-1 w-fit bg-accent text-accent-foreground ${getPaymentStatusColor(script.payment_status)}`}
           >
             <CreditCard className="h-4 w-4" />
             <span className="capitalize">{script.payment_status}</span>
@@ -135,9 +135,9 @@ export const TableRowContent = ({ script, onPreview }: TableRowContentProps) => 
         <TableCell>
           <div className="flex items-center gap-2">
             <Button
-              variant="ghost"
+              variant="outline"
               size="sm"
-              className="flex items-center justify-center gap-2"
+              className="text-primary hover:text-primary hover:bg-primary/10 border-primary/20"
               onClick={(e) => onPreview(script, e)}
             >
               <Eye className="h-4 w-4" />
@@ -145,9 +145,9 @@ export const TableRowContent = ({ script, onPreview }: TableRowContentProps) => 
             </Button>
             {invoice && (
               <Button
-                variant="ghost"
+                variant="outline"
                 size="sm"
-                className="flex items-center justify-center gap-2"
+                className="text-primary hover:text-primary hover:bg-primary/10 border-primary/20"
                 onClick={() => setShowInvoice(true)}
               >
                 <FileText className="h-4 w-4" />
