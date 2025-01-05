@@ -55,7 +55,7 @@ export default function ClinicPatients() {
 
   return (
     <ClinicLayout>
-      <div className="flex flex-col max-w-[1200px] w-full mx-auto h-screen py-8">
+      <div className="flex flex-col max-w-[1400px] w-full mx-auto h-screen py-8">
         <ScrollArea className="h-full rounded-2xl bg-gradient-to-br from-[#F8F9FE] to-[#FFFFFF]">
           <ClinicNavHeader />
           <div className="p-4 sm:p-6 lg:p-8">

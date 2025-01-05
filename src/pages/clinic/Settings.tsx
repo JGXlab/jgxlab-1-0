@@ -5,7 +5,7 @@ import { ClinicNavHeader } from "@/components/clinic/ClinicNavHeader";
 export default function Settings() {
   return (
     <ClinicLayout>
-      <div className="flex flex-col max-w-[1200px] w-full mx-auto h-screen py-8">
+      <div className="flex flex-col max-w-[1400px] w-full mx-auto h-screen py-8">
         <ScrollArea className="h-full rounded-2xl bg-[#F6F6F7]">
           <ClinicNavHeader />
           <div className="p-4 sm:p-6 lg:p-8">
