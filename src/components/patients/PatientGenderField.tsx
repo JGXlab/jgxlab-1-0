@@ -16,14 +16,17 @@ export function PatientGenderField({ form }) {
           <FormControl>
             <RadioGroup
               onValueChange={field.onChange}
-              value={field.value}
+              defaultValue={field.value}
               className="flex flex-col sm:flex-row gap-4"
             >
               {["male", "female", "other"].map((gender) => (
                 <div key={gender} className="flex items-center">
-                  <RadioGroupItem
-                    value={gender}
+                  <input
+                    type="radio"
                     id={gender}
+                    value={gender}
+                    checked={field.value === gender}
+                    onChange={(e) => field.onChange(e.target.value)}
                     className="peer sr-only"
                   />
                   <label
