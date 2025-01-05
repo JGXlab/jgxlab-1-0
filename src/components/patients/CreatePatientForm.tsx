@@ -80,9 +80,16 @@ export function CreatePatientForm({ onSuccess, clinicId }: { onSuccess: () => vo
     }
   }
 
+  // Add onSubmit handler to prevent event propagation
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    await form.handleSubmit(onSubmit)(e);
+  };
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form onSubmit={handleSubmit} className="space-y-8">
         <div className="space-y-6">
           <div className="p-6 rounded-xl bg-white/30 backdrop-blur-lg border border-white/20 shadow-xl">            
             <div className="space-y-6">
