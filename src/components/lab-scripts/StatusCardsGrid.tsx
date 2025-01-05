@@ -68,11 +68,9 @@ export const StatusCardsGrid = ({ statusCounts, selectedStatus, onStatusSelect }
       {statusCards.map((card) => (
         <StatusCard
           key={card.label}
-          icon={() => null}
           label={card.label}
           count={card.count}
           color={card.color}
-          gradient=""
           isHighlighted={card.isHighlighted}
           isSelected={selectedStatus === card.status}
           onClick={() => onStatusSelect(card.status)}

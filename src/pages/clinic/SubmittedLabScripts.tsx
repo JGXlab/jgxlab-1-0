@@ -127,9 +127,6 @@ export default function SubmittedLabScripts() {
               searchTerm={searchTerm}
               onSearchChange={setSearchTerm}
               onNewLabScript={() => setIsNewLabScriptOpen(true)}
-            />
-
-            <StatusCardsGrid 
               statusCounts={statusCounts}
               selectedStatus={null}
               onStatusSelect={() => {}}
