@@ -8,7 +8,6 @@ import { useState } from "react";
 import { format, isToday, isPast } from "date-fns";
 import { StatusDistributionChart } from "./StatusDistributionChart";
 import { StatusLegend } from "./StatusLegend";
-import { ChartPie, Clock, AlertOctagon, Calendar } from "lucide-react";
 
 interface DashboardContentProps {
   labScripts: any[];
@@ -101,19 +100,6 @@ export const DashboardContent = ({ labScripts, isLoading, stats, onPreview }: Da
             <div className="p-6">
               <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
                 <Button 
-                  variant={currentView === 'stats' ? 'default' : 'outline'}
-                  onClick={() => setCurrentView('stats')}
-                  size="sm"
-                  className={`transition-all duration-200 ${
-                    currentView === 'stats' 
-                      ? 'bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm' 
-                      : 'hover:bg-accent hover:text-accent-foreground'
-                  }`}
-                >
-                  <ChartPie className="w-4 h-4" />
-                  Status Stats
-                </Button>
-                <Button 
                   variant={currentView === 'recent' ? 'default' : 'outline'}
                   onClick={() => setCurrentView('recent')}
                   size="sm"
@@ -123,21 +109,7 @@ export const DashboardContent = ({ labScripts, isLoading, stats, onPreview }: Da
                       : 'hover:bg-accent hover:text-accent-foreground'
                   }`}
                 >
-                  <Clock className="w-4 h-4" />
                   Recent
-                </Button>
-                <Button 
-                  variant={currentView === 'overdue' ? 'default' : 'outline'}
-                  onClick={() => setCurrentView('overdue')}
-                  size="sm"
-                  className={`transition-all duration-200 ${
-                    currentView === 'overdue' 
-                      ? 'bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm' 
-                      : 'hover:bg-accent hover:text-accent-foreground'
-                  }`}
-                >
-                  <AlertOctagon className="w-4 h-4" />
-                  Overdue
                 </Button>
                 <Button 
                   variant={currentView === 'dueToday' ? 'default' : 'outline'}
@@ -149,8 +121,31 @@ export const DashboardContent = ({ labScripts, isLoading, stats, onPreview }: Da
                       : 'hover:bg-accent hover:text-accent-foreground'
                   }`}
                 >
-                  <Calendar className="w-4 h-4" />
                   Due Today
+                </Button>
+                <Button 
+                  variant={currentView === 'overdue' ? 'default' : 'outline'}
+                  onClick={() => setCurrentView('overdue')}
+                  size="sm"
+                  className={`transition-all duration-200 ${
+                    currentView === 'overdue' 
+                      ? 'bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm' 
+                      : 'hover:bg-accent hover:text-accent-foreground'
+                  }`}
+                >
+                  Overdue
+                </Button>
+                <Button 
+                  variant={currentView === 'stats' ? 'default' : 'outline'}
+                  onClick={() => setCurrentView('stats')}
+                  size="sm"
+                  className={`transition-all duration-200 ${
+                    currentView === 'stats' 
+                      ? 'bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm' 
+                      : 'hover:bg-accent hover:text-accent-foreground'
+                  }`}
+                >
+                  Status Stats
                 </Button>
               </div>
               {renderContent()}
