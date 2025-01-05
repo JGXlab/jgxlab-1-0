@@ -23,63 +23,63 @@ export const StatusCardsGrid = ({ statusCounts, selectedStatus, onStatusSelect }
       icon: Clock, 
       label: 'New Lab Scripts', 
       count: statusCounts.new, 
-      color: 'bg-amber-500',
-      gradient: 'bg-gradient-to-br from-amber-500/20 to-orange-500/20',
+      color: 'bg-[#9b87f5]',
+      gradient: 'bg-gradient-to-br from-[#9b87f5]/20 to-[#7E69AB]/20',
       status: 'pending'
     },
     { 
       icon: Loader2, 
       label: 'In Process', 
       count: statusCounts.inProcess, 
-      color: 'bg-blue-500',
-      gradient: 'bg-gradient-to-br from-blue-500/20 to-indigo-500/20',
+      color: 'bg-[#7E69AB]',
+      gradient: 'bg-gradient-to-br from-[#7E69AB]/20 to-[#6E59A5]/20',
       status: 'in_progress'
     },
     { 
       icon: Pause, 
       label: 'Paused', 
       count: statusCounts.paused, 
-      color: 'bg-orange-500',
-      gradient: 'bg-gradient-to-br from-orange-500/20 to-red-500/20',
+      color: 'bg-[#D6BCFA]',
+      gradient: 'bg-gradient-to-br from-[#D6BCFA]/20 to-[#E5DEFF]/20',
       status: 'paused'
     },
     { 
       icon: StopCircle, 
       label: 'On Hold', 
       count: statusCounts.onHold, 
-      color: 'bg-red-500',
-      gradient: 'bg-gradient-to-br from-red-500/20 to-pink-500/20',
+      color: 'bg-[#FEC6A1]',
+      gradient: 'bg-gradient-to-br from-[#FEC6A1]/20 to-[#FDE1D3]/20',
       status: 'on_hold'
     },
     { 
       icon: AlertTriangle, 
       label: 'Incomplete', 
       count: statusCounts.incomplete, 
-      color: 'bg-pink-500',
-      gradient: 'bg-gradient-to-br from-pink-500/20 to-rose-500/20',
+      color: 'bg-[#FFDEE2]',
+      gradient: 'bg-gradient-to-br from-[#FFDEE2]/20 to-[#FDE1D3]/20',
       status: 'incomplete'
     },
     { 
       icon: CheckCircle, 
       label: 'Completed', 
       count: statusCounts.completed, 
-      color: 'bg-green-500',
-      gradient: 'bg-gradient-to-br from-green-500/20 to-emerald-500/20',
+      color: 'bg-[#F2FCE2]',
+      gradient: 'bg-gradient-to-br from-[#F2FCE2]/20 to-[#FEF7CD]/20',
       status: 'completed'
     },
     { 
       icon: FileText, 
       label: 'All Scripts', 
       count: statusCounts.all, 
-      color: 'bg-violet-500',
-      gradient: 'bg-gradient-to-br from-violet-500/20 to-purple-500/20',
+      color: 'bg-[#D3E4FD]',
+      gradient: 'bg-gradient-to-br from-[#D3E4FD]/20 to-[#E5DEFF]/20',
       isHighlighted: true,
       status: null
     },
   ];
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-2 max-w-[900px]">
+    <div className="grid grid-cols-7 gap-2 w-full">
       {statusCards.map((card) => (
         <StatusCard
           key={card.label}
