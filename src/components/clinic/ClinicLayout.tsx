@@ -1,15 +1,11 @@
-import { ReactNode } from "react";
+import React from "react";
 
-interface ClinicLayoutProps {
-  children: ReactNode;
-}
-
-export function ClinicLayout({ children }: ClinicLayoutProps) {
+export function ClinicLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-background">
-      <main className="animate-fade-in">
+    <div className="min-h-screen bg-white w-full">
+      <div className="w-full h-full min-h-screen px-8 md:px-12 lg:px-16 bg-[#d9dfec]">
         {children}
-      </main>
+      </div>
     </div>
   );
 }

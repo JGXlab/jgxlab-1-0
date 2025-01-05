@@ -22,10 +22,10 @@ export function ClinicNavHeader() {
         <nav className="flex items-center space-x-3 border border-gray-200 rounded-full py-2 h-10">
           <button 
             onClick={() => navigate("/clinic/dashboard")}
-            className={`flex items-center space-x-1.5 px-4 h-10 rounded-full transition-all duration-300 ease-spring transform ${
+            className={`flex items-center space-x-1.5 px-4 h-10 rounded-full transition-all duration-200 ${
               isActivePath("/clinic/dashboard") 
-                ? "bg-primary text-white shadow-sm scale-105" 
-                : "text-gray-500 hover:bg-gray-100 hover:scale-102"
+                ? "bg-primary text-white shadow-sm" 
+                : "text-gray-500 hover:bg-gray-100"
             }`}
           >
             <LayoutDashboard className="h-3.5 w-3.5" />
@@ -34,10 +34,10 @@ export function ClinicNavHeader() {
           
           <button 
             onClick={() => navigate("/clinic/patients")}
-            className={`flex items-center space-x-1.5 px-4 h-10 rounded-full transition-all duration-300 ease-spring transform ${
+            className={`flex items-center space-x-1.5 px-4 h-10 rounded-full transition-all duration-200 ${
               isActivePath("/clinic/patients") 
-                ? "bg-primary text-white shadow-sm scale-105" 
-                : "text-gray-500 hover:bg-gray-100 hover:scale-102"
+                ? "bg-primary text-white shadow-sm" 
+                : "text-gray-500 hover:bg-gray-100"
             }`}
           >
             <Users className="h-3.5 w-3.5" />
@@ -46,10 +46,10 @@ export function ClinicNavHeader() {
           
           <button 
             onClick={() => navigate("/clinic/submittedlabscripts")}
-            className={`flex items-center space-x-1.5 px-4 h-10 rounded-full transition-all duration-300 ease-spring transform ${
+            className={`flex items-center space-x-1.5 px-4 h-10 rounded-full transition-all duration-200 ${
               isActivePath("/clinic/submittedlabscripts") 
-                ? "bg-primary text-white shadow-sm scale-105" 
-                : "text-gray-500 hover:bg-gray-100 hover:scale-102"
+                ? "bg-primary text-white shadow-sm" 
+                : "text-gray-500 hover:bg-gray-100"
             }`}
           >
             <FileText className="h-3.5 w-3.5" />
@@ -58,10 +58,10 @@ export function ClinicNavHeader() {
           
           <button 
             onClick={() => navigate("/clinic/myaccount")}
-            className={`flex items-center space-x-1.5 px-4 h-10 rounded-full transition-all duration-300 ease-spring transform ${
+            className={`flex items-center space-x-1.5 px-4 h-10 rounded-full transition-all duration-200 ${
               isActivePath("/clinic/myaccount") 
-                ? "bg-primary text-white shadow-sm scale-105" 
-                : "text-gray-500 hover:bg-gray-100 hover:scale-102"
+                ? "bg-primary text-white shadow-sm" 
+                : "text-gray-500 hover:bg-gray-100"
             }`}
           >
             <Settings className="h-3.5 w-3.5" />
@@ -72,7 +72,7 @@ export function ClinicNavHeader() {
 
       {/* Right side - notifications and profile */}
       <div className="flex items-center space-x-4">
-        <button className="relative text-gray-500 hover:text-gray-700 transition-colors duration-200">
+        <button className="relative text-gray-500 hover:text-gray-700">
           <Bell className="h-4 w-4" />
           <span className="absolute -top-1 -right-1 h-3.5 w-3.5 bg-red-500 rounded-full text-white text-[10px] flex items-center justify-center">
             2
