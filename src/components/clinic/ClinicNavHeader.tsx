@@ -72,9 +72,9 @@ export function ClinicNavHeader() {
 
       {/* Right side - notifications and profile */}
       <div className="flex items-center space-x-4">
-        <button className="relative text-gray-500 hover:text-gray-700 transition-colors">
+        <button className="relative p-2 rounded-full bg-[#8B5CF6]/10 text-[#8B5CF6] hover:bg-[#8B5CF6]/20 transition-all duration-200">
           <Bell className="h-4 w-4" />
-          <span className="absolute -top-1 -right-1 h-3.5 w-3.5 bg-red-500 rounded-full text-white text-[10px] flex items-center justify-center">
+          <span className="absolute -top-0.5 -right-0.5 h-4 w-4 bg-red-500 rounded-full text-white text-[10px] flex items-center justify-center border-2 border-white">
             2
           </span>
         </button>
