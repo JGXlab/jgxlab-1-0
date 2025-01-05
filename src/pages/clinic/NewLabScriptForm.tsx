@@ -100,14 +100,15 @@ export default function NewLabScriptForm() {
 
   return (
     <ClinicLayout>
-      <div className="min-h-screen bg-gray-50">
-        <div className="sticky top-0 z-10 bg-white border-b">
+      <div className="min-h-screen bg-[#F6F6F7]">
+        <div className="sticky top-0 z-10 bg-white border-b shadow-sm">
           <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16">
               <div className="flex items-center gap-4">
                 <Button
                   variant="ghost"
                   onClick={() => navigate("/clinic/submittedlabscripts")}
+                  className="text-gray-600 hover:text-gray-900"
                 >
                   <ArrowLeft className="h-4 w-4" />
                 </Button>
@@ -121,21 +122,29 @@ export default function NewLabScriptForm() {
         </div>
 
         <div className="max-w-3xl mx-auto px-4 py-8">
-          <div className="bg-white rounded-lg shadow-sm p-8 space-y-8">
+          <div className="bg-gradient-to-br from-white to-accent/30 rounded-xl shadow-lg p-8 space-y-8">
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                <PatientInformationSection form={form} />
-                <ApplianceDetailsSection form={form} />
-                <AdditionalInformationSection form={form} />
-                <PaymentSection 
-                  applianceType={watchedValues.applianceType}
-                  archType={watchedValues.arch}
-                  needsNightguard={watchedValues.needsNightguard}
-                  expressDesign={watchedValues.expressDesign}
-                  onSubmit={onSubmit}
-                  isSubmitting={isPending}
-                  form={form}
-                />
+                <div className="space-y-8">
+                  <PatientInformationSection form={form} />
+                  <div className="border-t border-gray-200 pt-8">
+                    <ApplianceDetailsSection form={form} />
+                  </div>
+                  <div className="border-t border-gray-200 pt-8">
+                    <AdditionalInformationSection form={form} />
+                  </div>
+                  <div className="border-t border-gray-200 pt-8">
+                    <PaymentSection 
+                      applianceType={watchedValues.applianceType}
+                      archType={watchedValues.arch}
+                      needsNightguard={watchedValues.needsNightguard}
+                      expressDesign={watchedValues.expressDesign}
+                      onSubmit={onSubmit}
+                      isSubmitting={isPending}
+                      form={form}
+                    />
+                  </div>
+                </div>
               </form>
             </Form>
           </div>
