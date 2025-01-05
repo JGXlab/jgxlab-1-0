@@ -1,5 +1,5 @@
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Bell, LayoutDashboard, Users, FileText, Settings } from "lucide-react";
+import { Bell, LayoutDashboard, Users, FileText, Settings, UserRound } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 
 export function ClinicNavHeader() {
@@ -72,14 +72,16 @@ export function ClinicNavHeader() {
 
       {/* Right side - notifications and profile */}
       <div className="flex items-center space-x-4">
-        <button className="relative text-gray-500 hover:text-gray-700">
+        <button className="relative text-gray-500 hover:text-gray-700 transition-colors">
           <Bell className="h-4 w-4" />
           <span className="absolute -top-1 -right-1 h-3.5 w-3.5 bg-red-500 rounded-full text-white text-[10px] flex items-center justify-center">
             2
           </span>
         </button>
-        <Avatar className="h-7 w-7">
-          <AvatarFallback>JD</AvatarFallback>
+        <Avatar className="h-8 w-8 ring-2 ring-[#8B5CF6]/20 ring-offset-2 ring-offset-white transition-all duration-200 hover:ring-[#8B5CF6]/40">
+          <AvatarFallback className="bg-[#8B5CF6]/10 text-[#8B5CF6]">
+            <UserRound className="h-4 w-4" />
+          </AvatarFallback>
         </Avatar>
       </div>
     </div>
