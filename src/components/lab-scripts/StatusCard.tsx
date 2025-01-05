@@ -1,12 +1,9 @@
 import { Card } from "@/components/ui/card";
-import { LucideIcon } from "lucide-react";
 
 interface StatusCardProps {
-  icon: LucideIcon;
   label: string;
   count: number;
   color: string;
-  gradient: string;
   isHighlighted?: boolean;
   isSelected?: boolean;
   onClick?: () => void;
