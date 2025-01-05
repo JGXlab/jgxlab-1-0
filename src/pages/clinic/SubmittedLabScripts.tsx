@@ -28,6 +28,7 @@ export default function SubmittedLabScripts() {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [isNewLabScriptOpen, setIsNewLabScriptOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
   const [searchParams] = useSearchParams();
   const { 
     verifyPayment, 
@@ -69,13 +70,13 @@ export default function SubmittedLabScripts() {
   }, [searchParams, verifyPayment]);
 
   const { data: labScripts = [], isLoading } = useQuery({
-    queryKey: ['labScripts'],
+    queryKey: ['labScripts', selectedStatus],
     queryFn: async () => {
       console.log('Fetching lab scripts...');
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("No user found");
 
-      const { data, error } = await supabase
+      let query = supabase
         .from('lab_scripts')
         .select(`
           *,
@@ -85,6 +86,12 @@ export default function SubmittedLabScripts() {
           )
         `)
         .order('created_at', { ascending: false });
+
+      if (selectedStatus) {
+        query = query.eq('status', selectedStatus);
+      }
+
+      const { data, error } = await query;
 
       if (error) {
         console.error('Error fetching lab scripts:', error);
@@ -117,6 +124,11 @@ export default function SubmittedLabScripts() {
     all: labScripts.length
   };
 
+  const handleStatusSelect = (status: string | null) => {
+    console.log('Selected status:', status);
+    setSelectedStatus(status);
+  };
+
   return (
     <ClinicLayout>
       <div className="flex flex-col max-w-[1400px] w-full mx-auto h-screen py-8">
@@ -128,8 +140,8 @@ export default function SubmittedLabScripts() {
               onSearchChange={setSearchTerm}
               onNewLabScript={() => setIsNewLabScriptOpen(true)}
               statusCounts={statusCounts}
-              selectedStatus={null}
-              onStatusSelect={() => {}}
+              selectedStatus={selectedStatus}
+              onStatusSelect={handleStatusSelect}
             />
 
             <Card className="bg-gradient-to-br from-white to-accent/30 border-none shadow-lg">
