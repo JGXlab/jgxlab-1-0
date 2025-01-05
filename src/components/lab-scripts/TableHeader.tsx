@@ -3,9 +3,13 @@ import { User, FileText, Calendar, Database, CreditCard, Clock, Building2 } from
 
 interface LabScriptsTableHeaderProps {
   isDesignPortal?: boolean;
+  hideClinicColumn?: boolean;
 }
 
-export const LabScriptsTableHeader = ({ isDesignPortal = false }: LabScriptsTableHeaderProps) => {
+export const LabScriptsTableHeader = ({ 
+  isDesignPortal = false,
+  hideClinicColumn = false 
+}: LabScriptsTableHeaderProps) => {
   return (
     <TableHeader>
       <TableRow className="bg-gray-50/50 hover:bg-gray-50/50 border-none">
@@ -15,12 +19,14 @@ export const LabScriptsTableHeader = ({ isDesignPortal = false }: LabScriptsTabl
             <span>Patient</span>
           </div>
         </TableHead>
-        <TableHead className="text-primary/80 font-semibold">
-          <div className="flex items-center space-x-2">
-            <Building2 className="h-4 w-4" />
-            <span>Clinic</span>
-          </div>
-        </TableHead>
+        {!hideClinicColumn && (
+          <TableHead className="text-primary/80 font-semibold">
+            <div className="flex items-center space-x-2">
+              <Building2 className="h-4 w-4" />
+              <span>Clinic</span>
+            </div>
+          </TableHead>
+        )}
         <TableHead className="text-primary/80 font-semibold">
           <div className="flex items-center space-x-2">
             <FileText className="h-4 w-4" />
