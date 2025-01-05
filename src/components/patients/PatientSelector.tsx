@@ -98,18 +98,6 @@ export function PatientSelector({ value, onChange, clinicId, className }: Patien
             <CommandList className="max-h-[300px] overflow-y-auto">
               <CommandEmpty>
                 No patient found.
-                <Button
-                  type="button"
-                  variant="link"
-                  className="mt-2"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setOpen(false);
-                    setCreatePatientOpen(true);
-                  }}
-                >
-                  Create new patient
-                </Button>
               </CommandEmpty>
               <CommandGroup>
                 {patients.map((patient) => (
@@ -144,6 +132,13 @@ export function PatientSelector({ value, onChange, clinicId, className }: Patien
           </Command>
         </PopoverContent>
       </Popover>
+      <Button 
+        type="button" 
+        variant="outline"
+        onClick={() => setCreatePatientOpen(true)}
+      >
+        Add Patient
+      </Button>
       <Dialog open={createPatientOpen} onOpenChange={setCreatePatientOpen}>
         <DialogContent>
           <DialogHeader>
