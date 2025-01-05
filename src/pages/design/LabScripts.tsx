@@ -1,9 +1,7 @@
 import { DesignLayout } from "@/components/design/DesignLayout";
 import { Card } from "@/components/ui/card";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { LoadingLabScripts } from "@/components/lab-scripts/LoadingLabScripts";
-import { EmptyLabScripts } from "@/components/lab-scripts/EmptyLabScripts";
 import { PreviewLabScriptModal } from "@/components/surgical-form/PreviewLabScriptModal";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
@@ -18,7 +16,6 @@ const DesignLabScripts = () => {
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const { toast } = useToast();
-  const queryClient = useQueryClient();
 
   const { data: labScripts, isLoading } = useQuery({
     queryKey: ['design-lab-scripts'],
@@ -72,36 +69,6 @@ const DesignLabScripts = () => {
     all: labScripts?.length || 0,
   };
 
-  const updateStatusMutation = useMutation({
-    mutationFn: async ({ id, status }: { id: string; status: string }) => {
-      const { error } = await supabase
-        .from('lab_scripts')
-        .update({ status })
-        .eq('id', id);
-
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['design-lab-scripts'] });
-      toast({
-        title: "Status Updated",
-        description: "Lab script status has been updated successfully.",
-      });
-    },
-    onError: (error) => {
-      toast({
-        title: "Error",
-        description: "Failed to update status. Please try again.",
-        variant: "destructive",
-      });
-      console.error('Error updating status:', error);
-    },
-  });
-
-  const handleStatusUpdate = (id: string, status: string) => {
-    updateStatusMutation.mutate({ id, status });
-  };
-
   const handlePreview = (script: any, e: React.MouseEvent) => {
     e.stopPropagation();
     setSelectedScript(script);
@@ -127,25 +94,29 @@ const DesignLabScripts = () => {
 
   return (
     <DesignLayout>
-      <div className="flex flex-col max-w-[1400px] w-full mx-auto h-screen py-8">
-        <ScrollArea className="h-full rounded-2xl bg-[#F6F6F7]">
+      <div className="flex flex-col max-w-[1400px] w-full mx-auto min-h-screen">
+        <div className="sticky top-0 z-50 w-full bg-gradient-to-br from-[#F8F9FD] to-[#E9EBFF] pb-4">
           <DesignNavbar 
             isCollapsed={isCollapsed}
             setIsCollapsed={setIsCollapsed}
           />
-          <div className="p-4 sm:p-6 lg:p-8 space-y-6">
-            <StatusCardsGrid 
-              statusCounts={statusCounts} 
-              selectedStatus={selectedStatus}
-              onStatusSelect={handleStatusSelect}
-            />
+        </div>
+        
+        <ScrollArea className="flex-1 px-6 py-8">
+          <div className="space-y-6">
+            <div className="bg-white rounded-xl p-6 shadow-sm">
+              <StatusCardsGrid 
+                statusCounts={statusCounts} 
+                selectedStatus={selectedStatus}
+                onStatusSelect={handleStatusSelect}
+              />
+            </div>
 
-            <Card className="bg-gradient-to-br from-white to-accent/30 border-none shadow-lg">
+            <Card className="bg-gradient-to-br from-white to-accent/30 border-none shadow-lg overflow-hidden">
               <LabScriptsTable
                 labScripts={filteredLabScripts || []}
                 isLoading={isLoading}
                 onPreview={handlePreview}
-                onStatusUpdate={handleStatusUpdate}
               />
             </Card>
 
