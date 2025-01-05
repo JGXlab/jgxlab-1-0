@@ -68,8 +68,7 @@ export function CreatePatientForm({ onSuccess, clinicId }: { onSuccess: () => vo
       });
       
       await queryClient.invalidateQueries({ queryKey: ["patients"] });
-      form.reset();
-      onSuccess();
+      onSuccess(); // This will close the form
     } catch (error) {
       console.error("Error creating patient:", error);
       toast({
