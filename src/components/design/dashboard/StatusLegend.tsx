@@ -11,7 +11,7 @@ interface StatusLegendProps {
 export const StatusLegend = ({ data, colors }: StatusLegendProps) => {
   return (
     <motion.div 
-      className="grid grid-cols-2 gap-3"
+      className="grid grid-cols-3 gap-2 mt-2"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ delay: 0.2 }}
@@ -19,19 +19,19 @@ export const StatusLegend = ({ data, colors }: StatusLegendProps) => {
       {data.map((item, index) => (
         <motion.div 
           key={item.name}
-          className="flex items-center justify-between p-2.5 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
+          className="flex items-center justify-between p-1.5 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: index * 0.1 }}
         >
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             <div 
-              className="w-3 h-3 rounded-full" 
+              className="w-2 h-2 rounded-full" 
               style={{ backgroundColor: colors[index % colors.length] }}
             />
-            <span className="font-medium text-sm">{item.name}</span>
+            <span className="text-xs font-medium">{item.name}</span>
           </div>
-          <span className="text-sm text-gray-600">{item.percentage}</span>
+          <span className="text-xs text-gray-600">{item.percentage}</span>
         </motion.div>
       ))}
     </motion.div>
