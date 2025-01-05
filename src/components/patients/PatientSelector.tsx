@@ -125,18 +125,16 @@ export function PatientSelector({ value, onChange, clinicId, className }: Patien
             New Patient
           </Button>
         </DialogTrigger>
-        <DialogContent className="sm:max-w-[500px]">
+        <DialogContent>
           <DialogHeader>
             <DialogTitle>Create New Patient</DialogTitle>
           </DialogHeader>
-          <div className="mt-4">
-            <CreatePatientForm 
-              clinicId={clinicId}
-              onSuccess={() => {
-                setCreatePatientOpen(false);
-              }}
-            />
-          </div>
+          <CreatePatientForm 
+            clinicId={clinicId}
+            onSuccess={() => {
+              setCreatePatientOpen(false);
+            }}
+          />
         </DialogContent>
       </Dialog>
     </div>
