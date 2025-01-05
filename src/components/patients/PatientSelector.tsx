@@ -14,7 +14,7 @@ interface PatientSelectorProps {
   value: string;
   onChange: (value: string) => void;
   clinicId?: string;
-  className?: string;
+  className?: string; // Added className prop
 }
 
 export function PatientSelector({ value, onChange, clinicId, className }: PatientSelectorProps) {
@@ -71,17 +71,39 @@ export function PatientSelector({ value, onChange, clinicId, className }: Patien
             </Button>
           </FormControl>
         </PopoverTrigger>
-        <PopoverContent className="w-[400px] p-0">
+        <PopoverContent 
+          className="w-[400px] p-0" 
+          align="start"
+          sideOffset={4}
+          onInteractOutside={(e) => {
+            e.preventDefault();
+            setOpen(false);
+          }}
+          style={{
+            zIndex: 50,
+            backgroundColor: 'white',
+            position: 'relative',
+            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+            pointerEvents: 'auto'
+          }}
+        >
           <Command>
-            <CommandInput placeholder="Search patients..." />
-            <CommandList>
+            <CommandInput 
+              placeholder="Search patients..." 
+              className="border-0"
+              onKeyDown={(e) => {
+                e.stopPropagation();
+              }}
+            />
+            <CommandList className="max-h-[300px] overflow-y-auto">
               <CommandEmpty>
                 No patient found.
                 <Button
                   type="button"
                   variant="link"
                   className="mt-2"
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.stopPropagation();
                     setOpen(false);
                     setCreatePatientOpen(true);
                   }}
@@ -103,6 +125,10 @@ export function PatientSelector({ value, onChange, clinicId, className }: Patien
                         setOpen(false);
                       }
                     }}
+                    className="cursor-pointer hover:bg-gray-100 py-2"
+                    onMouseDown={(e) => {
+                      e.stopPropagation();
+                    }}
                   >
                     <Check
                       className={cn(
@@ -118,7 +144,6 @@ export function PatientSelector({ value, onChange, clinicId, className }: Patien
           </Command>
         </PopoverContent>
       </Popover>
-
       <Dialog open={createPatientOpen} onOpenChange={setCreatePatientOpen}>
         <DialogTrigger asChild>
           <Button type="button" variant="outline">
@@ -130,10 +155,8 @@ export function PatientSelector({ value, onChange, clinicId, className }: Patien
             <DialogTitle>Create New Patient</DialogTitle>
           </DialogHeader>
           <CreatePatientForm 
+            onSuccess={() => setCreatePatientOpen(false)} 
             clinicId={clinicId}
-            onSuccess={() => {
-              setCreatePatientOpen(false);
-            }}
           />
         </DialogContent>
       </Dialog>

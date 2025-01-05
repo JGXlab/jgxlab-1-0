@@ -28,7 +28,7 @@ const formSchema = z.object({
 
 type PatientFormValues = z.infer<typeof formSchema>;
 
-export function CreatePatientForm({ onSuccess, clinicId }: { onSuccess?: () => void; clinicId?: string }) {
+export function CreatePatientForm({ onSuccess, clinicId }: { onSuccess: () => void; clinicId?: string }) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -68,11 +68,8 @@ export function CreatePatientForm({ onSuccess, clinicId }: { onSuccess?: () => v
       });
       
       await queryClient.invalidateQueries({ queryKey: ["patients"] });
-      
-      // Only call onSuccess if it exists
-      if (onSuccess) {
-        onSuccess();
-      }
+      form.reset();
+      onSuccess();
     } catch (error) {
       console.error("Error creating patient:", error);
       toast({
