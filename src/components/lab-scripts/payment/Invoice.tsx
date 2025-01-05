@@ -61,28 +61,37 @@ export const Invoice = ({ labScript, onDownload }: InvoiceProps) => {
   return (
     <Card className="bg-white w-full max-w-[210mm] mx-auto shadow-none border-none">
       <div className="p-8 space-y-8">
-        {/* Header */}
-        <div className="flex justify-between items-start">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Invoice</h1>
-            <div className="mt-4 space-y-1 text-sm text-gray-600">
+        {/* Enhanced Header */}
+        <div className="flex justify-between items-start border-b border-gray-200 pb-8">
+          <div className="space-y-4">
+            <div className="flex items-center space-x-4">
+              <h1 className="text-4xl font-bold text-gray-900">Invoice</h1>
+              <div className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-sm font-medium">
+                Paid
+              </div>
+            </div>
+            <div className="space-y-1 text-sm text-gray-600">
+              <p className="font-medium text-gray-900">Invoice Details</p>
               <p>Invoice number: {labScript.payment_id}</p>
-              <p>Date of issue: {format(new Date(), 'MMMM d, yyyy')}</p>
-              <p>Date due: {format(new Date(), 'MMMM d, yyyy')}</p>
-              <p className="mt-2">
-                Patient: {invoice.patient_name}
-              </p>
+              <p>Issue date: {format(new Date(labScript.payment_date || new Date()), 'MMMM d, yyyy')}</p>
+              <p>Payment date: {format(new Date(labScript.payment_date || new Date()), 'MMMM d, yyyy')}</p>
             </div>
           </div>
-          <div className="text-right">
+          <div className="text-right space-y-4">
             <h2 className="text-2xl font-semibold text-primary">JGX Dental Lab LLC</h2>
+            <div className="text-sm text-gray-600">
+              <p>25 Highview Trail</p>
+              <p>Pittsford, New York 14534</p>
+              <p>United States</p>
+              <p>+1 718-812-2869</p>
+            </div>
           </div>
         </div>
 
         {/* Addresses */}
         <div className="grid grid-cols-2 gap-12">
           <div>
-            <h3 className="font-semibold text-gray-900 mb-3">From</h3>
+            <h3 className="font-semibold text-gray-900 mb-3">Bill From</h3>
             <div className="space-y-1 text-gray-600">
               <p>JGX Dental Lab LLC</p>
               <p>25 Highview Trail</p>
@@ -92,7 +101,7 @@ export const Invoice = ({ labScript, onDownload }: InvoiceProps) => {
             </div>
           </div>
           <div>
-            <h3 className="font-semibold text-gray-900 mb-3">Bill to</h3>
+            <h3 className="font-semibold text-gray-900 mb-3">Bill To</h3>
             <div className="space-y-1 text-gray-600">
               <p>{invoice.clinic_name}</p>
               <p>{invoice.clinic_address}</p>
@@ -147,9 +156,15 @@ export const Invoice = ({ labScript, onDownload }: InvoiceProps) => {
                 </td>
               </tr>
               <tr>
-                <td colSpan={2} className="py-4 text-right font-medium text-gray-900">Amount due</td>
-                <td className="py-4 text-right font-medium text-primary">
+                <td colSpan={2} className="py-4 text-right font-medium text-gray-900">Amount Paid</td>
+                <td className="py-4 text-right font-medium text-emerald-600">
                   ${totalAmount.toFixed(2)} USD
+                </td>
+              </tr>
+              <tr>
+                <td colSpan={2} className="py-4 text-right font-medium text-gray-900">Balance Due</td>
+                <td className="py-4 text-right font-medium text-gray-900">
+                  $0.00 USD
                 </td>
               </tr>
             </tfoot>
