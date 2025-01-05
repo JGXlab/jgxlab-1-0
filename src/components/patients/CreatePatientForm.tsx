@@ -21,9 +21,7 @@ const formSchema = z.object({
   gender: z.enum(["male", "female", "other"], {
     required_error: "Please select a gender.",
   }),
-  clinic_id: z.string().min(1, {
-    message: "Please select a clinic.",
-  }),
+  clinic_id: z.string().optional(), // Made optional
 });
 
 type PatientFormValues = z.infer<typeof formSchema>;
@@ -53,7 +51,7 @@ export function CreatePatientForm({ onSuccess, clinicId }: { onSuccess: () => vo
         last_name: values.last_name,
         gender: values.gender as string,
         user_id: userData.user.id,
-        clinic_id: values.clinic_id,
+        clinic_id: clinicId || null, // Use clinicId if provided, otherwise null
       };
 
       console.log("Creating patient with data:", patientData);
