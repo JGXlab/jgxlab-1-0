@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
+import { Loader2 } from "lucide-react";
 
 async function getProfile() {
   const { data: { user } } = await supabase.auth.getUser();
@@ -31,7 +32,14 @@ export function ClinicGuard({ children }: { children: React.ReactNode }) {
   }, [profile, isLoading, navigate]);
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-white/80 backdrop-blur-sm">
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p className="text-sm text-muted-foreground animate-pulse">Loading...</p>
+        </div>
+      </div>
+    );
   }
 
   return profile?.role === 'clinic' ? <>{children}</> : null;
