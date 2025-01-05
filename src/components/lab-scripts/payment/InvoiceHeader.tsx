@@ -14,7 +14,7 @@ export const InvoiceHeader = ({ labScript }: InvoiceHeaderProps) => {
       <div className="space-y-6">
         <div className="space-y-2">
           <div className="flex items-center gap-3">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-[#9b87f5] bg-clip-text text-transparent">
+            <h1 className="text-4xl font-bold text-primary">
               Invoice
             </h1>
             <div className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-sm font-semibold border border-emerald-200">
