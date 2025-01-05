@@ -8,6 +8,7 @@ import { BillingAddresses } from "./BillingAddresses";
 import { InvoiceTable } from "./InvoiceTable";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import { InvoicePDF } from "./InvoicePDF";
+import { ReactNode } from "react";
 
 interface InvoiceProps {
   labScript: any;
@@ -65,10 +66,10 @@ export const Invoice = ({ labScript }: InvoiceProps) => {
           document={<InvoicePDF labScript={labScript} invoice={invoice} />}
           fileName={`invoice-${labScript.payment_id}.pdf`}
         >
-          {(props: { loading: boolean }) => (
-            <Button variant="outline" disabled={props.loading}>
+          {({ loading }: { loading: boolean }): ReactNode => (
+            <Button variant="outline" disabled={loading}>
               <Download className="mr-2 h-4 w-4" />
-              {props.loading ? "Preparing PDF..." : "Download Invoice"}
+              {loading ? "Preparing PDF..." : "Download Invoice"}
             </Button>
           )}
         </PDFDownloadLink>
