@@ -55,12 +55,7 @@ export default function ClinicPatients() {
           <ClinicNavHeader />
           <div className="p-4 sm:p-6 lg:p-8">
             <div className="space-y-6">
-              <div className="flex justify-between items-center">
-                <div className="space-y-1">
-                  <h1 className="text-2xl font-bold text-gray-900">Patients</h1>
-                  <p className="text-sm text-gray-500">Manage your patient records and information</p>
-                </div>
-                
+              <div className="flex justify-end items-center">
                 <div className="flex items-center gap-4">
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
@@ -92,19 +87,6 @@ export default function ClinicPatients() {
                     </DialogContent>
                   </Dialog>
                 </div>
-              </div>
-
-              <div className="flex gap-4 mb-6">
-                <button className="flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-lg">
-                  <span className="w-2 h-2 bg-primary rounded-full"></span>
-                  All Patients
-                </button>
-                <button className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg">
-                  Active
-                </button>
-                <button className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg">
-                  Inactive
-                </button>
               </div>
 
               <Card className="bg-gradient-to-br from-white to-accent/30 border-none shadow-lg overflow-hidden">
