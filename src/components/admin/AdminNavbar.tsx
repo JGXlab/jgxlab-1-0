@@ -8,40 +8,35 @@ import {
   LogOut,
   Building,
   Palette,
+  UserRound,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
-interface AdminNavbarProps {
-  isCollapsed: boolean;
-  setIsCollapsed: (value: boolean) => void;
-}
-
-export const AdminNavbar = ({ isCollapsed, setIsCollapsed }: AdminNavbarProps) => {
+export const AdminNavbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { toast } = useToast();
   
-  const isActive = (path: string) => location.pathname === path;
+  const isActivePath = (path: string) => {
+    return location.pathname === path;
+  };
 
   const handleLogout = async () => {
     try {
-      console.log("Admin logging out...");
-      await supabase.auth.signOut();
-      toast({
-        title: "Logged out successfully",
-        description: "You have been logged out of your admin account.",
-      });
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
       navigate("/admin/login");
+      toast.success("Logged out successfully");
     } catch (error) {
       console.error("Error logging out:", error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to log out. Please try again.",
-      });
+      toast.error("Failed to log out");
     }
   };
 
@@ -67,11 +62,6 @@ export const AdminNavbar = ({ isCollapsed, setIsCollapsed }: AdminNavbarProps) =
       path: "/admin/designers",
     },
     {
-      icon: Bell,
-      label: "Notifications",
-      path: "/admin/notifications",
-    },
-    {
       icon: FileText,
       label: "Lab Scripts",
       path: "/admin/lab-scripts",
@@ -84,50 +74,72 @@ export const AdminNavbar = ({ isCollapsed, setIsCollapsed }: AdminNavbarProps) =
   ];
 
   return (
-    <div className="sticky top-0 z-50 w-full bg-white border-b">
-      <div className="flex h-16 items-center px-8 gap-8">
-        <div className="flex items-center gap-2">
-          <h1 className="text-xl font-bold text-[#8B5CF6]">
-            JGX Digital Lab
-          </h1>
-          <span className="text-sm text-muted-foreground">
-            Admin Portal
-          </span>
+    <div className="sticky top-0 w-full bg-white rounded-t-2xl px-6 py-3 flex items-center justify-between z-10">
+      {/* Left side - Logo and nav items */}
+      <div className="flex items-center space-x-6">
+        <div className="flex flex-col">
+          <span className="text-xl font-bold tracking-tight font-inter">JGX Digital Lab</span>
+          <span className="text-xs text-muted-foreground">Admin Portal</span>
         </div>
-
-        <nav className="flex-1">
-          <ul className="flex items-center gap-1">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              return (
-                <li key={item.path}>
-                  <Link
-                    to={item.path}
-                    className={cn(
-                      "flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
-                      isActive(item.path)
-                        ? "bg-[#8B5CF6]/10 text-[#8B5CF6]"
-                        : "text-gray-600 hover:bg-gray-100"
-                    )}
-                  >
-                    <Icon className="h-4 w-4" />
-                    {item.label}
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
+        
+        <nav className="flex items-center space-x-3 border border-gray-200 rounded-full py-2 h-10">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            return (
+              <button
+                key={item.path}
+                onClick={() => navigate(item.path)}
+                className={`flex items-center space-x-1.5 px-4 h-10 rounded-full transition-all duration-200 ${
+                  isActivePath(item.path)
+                    ? "bg-primary text-white shadow-sm"
+                    : "text-gray-500 hover:bg-gray-100"
+                }`}
+              >
+                <Icon className="h-3.5 w-3.5" />
+                <span className="font-medium text-sm">{item.label}</span>
+              </button>
+            );
+          })}
         </nav>
+      </div>
 
-        <Button
-          variant="ghost"
-          size="sm"
-          className="text-red-600 hover:text-red-700 hover:bg-red-50"
-          onClick={handleLogout}
-        >
-          <LogOut className="h-4 w-4 mr-2" />
-          Logout
-        </Button>
+      {/* Right side - notifications and profile */}
+      <div className="flex items-center space-x-4">
+        <button className="relative p-2 rounded-full bg-[#8B5CF6]/10 text-[#8B5CF6] hover:bg-[#8B5CF6]/20 transition-all duration-200">
+          <Bell className="h-4 w-4" />
+          <span className="absolute -top-0.5 -right-0.5 h-4 w-4 bg-red-500 rounded-full text-white text-[10px] flex items-center justify-center border-2 border-white">
+            2
+          </span>
+        </button>
+        
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Avatar className="h-8 w-8 ring-2 ring-[#8B5CF6]/20 ring-offset-2 ring-offset-white transition-all duration-200 hover:ring-[#8B5CF6]/40 cursor-pointer">
+              <AvatarFallback className="bg-[#8B5CF6]/10 text-[#8B5CF6]">
+                <UserRound className="h-4 w-4" />
+              </AvatarFallback>
+            </Avatar>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent 
+            align="end" 
+            className="w-48 bg-white border border-gray-200 shadow-lg rounded-lg py-1 mt-1"
+          >
+            <DropdownMenuItem 
+              onClick={() => navigate("/admin/settings")}
+              className="flex items-center space-x-2 cursor-pointer text-sm font-medium text-gray-700 hover:text-[#8B5CF6] hover:bg-gray-50 focus:text-[#8B5CF6] focus:bg-gray-50 px-4 py-2"
+            >
+              <UserRound className="h-4 w-4" />
+              <span>My Profile</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem 
+              onClick={handleLogout}
+              className="flex items-center space-x-2 cursor-pointer text-sm font-medium text-gray-700 hover:text-[#8B5CF6] hover:bg-gray-50 focus:text-[#8B5CF6] focus:bg-gray-50 px-4 py-2"
+            >
+              <LogOut className="h-4 w-4" />
+              <span>Logout</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </div>
   );
