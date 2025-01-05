@@ -18,7 +18,6 @@ export default function Settings() {
                   </p>
                 </div>
               </div>
-              {/* Settings content will be added here later */}
             </div>
           </div>
         </ScrollArea>
