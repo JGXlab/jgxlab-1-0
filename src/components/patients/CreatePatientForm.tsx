@@ -82,20 +82,29 @@ export function CreatePatientForm({ onSuccess, clinicId }: { onSuccess: () => vo
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 p-6">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         <div className="space-y-6">
-          <div className="border border-border/20 rounded-lg p-4 bg-accent/10 backdrop-blur-sm">
-            <PatientNameFields form={form} />
-          </div>
-          
-          <div className="border border-border/20 rounded-lg p-4 bg-accent/10 backdrop-blur-sm">
-            <PatientGenderField form={form} />
+          <div className="p-6 rounded-xl bg-white/30 backdrop-blur-lg border border-white/20 shadow-xl">
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold text-gray-800 mb-1">Patient Information</h3>
+              <p className="text-sm text-gray-500">Enter the patient's basic information below.</p>
+            </div>
+            
+            <div className="space-y-6">
+              <div className="bg-white/50 backdrop-blur-sm rounded-lg p-5 shadow-sm border border-gray-100">
+                <PatientNameFields form={form} />
+              </div>
+              
+              <div className="bg-white/50 backdrop-blur-sm rounded-lg p-5 shadow-sm border border-gray-100">
+                <PatientGenderField form={form} />
+              </div>
+            </div>
           </div>
         </div>
 
         <Button 
           type="submit" 
-          className="w-full bg-primary hover:bg-primary/90 text-white font-medium py-2.5 rounded-lg shadow-lg shadow-primary/20 transition-all duration-200"
+          className="w-full bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary text-white font-medium py-3 rounded-xl shadow-lg shadow-primary/20 transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98]"
         >
           Create Patient
         </Button>
