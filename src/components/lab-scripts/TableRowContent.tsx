@@ -139,7 +139,7 @@ export const TableRowContent = ({ script, onPreview, onStatusUpdate }: TableRowC
                 document={<InvoicePDF labScript={script} invoice={null} />}
                 fileName={`invoice-${script.id}.pdf`}
               >
-                {({ loading }) => (
+                {({ blob, url, loading, error }) => (
                   <Button
                     variant="ghost"
                     size="icon"
