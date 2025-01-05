@@ -124,7 +124,7 @@ export const DesignNavbar = ({ isCollapsed, setIsCollapsed }: DesignNavbarProps)
           >
             <DropdownMenuItem 
               onClick={handleLogout}
-              className="flex items-center space-x-2 cursor-pointer text-sm font-medium text-gray-700 hover:text-[#8B5CF6] hover:bg-gray-50 focus:text-[#8B5CF6] focus:bg-gray-50 px-4 py-2"
+              className="flex items-center space-x-2 cursor-pointer text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 focus:text-red-700 focus:bg-red-50 px-4 py-2"
             >
               <LogOut className="h-4 w-4" />
               <span>Logout</span>
