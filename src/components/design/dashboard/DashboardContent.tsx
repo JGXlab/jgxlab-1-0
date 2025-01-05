@@ -53,26 +53,20 @@ export const DashboardContent = ({ labScripts, isLoading, stats, onPreview }: Da
     }));
   };
 
-  const COLORS = ['#00C49F', '#FFBB28', '#FF8042', '#0088FE', '#8884d8'];
+  const COLORS = ['#8884d8', '#00C49F', '#FFBB28', '#FF8042'];
 
   const renderContent = () => {
     if (currentView === 'stats') {
       const data = getStatusStats();
       return (
-        <motion.div 
-          className="h-full flex flex-col items-center justify-center"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-        >
-          <h3 className="text-lg font-semibold mb-4">Lab Script Status Distribution</h3>
+        <div className="h-[400px] flex flex-col space-y-4">
           <StatusDistributionChart 
             data={data} 
             colors={COLORS} 
             totalScripts={labScripts.length} 
           />
           <StatusLegend data={data} colors={COLORS} />
-        </motion.div>
+        </div>
       );
     }
 
@@ -102,7 +96,7 @@ export const DashboardContent = ({ labScripts, isLoading, stats, onPreview }: Da
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.3, delay: 0.1 }}
         >
-          <Card className="bg-white h-[500px]">
+          <Card className="bg-white">
             <div className="p-6">
               <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
                 <Button 
@@ -134,9 +128,7 @@ export const DashboardContent = ({ labScripts, isLoading, stats, onPreview }: Da
                   Status Stats
                 </Button>
               </div>
-              <div className="h-[400px]">
-                {renderContent()}
-              </div>
+              {renderContent()}
             </div>
           </Card>
         </motion.div>
