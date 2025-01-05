@@ -1,17 +1,14 @@
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { User, Eye, Receipt, Building2, Download } from "lucide-react";
+import { User, Eye, Receipt, Building2 } from "lucide-react";
 import { format } from "date-fns";
 import { getStatusColor, getPaymentStatusColor } from "./utils/statusStyles";
 import { StatusUpdateButtons } from "./StatusUpdateButtons";
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Invoice } from "./payment/Invoice";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { PDFDownloadLink } from "@react-pdf/renderer";
-import { InvoicePDF } from "./payment/InvoicePDF";
-import { BlobProvider } from '@react-pdf/renderer';
 
 interface TableRowContentProps {
   script: any;
@@ -115,20 +112,6 @@ export const TableRowContent = ({ script, onPreview, onStatusUpdate }: TableRowC
                 </span>
               </Button>
             )}
-            <BlobProvider document={<InvoicePDF labScript={script} invoice={null} />}>
-              {({ url, loading }) => (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 rounded-full text-gray-500 hover:text-gray-700 hover:bg-gray-100"
-                  disabled={loading}
-                  onClick={() => url && window.open(url, '_blank')}
-                >
-                  <Download className="h-4 w-4" />
-                  <span className="sr-only">Download Invoice</span>
-                </Button>
-              )}
-            </BlobProvider>
             <Button
               variant="ghost"
               size="icon"
@@ -147,27 +130,8 @@ export const TableRowContent = ({ script, onPreview, onStatusUpdate }: TableRowC
 
       <Dialog open={showInvoiceDialog} onOpenChange={setShowInvoiceDialog}>
         <DialogContent className="max-w-4xl h-[90vh] p-0 gap-0">
-          <DialogHeader className="px-2 py-3 border-b flex flex-row items-center justify-between">
+          <DialogHeader className="px-2 py-3 border-b">
             <DialogTitle>Invoice Preview</DialogTitle>
-            <div className="flex items-center gap-2">
-              <BlobProvider document={<InvoicePDF labScript={script} invoice={null} />}>
-                {({ url, loading }) => (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 rounded-full text-gray-500 hover:text-gray-700 hover:bg-gray-100"
-                    disabled={loading}
-                    onClick={() => url && window.open(url, '_blank')}
-                  >
-                    <Download className="h-4 w-4" />
-                    <span className="sr-only">Download Invoice</span>
-                  </Button>
-                )}
-              </BlobProvider>
-              <DialogClose className="h-8 w-8 rounded-full text-gray-500 hover:text-gray-700 hover:bg-gray-100">
-                <span className="sr-only">Close</span>
-              </DialogClose>
-            </div>
           </DialogHeader>
           <ScrollArea className="flex-1 h-full">
             <div className="p-6">
