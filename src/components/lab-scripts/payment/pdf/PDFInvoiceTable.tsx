@@ -13,15 +13,16 @@ interface PDFInvoiceTableProps {
 }
 
 export const PDFInvoiceTable = ({ invoice }: PDFInvoiceTableProps) => {
-  const formatApplianceType = (type: string) => {
+  const formatApplianceType = (type: string | undefined) => {
+    if (!type) return '';
     return type.split('-').map(word => 
       word.charAt(0).toUpperCase() + word.slice(1)
     ).join(' ');
   };
 
-  const totalAmount = invoice.amount_paid || 0;
-  const hasNightguard = invoice.needs_nightguard === 'yes';
-  const hasExpressDesign = invoice.express_design === 'yes';
+  const totalAmount = invoice?.amount_paid || 0;
+  const hasNightguard = invoice?.needs_nightguard === 'yes';
+  const hasExpressDesign = invoice?.express_design === 'yes';
   
   let basePrice = totalAmount;
   if (hasNightguard) basePrice -= 50;
@@ -37,9 +38,9 @@ export const PDFInvoiceTable = ({ invoice }: PDFInvoiceTableProps) => {
       
       <View style={styles.tableRow}>
         <Text style={[styles.tableCell, styles.col1]}>
-          {formatApplianceType(invoice.appliance_type)}
-          {invoice.arch === 'dual' && " (Dual Arch)"} - 
-          Patient: {invoice.patient_name}
+          {formatApplianceType(invoice?.appliance_type)}
+          {invoice?.arch === 'dual' && " (Dual Arch)"} - 
+          Patient: {invoice?.patient_name || 'N/A'}
         </Text>
         <Text style={[styles.tableCell, styles.col2]}>1</Text>
         <Text style={[styles.tableCell, styles.col3]}>${basePrice.toFixed(2)}</Text>
