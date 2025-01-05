@@ -68,8 +68,8 @@ export function CreatePatientForm({ onSuccess, clinicId }: { onSuccess: () => vo
       });
       
       await queryClient.invalidateQueries({ queryKey: ["patients"] });
-      form.reset(); // Reset the form after successful submission
-      onSuccess(); // Close the dialog
+      form.reset();
+      onSuccess();
     } catch (error) {
       console.error("Error creating patient:", error);
       toast({
@@ -82,10 +82,21 @@ export function CreatePatientForm({ onSuccess, clinicId }: { onSuccess: () => vo
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <PatientNameFields form={form} />
-        <PatientGenderField form={form} />
-        <Button type="submit" className="w-full">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 p-6">
+        <div className="space-y-6">
+          <div className="border border-border/20 rounded-lg p-4 bg-accent/10 backdrop-blur-sm">
+            <PatientNameFields form={form} />
+          </div>
+          
+          <div className="border border-border/20 rounded-lg p-4 bg-accent/10 backdrop-blur-sm">
+            <PatientGenderField form={form} />
+          </div>
+        </div>
+
+        <Button 
+          type="submit" 
+          className="w-full bg-primary hover:bg-primary/90 text-white font-medium py-2.5 rounded-lg shadow-lg shadow-primary/20 transition-all duration-200"
+        >
           Create Patient
         </Button>
       </form>
