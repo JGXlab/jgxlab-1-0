@@ -13,7 +13,7 @@ export function LabScriptsPageHeader({
   onNewLabScript 
 }: LabScriptsPageHeaderProps) {
   return (
-    <div className="flex justify-between items-center">
+    <div className="flex justify-end items-center">
       <div className="flex items-center gap-4">
         <div className="relative group">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 group-hover:text-gray-600 z-10" />
