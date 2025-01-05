@@ -103,11 +103,6 @@ export const DashboardContent = ({ labScripts, isLoading, stats, onPreview }: Da
                   variant={currentView === 'recent' ? 'default' : 'outline'}
                   onClick={() => setCurrentView('recent')}
                   size="sm"
-                  className={`transition-all duration-200 ${
-                    currentView === 'recent' 
-                      ? 'bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm' 
-                      : 'hover:bg-accent hover:text-accent-foreground'
-                  }`}
                 >
                   Recent
                 </Button>
@@ -115,11 +110,6 @@ export const DashboardContent = ({ labScripts, isLoading, stats, onPreview }: Da
                   variant={currentView === 'dueToday' ? 'default' : 'outline'}
                   onClick={() => setCurrentView('dueToday')}
                   size="sm"
-                  className={`transition-all duration-200 ${
-                    currentView === 'dueToday' 
-                      ? 'bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm' 
-                      : 'hover:bg-accent hover:text-accent-foreground'
-                  }`}
                 >
                   Due Today
                 </Button>
@@ -127,11 +117,6 @@ export const DashboardContent = ({ labScripts, isLoading, stats, onPreview }: Da
                   variant={currentView === 'overdue' ? 'default' : 'outline'}
                   onClick={() => setCurrentView('overdue')}
                   size="sm"
-                  className={`transition-all duration-200 ${
-                    currentView === 'overdue' 
-                      ? 'bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm' 
-                      : 'hover:bg-accent hover:text-accent-foreground'
-                  }`}
                 >
                   Overdue
                 </Button>
@@ -139,11 +124,6 @@ export const DashboardContent = ({ labScripts, isLoading, stats, onPreview }: Da
                   variant={currentView === 'stats' ? 'default' : 'outline'}
                   onClick={() => setCurrentView('stats')}
                   size="sm"
-                  className={`transition-all duration-200 ${
-                    currentView === 'stats' 
-                      ? 'bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm' 
-                      : 'hover:bg-accent hover:text-accent-foreground'
-                  }`}
                 >
                   Status Stats
                 </Button>
