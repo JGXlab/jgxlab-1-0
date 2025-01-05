@@ -1,16 +1,20 @@
-import { FormSection } from "./FormSection";
 import { UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 import { formSchema } from "./formSchema";
 import { PatientSelector } from "../patients/PatientSelector";
 import { FormField, FormItem, FormLabel } from "../ui/form";
 import { Button } from "../ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
+import { CreatePatientForm } from "../patients/CreatePatientForm";
+import { useState } from "react";
 
 interface PatientInformationSectionProps {
   form: UseFormReturn<z.infer<typeof formSchema>>;
 }
 
 export function PatientInformationSection({ form }: PatientInformationSectionProps) {
+  const [createPatientOpen, setCreatePatientOpen] = useState(false);
+
   return (
     <FormSection title="Patient Information">
       <div className="space-y-4">
@@ -29,6 +33,7 @@ export function PatientInformationSection({ form }: PatientInformationSectionPro
                 <Button 
                   type="button" 
                   variant="outline"
+                  onClick={() => setCreatePatientOpen(true)}
                 >
                   New Patient
                 </Button>
@@ -37,6 +42,17 @@ export function PatientInformationSection({ form }: PatientInformationSectionPro
           )}
         />
       </div>
+
+      <Dialog open={createPatientOpen} onOpenChange={setCreatePatientOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Create New Patient</DialogTitle>
+          </DialogHeader>
+          <CreatePatientForm 
+            onSuccess={() => setCreatePatientOpen(false)}
+          />
+        </DialogContent>
+      </Dialog>
     </FormSection>
   );
 }
