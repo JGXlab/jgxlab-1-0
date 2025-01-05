@@ -1,8 +1,6 @@
 import { ClinicLayout } from "@/components/clinic/ClinicLayout";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ClinicNavHeader } from "@/components/clinic/ClinicNavHeader";
-import { Card } from "@/components/ui/card";
-import { Settings as SettingsIcon } from "lucide-react";
 
 export default function Settings() {
   return (
@@ -20,15 +18,6 @@ export default function Settings() {
                   </p>
                 </div>
               </div>
-
-              <Card className="p-6">
-                <div className="flex items-center justify-center h-40 text-gray-400">
-                  <div className="text-center">
-                    <SettingsIcon className="w-12 h-12 mx-auto mb-4" />
-                    <p>Settings page under construction</p>
-                  </div>
-                </div>
-              </Card>
             </div>
           </div>
         </ScrollArea>
