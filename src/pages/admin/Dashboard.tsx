@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
+import { Card } from "@/components/ui/card";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -25,10 +26,14 @@ const AdminDashboard = () => {
   return (
     <AdminLayout>
       <div className="space-y-8">
-        <h1 className="text-2xl font-semibold">Dashboard</h1>
-        <div className="bg-white rounded-xl p-6">
-          <p>Welcome to the admin dashboard</p>
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+          <p className="text-sm text-gray-500">Welcome to the admin dashboard</p>
         </div>
+
+        <Card className="p-6 bg-gradient-to-br from-white to-accent/30 border-none shadow-lg">
+          <p>Welcome to the admin dashboard</p>
+        </Card>
       </div>
     </AdminLayout>
   );
