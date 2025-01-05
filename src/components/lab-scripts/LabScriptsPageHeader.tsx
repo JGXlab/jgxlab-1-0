@@ -34,12 +34,12 @@ export function LabScriptsPageHeader({
             placeholder="Search lab scripts..."
             value={searchTerm}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="pl-10 pr-4 py-2 rounded-full border border-gray-200 w-48 focus:outline-none focus:ring-2 focus:ring-primary bg-white/50 backdrop-blur-sm transition-all duration-200 hover:bg-white"
+            className="pl-10 pr-4 py-2 rounded-full border border-gray-200 w-48 focus:outline-none focus:ring-2 focus:ring-primary/50 bg-white/50 backdrop-blur-sm transition-all duration-200 hover:bg-white"
           />
         </div>
         <Button
           onClick={onNewLabScript}
-          className="bg-primary hover:bg-primary/90 text-white flex items-center gap-2"
+          className="bg-[#8B5CF6] hover:bg-[#7C3AED] text-white rounded-full px-6 flex items-center gap-2 transition-all duration-200 shadow-sm hover:shadow-md"
         >
           <Plus className="h-4 w-4" />
           Add Lab Script
