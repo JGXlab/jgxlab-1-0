@@ -78,7 +78,7 @@ export default function ClinicPatients() {
                   
                   <Dialog open={createOpen} onOpenChange={setCreateOpen}>
                     <DialogTrigger asChild>
-                      <Button className="bg-primary hover:bg-primary/90 text-white rounded-full shadow-lg shadow-primary/20 transition-all duration-200">
+                      <Button className="bg-[#8B5CF6] hover:bg-[#7C3AED] text-white rounded-full shadow-lg shadow-[#8B5CF6]/20 transition-all duration-200 px-6">
                         <Plus className="mr-2 h-4 w-4" />
                         Add New Patient
                       </Button>
