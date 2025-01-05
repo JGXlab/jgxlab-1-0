@@ -4,7 +4,6 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { NIGHTGUARD_PRICE, EXPRESS_DESIGN_PRICE } from "@/components/surgical-form/utils/priceCalculations";
 
 interface InvoiceProps {
   labScript: Tables<"lab_scripts">;
@@ -49,11 +48,8 @@ export const Invoice = ({ labScript, onDownload }: InvoiceProps) => {
     ).join(' ');
   };
 
-  // Calculate subtotal (base price)
-  const basePrice = invoice.amount_paid || 0;
-  const nightguardPrice = invoice.needs_nightguard === 'yes' ? NIGHTGUARD_PRICE : 0;
-  const expressDesignPrice = invoice.express_design === 'yes' ? EXPRESS_DESIGN_PRICE : 0;
-  const totalPrice = basePrice + nightguardPrice + expressDesignPrice;
+  // The total amount paid already includes add-ons
+  const totalAmount = invoice.amount_paid || 0;
 
   return (
     <Card className="bg-white w-full max-w-[210mm] mx-auto shadow-none border-none">
@@ -106,7 +102,6 @@ export const Invoice = ({ labScript, onDownload }: InvoiceProps) => {
               <tr className="border-b border-gray-200">
                 <th className="text-left py-3 text-gray-600 font-medium">Description</th>
                 <th className="text-center py-3 text-gray-600 font-medium">Qty</th>
-                <th className="text-right py-3 text-gray-600 font-medium">Unit price</th>
                 <th className="text-right py-3 text-gray-600 font-medium">Amount</th>
               </tr>
             </thead>
@@ -116,52 +111,26 @@ export const Invoice = ({ labScript, onDownload }: InvoiceProps) => {
                   {formatApplianceType(invoice.appliance_type)}
                   {invoice.arch === 'dual' && " (Dual Arch)"} - 
                   Patient: {invoice.patient_name}
+                  {invoice.needs_nightguard === 'yes' && " (Includes Nightguard)"}
+                  {invoice.express_design === 'yes' && " (Includes Express Design)"}
                 </td>
                 <td className="py-4 text-center text-gray-600">1</td>
-                <td className="py-4 text-right text-gray-600">
-                  ${basePrice.toFixed(2)}
-                </td>
                 <td className="py-4 text-right text-gray-900 font-medium">
-                  ${basePrice.toFixed(2)}
+                  ${totalAmount.toFixed(2)}
                 </td>
               </tr>
-              {invoice.needs_nightguard === 'yes' && (
-                <tr>
-                  <td className="py-4 text-gray-900">Additional Nightguard</td>
-                  <td className="py-4 text-center text-gray-600">1</td>
-                  <td className="py-4 text-right text-gray-600">${NIGHTGUARD_PRICE.toFixed(2)}</td>
-                  <td className="py-4 text-right text-gray-900 font-medium">${NIGHTGUARD_PRICE.toFixed(2)}</td>
-                </tr>
-              )}
-              {invoice.express_design === 'yes' && (
-                <tr>
-                  <td className="py-4 text-gray-900">Express Design Service</td>
-                  <td className="py-4 text-center text-gray-600">1</td>
-                  <td className="py-4 text-right text-gray-600">${EXPRESS_DESIGN_PRICE.toFixed(2)}</td>
-                  <td className="py-4 text-right text-gray-900 font-medium">${EXPRESS_DESIGN_PRICE.toFixed(2)}</td>
-                </tr>
-              )}
             </tbody>
             <tfoot className="border-t border-gray-200">
               <tr>
-                <td colSpan={2}></td>
-                <td className="py-4 text-right font-medium text-gray-900">Subtotal</td>
+                <td colSpan={2} className="py-4 text-right font-medium text-gray-900">Total</td>
                 <td className="py-4 text-right font-medium text-gray-900">
-                  ${totalPrice.toFixed(2)}
+                  ${totalAmount.toFixed(2)}
                 </td>
               </tr>
               <tr>
-                <td colSpan={2}></td>
-                <td className="py-4 text-right font-medium text-gray-900">Total</td>
-                <td className="py-4 text-right font-medium text-gray-900">
-                  ${totalPrice.toFixed(2)}
-                </td>
-              </tr>
-              <tr>
-                <td colSpan={2}></td>
-                <td className="py-4 text-right font-medium text-gray-900">Amount due</td>
+                <td colSpan={2} className="py-4 text-right font-medium text-gray-900">Amount due</td>
                 <td className="py-4 text-right font-medium text-primary">
-                  ${totalPrice.toFixed(2)} USD
+                  ${totalAmount.toFixed(2)} USD
                 </td>
               </tr>
             </tfoot>
