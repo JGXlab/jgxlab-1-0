@@ -99,26 +99,26 @@ export function PatientsTable({ clinicId }: PatientsTableProps) {
       <div className="rounded-xl bg-white">
         <Table>
           <TableHeader>
-            <TableRow className="bg-gray-50/50 hover:bg-gray-50/50">
-              <TableHead className="text-gray-600 font-medium">Name</TableHead>
-              <TableHead className="text-gray-600 font-medium">Gender</TableHead>
-              <TableHead className="text-gray-600 font-medium">Date of Birth</TableHead>
-              <TableHead className="text-gray-600 font-medium">Created At</TableHead>
-              <TableHead className="text-gray-600 font-medium text-right">Actions</TableHead>
+            <TableRow className="bg-gray-50/50 hover:bg-gray-50/50 border-none">
+              <TableHead className="text-primary/80 font-semibold">Name</TableHead>
+              <TableHead className="text-primary/80 font-semibold">Gender</TableHead>
+              <TableHead className="text-primary/80 font-semibold">Date of Birth</TableHead>
+              <TableHead className="text-primary/80 font-semibold">Created At</TableHead>
+              <TableHead className="text-primary/80 font-semibold text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {patients && patients.length > 0 ? (
               patients.map((patient) => (
-                <TableRow key={patient.id} className="hover:bg-gray-50/50">
-                  <TableCell className="font-medium">
+                <TableRow key={patient.id} className="hover:bg-gray-50/50 transition-colors duration-200">
+                  <TableCell className="font-medium text-gray-900">
                     {patient.first_name} {patient.last_name}
                   </TableCell>
-                  <TableCell className="capitalize">{patient.gender}</TableCell>
-                  <TableCell>
+                  <TableCell className="capitalize text-gray-600">{patient.gender}</TableCell>
+                  <TableCell className="text-gray-600">
                     {patient.date_of_birth ? new Date(patient.date_of_birth).toLocaleDateString() : 'Not set'}
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="text-gray-600">
                     {new Date(patient.created_at).toLocaleDateString()}
                   </TableCell>
                   <TableCell className="text-right">
@@ -127,7 +127,7 @@ export function PatientsTable({ clinicId }: PatientsTableProps) {
                         variant="outline"
                         size="sm"
                         onClick={() => setEditingPatient(patient)}
-                        className="text-gray-600 hover:text-gray-900"
+                        className="text-primary hover:text-primary hover:bg-primary/10 border-primary/20"
                       >
                         <Pencil className="h-4 w-4" />
                       </Button>
@@ -135,7 +135,7 @@ export function PatientsTable({ clinicId }: PatientsTableProps) {
                         variant="outline"
                         size="sm"
                         onClick={() => setDeletingPatient(patient)}
-                        className="text-red-600 hover:text-red-700"
+                        className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>

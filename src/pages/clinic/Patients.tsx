@@ -51,7 +51,7 @@ export default function ClinicPatients() {
   return (
     <ClinicLayout>
       <div className="flex flex-col max-w-[1200px] w-full mx-auto h-screen py-8">
-        <ScrollArea className="h-full rounded-2xl bg-[#F6F6F7]">
+        <ScrollArea className="h-full rounded-2xl bg-gradient-to-br from-[#F8F9FE] to-[#FFFFFF]">
           <ClinicNavHeader />
           <div className="p-4 sm:p-6 lg:p-8">
             <div className="space-y-6">
@@ -62,13 +62,13 @@ export default function ClinicPatients() {
                     <input
                       type="text"
                       placeholder="Search patients..."
-                      className="pl-10 pr-4 py-2 rounded-full border border-gray-200 w-64 focus:outline-none focus:ring-2 focus:ring-primary"
+                      className="pl-10 pr-4 py-2 rounded-full border border-gray-200 w-64 focus:outline-none focus:ring-2 focus:ring-primary bg-white/50 backdrop-blur-sm transition-all duration-200 hover:bg-white"
                     />
                   </div>
                   
                   <Dialog open={createOpen} onOpenChange={setCreateOpen}>
                     <DialogTrigger asChild>
-                      <Button className="bg-primary hover:bg-primary/90 text-white rounded-full">
+                      <Button className="bg-primary hover:bg-primary/90 text-white rounded-full shadow-lg shadow-primary/20 transition-all duration-200">
                         <Plus className="mr-2 h-4 w-4" />
                         Add New Patient
                       </Button>
@@ -89,7 +89,7 @@ export default function ClinicPatients() {
                 </div>
               </div>
 
-              <Card className="bg-gradient-to-br from-white to-accent/30 border-none shadow-lg overflow-hidden">
+              <Card className="bg-white border-none shadow-xl shadow-black/5 overflow-hidden rounded-2xl">
                 {isLoadingClinic ? (
                   <div className="flex items-center justify-center h-40">
                     <p className="text-gray-500">Loading clinic data...</p>
