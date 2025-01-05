@@ -1,5 +1,4 @@
 import { DesignLayout } from "@/components/design/DesignLayout";
-import { Card } from "@/components/ui/card";
 import { Bell, Search, LayoutDashboard, FileCheck, Settings, UserRound, LogOut } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -14,39 +13,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { StatsCards } from "@/components/design/dashboard/StatsCards";
-import { RecentActivity } from "@/components/design/dashboard/RecentActivity";
-import { motion } from "framer-motion";
-import { LabScriptsTable } from "@/components/lab-scripts/LabScriptsTable";
+import { DashboardContent } from "@/components/design/dashboard/DashboardContent";
 
 export default function DesignDashboard() {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
-
-  const handleLogout = async () => {
-    try {
-      console.log("Designer logging out...");
-      await supabase.auth.signOut();
-      toast({
-        title: "Logged out successfully",
-        description: "You have been logged out of your designer account.",
-      });
-      navigate("/design/login");
-    } catch (error) {
-      console.error("Error logging out:", error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to log out. Please try again.",
-      });
-    }
-  };
-
-  const isActivePath = (path: string) => {
-    return location.pathname === path;
-  };
 
   const { data: labScripts = [], isLoading } = useQuery({
     queryKey: ['design-dashboard-scripts'],
@@ -67,25 +40,31 @@ export default function DesignDashboard() {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
+      console.log('Fetched lab scripts:', data);
       return data || [];
     }
   });
 
-  const stats = {
-    pending: labScripts.filter(script => script.status === 'pending').length,
-    inProgress: labScripts.filter(script => script.status === 'in_progress').length,
-    completed: labScripts.filter(script => script.status === 'completed').length,
-    urgent: labScripts.filter(script => {
-      const dueDate = new Date(script.due_date);
-      const today = new Date();
-      return dueDate <= today && script.status !== 'completed';
-    }).length,
+  const handleLogout = async () => {
+    try {
+      console.log("Designer logging out...");
+      await supabase.auth.signOut();
+      toast({
+        title: "Logged out successfully",
+        description: "You have been logged out of your designer account.",
+      });
+      navigate("/design/login");
+    } catch (error) {
+      console.error("Error logging out:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to log out. Please try again.",
+      });
+    }
   };
 
-  const handlePreview = (script: any, e: React.MouseEvent) => {
-    // Add preview handler if needed
-    console.log("Preview script:", script);
-  };
+  const isActivePath = (path: string) => location.pathname === path;
 
   return (
     <DesignLayout>
@@ -155,48 +134,7 @@ export default function DesignDashboard() {
               </DropdownMenu>
             </div>
           </div>
-
-          <motion.div 
-            className="p-4 sm:p-6 lg:p-8 space-y-6"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            <StatsCards stats={stats} />
-            
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Left Column - Recent Lab Scripts */}
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.3, delay: 0.1 }}
-              >
-                <Card className="bg-white h-[600px] overflow-hidden">
-                  <div className="p-6">
-                    <h3 className="text-lg font-semibold mb-4">Recent Lab Scripts</h3>
-                    <ScrollArea className="h-[500px] pr-4">
-                      <LabScriptsTable 
-                        labScripts={labScripts.slice(0, 5)}
-                        isLoading={isLoading}
-                        onPreview={handlePreview}
-                        isDesignPortal={true}
-                        hideClinicColumn={false}
-                      />
-                    </ScrollArea>
-                  </div>
-                </Card>
-              </motion.div>
-
-              {/* Right Column - Recent Activity */}
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.3, delay: 0.2 }}
-              >
-                <RecentActivity labScripts={labScripts} />
-              </motion.div>
-            </div>
-          </motion.div>
+          <DashboardContent labScripts={labScripts} isLoading={isLoading} />
         </ScrollArea>
       </div>
     </DesignLayout>
