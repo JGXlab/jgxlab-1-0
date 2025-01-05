@@ -20,9 +20,15 @@ interface TableRowContentProps {
   script: any;
   onPreview: (script: any, e: React.MouseEvent) => void;
   onStatusUpdate?: (id: string, status: string) => void;
+  isDesignPortal?: boolean;
 }
 
-export const TableRowContent = ({ script, onPreview, onStatusUpdate }: TableRowContentProps) => {
+export const TableRowContent = ({ 
+  script, 
+  onPreview, 
+  onStatusUpdate,
+  isDesignPortal = false 
+}: TableRowContentProps) => {
   const [showInvoiceDialog, setShowInvoiceDialog] = useState(false);
 
   const handleViewInvoice = (e: React.MouseEvent) => {
@@ -48,21 +54,23 @@ export const TableRowContent = ({ script, onPreview, onStatusUpdate }: TableRowC
             </div>
           </div>
         </TableCell>
-        <TableCell>
-          <div className="flex items-center space-x-2">
-            <div className="h-8 w-8 rounded-full bg-emerald-50 flex items-center justify-center">
-              <Building2 className="h-4 w-4 text-emerald-600" />
+        {isDesignPortal && (
+          <TableCell>
+            <div className="flex items-center space-x-2">
+              <div className="h-8 w-8 rounded-full bg-emerald-50 flex items-center justify-center">
+                <Building2 className="h-4 w-4 text-emerald-600" />
+              </div>
+              <div>
+                <p className="font-medium text-gray-900">
+                  {script.patients?.clinics?.name || 'N/A'}
+                </p>
+                <p className="text-sm text-gray-600">
+                  Dr. {script.patients?.clinics?.doctor_name || 'N/A'}
+                </p>
+              </div>
             </div>
-            <div>
-              <p className="font-medium text-gray-900">
-                {script.patients?.clinics?.name || 'N/A'}
-              </p>
-              <p className="text-sm text-gray-600">
-                Dr. {script.patients?.clinics?.doctor_name || 'N/A'}
-              </p>
-            </div>
-          </div>
-        </TableCell>
+          </TableCell>
+        )}
         <TableCell>
           <div className="space-y-1">
             <p className="font-medium text-gray-900">
