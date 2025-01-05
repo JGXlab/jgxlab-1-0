@@ -1,18 +1,17 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import {
-  LayoutDashboard,
-  FileText,
-  Settings,
-  User,
-  LogOut,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
-import { Separator } from "@/components/ui/separator";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { LayoutDashboard, FileCheck, Settings, UserRound, LogOut, ChevronLeft, ChevronRight, Bell, Search } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 interface DesignNavbarProps {
   isCollapsed: boolean;
@@ -27,31 +26,19 @@ export const DesignNavbar = ({ isCollapsed, setIsCollapsed }: DesignNavbarProps)
 
   const handleLogout = async () => {
     try {
-      console.log("Attempting to sign out");
-      const { error } = await supabase.auth.signOut();
-      
-      if (error) {
-        console.error("Error signing out:", error);
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Failed to sign out. Please try again.",
-        });
-        return;
-      }
-
-      console.log("Successfully signed out");
+      console.log("Designer logging out...");
+      await supabase.auth.signOut();
       toast({
-        title: "Signed out",
-        description: "You have been successfully signed out.",
+        title: "Logged out successfully",
+        description: "You have been logged out of your designer account.",
       });
       navigate("/design/login");
     } catch (error) {
-      console.error("Unexpected error during sign out:", error);
+      console.error("Error logging out:", error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "An unexpected error occurred. Please try again.",
+        description: "Failed to log out. Please try again.",
       });
     }
   };
@@ -63,7 +50,7 @@ export const DesignNavbar = ({ isCollapsed, setIsCollapsed }: DesignNavbarProps)
       path: "/design/dashboard",
     },
     {
-      icon: FileText,
+      icon: FileCheck,
       label: "Lab Scripts",
       path: "/design/labscripts",
     },
@@ -73,7 +60,7 @@ export const DesignNavbar = ({ isCollapsed, setIsCollapsed }: DesignNavbarProps)
       path: "/design/settings",
     },
     {
-      icon: User,
+      icon: UserRound,
       label: "My Profile",
       path: "/design/myprofile",
     },
@@ -93,10 +80,10 @@ export const DesignNavbar = ({ isCollapsed, setIsCollapsed }: DesignNavbarProps)
         )}>
           {!isCollapsed && (
             <div className="flex flex-col animate-fade-in">
-              <h1 className="text-2xl font-bold text-primary">
+              <h1 className="text-2xl font-bold text-[#8B5CF6]">
                 JGX Digital Lab
               </h1>
-              <span className="text-sm text-muted-foreground">
+              <span className="text-sm text-gray-500">
                 Designer Portal
               </span>
             </div>
@@ -104,7 +91,7 @@ export const DesignNavbar = ({ isCollapsed, setIsCollapsed }: DesignNavbarProps)
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8 transition-transform duration-300 ease-spring hover:bg-accent"
+            className="h-8 w-8 transition-transform duration-300 ease-spring hover:bg-gray-50"
             onClick={() => setIsCollapsed(!isCollapsed)}
           >
             {isCollapsed ? (
@@ -126,8 +113,8 @@ export const DesignNavbar = ({ isCollapsed, setIsCollapsed }: DesignNavbarProps)
                   "flex items-center p-3 rounded-lg transition-all duration-200 ease-spring group",
                   isCollapsed ? "justify-center" : "space-x-3",
                   isActive(item.path) 
-                    ? "bg-accent text-primary shadow-sm" 
-                    : "text-secondary hover:bg-accent/50 hover:text-primary"
+                    ? "bg-[#EEF2FF] text-[#8B5CF6]" 
+                    : "text-gray-600 hover:bg-gray-50 hover:text-[#8B5CF6]"
                 )}
               >
                 <Icon className={cn(
@@ -145,12 +132,12 @@ export const DesignNavbar = ({ isCollapsed, setIsCollapsed }: DesignNavbarProps)
         <div className="absolute bottom-4 left-0 right-0 px-4">
           <Button
             variant="ghost"
-            onClick={handleLogout}
             className={cn(
               "w-full transition-colors duration-200 ease-spring",
-              "text-destructive hover:text-destructive/90 hover:bg-destructive/10",
+              "text-red-600 hover:text-red-700 hover:bg-red-50",
               isCollapsed ? "justify-center p-3" : "justify-start space-x-3 p-3"
             )}
+            onClick={handleLogout}
           >
             <LogOut className="h-5 w-5 flex-shrink-0" />
             {!isCollapsed && <span>Logout</span>}

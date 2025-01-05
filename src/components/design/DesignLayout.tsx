@@ -1,19 +1,11 @@
-import { useState } from "react";
-import { DesignNavbar } from "./DesignNavbar";
+import React from "react";
 
-export const DesignLayout = ({ children }: { children: React.ReactNode }) => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
-
+export function DesignLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-accent/30 flex relative w-full">
-      <DesignNavbar isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
-      <main 
-        className={`flex-1 p-4 sm:p-8 transition-all duration-300 ease-spring animate-fade-in w-full ${
-          isCollapsed ? 'ml-[60px]' : 'ml-[60px] sm:ml-64'
-        }`}
-      >
+    <div className="min-h-screen bg-white w-full">
+      <div className="w-full h-full min-h-screen px-8 md:px-12 lg:px-16 bg-[#d9dfec]">
         {children}
-      </main>
+      </div>
     </div>
   );
-};
+}
