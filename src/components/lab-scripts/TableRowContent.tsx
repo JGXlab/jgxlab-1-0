@@ -1,7 +1,7 @@
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { User, Eye, Receipt, Building2 } from "lucide-react";
+import { User, Eye, Receipt, Building2, MoreVertical } from "lucide-react";
 import { format } from "date-fns";
 import { getStatusColor, getPaymentStatusColor } from "./utils/statusStyles";
 import { StatusUpdateButtons } from "./StatusUpdateButtons";
@@ -9,6 +9,12 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Invoice } from "./payment/Invoice";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface TableRowContentProps {
   script: any;
@@ -98,32 +104,30 @@ export const TableRowContent = ({ script, onPreview, onStatusUpdate }: TableRowC
             {onStatusUpdate && (
               <StatusUpdateButtons script={script} onStatusUpdate={onStatusUpdate} />
             )}
-            {script.payment_status === 'paid' && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handleViewInvoice}
-                className="h-8 w-8 rounded-full text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 border-emerald-200 transition-all duration-300 hover:scale-105 group relative"
-              >
-                <Receipt className="h-4 w-4 transition-transform duration-300 group-hover:scale-110" />
-                <span className="sr-only">View Invoice</span>
-                <span className="absolute -bottom-8 scale-0 transition-all duration-200 group-hover:scale-100 text-xs bg-gray-900 text-white px-2 py-1 rounded whitespace-nowrap">
-                  View Invoice
-                </span>
-              </Button>
-            )}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={(e) => onPreview(script, e)}
-              className="h-8 w-8 rounded-full text-primary hover:text-primary hover:bg-primary/10 border-primary/20 transition-all duration-300 hover:scale-105 group relative"
-            >
-              <Eye className="h-4 w-4 transition-transform duration-300 group-hover:scale-110" />
-              <span className="sr-only">Preview</span>
-              <span className="absolute -bottom-8 scale-0 transition-all duration-200 group-hover:scale-100 text-xs bg-gray-900 text-white px-2 py-1 rounded whitespace-nowrap">
-                Preview Script
-              </span>
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 rounded-full text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-all duration-300 hover:scale-105"
+                >
+                  <MoreVertical className="h-4 w-4" />
+                  <span className="sr-only">More options</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                {script.payment_status === 'paid' && (
+                  <DropdownMenuItem onClick={handleViewInvoice}>
+                    <Receipt className="mr-2 h-4 w-4" />
+                    View Invoice
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuItem onClick={(e) => onPreview(script, e)}>
+                  <Eye className="mr-2 h-4 w-4" />
+                  Preview Script
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </TableCell>
       </TableRow>
