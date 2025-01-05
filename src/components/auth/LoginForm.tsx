@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, LogIn } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 export function LoginForm() {
@@ -30,7 +30,6 @@ export function LoginForm() {
       if (error) {
         console.error("Login error details:", error);
         
-        // Handle specific error cases
         if (error.message.includes("Invalid login credentials")) {
           toast({
             variant: "destructive",
@@ -90,12 +89,17 @@ export function LoginForm() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <Card className="w-full max-w-[420px] shadow-lg rounded-2xl border-0">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 px-4">
+      <div className="text-center mb-8">
+        <h1 className="text-4xl font-bold text-primary mb-2">Welcome to DentFlow</h1>
+        <p className="text-muted-foreground">Your Digital Dental Lab Management Solution</p>
+      </div>
+      
+      <Card className="w-full max-w-[420px] shadow-lg rounded-xl border-0">
         <CardContent className="p-8">
           <div className="text-center mb-8">
-            <h1 className="text-2xl font-semibold text-gray-900">Welcome Back</h1>
-            <p className="text-gray-500 mt-2">Please enter your credentials to continue</p>
+            <h2 className="text-2xl font-semibold text-gray-900">Sign In</h2>
+            <p className="text-muted mt-2">Enter your credentials to access your account</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -107,7 +111,7 @@ export function LoginForm() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email"
                 required
-                className="h-11"
+                className="h-11 bg-white"
               />
             </div>
 
@@ -120,7 +124,7 @@ export function LoginForm() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
                   required
-                  className="h-11 pr-10"
+                  className="h-11 pr-10 bg-white"
                 />
                 <button
                   type="button"
@@ -134,10 +138,16 @@ export function LoginForm() {
 
             <Button
               type="submit"
-              className="w-full h-11 text-base font-medium"
+              className="w-full h-11 text-base font-medium bg-primary hover:bg-primary/90"
               disabled={isPending}
             >
-              {isPending ? "Signing in..." : "Sign in"}
+              {isPending ? (
+                "Signing in..."
+              ) : (
+                <>
+                  <LogIn className="mr-2 h-5 w-5" /> Sign in
+                </>
+              )}
             </Button>
           </form>
         </CardContent>
