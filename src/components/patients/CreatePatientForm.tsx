@@ -31,7 +31,7 @@ type PatientFormValues = z.infer<typeof formSchema>;
 export function CreatePatientForm({ onSuccess, clinicId }: { onSuccess?: () => void; clinicId?: string }) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  
+
   const form = useForm<PatientFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -43,7 +43,7 @@ export function CreatePatientForm({ onSuccess, clinicId }: { onSuccess?: () => v
   });
 
   async function onSubmit(values: PatientFormValues) {
-    console.log("Submitting patient form with values:", values);
+    console.log("Submitting form with values:", values);
     try {
       const { data: userData, error: userError } = await supabase.auth.getUser();
       if (userError) throw userError;
@@ -69,13 +69,10 @@ export function CreatePatientForm({ onSuccess, clinicId }: { onSuccess?: () => v
       
       await queryClient.invalidateQueries({ queryKey: ["patients"] });
       
+      // Only call onSuccess if it exists
       if (onSuccess) {
         onSuccess();
       }
-      
-      // Reset form after successful submission
-      form.reset();
-      
     } catch (error) {
       console.error("Error creating patient:", error);
       toast({
