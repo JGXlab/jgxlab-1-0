@@ -21,7 +21,6 @@ const formSchema = z.object({
   gender: z.enum(["male", "female", "other"], {
     required_error: "Please select a gender.",
   }),
-  clinic_id: z.string().optional(), // Made optional
 });
 
 type PatientFormValues = z.infer<typeof formSchema>;
@@ -36,7 +35,6 @@ export function CreatePatientForm({ onSuccess, clinicId }: { onSuccess: () => vo
       first_name: "",
       last_name: "",
       gender: undefined,
-      clinic_id: clinicId || "",
     },
   });
 
@@ -46,12 +44,13 @@ export function CreatePatientForm({ onSuccess, clinicId }: { onSuccess: () => vo
       const { data: userData, error: userError } = await supabase.auth.getUser();
       if (userError) throw userError;
 
+      // Make sure to include the clinicId in the patient data
       const patientData = {
         first_name: values.first_name,
         last_name: values.last_name,
         gender: values.gender as string,
         user_id: userData.user.id,
-        clinic_id: clinicId || null, // Use clinicId if provided, otherwise null
+        clinic_id: clinicId, // Always use the provided clinicId
       };
 
       console.log("Creating patient with data:", patientData);
