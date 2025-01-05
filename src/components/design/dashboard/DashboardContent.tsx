@@ -34,10 +34,10 @@ export const DashboardContent = ({ labScripts, isLoading, stats, onPreview }: Da
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.3, delay: 0.1 }}
         >
-          <Card className="bg-white h-[600px] overflow-hidden">
+          <Card className="bg-white h-[500px] overflow-hidden">
             <div className="p-6">
               <h3 className="text-lg font-semibold mb-4">Recent Lab Scripts</h3>
-              <ScrollArea className="h-[500px] pr-4">
+              <ScrollArea className="h-[400px] pr-4">
                 <LabScriptsTable 
                   labScripts={labScripts.slice(0, 5)}
                   isLoading={isLoading}
