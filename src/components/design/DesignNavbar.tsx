@@ -11,7 +11,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-export const DesignNavbar = () => {
+interface DesignNavbarProps {
+  isCollapsed?: boolean;
+  setIsCollapsed?: (value: boolean) => void;
+}
+
+export const DesignNavbar = ({ isCollapsed, setIsCollapsed }: DesignNavbarProps) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { toast } = useToast();
