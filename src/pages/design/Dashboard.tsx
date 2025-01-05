@@ -1,10 +1,12 @@
 import { DesignLayout } from "@/components/design/DesignLayout";
 import { Card } from "@/components/ui/card";
-import { Bell, Search, LayoutDashboard, FileCheck, Clock, AlertCircle } from "lucide-react";
+import { Bell, Search, LayoutDashboard, FileCheck, Clock, AlertCircle, Settings, UserRound } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,6 +15,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 export default function DesignDashboard() {
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const isActivePath = (path: string) => {
+    return location.pathname === path;
+  };
+
   const { data: labScripts = [], isLoading } = useQuery({
     queryKey: ['design-dashboard-scripts'],
     queryFn: async () => {
@@ -46,13 +56,65 @@ export default function DesignDashboard() {
       <div className="flex flex-col max-w-[1400px] w-full mx-auto h-screen py-8">
         <ScrollArea className="h-full rounded-2xl bg-[#F6F6F7]">
           <div className="sticky top-0 w-full bg-white rounded-t-2xl px-6 py-3 flex items-center justify-between z-10">
+            {/* Left side - Logo and nav items */}
             <div className="flex items-center space-x-6">
               <div className="flex flex-col">
-                <span className="text-xl font-bold tracking-tight">JGX Digital Lab</span>
+                <span className="text-xl font-bold tracking-tight font-inter">JGX Digital Lab</span>
                 <span className="text-xs text-muted-foreground">Designer Portal</span>
               </div>
+              
+              <nav className="flex items-center space-x-3 border border-gray-200 rounded-full py-2 h-10">
+                <button 
+                  onClick={() => navigate("/design/dashboard")}
+                  className={`flex items-center space-x-1.5 px-4 h-10 rounded-full transition-all duration-200 ${
+                    isActivePath("/design/dashboard") 
+                      ? "bg-[#8B5CF6] text-white shadow-sm" 
+                      : "text-gray-500 hover:bg-gray-100"
+                  }`}
+                >
+                  <LayoutDashboard className="h-3.5 w-3.5" />
+                  <span className="font-medium text-sm">Dashboard</span>
+                </button>
+                
+                <button 
+                  onClick={() => navigate("/design/labscripts")}
+                  className={`flex items-center space-x-1.5 px-4 h-10 rounded-full transition-all duration-200 ${
+                    isActivePath("/design/labscripts") 
+                      ? "bg-[#8B5CF6] text-white shadow-sm" 
+                      : "text-gray-500 hover:bg-gray-100"
+                  }`}
+                >
+                  <FileCheck className="h-3.5 w-3.5" />
+                  <span className="font-medium text-sm">Lab Scripts</span>
+                </button>
+                
+                <button 
+                  onClick={() => navigate("/design/settings")}
+                  className={`flex items-center space-x-1.5 px-4 h-10 rounded-full transition-all duration-200 ${
+                    isActivePath("/design/settings") 
+                      ? "bg-[#8B5CF6] text-white shadow-sm" 
+                      : "text-gray-500 hover:bg-gray-100"
+                  }`}
+                >
+                  <Settings className="h-3.5 w-3.5" />
+                  <span className="font-medium text-sm">Settings</span>
+                </button>
+                
+                <button 
+                  onClick={() => navigate("/design/myprofile")}
+                  className={`flex items-center space-x-1.5 px-4 h-10 rounded-full transition-all duration-200 ${
+                    isActivePath("/design/myprofile") 
+                      ? "bg-[#8B5CF6] text-white shadow-sm" 
+                      : "text-gray-500 hover:bg-gray-100"
+                  }`}
+                >
+                  <UserRound className="h-3.5 w-3.5" />
+                  <span className="font-medium text-sm">My Profile</span>
+                </button>
+              </nav>
             </div>
 
+            {/* Right side - notifications and profile */}
             <div className="flex items-center space-x-4">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
@@ -77,10 +139,10 @@ export default function DesignDashboard() {
                   </Avatar>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
-                  <DropdownMenuItem onClick={() => window.location.href = '/design/myprofile'}>
+                  <DropdownMenuItem onClick={() => navigate('/design/myprofile')}>
                     My Profile
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => window.location.href = '/design/settings'}>
+                  <DropdownMenuItem onClick={() => navigate('/design/settings')}>
                     Settings
                   </DropdownMenuItem>
                 </DropdownMenuContent>
