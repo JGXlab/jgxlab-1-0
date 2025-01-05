@@ -62,13 +62,13 @@ export default function ClinicPatients() {
                     <input
                       type="text"
                       placeholder="Search patients..."
-                      className="pl-10 pr-4 py-2 rounded-lg border border-gray-200 w-64 focus:outline-none focus:ring-2 focus:ring-primary"
+                      className="pl-10 pr-4 py-2 rounded-full border border-gray-200 w-64 focus:outline-none focus:ring-2 focus:ring-primary"
                     />
                   </div>
                   
                   <Dialog open={createOpen} onOpenChange={setCreateOpen}>
                     <DialogTrigger asChild>
-                      <Button className="bg-primary hover:bg-primary/90 text-white">
+                      <Button className="bg-primary hover:bg-primary/90 text-white rounded-full">
                         <Plus className="mr-2 h-4 w-4" />
                         Add New Patient
                       </Button>
