@@ -66,7 +66,7 @@ export const Invoice = ({ labScript }: InvoiceProps) => {
           document={<InvoicePDF labScript={labScript} invoice={invoice} />}
           fileName={`invoice-${labScript.payment_id}.pdf`}
         >
-          {({ loading }: { loading: boolean }): ReactNode => (
+          {({ loading }) => (
             <Button variant="outline" disabled={loading}>
               <Download className="mr-2 h-4 w-4" />
               {loading ? "Preparing PDF..." : "Download Invoice"}
