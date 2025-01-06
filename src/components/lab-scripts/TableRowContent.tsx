@@ -55,25 +55,94 @@ export const TableRowContent = ({
         throw new Error('Could not open print window');
       }
 
-      // Write the invoice content to the new window
-      printWindow.document.write(`
+      const clinicInfo = script.patients?.clinics || {};
+      const patientName = `${script.patients?.first_name || ''} ${script.patients?.last_name || ''}`;
+      
+      // Create a simple HTML template for the invoice
+      const invoiceHTML = `
         <html>
           <head>
             <title>Invoice</title>
             <style>
               @page { size: A4; margin: 1.6cm; }
               body { font-family: system-ui, -apple-system, sans-serif; }
+              .invoice-header { display: flex; justify-content: space-between; margin-bottom: 2rem; }
+              .company-info { text-align: right; }
+              .invoice-title { font-size: 2rem; color: #375bdc; margin-bottom: 1rem; }
+              .details { margin: 2rem 0; }
+              .table { width: 100%; border-collapse: collapse; margin: 2rem 0; }
+              .table th, .table td { padding: 0.5rem; text-align: left; border-bottom: 1px solid #eee; }
+              .total { text-align: right; margin-top: 2rem; }
             </style>
-            ${document.head.innerHTML}
           </head>
           <body>
             <div style="padding: 20px;">
-              ${Invoice({ labScript: script }).type({ labScript: script })}
+              <div class="invoice-header">
+                <div>
+                  <div class="invoice-title">Invoice</div>
+                  <div>Payment ID: ${script.payment_id || 'N/A'}</div>
+                  <div>Date: ${format(new Date(script.payment_date || new Date()), 'MMMM d, yyyy')}</div>
+                </div>
+                <div class="company-info">
+                  <div style="font-weight: bold; color: #375bdc;">JGX Dental Lab LLC</div>
+                  <div>25 Highview Trail</div>
+                  <div>Pittsford, New York 14534</div>
+                  <div>United States</div>
+                  <div>+1 718-812-2869</div>
+                </div>
+              </div>
+
+              <div class="details">
+                <h3>Bill To:</h3>
+                <div>${clinicInfo.name || 'N/A'}</div>
+                <div>${clinicInfo.address || 'N/A'}</div>
+                <div>Phone: ${clinicInfo.phone || 'N/A'}</div>
+                <div>Email: ${clinicInfo.email || 'N/A'}</div>
+              </div>
+
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Description</th>
+                    <th>Quantity</th>
+                    <th>Amount</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>${script.appliance_type.split('-').map(word => 
+                      word.charAt(0).toUpperCase() + word.slice(1)
+                    ).join(' ')} - Patient: ${patientName}</td>
+                    <td>1</td>
+                    <td>$${script.amount_paid?.toFixed(2) || '0.00'}</td>
+                  </tr>
+                  ${script.needs_nightguard === 'yes' ? `
+                    <tr>
+                      <td>Additional Nightguard</td>
+                      <td>1</td>
+                      <td>$50.00</td>
+                    </tr>
+                  ` : ''}
+                  ${script.express_design === 'yes' ? `
+                    <tr>
+                      <td>Express Design Service</td>
+                      <td>1</td>
+                      <td>$50.00</td>
+                    </tr>
+                  ` : ''}
+                </tbody>
+              </table>
+
+              <div class="total">
+                <div><strong>Total Amount:</strong> $${script.amount_paid?.toFixed(2) || '0.00'}</div>
+                <div style="color: #059669;"><strong>Amount Paid:</strong> $${script.amount_paid?.toFixed(2) || '0.00'} USD</div>
+              </div>
             </div>
           </body>
         </html>
-      `);
+      `;
 
+      printWindow.document.write(invoiceHTML);
       printWindow.document.close();
       printWindow.focus();
 
