@@ -1,100 +1,106 @@
+import { useState } from "react";
 import { Check, ChevronsUpDown } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { CreatePatientForm } from "@/components/patients/CreatePatientForm";
-import { FormControl } from "@/components/ui/form";
+import { Button } from "@/components/ui/button";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { CreatePatientForm } from "./CreatePatientForm";
+import { useToast } from "@/hooks/use-toast";
 
 interface PatientSelectorProps {
-  value: string;
-  onChange: (value: string) => void;
-  clinicId?: string;
+  value?: string;
+  onChange?: (value: string) => void;
   className?: string;
+  clinicId?: string;
 }
 
-export function PatientSelector({ value, onChange, clinicId, className }: PatientSelectorProps) {
+export function PatientSelector({ value, onChange, className, clinicId }: PatientSelectorProps) {
   const [open, setOpen] = useState(false);
   const [createPatientOpen, setCreatePatientOpen] = useState(false);
+  const { toast } = useToast();
 
-  const { data: patients = [], isLoading } = useQuery({
+  const { data: patients = [], isLoading, error } = useQuery({
     queryKey: ['patients', clinicId],
     queryFn: async () => {
-      console.log('Fetching patients for clinic:', clinicId);
-      const query = supabase
-        .from('patients')
-        .select('*')
-        .order('created_at', { ascending: false });
+      try {
+        // First check if we have a valid session
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError) {
+          console.error("Session error:", sessionError);
+          throw sessionError;
+        }
 
-      if (clinicId) {
-        query.eq('clinic_id', clinicId);
+        if (!session) {
+          console.log("No active session found");
+          throw new Error("No active session");
+        }
+
+        // If we have a valid session, proceed with the query
+        const { data, error: patientsError } = await supabase
+          .from('patients')
+          .select('*')
+          .eq('clinic_id', clinicId)
+          .order('created_at', { ascending: false });
+
+        if (patientsError) {
+          console.error("Error fetching patients:", patientsError);
+          throw patientsError;
+        }
+
+        return data || [];
+      } catch (error) {
+        console.error("Error in patient query:", error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to load patients. Please try refreshing the page.",
+        });
+        return [];
       }
-
-      const { data, error } = await query;
-
-      if (error) {
-        console.error('Error fetching patients:', error);
-        throw error;
-      }
-
-      console.log('Fetched patients:', data);
-      return data || [];
-    }
+    },
+    enabled: !!clinicId,
   });
+
+  if (error) {
+    console.error("Patient selector error:", error);
+  }
 
   const selectedPatient = patients.find((patient) => patient.id === value);
 
   return (
-    <div className={cn("flex gap-2", className)}>
+    <div className="flex items-center gap-2">
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
-          <FormControl>
-            <Button
-              variant="outline"
-              role="combobox"
-              aria-expanded={open}
-              className="justify-between w-full"
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                "Loading patients..."
-              ) : (
-                selectedPatient
-                  ? `${selectedPatient.first_name} ${selectedPatient.last_name}`
-                  : "Select patient"
-              )}
-              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-            </Button>
-          </FormControl>
+          <Button
+            variant="outline"
+            role="combobox"
+            aria-expanded={open}
+            className={cn("w-full justify-between", className)}
+            disabled={isLoading}
+          >
+            {value && selectedPatient
+              ? `${selectedPatient.first_name} ${selectedPatient.last_name}`
+              : "Select patient..."}
+            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          </Button>
         </PopoverTrigger>
-        <PopoverContent 
-          className="w-[400px] p-0" 
-          align="start"
-          sideOffset={4}
-          onInteractOutside={(e) => {
-            e.preventDefault();
-            setOpen(false);
-          }}
-          style={{
-            zIndex: 50,
-            backgroundColor: 'white',
-            position: 'relative',
-            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-            pointerEvents: 'auto'
-          }}
-        >
+        <PopoverContent className="w-full p-0">
           <Command>
-            <CommandInput 
-              placeholder="Search patients..." 
-              className="border-0"
-              onKeyDown={(e) => {
-                e.stopPropagation();
-              }}
-            />
+            <CommandInput placeholder="Search patients..." />
             <CommandList className="max-h-[300px] overflow-y-auto">
               <CommandEmpty>
                 No patient found.
@@ -113,19 +119,10 @@ export function PatientSelector({ value, onChange, clinicId, className }: Patien
                 {patients.map((patient) => (
                   <CommandItem
                     key={patient.id}
-                    value={`${patient.first_name} ${patient.last_name}`.toLowerCase()}
-                    onSelect={(currentValue) => {
-                      const selectedPatient = patients.find(
-                        (p) => `${p.first_name} ${p.last_name}`.toLowerCase() === currentValue
-                      );
-                      if (selectedPatient) {
-                        onChange(selectedPatient.id);
-                        setOpen(false);
-                      }
-                    }}
-                    className="cursor-pointer hover:bg-gray-100 py-2"
-                    onMouseDown={(e) => {
-                      e.stopPropagation();
+                    value={`${patient.first_name} ${patient.last_name}`}
+                    onSelect={() => {
+                      onChange?.(patient.id);
+                      setOpen(false);
                     }}
                   >
                     <Check
@@ -161,6 +158,18 @@ export function PatientSelector({ value, onChange, clinicId, className }: Patien
           />
         </DialogContent>
       </Dialog>
+    </div>
+  );
+}
+
+interface CommandListProps {
+  children: React.ReactNode;
+}
+
+function CommandList({ children }: CommandListProps) {
+  return (
+    <div className="max-h-[300px] overflow-y-auto">
+      {children}
     </div>
   );
 }
