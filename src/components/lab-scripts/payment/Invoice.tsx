@@ -115,12 +115,12 @@ export const Invoice = ({ labScript }: InvoiceProps) => {
     <div className="relative">
       <Button
         onClick={handlePrint}
-        size="sm"
-        variant="outline"
+        size="icon"
+        variant="ghost"
         className="absolute top-0 right-0 m-4"
+        title="Print Invoice"
       >
-        <Printer className="h-4 w-4 mr-2" />
-        Print
+        <Printer className="h-4 w-4" />
       </Button>
       <Card className="w-[210mm] h-[297mm] mx-auto shadow-none border-none bg-white invoice-content">
         <div className="p-6 space-y-6 h-full">
