@@ -18,8 +18,11 @@ export const useLabScripts = (selectedStatus: string | null) => {
             last_name,
             clinic_id,
             clinics (
+              id,
               name,
-              doctor_name
+              doctor_name,
+              email,
+              phone
             )
           )
         `)
@@ -30,7 +33,7 @@ export const useLabScripts = (selectedStatus: string | null) => {
         throw error;
       }
 
-      console.log('Fetched lab scripts:', data);
+      console.log('Fetched lab scripts with clinic details:', data);
       return data || [];
     },
   });
