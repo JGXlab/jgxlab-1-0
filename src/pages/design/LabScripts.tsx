@@ -144,6 +144,7 @@ const DesignLabScripts = () => {
                 onPreview={handlePreview}
                 onStatusUpdate={handleStatusUpdate}
                 isDesignPortal={true}
+                hideClinicColumn={false}
               />
             </Card>
 
