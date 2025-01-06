@@ -95,7 +95,7 @@ export function PatientSelector({ value, onChange, clinicId, className }: Patien
                 e.stopPropagation();
               }}
             />
-            <CommandList className="max-h-[300px] overflow-y-auto">
+            <CommandList>
               <CommandEmpty>
                 No patient found.
               </CommandEmpty>

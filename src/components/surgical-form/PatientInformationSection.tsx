@@ -8,6 +8,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import { CreatePatientForm } from "../patients/CreatePatientForm";
 import { useState } from "react";
 import { FormSection } from "./FormSection";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
 
 interface PatientInformationSectionProps {
   form: UseFormReturn<z.infer<typeof formSchema>>;
@@ -15,6 +17,24 @@ interface PatientInformationSectionProps {
 
 export function PatientInformationSection({ form }: PatientInformationSectionProps) {
   const [createPatientOpen, setCreatePatientOpen] = useState(false);
+
+  // Get the current clinic's ID
+  const { data: clinicData } = useQuery({
+    queryKey: ['currentClinic'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('No user found');
+
+      const { data, error } = await supabase
+        .from('clinics')
+        .select('id')
+        .eq('user_id', user.id)
+        .single();
+
+      if (error) throw error;
+      return data;
+    }
+  });
 
   return (
     <FormSection title="Patient Information">
@@ -29,6 +49,7 @@ export function PatientInformationSection({ form }: PatientInformationSectionPro
                 <PatientSelector 
                   value={field.value} 
                   onChange={field.onChange}
+                  clinicId={clinicData?.id}
                   className="w-full bg-white border border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-primary focus:border-transparent"
                 />
                 <Button 
@@ -51,6 +72,7 @@ export function PatientInformationSection({ form }: PatientInformationSectionPro
           </DialogHeader>
           <CreatePatientForm 
             onSuccess={() => setCreatePatientOpen(false)}
+            clinicId={clinicData?.id}
           />
         </DialogContent>
       </Dialog>
