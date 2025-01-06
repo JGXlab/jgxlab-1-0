@@ -15,7 +15,11 @@ export const useLabScripts = (selectedStatus: string | null) => {
           *,
           patients (
             first_name,
-            last_name
+            last_name,
+            clinics (
+              name,
+              doctor_name
+            )
           )
         `)
         .order('created_at', { ascending: false });
