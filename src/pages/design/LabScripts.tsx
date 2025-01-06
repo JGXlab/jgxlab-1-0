@@ -29,6 +29,7 @@ const DesignLabScripts = () => {
             last_name,
             clinic_id,
             clinics (
+              id,
               name,
               doctor_name
             )
@@ -117,6 +118,7 @@ const DesignLabScripts = () => {
                 isLoading={isLoading}
                 onPreview={handlePreview}
                 onStatusUpdate={handleStatusUpdate}
+                isDesignPortal={true}
               />
             </Card>
 

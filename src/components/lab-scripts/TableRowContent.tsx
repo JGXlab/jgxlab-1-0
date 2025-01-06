@@ -38,6 +38,9 @@ export const TableRowContent = ({
     setShowInvoiceDialog(true);
   };
 
+  const clinicName = script.patients?.clinics?.name;
+  const doctorName = script.patients?.clinics?.doctor_name;
+
   return (
     <>
       <TableRow className="hover:bg-gray-50/50 transition-colors duration-200">
@@ -64,10 +67,10 @@ export const TableRowContent = ({
               </div>
               <div>
                 <p className="font-medium text-gray-900">
-                  {script.patients?.clinics?.name || 'N/A'}
+                  {clinicName || 'N/A'}
                 </p>
                 <p className="text-sm text-gray-600">
-                  Dr. {script.patients?.clinics?.doctor_name || 'N/A'}
+                  {doctorName ? `Dr. ${doctorName}` : 'N/A'}
                 </p>
               </div>
             </div>
@@ -76,7 +79,9 @@ export const TableRowContent = ({
         <TableCell>
           <div className="space-y-1">
             <p className="font-medium text-gray-900">
-              {script.appliance_type}
+              {script.appliance_type.split('-').map((word: string) => 
+                word.charAt(0).toUpperCase() + word.slice(1)
+              ).join(' ')}
             </p>
             <p className="text-sm text-gray-600">
               {script.arch.charAt(0).toUpperCase() + script.arch.slice(1)} Arch
@@ -93,7 +98,7 @@ export const TableRowContent = ({
             variant="secondary"
             className={`flex items-center gap-1 w-fit ${getStatusColor(script.status)}`}
           >
-            <span className="capitalize">{script.status}</span>
+            <span className="capitalize">{script.status.replace('_', ' ')}</span>
           </Badge>
         </TableCell>
         <TableCell>
