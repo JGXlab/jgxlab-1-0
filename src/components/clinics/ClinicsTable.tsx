@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { UserPlus, LogIn } from "lucide-react";
+import { UserPlus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import {
   Table,
@@ -12,12 +12,11 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { EditClinicDialog } from "./EditClinicDialog";
+import { LoginAsClinicButton } from "./LoginAsClinicButton";
 import { Clinic } from "./types";
-import { useNavigate } from "react-router-dom";
 
 export function ClinicsTable() {
   const { toast } = useToast();
-  const navigate = useNavigate();
   
   const { data: clinics, isLoading } = useQuery({
     queryKey: ['clinics'],
@@ -119,38 +118,6 @@ export function ClinicsTable() {
     }
   };
 
-  const handleLoginAs = async (email: string) => {
-    try {
-      console.log('Logging in as clinic:', email);
-      
-      // Sign in as the clinic user
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: email,
-        password: 'Password1', // Using the default password we set when creating users
-      });
-
-      if (error) {
-        console.error('Error logging in as clinic:', error);
-        throw error;
-      }
-
-      // Redirect to clinic dashboard
-      navigate('/clinic/dashboard');
-
-      toast({
-        title: "Logged In",
-        description: `Successfully logged in as ${email}`,
-      });
-    } catch (error) {
-      console.error('Error in login as handler:', error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error instanceof Error ? error.message : "An unexpected error occurred. Please try again.",
-      });
-    }
-  };
-
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -192,14 +159,10 @@ export function ClinicsTable() {
                   <UserPlus className="w-4 h-4 mr-2" />
                   Invite
                 </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleLoginAs(clinic.email)}
-                >
-                  <LogIn className="w-4 h-4 mr-2" />
-                  Login As
-                </Button>
+                <LoginAsClinicButton 
+                  email={clinic.email} 
+                  clinicName={clinic.name}
+                />
               </TableCell>
             </TableRow>
           ))}
