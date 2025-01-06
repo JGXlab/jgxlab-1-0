@@ -1,7 +1,7 @@
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { User, Eye, Receipt, Building2, MoreVertical, Printer } from "lucide-react";
+import { User, Eye, Receipt, Building2, MoreVertical } from "lucide-react";
 import { format } from "date-fns";
 import { getStatusColor, getPaymentStatusColor } from "./utils/statusStyles";
 import { StatusUpdateButtons } from "./StatusUpdateButtons";
@@ -15,8 +15,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { PreviewLabScriptModal } from "@/components/surgical-form/PreviewLabScriptModal";
-import { toast } from "sonner";
 
 interface TableRowContentProps {
   script: any;
@@ -34,129 +32,10 @@ export const TableRowContent = ({
   hideClinicColumn = false
 }: TableRowContentProps) => {
   const [showInvoiceDialog, setShowInvoiceDialog] = useState(false);
-  const [showPrintPreview, setShowPrintPreview] = useState(false);
 
   const handleViewInvoice = (e: React.MouseEvent) => {
     e.preventDefault();
     setShowInvoiceDialog(true);
-  };
-
-  const handlePrint = (e: React.MouseEvent) => {
-    e.preventDefault();
-    setShowPrintPreview(true);
-  };
-
-  const handlePrintInvoice = (e: React.MouseEvent) => {
-    e.preventDefault();
-    try {
-      // Create a new window for printing
-      const printWindow = window.open('', '', 'width=800,height=600');
-      if (!printWindow) {
-        throw new Error('Could not open print window');
-      }
-
-      const clinicInfo = script.patients?.clinics || {};
-      const patientName = `${script.patients?.first_name || ''} ${script.patients?.last_name || ''}`;
-      
-      // Create a simple HTML template for the invoice
-      const invoiceHTML = `
-        <html>
-          <head>
-            <title>Invoice</title>
-            <style>
-              @page { size: A4; margin: 1.6cm; }
-              body { font-family: system-ui, -apple-system, sans-serif; }
-              .invoice-header { display: flex; justify-content: space-between; margin-bottom: 2rem; }
-              .company-info { text-align: right; }
-              .invoice-title { font-size: 2rem; color: #375bdc; margin-bottom: 1rem; }
-              .details { margin: 2rem 0; }
-              .table { width: 100%; border-collapse: collapse; margin: 2rem 0; }
-              .table th, .table td { padding: 0.5rem; text-align: left; border-bottom: 1px solid #eee; }
-              .total { text-align: right; margin-top: 2rem; }
-            </style>
-          </head>
-          <body>
-            <div style="padding: 20px;">
-              <div class="invoice-header">
-                <div>
-                  <div class="invoice-title">Invoice</div>
-                  <div>Payment ID: ${script.payment_id || 'N/A'}</div>
-                  <div>Date: ${format(new Date(script.payment_date || new Date()), 'MMMM d, yyyy')}</div>
-                </div>
-                <div class="company-info">
-                  <div style="font-weight: bold; color: #375bdc;">JGX Dental Lab LLC</div>
-                  <div>25 Highview Trail</div>
-                  <div>Pittsford, New York 14534</div>
-                  <div>United States</div>
-                  <div>+1 718-812-2869</div>
-                </div>
-              </div>
-
-              <div class="details">
-                <h3>Bill To:</h3>
-                <div>${clinicInfo.name || 'N/A'}</div>
-                <div>${clinicInfo.address || 'N/A'}</div>
-                <div>Phone: ${clinicInfo.phone || 'N/A'}</div>
-                <div>Email: ${clinicInfo.email || 'N/A'}</div>
-              </div>
-
-              <table class="table">
-                <thead>
-                  <tr>
-                    <th>Description</th>
-                    <th>Quantity</th>
-                    <th>Amount</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>${script.appliance_type.split('-').map(word => 
-                      word.charAt(0).toUpperCase() + word.slice(1)
-                    ).join(' ')} - Patient: ${patientName}</td>
-                    <td>1</td>
-                    <td>$${script.amount_paid?.toFixed(2) || '0.00'}</td>
-                  </tr>
-                  ${script.needs_nightguard === 'yes' ? `
-                    <tr>
-                      <td>Additional Nightguard</td>
-                      <td>1</td>
-                      <td>$50.00</td>
-                    </tr>
-                  ` : ''}
-                  ${script.express_design === 'yes' ? `
-                    <tr>
-                      <td>Express Design Service</td>
-                      <td>1</td>
-                      <td>$50.00</td>
-                    </tr>
-                  ` : ''}
-                </tbody>
-              </table>
-
-              <div class="total">
-                <div><strong>Total Amount:</strong> $${script.amount_paid?.toFixed(2) || '0.00'}</div>
-                <div style="color: #059669;"><strong>Amount Paid:</strong> $${script.amount_paid?.toFixed(2) || '0.00'} USD</div>
-              </div>
-            </div>
-          </body>
-        </html>
-      `;
-
-      printWindow.document.write(invoiceHTML);
-      printWindow.document.close();
-      printWindow.focus();
-
-      // Wait for resources to load then print
-      setTimeout(() => {
-        printWindow.print();
-        printWindow.close();
-      }, 250);
-
-      toast.success("Print dialog opened");
-    } catch (error) {
-      console.error('Print error:', error);
-      toast.error("Failed to open print dialog");
-    }
   };
 
   const clinicName = script.patients?.clinics?.name;
@@ -255,30 +134,14 @@ export const TableRowContent = ({
                 align="end" 
                 className="w-48 bg-white border border-gray-200 shadow-lg rounded-md"
               >
-                <DropdownMenuItem 
-                  onClick={handlePrint}
-                  className="cursor-pointer hover:bg-gray-100"
-                >
-                  <Printer className="mr-2 h-4 w-4" />
-                  Print Script
-                </DropdownMenuItem>
                 {script.payment_status === 'paid' && (
-                  <>
-                    <DropdownMenuItem 
-                      onClick={handleViewInvoice}
-                      className="cursor-pointer hover:bg-gray-100"
-                    >
-                      <Receipt className="mr-2 h-4 w-4" />
-                      View Invoice
-                    </DropdownMenuItem>
-                    <DropdownMenuItem 
-                      onClick={handlePrintInvoice}
-                      className="cursor-pointer hover:bg-gray-100"
-                    >
-                      <Printer className="mr-2 h-4 w-4" />
-                      Print Invoice
-                    </DropdownMenuItem>
-                  </>
+                  <DropdownMenuItem 
+                    onClick={handleViewInvoice}
+                    className="cursor-pointer hover:bg-gray-100"
+                  >
+                    <Receipt className="mr-2 h-4 w-4" />
+                    View Invoice
+                  </DropdownMenuItem>
                 )}
                 <DropdownMenuItem 
                   onClick={(e) => onPreview(script, e)}
@@ -305,15 +168,6 @@ export const TableRowContent = ({
           </ScrollArea>
         </DialogContent>
       </Dialog>
-
-      {showPrintPreview && (
-        <PreviewLabScriptModal
-          isOpen={showPrintPreview}
-          onClose={() => setShowPrintPreview(false)}
-          labScriptId={script.id}
-          printMode={true}
-        />
-      )}
     </>
   );
 };

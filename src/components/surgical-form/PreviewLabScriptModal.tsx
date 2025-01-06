@@ -21,7 +21,6 @@ interface PreviewLabScriptModalProps {
   onClose: () => void;
   labScriptId?: string;
   formData?: z.infer<typeof formSchema>;
-  printMode?: boolean;
 }
 
 export const PreviewLabScriptModal = ({
@@ -29,7 +28,6 @@ export const PreviewLabScriptModal = ({
   onClose,
   labScriptId,
   formData,
-  printMode = false,
 }: PreviewLabScriptModalProps) => {
   const { toast } = useToast();
   const [labScript, setLabScript] = useState<Tables<"lab_scripts"> | null>(null);
@@ -165,15 +163,6 @@ export const PreviewLabScriptModal = ({
       });
     }
   };
-
-  // Auto-trigger print when in print mode
-  useEffect(() => {
-    if (printMode && !isLoadingPatient && patient && labScript) {
-      console.log('Auto-triggering print in print mode');
-      window.print();
-      onClose();
-    }
-  }, [printMode, isLoadingPatient, patient, labScript, onClose]);
 
   if (!labScript) return null;
 
