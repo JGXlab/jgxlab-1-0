@@ -2,7 +2,6 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { UserPlus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom";
 import {
   Table,
   TableBody,
@@ -17,7 +16,6 @@ import { Clinic } from "./types";
 
 export function ClinicsTable() {
   const { toast } = useToast();
-  const navigate = useNavigate();
   
   const { data: clinics, isLoading } = useQuery({
     queryKey: ['clinics'],
@@ -37,58 +35,6 @@ export function ClinicsTable() {
       return data as Clinic[];
     },
   });
-
-  const handleLoginAs = async (email: string) => {
-    try {
-      console.log('Attempting to login as clinic:', email);
-      
-      const { data, error } = await supabase.auth.admin.generateLink({
-        type: 'magiclink',
-        email: email,
-      });
-
-      if (error) {
-        console.error('Error generating login link:', error);
-        toast({
-          variant: "destructive",
-          title: "Login Failed",
-          description: "Failed to login as clinic user. Please try again.",
-        });
-        return;
-      }
-
-      // Use the generated token to sign in
-      const { data: { session }, error: signInError } = await supabase.auth.signInWithPassword({
-        email: email,
-        password: 'Password1', // Using default password since we're admin
-      });
-
-      if (signInError) {
-        console.error('Error signing in as clinic:', signInError);
-        toast({
-          variant: "destructive",
-          title: "Login Failed",
-          description: "Failed to login as clinic user. Please try again.",
-        });
-        return;
-      }
-
-      if (session) {
-        toast({
-          title: "Success",
-          description: "Successfully logged in as clinic user.",
-        });
-        navigate("/clinic/dashboard");
-      }
-    } catch (error) {
-      console.error('Unexpected error during login:', error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "An unexpected error occurred. Please try again.",
-      });
-    }
-  };
 
   const handleInvite = async (email: string, clinicName: string) => {
     try {
@@ -202,7 +148,7 @@ export function ClinicsTable() {
               <TableCell>{clinic.email}</TableCell>
               <TableCell>{clinic.phone}</TableCell>
               <TableCell>{clinic.address}</TableCell>
-              <TableCell className="flex items-center gap-2">
+              <TableCell className="flex items-center">
                 <EditClinicDialog clinic={clinic} />
                 <Button
                   variant="outline"
@@ -211,13 +157,6 @@ export function ClinicsTable() {
                 >
                   <UserPlus className="w-4 h-4 mr-2" />
                   Invite
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleLoginAs(clinic.email)}
-                >
-                  Login As
                 </Button>
               </TableCell>
             </TableRow>
