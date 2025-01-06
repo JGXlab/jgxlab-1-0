@@ -1,7 +1,7 @@
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { User, Eye, Receipt, Building2, MoreVertical } from "lucide-react";
+import { User, Eye, Receipt, Building2, MoreVertical, Printer } from "lucide-react";
 import { format } from "date-fns";
 import { getStatusColor, getPaymentStatusColor } from "./utils/statusStyles";
 import { StatusUpdateButtons } from "./StatusUpdateButtons";
@@ -36,6 +36,11 @@ export const TableRowContent = ({
   const handleViewInvoice = (e: React.MouseEvent) => {
     e.preventDefault();
     setShowInvoiceDialog(true);
+  };
+
+  const handlePrint = (e: React.MouseEvent) => {
+    e.preventDefault();
+    window.print();
   };
 
   const clinicName = script.patients?.clinics?.name;
@@ -134,6 +139,13 @@ export const TableRowContent = ({
                 align="end" 
                 className="w-48 bg-white border border-gray-200 shadow-lg rounded-md"
               >
+                <DropdownMenuItem 
+                  onClick={handlePrint}
+                  className="cursor-pointer hover:bg-gray-100"
+                >
+                  <Printer className="mr-2 h-4 w-4" />
+                  Print Script
+                </DropdownMenuItem>
                 {script.payment_status === 'paid' && (
                   <DropdownMenuItem 
                     onClick={handleViewInvoice}
