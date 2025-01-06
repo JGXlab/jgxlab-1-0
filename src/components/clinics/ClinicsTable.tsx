@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { UserPlus } from "lucide-react";
+import { UserPlus, LogIn } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import {
   Table,
@@ -117,6 +117,39 @@ export function ClinicsTable() {
     }
   };
 
+  const handleMagicLink = async (email: string) => {
+    try {
+      console.log('Sending magic link to:', email);
+      
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          shouldCreateUser: false,
+          data: {
+            redirect_to: `${window.location.origin}/clinic/dashboard`,
+          }
+        }
+      });
+
+      if (error) {
+        console.error('Error sending magic link:', error);
+        throw error;
+      }
+
+      toast({
+        title: "Magic Link Sent",
+        description: `A login link has been sent to ${email}. Please check your email.`,
+      });
+    } catch (error) {
+      console.error('Error in magic link handler:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error instanceof Error ? error.message : "An unexpected error occurred. Please try again.",
+      });
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -148,7 +181,7 @@ export function ClinicsTable() {
               <TableCell>{clinic.email}</TableCell>
               <TableCell>{clinic.phone}</TableCell>
               <TableCell>{clinic.address}</TableCell>
-              <TableCell className="flex items-center">
+              <TableCell className="flex items-center gap-2">
                 <EditClinicDialog clinic={clinic} />
                 <Button
                   variant="outline"
@@ -157,6 +190,14 @@ export function ClinicsTable() {
                 >
                   <UserPlus className="w-4 h-4 mr-2" />
                   Invite
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleMagicLink(clinic.email)}
+                >
+                  <LogIn className="w-4 h-4 mr-2" />
+                  Login As
                 </Button>
               </TableCell>
             </TableRow>
