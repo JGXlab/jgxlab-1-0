@@ -15,6 +15,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { PreviewLabScriptModal } from "@/components/surgical-form/PreviewLabScriptModal";
 
 interface TableRowContentProps {
   script: any;
@@ -32,6 +33,7 @@ export const TableRowContent = ({
   hideClinicColumn = false
 }: TableRowContentProps) => {
   const [showInvoiceDialog, setShowInvoiceDialog] = useState(false);
+  const [showPrintPreview, setShowPrintPreview] = useState(false);
 
   const handleViewInvoice = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -40,7 +42,7 @@ export const TableRowContent = ({
 
   const handlePrint = (e: React.MouseEvent) => {
     e.preventDefault();
-    window.print();
+    setShowPrintPreview(true);
   };
 
   const clinicName = script.patients?.clinics?.name;
@@ -180,6 +182,15 @@ export const TableRowContent = ({
           </ScrollArea>
         </DialogContent>
       </Dialog>
+
+      {showPrintPreview && (
+        <PreviewLabScriptModal
+          isOpen={showPrintPreview}
+          onClose={() => setShowPrintPreview(false)}
+          labScriptId={script.id}
+          printMode={true}
+        />
+      )}
     </>
   );
 };
