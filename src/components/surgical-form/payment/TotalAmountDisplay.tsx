@@ -1,4 +1,4 @@
-import { Info } from "lucide-react";
+import { Info, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -55,13 +55,18 @@ export const TotalAmountDisplay = ({
           </DialogContent>
         </Dialog>
       </div>
-      <p className="text-2xl font-semibold text-gray-900">
+      <div className="min-h-[2.5rem] flex items-center">
         {isLoading ? (
-          <span className="text-gray-400">Loading...</span>
+          <div className="flex items-center gap-2 text-primary">
+            <Loader2 className="h-5 w-5 animate-spin" />
+            <span className="text-lg font-medium">Calculating price...</span>
+          </div>
         ) : (
-          `$${Number(totalAmount).toFixed(2)}`
+          <p className="text-2xl font-semibold text-gray-900">
+            ${Number(totalAmount).toFixed(2)}
+          </p>
         )}
-      </p>
+      </div>
     </div>
   );
 };

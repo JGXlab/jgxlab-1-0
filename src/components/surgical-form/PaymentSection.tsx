@@ -52,14 +52,21 @@ export const PaymentSection = ({
     enabled: !!applianceType,
   });
 
+  const [isCalculating, setIsCalculating] = useState(false);
+
   useEffect(() => {
     const updatePrices = async () => {
-      const result = await calculateTotalPrice(
-        basePrice,
-        { archType, needsNightguard, expressDesign, applianceType }
-      );
-      setTotalAmount(result.total);
-      setLineItems(result.lineItems);
+      setIsCalculating(true);
+      try {
+        const result = await calculateTotalPrice(
+          basePrice,
+          { archType, needsNightguard, expressDesign, applianceType }
+        );
+        setTotalAmount(result.total);
+        setLineItems(result.lineItems);
+      } finally {
+        setIsCalculating(false);
+      }
     };
 
     updatePrices();
@@ -139,6 +146,8 @@ export const PaymentSection = ({
     createCheckoutSession.mutate(values);
   };
 
+  const isLoading = isPriceLoading || isCalculating;
+
   return (
     <div className="sticky bottom-0 bg-white border-t shadow-lg p-4">
       <div className="flex justify-between items-start">
@@ -150,12 +159,13 @@ export const PaymentSection = ({
           needsNightguard={needsNightguard}
           expressDesign={expressDesign}
           formattedApplianceType={formatApplianceType(applianceType)}
-          isLoading={isPriceLoading}
+          isLoading={isLoading}
         />
         <SubmitButton
           isSubmitting={isSubmitting}
           isPending={createCheckoutSession.isPending}
           onClick={handleSubmitAndPay}
+          disabled={isLoading}
         />
       </div>
     </div>

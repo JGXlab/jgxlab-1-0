@@ -1,28 +1,34 @@
-import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
 
 interface SubmitButtonProps {
   isSubmitting: boolean;
   isPending: boolean;
   onClick: (e: React.MouseEvent) => void;
+  disabled?: boolean;
 }
 
-export const SubmitButton = ({ isSubmitting, isPending, onClick }: SubmitButtonProps) => {
+export const SubmitButton = ({ 
+  isSubmitting, 
+  isPending, 
+  onClick,
+  disabled = false 
+}: SubmitButtonProps) => {
   return (
-    <Button 
-      type="submit" 
+    <Button
+      type="submit"
       size="lg"
-      disabled={isSubmitting || isPending}
-      className="min-w-[200px]"
+      className="min-w-[150px]"
       onClick={onClick}
+      disabled={isSubmitting || isPending || disabled}
     >
-      {isPending ? (
+      {isSubmitting || isPending ? (
         <>
           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          Redirecting to payment...
+          Processing...
         </>
       ) : (
-        'Submit and Pay'
+        "Submit & Pay"
       )}
     </Button>
   );
