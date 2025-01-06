@@ -101,7 +101,7 @@ export function PatientSelector({ value, onChange, className, clinicId }: Patien
         <PopoverContent className="w-full p-0">
           <Command>
             <CommandInput placeholder="Search patients..." />
-            <CommandList className="max-h-[300px] overflow-y-auto">
+            <div className="max-h-[300px] overflow-y-auto">
               <CommandEmpty>
                 No patient found.
                 <Button
@@ -135,7 +135,7 @@ export function PatientSelector({ value, onChange, className, clinicId }: Patien
                   </CommandItem>
                 ))}
               </CommandGroup>
-            </CommandList>
+            </div>
           </Command>
         </PopoverContent>
       </Popover>
@@ -158,18 +158,6 @@ export function PatientSelector({ value, onChange, className, clinicId }: Patien
           />
         </DialogContent>
       </Dialog>
-    </div>
-  );
-}
-
-interface CommandListProps {
-  children: React.ReactNode;
-}
-
-function CommandList({ children }: CommandListProps) {
-  return (
-    <div className="max-h-[300px] overflow-y-auto">
-      {children}
     </div>
   );
 }
