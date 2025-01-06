@@ -98,16 +98,6 @@ export function PatientSelector({ value, onChange, clinicId, className }: Patien
             <CommandList className="max-h-[300px] overflow-y-auto">
               <CommandEmpty>
                 No patient found.
-                <Button
-                  variant="ghost"
-                  className="w-full mt-2"
-                  onClick={() => {
-                    setCreatePatientOpen(true);
-                    setOpen(false);
-                  }}
-                >
-                  Create new patient
-                </Button>
               </CommandEmpty>
               <CommandGroup>
                 {patients.map((patient) => (
@@ -142,21 +132,13 @@ export function PatientSelector({ value, onChange, clinicId, className }: Patien
           </Command>
         </PopoverContent>
       </Popover>
-      <Button 
-        variant="outline"
-        onClick={() => setCreatePatientOpen(true)}
-      >
-        New Patient
-      </Button>
       <Dialog open={createPatientOpen} onOpenChange={setCreatePatientOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Create New Patient</DialogTitle>
           </DialogHeader>
           <CreatePatientForm 
-            onSuccess={() => {
-              setCreatePatientOpen(false);
-            }} 
+            onSuccess={() => setCreatePatientOpen(false)} 
             clinicId={clinicId}
           />
         </DialogContent>
