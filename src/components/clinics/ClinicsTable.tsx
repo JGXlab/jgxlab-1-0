@@ -42,10 +42,29 @@ export function ClinicsTable() {
     try {
       console.log('Attempting to login as clinic:', email);
       
-      const { data: { session }, error } = await supabase.auth.admin.signInAsUser(email);
+      const { data, error } = await supabase.auth.admin.generateLink({
+        type: 'magiclink',
+        email: email,
+      });
 
       if (error) {
-        console.error('Error logging in as clinic:', error);
+        console.error('Error generating login link:', error);
+        toast({
+          variant: "destructive",
+          title: "Login Failed",
+          description: "Failed to login as clinic user. Please try again.",
+        });
+        return;
+      }
+
+      // Use the generated token to sign in
+      const { data: { session }, error: signInError } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: 'Password1', // Using default password since we're admin
+      });
+
+      if (signInError) {
+        console.error('Error signing in as clinic:', signInError);
         toast({
           variant: "destructive",
           title: "Login Failed",
