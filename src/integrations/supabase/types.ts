@@ -164,6 +164,7 @@ export type Database = {
           amount_paid: number | null
           appliance_type: string
           arch: string
+          clinic_id: string | null
           created_at: string
           due_date: string
           express_design: string | null
@@ -186,6 +187,7 @@ export type Database = {
           amount_paid?: number | null
           appliance_type: string
           arch: string
+          clinic_id?: string | null
           created_at?: string
           due_date: string
           express_design?: string | null
@@ -208,6 +210,7 @@ export type Database = {
           amount_paid?: number | null
           appliance_type?: string
           arch?: string
+          clinic_id?: string | null
           created_at?: string
           due_date?: string
           express_design?: string | null
@@ -232,6 +235,13 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lab_scripts_clinic_id_fkey"
+            columns: ["clinic_id"]
+            isOneToOne: false
+            referencedRelation: "clinics"
             referencedColumns: ["id"]
           },
           {

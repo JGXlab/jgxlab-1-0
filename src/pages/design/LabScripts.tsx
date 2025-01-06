@@ -33,6 +33,11 @@ const DesignLabScripts = () => {
               name,
               doctor_name
             )
+          ),
+          clinics (
+            id,
+            name,
+            doctor_name
           )
         `)
         .order('created_at', { ascending: false });
@@ -40,6 +45,26 @@ const DesignLabScripts = () => {
       if (error) {
         console.error('Error fetching lab scripts:', error);
         throw error;
+      }
+
+      // Update clinic_id for any lab scripts that don't have it set
+      const scriptsToUpdate = data?.filter(
+        script => !script.clinic_id && script.patients?.clinic_id
+      );
+
+      if (scriptsToUpdate && scriptsToUpdate.length > 0) {
+        console.log('Updating missing clinic IDs for lab scripts...');
+        
+        for (const script of scriptsToUpdate) {
+          const { error: updateError } = await supabase
+            .from('lab_scripts')
+            .update({ clinic_id: script.patients.clinic_id })
+            .eq('id', script.id);
+
+          if (updateError) {
+            console.error('Error updating clinic ID:', updateError);
+          }
+        }
       }
 
       console.log('Fetched lab scripts:', data);
