@@ -13,9 +13,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { EditClinicDialog } from "./EditClinicDialog";
 import { Clinic } from "./types";
+import { useNavigate } from "react-router-dom";
 
 export function ClinicsTable() {
   const { toast } = useToast();
+  const navigate = useNavigate();
   
   const { data: clinics, isLoading } = useQuery({
     queryKey: ['clinics'],
@@ -117,31 +119,30 @@ export function ClinicsTable() {
     }
   };
 
-  const handleMagicLink = async (email: string) => {
+  const handleLoginAs = async (email: string) => {
     try {
-      console.log('Sending magic link to:', email);
+      console.log('Logging in as clinic:', email);
       
-      const { error } = await supabase.auth.signInWithOtp({
-        email,
-        options: {
-          shouldCreateUser: false,
-          data: {
-            redirect_to: `${window.location.origin}/clinic/dashboard`,
-          }
-        }
+      // Sign in as the clinic user
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: 'Password1', // Using the default password we set when creating users
       });
 
       if (error) {
-        console.error('Error sending magic link:', error);
+        console.error('Error logging in as clinic:', error);
         throw error;
       }
 
+      // Redirect to clinic dashboard
+      navigate('/clinic/dashboard');
+
       toast({
-        title: "Magic Link Sent",
-        description: `A login link has been sent to ${email}. Please check your email.`,
+        title: "Logged In",
+        description: `Successfully logged in as ${email}`,
       });
     } catch (error) {
-      console.error('Error in magic link handler:', error);
+      console.error('Error in login as handler:', error);
       toast({
         variant: "destructive",
         title: "Error",
@@ -194,7 +195,7 @@ export function ClinicsTable() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => handleMagicLink(clinic.email)}
+                  onClick={() => handleLoginAs(clinic.email)}
                 >
                   <LogIn className="w-4 h-4 mr-2" />
                   Login As
