@@ -34,6 +34,7 @@ export const TableRowContent = ({
 }: TableRowContentProps) => {
   const [showInvoiceDialog, setShowInvoiceDialog] = useState(false);
   const [showPrintPreview, setShowPrintPreview] = useState(false);
+  const [showPrintInvoice, setShowPrintInvoice] = useState(false);
 
   const handleViewInvoice = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -43,6 +44,11 @@ export const TableRowContent = ({
   const handlePrint = (e: React.MouseEvent) => {
     e.preventDefault();
     setShowPrintPreview(true);
+  };
+
+  const handlePrintInvoice = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setShowPrintInvoice(true);
   };
 
   const clinicName = script.patients?.clinics?.name;
@@ -149,13 +155,22 @@ export const TableRowContent = ({
                   Print Script
                 </DropdownMenuItem>
                 {script.payment_status === 'paid' && (
-                  <DropdownMenuItem 
-                    onClick={handleViewInvoice}
-                    className="cursor-pointer hover:bg-gray-100"
-                  >
-                    <Receipt className="mr-2 h-4 w-4" />
-                    View Invoice
-                  </DropdownMenuItem>
+                  <>
+                    <DropdownMenuItem 
+                      onClick={handleViewInvoice}
+                      className="cursor-pointer hover:bg-gray-100"
+                    >
+                      <Receipt className="mr-2 h-4 w-4" />
+                      View Invoice
+                    </DropdownMenuItem>
+                    <DropdownMenuItem 
+                      onClick={handlePrintInvoice}
+                      className="cursor-pointer hover:bg-gray-100"
+                    >
+                      <Printer className="mr-2 h-4 w-4" />
+                      Print Invoice
+                    </DropdownMenuItem>
+                  </>
                 )}
                 <DropdownMenuItem 
                   onClick={(e) => onPreview(script, e)}
@@ -190,6 +205,21 @@ export const TableRowContent = ({
           labScriptId={script.id}
           printMode={true}
         />
+      )}
+
+      {showPrintInvoice && (
+        <Dialog open={showPrintInvoice} onOpenChange={setShowPrintInvoice}>
+          <DialogContent className="max-w-4xl h-[90vh] p-0 gap-0">
+            <DialogHeader className="px-2 py-3 border-b">
+              <DialogTitle>Invoice Preview</DialogTitle>
+            </DialogHeader>
+            <ScrollArea className="flex-1 h-full print:overflow-visible">
+              <div className="p-6">
+                <Invoice labScript={script} />
+              </div>
+            </ScrollArea>
+          </DialogContent>
+        </Dialog>
       )}
     </>
   );
