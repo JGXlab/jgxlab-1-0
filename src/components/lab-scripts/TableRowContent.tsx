@@ -16,6 +16,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { PreviewLabScriptModal } from "@/components/surgical-form/PreviewLabScriptModal";
+import { toast } from "sonner";
 
 interface TableRowContentProps {
   script: any;
@@ -34,7 +35,6 @@ export const TableRowContent = ({
 }: TableRowContentProps) => {
   const [showInvoiceDialog, setShowInvoiceDialog] = useState(false);
   const [showPrintPreview, setShowPrintPreview] = useState(false);
-  const [showPrintInvoice, setShowPrintInvoice] = useState(false);
 
   const handleViewInvoice = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -48,7 +48,46 @@ export const TableRowContent = ({
 
   const handlePrintInvoice = (e: React.MouseEvent) => {
     e.preventDefault();
-    setShowPrintInvoice(true);
+    try {
+      // Create a new window for printing
+      const printWindow = window.open('', '', 'width=800,height=600');
+      if (!printWindow) {
+        throw new Error('Could not open print window');
+      }
+
+      // Write the invoice content to the new window
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>Invoice</title>
+            <style>
+              @page { size: A4; margin: 1.6cm; }
+              body { font-family: system-ui, -apple-system, sans-serif; }
+            </style>
+            ${document.head.innerHTML}
+          </head>
+          <body>
+            <div style="padding: 20px;">
+              ${Invoice({ labScript: script }).type({ labScript: script })}
+            </div>
+          </body>
+        </html>
+      `);
+
+      printWindow.document.close();
+      printWindow.focus();
+
+      // Wait for resources to load then print
+      setTimeout(() => {
+        printWindow.print();
+        printWindow.close();
+      }, 250);
+
+      toast.success("Print dialog opened");
+    } catch (error) {
+      console.error('Print error:', error);
+      toast.error("Failed to open print dialog");
+    }
   };
 
   const clinicName = script.patients?.clinics?.name;
@@ -205,21 +244,6 @@ export const TableRowContent = ({
           labScriptId={script.id}
           printMode={true}
         />
-      )}
-
-      {showPrintInvoice && (
-        <Dialog open={showPrintInvoice} onOpenChange={setShowPrintInvoice}>
-          <DialogContent className="max-w-4xl h-[90vh] p-0 gap-0">
-            <DialogHeader className="px-2 py-3 border-b">
-              <DialogTitle>Invoice Preview</DialogTitle>
-            </DialogHeader>
-            <ScrollArea className="flex-1 h-full print:overflow-visible">
-              <div className="p-6">
-                <Invoice labScript={script} />
-              </div>
-            </ScrollArea>
-          </DialogContent>
-        </Dialog>
       )}
     </>
   );
