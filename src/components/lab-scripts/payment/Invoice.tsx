@@ -1,18 +1,18 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Printer } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { InvoiceHeader } from "./InvoiceHeader";
 import { BillingAddresses } from "./BillingAddresses";
 import { InvoiceTable } from "./InvoiceTable";
-import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 
 interface InvoiceProps {
   labScript: any;
+  onPrint?: () => void;
 }
 
-export const Invoice = ({ labScript }: InvoiceProps) => {
+export const Invoice = ({ labScript, onPrint }: InvoiceProps) => {
   const { toast } = useToast();
   const { data: invoice, isLoading: isLoadingInvoice } = useQuery({
     queryKey: ['invoice', labScript.id],
@@ -35,66 +35,6 @@ export const Invoice = ({ labScript }: InvoiceProps) => {
     enabled: !!labScript.id,
   });
 
-  const handlePrint = () => {
-    try {
-      const printContent = document.querySelector('.invoice-content');
-      if (!printContent) {
-        throw new Error('Print content not found');
-      }
-      
-      const originalDisplay = document.body.style.display;
-      const printStyles = `
-        @page { size: A4; margin: 0; }
-        body { margin: 1.6cm; }
-      `;
-      
-      const styleSheet = document.createElement('style');
-      styleSheet.textContent = printStyles;
-      document.head.appendChild(styleSheet);
-      
-      document.body.style.display = 'none';
-      const printWindow = window.open('', '', 'width=800,height=600');
-      if (!printWindow) {
-        throw new Error('Could not open print window');
-      }
-      
-      printWindow.document.write(`
-        <html>
-          <head>
-            <title>Invoice</title>
-            ${document.head.innerHTML}
-          </head>
-          <body>
-            ${printContent.innerHTML}
-          </body>
-        </html>
-      `);
-      
-      printWindow.document.close();
-      printWindow.focus();
-      
-      // Wait for resources to load
-      setTimeout(() => {
-        printWindow.print();
-        printWindow.close();
-        document.body.style.display = originalDisplay;
-        document.head.removeChild(styleSheet);
-      }, 250);
-
-      toast({
-        title: "Print Started",
-        description: "The invoice print dialog should open shortly.",
-      });
-    } catch (error) {
-      console.error('Print error:', error);
-      toast({
-        title: "Print Error",
-        description: "Failed to print the invoice. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
-
   if (isLoadingInvoice) {
     return (
       <div className="flex items-center justify-center p-8">
@@ -112,23 +52,12 @@ export const Invoice = ({ labScript }: InvoiceProps) => {
   }
 
   return (
-    <div className="relative">
-      <Button
-        onClick={handlePrint}
-        size="icon"
-        variant="ghost"
-        className="absolute top-0 right-0 m-4"
-        title="Print Invoice"
-      >
-        <Printer className="h-4 w-4" />
-      </Button>
-      <Card className="w-[210mm] h-[297mm] mx-auto shadow-none border-none bg-white invoice-content">
-        <div className="p-6 space-y-6 h-full">
-          <InvoiceHeader labScript={labScript} />
-          <BillingAddresses invoice={invoice} />
-          <InvoiceTable invoice={invoice} />
-        </div>
-      </Card>
-    </div>
+    <Card className="w-[210mm] h-[297mm] mx-auto shadow-none border-none bg-white invoice-content">
+      <div className="p-6 space-y-6 h-full">
+        <InvoiceHeader labScript={labScript} />
+        <BillingAddresses invoice={invoice} />
+        <InvoiceTable invoice={invoice} />
+      </div>
+    </Card>
   );
 };
