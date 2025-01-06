@@ -1,7 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { UserPlus } from "lucide-react";
+import { UserPlus, LogIn } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 import {
   Table,
   TableBody,
@@ -16,6 +17,7 @@ import { Clinic } from "./types";
 
 export function ClinicsTable() {
   const { toast } = useToast();
+  const navigate = useNavigate();
   
   const { data: clinics, isLoading } = useQuery({
     queryKey: ['clinics'],
@@ -117,6 +119,46 @@ export function ClinicsTable() {
     }
   };
 
+  const handleLoginAsClinic = async (clinicId: string, email: string) => {
+    try {
+      console.log('Attempting to login as clinic:', email);
+      
+      // First sign out of current admin session
+      await supabase.auth.signOut();
+      
+      // Sign in as the clinic user
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: 'Password1', // This is the default password set when inviting users
+      });
+
+      if (error) {
+        console.error('Error logging in as clinic:', error);
+        toast({
+          variant: "destructive",
+          title: "Login Failed",
+          description: "Could not login as clinic. Please make sure the clinic has been invited first.",
+        });
+        return;
+      }
+
+      toast({
+        title: "Success",
+        description: `Logged in as clinic: ${email}`,
+      });
+      
+      // Navigate to clinic dashboard
+      navigate("/clinic/dashboard");
+    } catch (error) {
+      console.error('Error in login as clinic handler:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error instanceof Error ? error.message : "An unexpected error occurred",
+      });
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -148,7 +190,7 @@ export function ClinicsTable() {
               <TableCell>{clinic.email}</TableCell>
               <TableCell>{clinic.phone}</TableCell>
               <TableCell>{clinic.address}</TableCell>
-              <TableCell className="flex items-center">
+              <TableCell className="flex items-center gap-2">
                 <EditClinicDialog clinic={clinic} />
                 <Button
                   variant="outline"
@@ -157,6 +199,14 @@ export function ClinicsTable() {
                 >
                   <UserPlus className="w-4 h-4 mr-2" />
                   Invite
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleLoginAsClinic(clinic.id, clinic.email)}
+                >
+                  <LogIn className="w-4 h-4 mr-2" />
+                  Login as
                 </Button>
               </TableCell>
             </TableRow>
