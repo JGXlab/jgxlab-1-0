@@ -22,7 +22,8 @@ export const useLabScripts = (selectedStatus: string | null) => {
               name,
               doctor_name,
               email,
-              phone
+              phone,
+              address
             )
           )
         `)
