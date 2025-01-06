@@ -1,21 +1,13 @@
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { User, Eye, Receipt, Building2, MoreVertical, Printer } from "lucide-react";
+import { Building2 } from "lucide-react";
 import { format } from "date-fns";
 import { getStatusColor, getPaymentStatusColor } from "./utils/statusStyles";
 import { StatusUpdateButtons } from "./StatusUpdateButtons";
-import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Invoice } from "./payment/Invoice";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { PatientInfo } from "./table/PatientInfo";
+import { LabScriptActions } from "./table/LabScriptActions";
 import { PreviewLabScriptModal } from "@/components/surgical-form/PreviewLabScriptModal";
+import { useState } from "react";
 
 interface TableRowContentProps {
   script: any;
@@ -32,25 +24,8 @@ export const TableRowContent = ({
   isDesignPortal = false,
   hideClinicColumn = false
 }: TableRowContentProps) => {
-  const [showInvoiceDialog, setShowInvoiceDialog] = useState(false);
   const [showPrintPreview, setShowPrintPreview] = useState(false);
-  const [showPrintInvoice, setShowPrintInvoice] = useState(false);
-
-  const handleViewInvoice = (e: React.MouseEvent) => {
-    e.preventDefault();
-    setShowInvoiceDialog(true);
-  };
-
-  const handlePrint = (e: React.MouseEvent) => {
-    e.preventDefault();
-    setShowPrintPreview(true);
-  };
-
-  const handlePrintInvoice = (e: React.MouseEvent) => {
-    e.preventDefault();
-    setShowPrintInvoice(true);
-  };
-
+  
   const clinicName = script.patients?.clinics?.name;
   const doctorName = script.patients?.clinics?.doctor_name;
 
@@ -58,19 +33,7 @@ export const TableRowContent = ({
     <>
       <TableRow className="hover:bg-gray-50/50 transition-colors duration-200">
         <TableCell>
-          <div className="flex items-center space-x-3">
-            <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-              <User className="h-4 w-4 text-primary" />
-            </div>
-            <div>
-              <p className="font-medium text-gray-900">
-                {script.patients?.first_name} {script.patients?.last_name}
-              </p>
-              <p className="text-sm text-gray-600">
-                ID: {script.patient_id.slice(0, 8)}
-              </p>
-            </div>
-          </div>
+          <PatientInfo patient={script.patients} />
         </TableCell>
         {!hideClinicColumn && (
           <TableCell>
@@ -132,71 +95,10 @@ export const TableRowContent = ({
             {onStatusUpdate && (
               <StatusUpdateButtons script={script} onStatusUpdate={onStatusUpdate} />
             )}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 rounded-full text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-all duration-300 hover:scale-105"
-                >
-                  <MoreVertical className="h-4 w-4" />
-                  <span className="sr-only">More options</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent 
-                align="end" 
-                className="w-48 bg-white border border-gray-200 shadow-lg rounded-md"
-              >
-                <DropdownMenuItem 
-                  onClick={handlePrint}
-                  className="cursor-pointer hover:bg-gray-100"
-                >
-                  <Printer className="mr-2 h-4 w-4" />
-                  Print Script
-                </DropdownMenuItem>
-                {script.payment_status === 'paid' && (
-                  <>
-                    <DropdownMenuItem 
-                      onClick={handleViewInvoice}
-                      className="cursor-pointer hover:bg-gray-100"
-                    >
-                      <Receipt className="mr-2 h-4 w-4" />
-                      View Invoice
-                    </DropdownMenuItem>
-                    <DropdownMenuItem 
-                      onClick={handlePrintInvoice}
-                      className="cursor-pointer hover:bg-gray-100"
-                    >
-                      <Printer className="mr-2 h-4 w-4" />
-                      Print Invoice
-                    </DropdownMenuItem>
-                  </>
-                )}
-                <DropdownMenuItem 
-                  onClick={(e) => onPreview(script, e)}
-                  className="cursor-pointer hover:bg-gray-100"
-                >
-                  <Eye className="mr-2 h-4 w-4" />
-                  Preview Script
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <LabScriptActions script={script} onPreview={onPreview} />
           </div>
         </TableCell>
       </TableRow>
-
-      <Dialog open={showInvoiceDialog} onOpenChange={setShowInvoiceDialog}>
-        <DialogContent className="max-w-4xl h-[90vh] p-0 gap-0">
-          <DialogHeader className="px-2 py-3 border-b">
-            <DialogTitle>Invoice Preview</DialogTitle>
-          </DialogHeader>
-          <ScrollArea className="flex-1 h-full">
-            <div className="p-6">
-              <Invoice labScript={script} />
-            </div>
-          </ScrollArea>
-        </DialogContent>
-      </Dialog>
 
       {showPrintPreview && (
         <PreviewLabScriptModal
@@ -205,21 +107,6 @@ export const TableRowContent = ({
           labScriptId={script.id}
           printMode={true}
         />
-      )}
-
-      {showPrintInvoice && (
-        <Dialog open={showPrintInvoice} onOpenChange={setShowPrintInvoice}>
-          <DialogContent className="max-w-4xl h-[90vh] p-0 gap-0">
-            <DialogHeader className="px-2 py-3 border-b">
-              <DialogTitle>Invoice Preview</DialogTitle>
-            </DialogHeader>
-            <ScrollArea className="flex-1 h-full print:overflow-visible">
-              <div className="p-6">
-                <Invoice labScript={script} />
-              </div>
-            </ScrollArea>
-          </DialogContent>
-        </Dialog>
       )}
     </>
   );
