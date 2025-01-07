@@ -72,23 +72,22 @@ const DesignLabScripts = () => {
     }
   });
 
-  const handlePreview = (script: any, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setSelectedScript(script);
-    setIsPreviewOpen(true);
-  };
-
-  const handleStatusUpdate = async (id: string, newStatus: string, reason?: string, comment?: string) => {
+  const handleStatusUpdate = async (id: string, newStatus: string, reason?: string, comment?: string, designUrl?: string) => {
     try {
+      console.log('Updating status with:', { id, newStatus, reason, comment, designUrl }); // Debug log
       const updateData: any = { status: newStatus };
       
       if (newStatus === 'on_hold') {
         updateData.hold_reason = reason;
         updateData.hold_comment = comment;
+        if (reason === 'approval' && designUrl) {
+          updateData.design_url = designUrl;
+        }
       } else {
         // Clear hold data when changing to other statuses
         updateData.hold_reason = null;
         updateData.hold_comment = null;
+        updateData.design_url = null;
       }
 
       const { error } = await supabase

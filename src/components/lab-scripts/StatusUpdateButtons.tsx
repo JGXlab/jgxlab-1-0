@@ -19,6 +19,7 @@ export const StatusUpdateButtons = ({ script, onStatusUpdate }: StatusUpdateButt
   const status = script.status.toLowerCase();
 
   const handleHoldSubmit = (reason: string, comment: string, designUrl?: string) => {
+    console.log('Submitting hold with design URL:', designUrl); // Debug log
     onStatusUpdate(script.id, 'on_hold', reason, comment, designUrl);
     setShowHoldDialog(false);
   };
