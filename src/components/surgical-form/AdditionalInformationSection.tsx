@@ -14,6 +14,7 @@ interface AdditionalInformationSectionProps {
 
 export const AdditionalInformationSection = ({ form }: AdditionalInformationSectionProps) => {
   const applianceType = form.watch('applianceType');
+  const expressDesign = form.watch('expressDesign');
   const showExpressDesign = applianceType !== 'surgical-day';
 
   // Define appliance types that require 4 working days
@@ -25,12 +26,24 @@ export const AdditionalInformationSection = ({ form }: AdditionalInformationSect
     'ti-bar'
   ];
 
-  // Calculate minimum due date based on appliance type, accounting for weekends
+  // Calculate minimum due date based on appliance type and express design selection
   const calculateMinDueDate = () => {
+    // If express design is selected, allow next working day
+    if (expressDesign === 'yes') {
+      let nextDay = addDays(new Date(), 1);
+      // If next day is weekend, move to Monday
+      while (isWeekend(nextDay)) {
+        nextDay = addDays(nextDay, 1);
+      }
+      return format(nextDay, 'yyyy-MM-dd');
+    }
+
+    // If not express design and not in lead time appliances, allow same day
     if (!appliancesWithLeadTime.includes(applianceType)) {
       return format(new Date(), 'yyyy-MM-dd');
     }
 
+    // Calculate 4 working days for lead time appliances
     let date = new Date();
     let daysToAdd = 4;
     let daysAdded = 0;
@@ -90,7 +103,7 @@ export const AdditionalInformationSection = ({ form }: AdditionalInformationSect
               {...field} 
               min={minDueDate}
             />
-            {appliancesWithLeadTime.includes(applianceType) && (
+            {appliancesWithLeadTime.includes(applianceType) && expressDesign !== 'yes' && (
               <p className="text-sm text-muted-foreground mt-1">
                 This appliance type requires a minimum of 4 working days (excluding weekends) for design completion.
               </p>
