@@ -1,7 +1,7 @@
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { User, Eye, Receipt, Building2, MoreVertical, Package } from "lucide-react";
+import { User, Eye, Receipt, Building2, MoreVertical, Package, AlertCircle } from "lucide-react";
 import { format } from "date-fns";
 import { getStatusColor, getPaymentStatusColor } from "./utils/statusStyles";
 import { StatusUpdateButtons } from "./StatusUpdateButtons";
@@ -14,7 +14,13 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
 
 interface TableRowContentProps {
   script: any;
@@ -46,6 +52,13 @@ export const TableRowContent = ({
 
   const clinicName = script.patients?.clinics?.name;
   const doctorName = script.patients?.clinics?.doctor_name;
+
+  // Format the hold reason to be more readable
+  const formatHoldReason = (reason: string) => {
+    return reason.split('_').map(word => 
+      word.charAt(0).toUpperCase() + word.slice(1)
+    ).join(' ');
+  };
 
   return (
     <>
@@ -108,12 +121,38 @@ export const TableRowContent = ({
           </div>
         </TableCell>
         <TableCell>
-          <Badge 
-            variant="secondary"
-            className={`flex items-center gap-1 w-fit ${getStatusColor(script.status)}`}
-          >
-            <span className="capitalize">{script.status.replace('_', ' ')}</span>
-          </Badge>
+          <div className="flex items-center gap-2">
+            <Badge 
+              variant="secondary"
+              className={`flex items-center gap-1 w-fit ${getStatusColor(script.status)}`}
+            >
+              <span className="capitalize">{script.status.replace('_', ' ')}</span>
+            </Badge>
+            {script.status === 'on_hold' && script.hold_reason && (
+              <HoverCard>
+                <HoverCardTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-6 w-6 p-0">
+                    <AlertCircle className="h-4 w-4 text-amber-500" />
+                  </Button>
+                </HoverCardTrigger>
+                <HoverCardContent className="w-80 bg-white p-4">
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-sm text-gray-900">Hold Details</h4>
+                    <div className="text-sm">
+                      <p className="text-gray-700">
+                        <span className="font-medium">Reason:</span> {formatHoldReason(script.hold_reason)}
+                      </p>
+                      {script.hold_comment && (
+                        <p className="text-gray-700 mt-1">
+                          <span className="font-medium">Comment:</span> {script.hold_comment}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </HoverCardContent>
+              </HoverCard>
+            )}
+          </div>
         </TableCell>
         <TableCell>
           <Badge 
@@ -152,13 +191,16 @@ export const TableRowContent = ({
                 className="w-48 bg-white border border-gray-200 shadow-lg rounded-md"
               >
                 {script.payment_status === 'paid' && (
-                  <DropdownMenuItem 
-                    onClick={handleViewInvoice}
-                    className="cursor-pointer hover:bg-gray-100"
-                  >
-                    <Receipt className="mr-2 h-4 w-4" />
-                    View Invoice
-                  </DropdownMenuItem>
+                  <>
+                    <DropdownMenuItem 
+                      onClick={handleViewInvoice}
+                      className="cursor-pointer hover:bg-gray-100"
+                    >
+                      <Receipt className="mr-2 h-4 w-4" />
+                      View Invoice
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                  </>
                 )}
                 <DropdownMenuItem 
                   onClick={(e) => onPreview(script, e)}
