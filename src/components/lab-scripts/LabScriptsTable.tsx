@@ -8,9 +8,9 @@ interface LabScriptsTableProps {
   labScripts: any[];
   isLoading?: boolean;
   onPreview: (script: any, e: React.MouseEvent) => void;
-  onStatusUpdate?: (id: string, status: string) => void;
+  onStatusUpdate?: (id: string, status: string, reason?: string, comment?: string) => void;
   isDesignPortal?: boolean;
-  hideClinicColumn?: boolean; // Add this new prop
+  hideClinicColumn?: boolean;
 }
 
 export const LabScriptsTable = ({ 
@@ -19,7 +19,7 @@ export const LabScriptsTable = ({
   onPreview, 
   onStatusUpdate,
   isDesignPortal = false,
-  hideClinicColumn = false // Add default value
+  hideClinicColumn = false
 }: LabScriptsTableProps) => {
   if (isLoading) {
     return <LoadingLabScripts />;

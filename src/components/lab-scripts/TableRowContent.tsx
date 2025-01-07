@@ -19,7 +19,7 @@ import {
 interface TableRowContentProps {
   script: any;
   onPreview: (script: any, e: React.MouseEvent) => void;
-  onStatusUpdate?: (id: string, status: string) => void;
+  onStatusUpdate?: (id: string, status: string, reason?: string, comment?: string) => void;
   isDesignPortal?: boolean;
   hideClinicColumn?: boolean;
 }
@@ -36,6 +36,12 @@ export const TableRowContent = ({
   const handleViewInvoice = (e: React.MouseEvent) => {
     e.preventDefault();
     setShowInvoiceDialog(true);
+  };
+
+  const handleStatusUpdate = (id: string, status: string, reason?: string, comment?: string) => {
+    if (onStatusUpdate) {
+      onStatusUpdate(id, status, reason, comment);
+    }
   };
 
   const clinicName = script.patients?.clinics?.name;
@@ -125,7 +131,10 @@ export const TableRowContent = ({
         <TableCell className="text-right">
           <div className="flex items-center justify-end gap-2">
             {onStatusUpdate && (
-              <StatusUpdateButtons script={script} onStatusUpdate={onStatusUpdate} />
+              <StatusUpdateButtons 
+                script={script} 
+                onStatusUpdate={handleStatusUpdate} 
+              />
             )}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
