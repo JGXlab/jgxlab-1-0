@@ -1,7 +1,7 @@
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { User, Eye, Receipt, Building2, MoreVertical, Package, AlertCircle, ExternalLink } from "lucide-react";
+import { User, Eye, Receipt, Building2, MoreVertical, Package, AlertCircle, ExternalLink, Download } from "lucide-react";
 import { format } from "date-fns";
 import { getStatusColor, getPaymentStatusColor } from "./utils/statusStyles";
 import { StatusUpdateButtons } from "./StatusUpdateButtons";
@@ -80,6 +80,32 @@ export const TableRowContent = ({
             </TooltipTrigger>
             <TooltipContent>
               <p>Open design in new tab</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      );
+    }
+    return null;
+  };
+
+  // Render download button for completed designs with download URL
+  const renderDownloadButton = () => {
+    if (script.status === 'completed' && script.design_download_url) {
+      return (
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <a
+                href={script.design_download_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center w-8 h-8 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground"
+              >
+                <Download className="h-4 w-4" />
+              </a>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Download Design</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
@@ -208,6 +234,7 @@ export const TableRowContent = ({
                 onStatusUpdate={handleStatusUpdate} 
               />
             )}
+            {renderDownloadButton()}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
