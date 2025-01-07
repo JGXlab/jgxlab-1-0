@@ -7,7 +7,7 @@ import { z } from "zod";
 import { formSchema } from "./formSchema";
 import { SelectionButton } from "./SelectionButton";
 import { addDays, format, isWeekend } from "date-fns";
-import { zonedTimeToUtc, utcToZonedTime } from 'date-fns-tz';
+import { toZonedTime } from 'date-fns-tz';
 
 interface AdditionalInformationSectionProps {
   form: UseFormReturn<z.infer<typeof formSchema>>;
@@ -36,7 +36,7 @@ export const AdditionalInformationSection = ({ form }: AdditionalInformationSect
     
     // Convert to EST timezone
     const timeZone = 'America/New_York';
-    const estDate = utcToZonedTime(selectedDate, timeZone);
+    const estDate = toZonedTime(selectedDate, timeZone);
     
     if (isWeekend(estDate)) {
       alert('Weekend dates (Saturday and Sunday) are not available. Please select a weekday.');
