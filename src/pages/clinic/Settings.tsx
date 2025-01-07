@@ -1,6 +1,7 @@
 import { ClinicLayout } from "@/components/clinic/ClinicLayout";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ClinicNavHeader } from "@/components/clinic/ClinicNavHeader";
+import { PasswordChangeForm } from "@/components/clinic/PasswordChangeForm";
 
 export default function Settings() {
   return (
@@ -18,7 +19,11 @@ export default function Settings() {
                   </p>
                 </div>
               </div>
-              {/* Settings content will be added here later */}
+
+              <div className="max-w-xl">
+                <h2 className="text-lg font-semibold text-gray-900 mb-4">Change Password</h2>
+                <PasswordChangeForm />
+              </div>
             </div>
           </div>
         </ScrollArea>
