@@ -1,7 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
-import { Pencil, Trash2, User } from "lucide-react";
+import { User } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -25,6 +24,8 @@ import { useState } from "react";
 import { EditPatientForm } from "./EditPatientForm";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
+import { PatientActions } from "./PatientActions";
+import { LabScriptHistoryModal } from "./LabScriptHistoryModal";
 
 interface PatientsTableProps {
   clinicId?: string;
@@ -34,6 +35,7 @@ interface PatientsTableProps {
 export function PatientsTable({ clinicId, searchTerm = "" }: PatientsTableProps) {
   const [editingPatient, setEditingPatient] = useState(null);
   const [deletingPatient, setDeletingPatient] = useState(null);
+  const [selectedPatient, setSelectedPatient] = useState(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -145,24 +147,11 @@ export function PatientsTable({ clinicId, searchTerm = "" }: PatientsTableProps)
                     {new Date(patient.created_at).toLocaleDateString()}
                   </TableCell>
                   <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setEditingPatient(patient)}
-                        className="text-primary hover:text-primary hover:bg-primary/10 border-primary/20"
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setDeletingPatient(patient)}
-                        className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
+                    <PatientActions
+                      onEdit={() => setEditingPatient(patient)}
+                      onDelete={() => setDeletingPatient(patient)}
+                      onViewHistory={() => setSelectedPatient(patient)}
+                    />
                   </TableCell>
                 </TableRow>
               ))
@@ -209,6 +198,15 @@ export function PatientsTable({ clinicId, searchTerm = "" }: PatientsTableProps)
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {selectedPatient && (
+        <LabScriptHistoryModal
+          isOpen={!!selectedPatient}
+          onClose={() => setSelectedPatient(null)}
+          patientId={selectedPatient.id}
+          patientName={`${selectedPatient.first_name} ${selectedPatient.last_name}`}
+        />
+      )}
     </>
   );
 }
