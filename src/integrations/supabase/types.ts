@@ -177,7 +177,9 @@ export type Database = {
           appliance_type: string
           arch: string
           clinic_id: string | null
+          completion_comment: string | null
           created_at: string
+          design_download_url: string | null
           design_url: string | null
           due_date: string
           express_design: string | null
@@ -203,7 +205,9 @@ export type Database = {
           appliance_type: string
           arch: string
           clinic_id?: string | null
+          completion_comment?: string | null
           created_at?: string
+          design_download_url?: string | null
           design_url?: string | null
           due_date: string
           express_design?: string | null
@@ -229,7 +233,9 @@ export type Database = {
           appliance_type?: string
           arch?: string
           clinic_id?: string | null
+          completion_comment?: string | null
           created_at?: string
+          design_download_url?: string | null
           design_url?: string | null
           due_date?: string
           express_design?: string | null
