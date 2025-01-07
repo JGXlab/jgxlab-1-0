@@ -8,6 +8,7 @@ import { calculateTotalPrice } from "./utils/priceCalculations";
 import { TotalAmountDisplay } from "./payment/TotalAmountDisplay";
 import { SubmitButton } from "./payment/SubmitButton";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface PaymentSectionProps {
   applianceType: string;
@@ -29,6 +30,7 @@ export const PaymentSection = ({
   form
 }: PaymentSectionProps) => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [totalAmount, setTotalAmount] = useState(0);
   const [lineItems, setLineItems] = useState<Array<{ price: string; quantity: number }>>([]);
   const [isCalculating, setIsCalculating] = useState(false);
@@ -89,6 +91,45 @@ export const PaymentSection = ({
 
     updatePrices();
   }, [basePrice, archType, needsNightguard, expressDesign, applianceType, isFreeScript, surgicalDayArch]);
+
+  const submitFreeLabScript = useMutation({
+    mutationFn: async (formData: z.infer<typeof formSchema>) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('No user found');
+
+      console.log('Submitting free lab script:', formData);
+
+      const { data, error } = await supabase
+        .from('lab_scripts')
+        .insert([{
+          ...formData,
+          user_id: user.id,
+          payment_status: 'paid',
+          amount_paid: 0,
+          payment_date: new Date().toISOString()
+        }])
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Lab script submitted successfully",
+      });
+      navigate('/clinic/submittedlabscripts');
+    },
+    onError: (error: Error) => {
+      console.error('Error submitting lab script:', error);
+      toast({
+        title: "Error",
+        description: "Failed to submit lab script. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
 
   const createCheckoutSession = useMutation({
     mutationFn: async (formData: z.infer<typeof formSchema>) => {
@@ -151,6 +192,13 @@ export const PaymentSection = ({
       return;
     }
 
+    // If total amount is 0 (free script), submit directly
+    if (totalAmount === 0) {
+      submitFreeLabScript.mutate(values);
+      return;
+    }
+
+    // Otherwise, create checkout session
     createCheckoutSession.mutate(values);
   };
 
@@ -178,7 +226,7 @@ export const PaymentSection = ({
           }}
         />
         <SubmitButton
-          isSubmitting={isSubmitting}
+          isSubmitting={isSubmitting || submitFreeLabScript.isPending}
           isPending={createCheckoutSession.isPending}
           onClick={handleSubmitAndPay}
           disabled={isLoading}
