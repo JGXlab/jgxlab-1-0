@@ -31,8 +31,29 @@ export const PaymentSection = ({
   const { toast } = useToast();
   const [totalAmount, setTotalAmount] = useState(0);
   const [lineItems, setLineItems] = useState<Array<{ price: string; quantity: number }>>([]);
+  const [isCalculating, setIsCalculating] = useState(false);
 
   const isFreeScript = form.watch('is_free_printed_tryin');
+
+  const { data: basePrice = 0, isLoading: isPriceLoading } = useQuery({
+    queryKey: ['service-price', applianceType],
+    queryFn: async () => {
+      if (!applianceType) return 0;
+      const { data, error } = await supabase
+        .from('service_prices')
+        .select('price')
+        .eq('service_name', applianceType)
+        .maybeSingle();
+
+      if (error) {
+        console.error('Error fetching price:', error);
+        return 0;
+      }
+
+      return data?.price ?? 0;
+    },
+    enabled: !!applianceType,
+  });
 
   useEffect(() => {
     const updatePrices = async () => {
@@ -58,29 +79,8 @@ export const PaymentSection = ({
     updatePrices();
   }, [basePrice, archType, needsNightguard, expressDesign, applianceType, isFreeScript]);
 
-  const { data: basePrice = 0, isLoading: isPriceLoading } = useQuery({
-    queryKey: ['service-price', applianceType],
-    queryFn: async () => {
-      if (!applianceType) return 0;
-      const { data, error } = await supabase
-        .from('service_prices')
-        .select('price')
-        .eq('service_name', applianceType)
-        .maybeSingle();
-
-      if (error) {
-        console.error('Error fetching price:', error);
-        return 0;
-      }
-
-      return data?.price ?? 0;
-    },
-    enabled: !!applianceType,
-  });
-
   const createCheckoutSession = useMutation({
     mutationFn: async (formData: z.infer<typeof formSchema>) => {
-      // Get the current user's ID
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('No user found');
 
