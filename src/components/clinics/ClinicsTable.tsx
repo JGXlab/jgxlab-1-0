@@ -42,7 +42,7 @@ export function ClinicsTable() {
     try {
       console.log('Sending invitation to:', email);
       
-      // First, check if the user already exists using maybeSingle() instead of single()
+      // First, check if the user already exists
       const { data: existingUser, error: userCheckError } = await supabase
         .from('profiles')
         .select('id')
@@ -56,11 +56,10 @@ export function ClinicsTable() {
 
       if (existingUser) {
         console.log('User already exists, sending password reset email');
-        // If user exists, just send a password reset email
         const { error: resetError } = await supabase.auth.resetPasswordForEmail(
           email,
           {
-            redirectTo: `${window.location.origin}/admin/login`,
+            redirectTo: `${window.location.origin}/clinic/login`,
           }
         );
 
@@ -75,13 +74,15 @@ export function ClinicsTable() {
         });
       } else {
         console.log('Creating new user and sending invitation');
-        // If user doesn't exist, create them and send invitation
-        const { error: signUpError } = await supabase.auth.signUp({
+        const tempPassword = 'Password1'; // Temporary password for initial login
+        
+        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
           email,
-          password: 'Password1',
+          password: tempPassword,
           options: {
             data: {
               clinic_name: clinicName,
+              role: 'clinic',
             },
           }
         });
@@ -91,23 +92,25 @@ export function ClinicsTable() {
           throw signUpError;
         }
 
-        // Send password reset email to new user
-        const { error: resetError } = await supabase.auth.resetPasswordForEmail(
-          email,
-          {
-            redirectTo: `${window.location.origin}/admin/login`,
+        if (signUpData.user) {
+          // Send password reset email to new user
+          const { error: resetError } = await supabase.auth.resetPasswordForEmail(
+            email,
+            {
+              redirectTo: `${window.location.origin}/clinic/login`,
+            }
+          );
+
+          if (resetError) {
+            console.error('Error sending reset email:', resetError);
+            throw resetError;
           }
-        );
 
-        if (resetError) {
-          console.error('Error sending reset email:', resetError);
-          throw resetError;
+          toast({
+            title: "User Created and Invited",
+            description: `An account has been created for ${email} and a password reset link has been sent. Please check spam folder if not received.`,
+          });
         }
-
-        toast({
-          title: "User Created and Invited",
-          description: `An account has been created for ${email} and a password reset link has been sent. Please check spam folder if not received.`,
-        });
       }
     } catch (error) {
       console.error('Error in invite handler:', error);
@@ -123,13 +126,30 @@ export function ClinicsTable() {
     try {
       console.log('Attempting to login as clinic:', email);
       
-      // First sign out of current admin session
+      // First check if the user exists in profiles
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('email', email)
+        .maybeSingle();
+
+      if (profileError || !profileData) {
+        console.error('Error checking profile or profile not found:', profileError);
+        toast({
+          variant: "destructive",
+          title: "Login Failed",
+          description: "Could not find clinic profile. Please make sure the clinic has been invited first.",
+        });
+        return;
+      }
+
+      // Sign out of current admin session
       await supabase.auth.signOut();
       
-      // Sign in as the clinic user
+      // Sign in as the clinic user with default password
       const { data, error } = await supabase.auth.signInWithPassword({
-        email: email,
-        password: 'Password1', // This is the default password set when inviting users
+        email,
+        password: 'Password1',
       });
 
       if (error) {
@@ -137,18 +157,18 @@ export function ClinicsTable() {
         toast({
           variant: "destructive",
           title: "Login Failed",
-          description: "Could not login as clinic. Please make sure the clinic has been invited first.",
+          description: "Could not login as clinic. The clinic may need to be invited first or reset their password.",
         });
         return;
       }
 
-      toast({
-        title: "Success",
-        description: `Logged in as clinic: ${email}`,
-      });
-      
-      // Navigate to clinic dashboard
-      navigate("/clinic/dashboard");
+      if (data.user) {
+        toast({
+          title: "Success",
+          description: `Logged in as clinic: ${email}`,
+        });
+        navigate("/clinic/dashboard");
+      }
     } catch (error) {
       console.error('Error in login as clinic handler:', error);
       toast({
