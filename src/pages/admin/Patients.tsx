@@ -4,8 +4,13 @@ import { Bell, Search, Users } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { useState } from "react";
 
 const Patients = () => {
+  const [searchQuery, setSearchQuery] = useState("");
+  
   const { data: patients, isLoading } = useQuery({
     queryKey: ['admin-patients'],
     queryFn: async () => {
@@ -31,69 +36,103 @@ const Patients = () => {
     }
   });
 
+  const filteredPatients = patients?.filter(patient => {
+    const fullName = `${patient.first_name} ${patient.last_name}`.toLowerCase();
+    return fullName.includes(searchQuery.toLowerCase());
+  });
+
   return (
     <AdminLayout>
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-2xl font-semibold">Patients</h1>
+        <div className="space-y-1">
+          <h1 className="text-2xl font-semibold text-gray-900">Patients</h1>
+          <p className="text-sm text-muted-foreground">
+            Manage and view all patient records across clinics
+          </p>
+        </div>
         <div className="flex items-center gap-4">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-            <input
+            <Input
               type="text"
               placeholder="Search patients..."
-              className="pl-10 pr-4 py-2 rounded-lg border border-gray-200 w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 pr-4 w-[300px] bg-white border-gray-200 focus-visible:ring-primary"
             />
           </div>
-          <button className="p-2 relative">
+          <Button variant="outline" size="icon" className="relative">
             <Bell size={20} />
-            <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
-          </button>
-          <img src="/placeholder.svg" alt="Profile" className="w-10 h-10 rounded-full" />
+            <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+          </Button>
+          <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+            <Users className="h-4 w-4 text-primary" />
+          </div>
         </div>
       </div>
 
       <div className="flex gap-4 mb-6">
-        <button className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg">
-          <span className="w-2 h-2 bg-blue-600 rounded-full"></span>
+        <Button
+          variant="secondary"
+          className="bg-primary/10 hover:bg-primary/20 text-primary"
+        >
+          <span className="w-2 h-2 bg-primary rounded-full mr-2"></span>
           All Patients
-        </button>
-        <button className="flex items-center gap-2 px-4 py-2 text-gray-600">
+        </Button>
+        <Button variant="ghost" className="text-gray-600">
           Active
-        </button>
-        <button className="flex items-center gap-2 px-4 py-2 text-gray-600">
+        </Button>
+        <Button variant="ghost" className="text-gray-600">
           Inactive
-        </button>
+        </Button>
       </div>
 
-      <Card className="p-6">
+      <Card className="overflow-hidden border-none shadow-sm bg-white">
         {isLoading ? (
           <div className="flex items-center justify-center h-40">
             <p className="text-gray-500">Loading patients...</p>
           </div>
-        ) : !patients?.length ? (
-          <div className="flex items-center justify-center h-40 text-gray-400">
-            <div className="text-center">
-              <Users className="w-12 h-12 mx-auto mb-4" />
-              <p>No patients found</p>
-            </div>
+        ) : !filteredPatients?.length ? (
+          <div className="flex flex-col items-center justify-center h-40 text-gray-400">
+            <Users className="w-12 h-12 mb-4 text-gray-300" />
+            <p className="text-gray-500 font-medium">No patients found</p>
+            <p className="text-sm text-gray-400">
+              {searchQuery ? "Try adjusting your search terms" : "Add your first patient to get started"}
+            </p>
           </div>
         ) : (
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Gender</TableHead>
-                <TableHead>Clinic</TableHead>
-                <TableHead>Created At</TableHead>
+              <TableRow className="bg-gray-50/50 hover:bg-gray-50/50">
+                <TableHead className="text-primary/80 font-semibold">Name</TableHead>
+                <TableHead className="text-primary/80 font-semibold">Gender</TableHead>
+                <TableHead className="text-primary/80 font-semibold">Clinic</TableHead>
+                <TableHead className="text-primary/80 font-semibold">Created At</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {patients.map((patient) => (
-                <TableRow key={patient.id}>
-                  <TableCell>{patient.first_name} {patient.last_name}</TableCell>
-                  <TableCell className="capitalize">{patient.gender}</TableCell>
+              {filteredPatients.map((patient) => (
+                <TableRow key={patient.id} className="hover:bg-gray-50/50">
+                  <TableCell>
+                    <div className="flex items-center gap-3">
+                      <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                        <Users className="h-4 w-4 text-primary" />
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="font-medium text-gray-900">
+                          {patient.first_name} {patient.last_name}
+                        </span>
+                        <span className="text-sm text-gray-500">
+                          ID: {patient.id.slice(0, 8)}
+                        </span>
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell className="capitalize text-gray-600">{patient.gender}</TableCell>
                   <TableCell>{patient.clinics?.name || 'No clinic assigned'}</TableCell>
-                  <TableCell>{new Date(patient.created_at).toLocaleDateString()}</TableCell>
+                  <TableCell className="text-gray-600">
+                    {new Date(patient.created_at).toLocaleDateString()}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
