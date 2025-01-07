@@ -14,15 +14,9 @@ interface StatusCardsGridProps {
   statusCounts: StatusCount;
   selectedStatus: string | null;
   onStatusSelect: (status: string | null) => void;
-  variant?: 'dashboard' | 'labScripts';
 }
 
-export const StatusCardsGrid = ({ 
-  statusCounts, 
-  selectedStatus, 
-  onStatusSelect,
-  variant = 'labScripts' 
-}: StatusCardsGridProps) => {
+export const StatusCardsGrid = ({ statusCounts, selectedStatus, onStatusSelect }: StatusCardsGridProps) => {
   const statusCards = [
     { 
       label: 'New', 
@@ -70,11 +64,7 @@ export const StatusCardsGrid = ({
   ];
 
   return (
-    <div className={
-      variant === 'dashboard' 
-        ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 w-full"
-        : "flex flex-nowrap gap-1.5 sm:gap-2 items-center overflow-x-auto scrollbar-hide min-w-0 w-full"
-    }>
+    <div className="flex flex-nowrap gap-1.5 sm:gap-2 items-center overflow-x-auto scrollbar-hide min-w-0 w-full">
       {statusCards.map((card) => (
         <StatusCard
           key={card.label}
@@ -84,7 +74,6 @@ export const StatusCardsGrid = ({
           isHighlighted={card.isHighlighted}
           isSelected={selectedStatus === card.status}
           onClick={() => onStatusSelect(card.status)}
-          variant={variant}
         />
       ))}
     </div>
