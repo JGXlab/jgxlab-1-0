@@ -72,6 +72,12 @@ const DesignLabScripts = () => {
     }
   });
 
+  const handlePreview = (script: any, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedScript(script);
+    setIsPreviewOpen(true);
+  };
+
   const handleStatusUpdate = async (id: string, newStatus: string, reason?: string, comment?: string, designUrl?: string) => {
     try {
       console.log('Updating status with:', { id, newStatus, reason, comment, designUrl }); // Debug log
