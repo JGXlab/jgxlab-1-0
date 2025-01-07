@@ -20,6 +20,7 @@ import { ClinicNavHeader } from "@/components/clinic/ClinicNavHeader";
 import { Card } from "@/components/ui/card";
 import { LabScriptsPageHeader } from "@/components/lab-scripts/LabScriptsPageHeader";
 import { useLabScripts } from "@/hooks/use-lab-scripts";
+import { Loader2 } from "lucide-react";
 
 export default function SubmittedLabScripts() {
   const [selectedScript, setSelectedScript] = useState<any>(null);
@@ -28,6 +29,7 @@ export default function SubmittedLabScripts() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
   const [searchParams] = useSearchParams();
+  const [isVerifyingPayment, setIsVerifyingPayment] = useState(false);
   
   const { 
     verifyPayment, 
@@ -63,7 +65,12 @@ export default function SubmittedLabScripts() {
 
       if (paymentStatus === 'success' && sessionId) {
         console.log('Initiating payment verification for session:', sessionId);
-        await verifyPayment(sessionId);
+        setIsVerifyingPayment(true);
+        try {
+          await verifyPayment(sessionId);
+        } finally {
+          setIsVerifyingPayment(false);
+        }
       }
     };
 
@@ -84,6 +91,18 @@ export default function SubmittedLabScripts() {
     console.log('Selected status:', status);
     setSelectedStatus(status);
   };
+
+  // Show loading overlay when verifying payment
+  if (isVerifyingPayment) {
+    return (
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div className="bg-white p-8 rounded-lg shadow-xl flex flex-col items-center space-y-4">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p className="text-gray-600">Verifying your payment...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <ClinicLayout>
@@ -108,7 +127,7 @@ export default function SubmittedLabScripts() {
                 })}
                 isLoading={isLoading}
                 onPreview={handlePreview}
-                hideClinicColumn={true} // Add this prop to hide clinic column in clinic portal
+                hideClinicColumn={true}
               />
             </Card>
 
