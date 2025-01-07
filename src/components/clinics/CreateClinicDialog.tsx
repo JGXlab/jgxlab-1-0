@@ -13,7 +13,7 @@ export function CreateClinicDialog() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button className="bg-[#9b87f5] hover:bg-[#7E69AB] text-white transition-colors gap-2">
+        <Button className="bg-primary hover:bg-primary-hover text-white transition-colors gap-2">
           <Plus className="h-4 w-4" />
           Create Clinic
         </Button>

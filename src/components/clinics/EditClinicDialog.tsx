@@ -21,7 +21,7 @@ export function EditClinicDialog({ clinic }: EditClinicDialogProps) {
         <Button 
           variant="outline" 
           size="sm"
-          className="bg-white border-[#E5DEFF] text-[#7E69AB] hover:bg-[#F1F0FB] hover:text-[#6E59A5] transition-colors"
+          className="bg-white border-[#D3E4FD] text-primary hover:bg-[#F8FAFC] hover:text-primary/90 transition-colors"
         >
           <Pencil className="w-4 h-4 mr-2" />
           Edit
