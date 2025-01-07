@@ -1,5 +1,4 @@
 import { Clock, Loader, Pause, SquareX, AlertTriangle, CheckCircle, FileText } from "lucide-react";
-import { Progress } from "@/components/ui/progress";
 
 interface StatusCardProps {
   label: string;
@@ -8,6 +7,7 @@ interface StatusCardProps {
   isHighlighted?: boolean;
   isSelected?: boolean;
   onClick?: () => void;
+  variant?: 'dashboard' | 'labScripts';
 }
 
 const getStatusIcon = (label: string) => {
@@ -57,14 +57,16 @@ export const StatusCard = ({
   count, 
   isHighlighted = false,
   isSelected = false,
-  onClick 
+  onClick,
+  variant = 'labScripts'
 }: StatusCardProps) => (
   <div 
     className={`
       relative p-4 rounded-lg cursor-pointer transition-all duration-300
-      hover:shadow-md hover:-translate-y-0.5 bg-white w-full
+      hover:shadow-md hover:-translate-y-0.5 bg-white
       ${isSelected ? 'ring-2 ring-[#9b87f5] shadow-sm' : ''}
       ${isHighlighted ? 'border border-[#9b87f5]' : ''}
+      ${variant === 'labScripts' ? 'min-w-[200px]' : 'w-full'}
     `}
     onClick={onClick}
   >
