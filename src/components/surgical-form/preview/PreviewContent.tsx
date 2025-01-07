@@ -28,6 +28,7 @@ export const PreviewContent = ({ labScript, patient }: PreviewContentProps) => {
           vdoDetails={labScript.vdo_details || ''}
           needsNightguard={labScript.needs_nightguard || ''}
           shade={labScript.shade || ''}
+          expressDesign={labScript.express_design}
         />
         <InstructionsSection 
           instructions={labScript.specific_instructions}

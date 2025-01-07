@@ -9,6 +9,7 @@ interface ApplianceSectionProps {
   vdoDetails: string;
   needsNightguard: string;
   shade: string;
+  expressDesign?: string;
 }
 
 const vdoDetailsMap = {
@@ -37,6 +38,7 @@ export const ApplianceSection = ({
   vdoDetails,
   needsNightguard,
   shade,
+  expressDesign,
 }: ApplianceSectionProps) => {
   const formatTreatmentType = (value: string) => {
     if (!value) return 'Not specified';
@@ -110,6 +112,12 @@ export const ApplianceSection = ({
         <PreviewField 
           label="Shade" 
           value={shade ? shade.toUpperCase() : 'Not specified'} 
+        />
+        <PreviewField 
+          label="Express Design" 
+          value={expressDesign 
+            ? expressDesign.charAt(0).toUpperCase() + expressDesign.slice(1)
+            : 'Not specified'} 
         />
       </div>
     </div>
