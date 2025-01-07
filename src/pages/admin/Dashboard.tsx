@@ -66,15 +66,15 @@ export default function AdminDashboard() {
     all: labScripts.length
   };
 
-  // Calculate status counts for the pie chart
-  const statusCountsForPieChart = labScripts.reduce((acc, script) => {
+  // Calculate status counts for the pie chart with explicit type casting
+  const statusCountsForPieChart: Record<string, number> = labScripts.reduce((acc, script) => {
     acc[script.status] = (acc[script.status] || 0) + 1;
     return acc;
-  }, {});
+  }, {} as Record<string, number>);
 
   const pieChartData = Object.entries(statusCountsForPieChart).map(([status, count]) => ({
     name: status.charAt(0).toUpperCase() + status.slice(1),
-    value: count,
+    value: count as number
   }));
 
   // Calculate daily submissions for the line chart
