@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { useState } from "react";
 
 interface StatusUpdateButtonsProps {
@@ -18,20 +19,22 @@ interface StatusUpdateButtonsProps {
     id: string;
     status: string;
   };
-  onStatusUpdate: (id: string, status: string, reason?: string, comment?: string) => void;
+  onStatusUpdate: (id: string, status: string, reason?: string, comment?: string, designUrl?: string) => void;
 }
 
 export const StatusUpdateButtons = ({ script, onStatusUpdate }: StatusUpdateButtonsProps) => {
   const [showHoldDialog, setShowHoldDialog] = useState(false);
   const [holdReason, setHoldReason] = useState<string>("");
   const [holdComment, setHoldComment] = useState<string>("");
+  const [designUrl, setDesignUrl] = useState<string>("");
   const status = script.status.toLowerCase();
 
   const handleHoldSubmit = () => {
-    onStatusUpdate(script.id, 'on_hold', holdReason, holdComment);
+    onStatusUpdate(script.id, 'on_hold', holdReason, holdComment, designUrl);
     setShowHoldDialog(false);
     setHoldReason("");
     setHoldComment("");
+    setDesignUrl("");
   };
 
   if (status === 'completed') {
@@ -168,6 +171,19 @@ export const StatusUpdateButtons = ({ script, onStatusUpdate }: StatusUpdateButt
                 </SelectContent>
               </Select>
             </div>
+            {holdReason === 'approval' && (
+              <div className="grid gap-2">
+                <Label htmlFor="design-url">Design URL</Label>
+                <Input
+                  id="design-url"
+                  type="url"
+                  placeholder="Enter the design URL"
+                  value={designUrl}
+                  onChange={(e) => setDesignUrl(e.target.value)}
+                  className="bg-white"
+                />
+              </div>
+            )}
             <div className="grid gap-2">
               <Label htmlFor="hold-comment">Additional Comments</Label>
               <Textarea
@@ -185,7 +201,7 @@ export const StatusUpdateButtons = ({ script, onStatusUpdate }: StatusUpdateButt
             </Button>
             <Button 
               onClick={handleHoldSubmit}
-              disabled={!holdReason}
+              disabled={!holdReason || (holdReason === 'approval' && !designUrl)}
             >
               Submit
             </Button>
