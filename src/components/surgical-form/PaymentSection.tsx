@@ -8,7 +8,7 @@ import { calculateTotalPrice } from "./utils/priceCalculations";
 import { TotalAmountDisplay } from "./payment/TotalAmountDisplay";
 import { SubmitButton } from "./payment/SubmitButton";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useSubmitFreeLabScript } from "./payment/useSubmitFreeLabScript";
 
 interface PaymentSectionProps {
   applianceType: string;
@@ -30,7 +30,6 @@ export const PaymentSection = ({
   form
 }: PaymentSectionProps) => {
   const { toast } = useToast();
-  const navigate = useNavigate();
   const [totalAmount, setTotalAmount] = useState(0);
   const [lineItems, setLineItems] = useState<Array<{ price: string; quantity: number }>>([]);
   const [isCalculating, setIsCalculating] = useState(false);
@@ -92,44 +91,7 @@ export const PaymentSection = ({
     updatePrices();
   }, [basePrice, archType, needsNightguard, expressDesign, applianceType, isFreeScript, surgicalDayArch]);
 
-  const submitFreeLabScript = useMutation({
-    mutationFn: async (formData: z.infer<typeof formSchema>) => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('No user found');
-
-      console.log('Submitting free lab script:', formData);
-
-      const { data, error } = await supabase
-        .from('lab_scripts')
-        .insert([{
-          ...formData,
-          user_id: user.id,
-          payment_status: 'paid',
-          amount_paid: 0,
-          payment_date: new Date().toISOString()
-        }])
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
-    onSuccess: () => {
-      toast({
-        title: "Success",
-        description: "Lab script submitted successfully",
-      });
-      navigate('/clinic/submittedlabscripts');
-    },
-    onError: (error: Error) => {
-      console.error('Error submitting lab script:', error);
-      toast({
-        title: "Error",
-        description: "Failed to submit lab script. Please try again.",
-        variant: "destructive",
-      });
-    },
-  });
+  const submitFreeLabScript = useSubmitFreeLabScript();
 
   const createCheckoutSession = useMutation({
     mutationFn: async (formData: z.infer<typeof formSchema>) => {
