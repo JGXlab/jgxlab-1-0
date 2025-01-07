@@ -182,6 +182,7 @@ export const PaymentSection = ({
           isPending={createCheckoutSession.isPending}
           onClick={handleSubmitAndPay}
           disabled={isLoading}
+          totalAmount={totalAmount}
         />
       </div>
     </div>

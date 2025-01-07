@@ -6,14 +6,18 @@ interface SubmitButtonProps {
   isPending: boolean;
   onClick: (e: React.MouseEvent) => void;
   disabled?: boolean;
+  totalAmount?: number;
 }
 
 export const SubmitButton = ({ 
   isSubmitting, 
   isPending, 
   onClick,
-  disabled = false 
+  disabled = false,
+  totalAmount = 0
 }: SubmitButtonProps) => {
+  const buttonText = totalAmount === 0 ? "Submit" : "Submit & Pay";
+
   return (
     <Button
       type="submit"
@@ -28,7 +32,7 @@ export const SubmitButton = ({
           Processing...
         </>
       ) : (
-        "Submit & Pay"
+        buttonText
       )}
     </Button>
   );
