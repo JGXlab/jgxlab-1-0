@@ -44,16 +44,24 @@ export function ClinicProfileForm() {
       }
 
       // Split the address field into components if it exists
+      const formattedClinicData = {
+        ...clinicData,
+        street_address: '',
+        city: '',
+        state: '',
+        zip_code: ''
+      };
+
       if (clinicData.address) {
         const addressParts = clinicData.address.split(',').map(part => part.trim());
-        clinicData.street_address = addressParts[0] || '';
-        clinicData.city = addressParts[1] || '';
+        formattedClinicData.street_address = addressParts[0] || '';
+        formattedClinicData.city = addressParts[1] || '';
         const stateZip = addressParts[2] ? addressParts[2].split(' ') : ['', ''];
-        clinicData.state = stateZip[0] || '';
-        clinicData.zip_code = stateZip[1] || '';
+        formattedClinicData.state = stateZip[0] || '';
+        formattedClinicData.zip_code = stateZip[1] || '';
       }
 
-      return clinicData as Clinic;
+      return formattedClinicData as Clinic;
     },
   });
 

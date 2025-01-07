@@ -13,6 +13,7 @@ export type Database = {
         Row: {
           address: string
           auth_user_id: string
+          city: string | null
           contact_person: string
           contact_phone: string
           created_at: string
@@ -21,11 +22,15 @@ export type Database = {
           id: string
           name: string
           phone: string
+          state: string | null
+          street_address: string | null
           user_id: string
+          zip_code: string | null
         }
         Insert: {
           address: string
           auth_user_id: string
+          city?: string | null
           contact_person: string
           contact_phone: string
           created_at?: string
@@ -34,11 +39,15 @@ export type Database = {
           id?: string
           name: string
           phone: string
+          state?: string | null
+          street_address?: string | null
           user_id: string
+          zip_code?: string | null
         }
         Update: {
           address?: string
           auth_user_id?: string
+          city?: string | null
           contact_person?: string
           contact_phone?: string
           created_at?: string
@@ -47,7 +56,10 @@ export type Database = {
           id?: string
           name?: string
           phone?: string
+          state?: string | null
+          street_address?: string | null
           user_id?: string
+          zip_code?: string | null
         }
         Relationships: [
           {

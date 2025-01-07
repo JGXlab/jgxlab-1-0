@@ -31,8 +31,17 @@ export function ClinicsTable() {
         throw error;
       }
 
-      console.log('Fetched clinics:', data);
-      return data as Clinic[];
+      // Transform the data to include address fields
+      const transformedData = data.map(clinic => ({
+        ...clinic,
+        street_address: '',
+        city: '',
+        state: '',
+        zip_code: '',
+      })) as Clinic[];
+
+      console.log('Fetched clinics:', transformedData);
+      return transformedData;
     },
   });
 
