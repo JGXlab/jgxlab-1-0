@@ -24,7 +24,7 @@ interface TotalAmountDisplayProps {
   isLoading?: boolean;
   form?: UseFormReturn<z.infer<typeof formSchema>>;
   patientId?: string;
-  onValidCoupon?: () => void;
+  onValidCoupon?: (validationResult?: { archType?: string }) => void;
 }
 
 export const TotalAmountDisplay = ({
@@ -85,7 +85,7 @@ export const TotalAmountDisplay = ({
             <CouponField 
               form={form} 
               patientId={patientId}
-              onValidCoupon={onValidCoupon || (() => {})}
+              onValidCoupon={onValidCoupon}
             />
           </div>
         )}

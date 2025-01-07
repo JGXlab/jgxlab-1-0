@@ -11,7 +11,7 @@ import { formSchema } from "./formSchema";
 interface CouponFieldProps {
   form: UseFormReturn<z.infer<typeof formSchema>>;
   patientId: string;
-  onValidCoupon: () => void;
+  onValidCoupon?: (validationResult?: { archType?: string }) => void;
 }
 
 export const CouponField = ({ form, patientId, onValidCoupon }: CouponFieldProps) => {
@@ -33,7 +33,7 @@ export const CouponField = ({ form, patientId, onValidCoupon }: CouponFieldProps
         toast.success(result.message);
         form.setValue('is_free_printed_tryin', true);
         form.setValue('couponCode', couponCode);
-        onValidCoupon();
+        onValidCoupon?.(result);
       } else {
         toast.error(result.message);
         form.setValue('is_free_printed_tryin', false);

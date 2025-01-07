@@ -162,7 +162,7 @@ export const PaymentSection = ({
           isLoading={isLoading}
           form={form}
           patientId={patientId}
-          onValidCoupon={(validationResult) => {
+          onValidCoupon={(validationResult?: { archType?: string }) => {
             console.log('Valid coupon applied');
             if (validationResult?.archType) {
               setSurgicalDayArch(validationResult.archType);
