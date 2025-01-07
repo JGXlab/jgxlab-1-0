@@ -2,6 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Clock, RefreshCw, Pause, StopCircle, AlertTriangle, CheckCircle2, Files } from "lucide-react";
 import { motion } from "framer-motion";
 import { Progress } from "@/components/ui/progress";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 interface DashboardStatusCardsProps {
   stats: {
@@ -76,38 +77,40 @@ export const DashboardStatusCards = ({ stats }: DashboardStatusCardsProps) => {
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      {cards.map((card, index) => {
-        const Icon = card.icon;
-        const progressValue = stats.all > 0 ? (card.value / stats.all) * 100 : 0;
-        
-        return (
-          <motion.div
-            key={card.title}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: index * 0.1 }}
-            className="w-full"
-          >
-            <Card className="bg-white hover:shadow-md transition-all duration-200">
-              <div className="p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <div className={`p-2 rounded-lg ${card.bgColor}`}>
-                    <Icon className={`h-5 w-5 ${card.color}`} />
+    <TooltipProvider>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {cards.map((card, index) => {
+          const Icon = card.icon;
+          const progressValue = stats.all > 0 ? (card.value / stats.all) * 100 : 0;
+          
+          return (
+            <motion.div
+              key={card.title}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: index * 0.1 }}
+              className="w-full"
+            >
+              <Card className="bg-white hover:shadow-md transition-all duration-200">
+                <div className="p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className={`p-2 rounded-lg ${card.bgColor}`}>
+                      <Icon className={`h-5 w-5 ${card.color}`} />
+                    </div>
+                    <span className="text-3xl font-bold">{card.value}</span>
                   </div>
-                  <span className="text-3xl font-bold">{card.value}</span>
+                  <h3 className="text-sm font-medium text-gray-600 mb-2">{card.title}</h3>
+                  <Progress 
+                    value={progressValue} 
+                    className="h-2 bg-gray-100"
+                    indicatorClassName={card.progressColor}
+                  />
                 </div>
-                <h3 className="text-sm font-medium text-gray-600 mb-2">{card.title}</h3>
-                <Progress 
-                  value={progressValue} 
-                  className="h-2 bg-gray-100"
-                  indicatorClassName={card.progressColor}
-                />
-              </div>
-            </Card>
-          </motion.div>
-        );
-      })}
-    </div>
+              </Card>
+            </motion.div>
+          );
+        })}
+      </div>
+    </TooltipProvider>
   );
 };
