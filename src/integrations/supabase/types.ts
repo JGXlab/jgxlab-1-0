@@ -178,7 +178,6 @@ export type Database = {
           arch: string
           clinic_id: string | null
           completion_comment: string | null
-          coupon_code: string | null
           created_at: string
           design_download_url: string | null
           design_url: string | null
@@ -187,7 +186,6 @@ export type Database = {
           hold_comment: string | null
           hold_reason: string | null
           id: string
-          is_free_printed_tryin: boolean | null
           needs_nightguard: string | null
           other_screw_type: string | null
           patient_id: string
@@ -208,7 +206,6 @@ export type Database = {
           arch: string
           clinic_id?: string | null
           completion_comment?: string | null
-          coupon_code?: string | null
           created_at?: string
           design_download_url?: string | null
           design_url?: string | null
@@ -217,7 +214,6 @@ export type Database = {
           hold_comment?: string | null
           hold_reason?: string | null
           id?: string
-          is_free_printed_tryin?: boolean | null
           needs_nightguard?: string | null
           other_screw_type?: string | null
           patient_id: string
@@ -238,7 +234,6 @@ export type Database = {
           arch?: string
           clinic_id?: string | null
           completion_comment?: string | null
-          coupon_code?: string | null
           created_at?: string
           design_download_url?: string | null
           design_url?: string | null
@@ -247,7 +242,6 @@ export type Database = {
           hold_comment?: string | null
           hold_reason?: string | null
           id?: string
-          is_free_printed_tryin?: boolean | null
           needs_nightguard?: string | null
           other_screw_type?: string | null
           patient_id?: string

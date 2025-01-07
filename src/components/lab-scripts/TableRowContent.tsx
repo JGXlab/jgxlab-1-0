@@ -9,8 +9,6 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Invoice } from "./payment/Invoice";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { CouponBadge } from "./CouponBadge";
-import { CouponInput } from "./CouponInput";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -41,7 +39,6 @@ export const TableRowContent = ({
   hideClinicColumn = false
 }: TableRowContentProps) => {
   const [showInvoiceDialog, setShowInvoiceDialog] = useState(false);
-  const [hasCouponApplied, setHasCouponApplied] = useState(false);
 
   const handleViewInvoice = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -56,6 +53,66 @@ export const TableRowContent = ({
 
   const clinicName = script.patients?.clinics?.name;
   const doctorName = script.patients?.clinics?.doctor_name;
+
+  // Format the hold reason to be more readable
+  const formatHoldReason = (reason: string) => {
+    return reason.split('_').map(word => 
+      word.charAt(0).toUpperCase() + word.slice(1)
+    ).join(' ');
+  };
+
+  // Render design URL link if available and script is on hold
+  const renderDesignUrl = () => {
+    if (script.status === 'on_hold' && script.design_url) {
+      return (
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <a 
+                href={script.design_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary hover:text-primary/80 inline-flex items-center gap-1"
+              >
+                <ExternalLink className="h-4 w-4" />
+                View Design
+              </a>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Open design in new tab</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      );
+    }
+    return null;
+  };
+
+  // Render download button for completed designs with download URL
+  const renderDownloadButton = () => {
+    if (script.status === 'completed' && script.design_download_url) {
+      return (
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <a
+                href={script.design_download_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center w-8 h-8 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground"
+              >
+                <Download className="h-4 w-4" />
+              </a>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Download Design</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      );
+    }
+    return null;
+  };
 
   return (
     <>
@@ -76,10 +133,6 @@ export const TableRowContent = ({
                     Express
                   </Badge>
                 )}
-                <CouponBadge 
-                  couponCode={script.coupon_code} 
-                  applianceType={script.appliance_type}
-                />
               </div>
               <p className="text-sm text-gray-600">
                 ID: {script.patient_id.slice(0, 8)}
@@ -123,18 +176,54 @@ export const TableRowContent = ({
         </TableCell>
         <TableCell>
           <div className="flex items-center gap-2">
-            {script.appliance_type === 'printed-try-in' && !hasCouponApplied && (
-              <CouponInput 
-                patientId={script.patient_id}
-                onCouponApply={setHasCouponApplied}
-              />
-            )}
             <Badge 
               variant="secondary"
-              className={`flex items-center gap-1 w-fit ${getPaymentStatusColor(script.payment_status)}`}
+              className={`flex items-center gap-1 w-fit ${getStatusColor(script.status)}`}
             >
-              <span className="capitalize">{script.payment_status}</span>
+              <span className="capitalize">{script.status.replace('_', ' ')}</span>
             </Badge>
+            {script.status === 'on_hold' && (
+              <div className="flex items-center gap-2">
+                {script.hold_reason && (
+                  <HoverCard>
+                    <HoverCardTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-6 w-6 p-0">
+                        <AlertCircle className="h-4 w-4 text-amber-500" />
+                      </Button>
+                    </HoverCardTrigger>
+                    <HoverCardContent className="w-80 bg-white p-4">
+                      <div className="space-y-2">
+                        <h4 className="font-semibold text-sm text-gray-900">Hold Details</h4>
+                        <div className="text-sm">
+                          <p className="text-gray-700">
+                            <span className="font-medium">Reason:</span> {formatHoldReason(script.hold_reason)}
+                          </p>
+                          {script.hold_comment && (
+                            <p className="text-gray-700 mt-1">
+                              <span className="font-medium">Comment:</span> {script.hold_comment}
+                            </p>
+                          )}
+                          {renderDesignUrl()}
+                        </div>
+                      </div>
+                    </HoverCardContent>
+                  </HoverCard>
+                )}
+              </div>
+            )}
+          </div>
+        </TableCell>
+        <TableCell>
+          <Badge 
+            variant="secondary"
+            className={`flex items-center gap-1 w-fit ${getPaymentStatusColor(script.payment_status)}`}
+          >
+            <span className="capitalize">{script.payment_status}</span>
+          </Badge>
+        </TableCell>
+        <TableCell>
+          <div className="text-sm text-gray-600">
+            {format(new Date(script.created_at), 'MMM d, yyyy')}
           </div>
         </TableCell>
         <TableCell className="text-right">
@@ -145,6 +234,7 @@ export const TableRowContent = ({
                 onStatusUpdate={handleStatusUpdate} 
               />
             )}
+            {renderDownloadButton()}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -160,14 +250,18 @@ export const TableRowContent = ({
                 align="end" 
                 className="w-48 bg-white border border-gray-200 shadow-lg rounded-md"
               >
-                <DropdownMenuItem 
-                  onClick={handleViewInvoice}
-                  className="cursor-pointer hover:bg-gray-100"
-                >
-                  <Receipt className="mr-2 h-4 w-4" />
-                  View Invoice
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
+                {script.payment_status === 'paid' && (
+                  <>
+                    <DropdownMenuItem 
+                      onClick={handleViewInvoice}
+                      className="cursor-pointer hover:bg-gray-100"
+                    >
+                      <Receipt className="mr-2 h-4 w-4" />
+                      View Invoice
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                  </>
+                )}
                 <DropdownMenuItem 
                   onClick={(e) => onPreview(script, e)}
                   className="cursor-pointer hover:bg-gray-100"
