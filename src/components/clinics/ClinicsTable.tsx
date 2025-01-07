@@ -135,34 +135,38 @@ export function ClinicsTable() {
   }
 
   return (
-    <div className="rounded-md border">
+    <div className="rounded-xl border border-[#E5DEFF] bg-white shadow-sm">
       <Table>
         <TableHeader>
-          <TableRow>
-            <TableHead className="text-foreground font-semibold">Clinic Name</TableHead>
-            <TableHead className="text-foreground font-semibold">Doctor</TableHead>
-            <TableHead className="text-foreground font-semibold">Contact Person</TableHead>
-            <TableHead className="text-foreground font-semibold">Email</TableHead>
-            <TableHead className="text-foreground font-semibold">Phone</TableHead>
-            <TableHead className="text-foreground font-semibold">Address</TableHead>
-            <TableHead className="text-foreground font-semibold">Actions</TableHead>
+          <TableRow className="border-b border-[#E5DEFF] hover:bg-[#F1F0FB]">
+            <TableHead className="text-sm font-semibold text-[#1A1F2C]">Clinic Name</TableHead>
+            <TableHead className="text-sm font-semibold text-[#1A1F2C]">Doctor</TableHead>
+            <TableHead className="text-sm font-semibold text-[#1A1F2C]">Contact Person</TableHead>
+            <TableHead className="text-sm font-semibold text-[#1A1F2C]">Email</TableHead>
+            <TableHead className="text-sm font-semibold text-[#1A1F2C]">Phone</TableHead>
+            <TableHead className="text-sm font-semibold text-[#1A1F2C]">Address</TableHead>
+            <TableHead className="text-sm font-semibold text-[#1A1F2C]">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {clinics?.map((clinic) => (
-            <TableRow key={clinic.id}>
-              <TableCell className="font-medium">{clinic.name}</TableCell>
-              <TableCell>{clinic.doctor_name}</TableCell>
-              <TableCell>{clinic.contact_person}</TableCell>
-              <TableCell>{clinic.email}</TableCell>
-              <TableCell>{clinic.phone}</TableCell>
-              <TableCell>{clinic.address}</TableCell>
-              <TableCell className="flex items-center">
+            <TableRow 
+              key={clinic.id}
+              className="border-b border-[#E5DEFF] hover:bg-[#F1F0FB] transition-colors"
+            >
+              <TableCell className="font-medium text-[#403E43]">{clinic.name}</TableCell>
+              <TableCell className="text-[#8E9196]">{clinic.doctor_name}</TableCell>
+              <TableCell className="text-[#8E9196]">{clinic.contact_person}</TableCell>
+              <TableCell className="text-[#8E9196]">{clinic.email}</TableCell>
+              <TableCell className="text-[#8E9196]">{clinic.phone}</TableCell>
+              <TableCell className="text-[#8E9196]">{clinic.address}</TableCell>
+              <TableCell className="flex items-center gap-2">
                 <EditClinicDialog clinic={clinic} />
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => handleInvite(clinic.email, clinic.name)}
+                  className="bg-white border-[#E5DEFF] text-[#7E69AB] hover:bg-[#F1F0FB] hover:text-[#6E59A5] transition-colors"
                 >
                   <UserPlus className="w-4 h-4 mr-2" />
                   Invite
@@ -172,7 +176,10 @@ export function ClinicsTable() {
           ))}
           {!clinics?.length && (
             <TableRow>
-              <TableCell colSpan={7} className="text-center text-muted-foreground h-24">
+              <TableCell 
+                colSpan={7} 
+                className="h-24 text-center text-[#8E9196]"
+              >
                 No clinics found
               </TableCell>
             </TableRow>
