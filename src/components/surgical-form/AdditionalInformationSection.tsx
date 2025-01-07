@@ -6,7 +6,7 @@ import { UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 import { formSchema } from "./formSchema";
 import { SelectionButton } from "./SelectionButton";
-import { addDays, format } from "date-fns";
+import { addDays, format, isWeekend } from "date-fns";
 
 interface AdditionalInformationSectionProps {
   form: UseFormReturn<z.infer<typeof formSchema>>;
@@ -29,6 +29,18 @@ export const AdditionalInformationSection = ({ form }: AdditionalInformationSect
   const minDueDate = appliancesWithLeadTime.includes(applianceType) 
     ? format(addDays(new Date(), 4), 'yyyy-MM-dd')
     : format(new Date(), 'yyyy-MM-dd');
+
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedDate = new Date(e.target.value);
+    
+    if (isWeekend(selectedDate)) {
+      alert('Weekend dates (Saturday and Sunday) are not available. Please select a weekday.');
+      e.target.value = form.getValues('dueDate') || minDueDate;
+      return;
+    }
+    
+    form.setValue('dueDate', e.target.value);
+  };
 
   return (
     <FormSection title="Additional Information" className="pt-6 border-t">
@@ -65,7 +77,8 @@ export const AdditionalInformationSection = ({ form }: AdditionalInformationSect
             <Input 
               type="date" 
               className="max-w-xs bg-white" 
-              {...field} 
+              {...field}
+              onChange={handleDateChange}
               min={minDueDate}
             />
             {appliancesWithLeadTime.includes(applianceType) && (
