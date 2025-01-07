@@ -37,6 +37,14 @@ export const PaymentSection = ({
   const isFreeScript = form.watch('is_free_printed_tryin');
   const patientId = form.watch('patientId');
 
+  // Watch for patient changes and reset coupon
+  useEffect(() => {
+    console.log('Patient changed, resetting coupon');
+    form.setValue('is_free_printed_tryin', false);
+    form.setValue('couponCode', '');
+    setSurgicalDayArch(undefined);
+  }, [patientId, form]);
+
   const { data: basePrice = 0, isLoading: isPriceLoading } = useQuery({
     queryKey: ['service-price', applianceType],
     queryFn: async () => {
