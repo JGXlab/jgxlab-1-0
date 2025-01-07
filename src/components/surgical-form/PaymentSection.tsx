@@ -39,17 +39,25 @@ export const PaymentSection = ({
   const { data: eligibilityData, isLoading: isCheckingEligibility } = useQuery({
     queryKey: ['free-tryin-eligibility', patientId],
     queryFn: async () => {
-      if (!patientId || applianceType !== 'printed-try-in') return { isEligible: false };
+      if (!patientId || applianceType !== 'printed-try-in') {
+        console.log('Not checking eligibility - not a printed try-in or no patient ID');
+        return { isEligible: false };
+      }
 
       console.log('Checking free try-in eligibility for patient:', patientId);
 
       // First check if patient has any previous free try-ins
-      const { data: existingFreeTrials } = await supabase
+      const { data: existingFreeTrials, error: freeTrialsError } = await supabase
         .from('lab_scripts')
         .select('id')
         .eq('patient_id', patientId)
         .eq('is_free_printed_tryin', true)
-        .single();
+        .maybeSingle();
+
+      if (freeTrialsError) {
+        console.error('Error checking free trials:', freeTrialsError);
+        return { isEligible: false };
+      }
 
       if (existingFreeTrials) {
         console.log('Patient already had a free try-in');
@@ -57,12 +65,17 @@ export const PaymentSection = ({
       }
 
       // Then check if patient has a surgical day appliance
-      const { data: surgicalAppliance } = await supabase
+      const { data: surgicalAppliance, error: surgicalError } = await supabase
         .from('lab_scripts')
         .select('id')
         .eq('patient_id', patientId)
         .eq('appliance_type', 'surgical-day')
-        .single();
+        .maybeSingle();
+
+      if (surgicalError) {
+        console.error('Error checking surgical appliances:', surgicalError);
+        return { isEligible: false };
+      }
 
       const isEligible = !!surgicalAppliance && !existingFreeTrials;
       console.log('Free try-in eligibility:', isEligible);

@@ -6,14 +6,20 @@ import { DashboardMetrics } from "@/components/design/dashboard/DashboardMetrics
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { useToast } from "@/hooks/use-toast";
 
 export default function ClinicDashboard() {
-  const { data: labScripts = [] } = useQuery({
+  const { toast } = useToast();
+  
+  const { data: labScripts = [], isError } = useQuery({
     queryKey: ['dashboardLabScripts'],
     queryFn: async () => {
       console.log('Fetching lab scripts for dashboard...');
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("No user found");
+      if (!user) {
+        console.error('No user found');
+        throw new Error("No user found");
+      }
 
       const { data, error } = await supabase
         .from('lab_scripts')
@@ -35,7 +41,26 @@ export default function ClinicDashboard() {
       console.log('Fetched lab scripts:', data);
       return data || [];
     },
+    retry: 1,
+    onError: (error) => {
+      console.error('Error in lab scripts query:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load dashboard data. Please try again.",
+        variant: "destructive",
+      });
+    }
   });
+
+  if (isError) {
+    return (
+      <ClinicLayout>
+        <div className="flex flex-col items-center justify-center h-screen">
+          <p className="text-red-500">Failed to load dashboard data. Please refresh the page.</p>
+        </div>
+      </ClinicLayout>
+    );
+  }
 
   return (
     <ClinicLayout>
@@ -44,10 +69,7 @@ export default function ClinicDashboard() {
           <ClinicNavHeader />
           <TooltipProvider>
             <div className="p-4 sm:p-6 lg:p-8 space-y-6">
-              {/* Status Cards */}
               <DashboardMetrics />
-
-              {/* Charts */}
               <DashboardCharts labScripts={labScripts} />
             </div>
           </TooltipProvider>
