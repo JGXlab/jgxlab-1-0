@@ -26,17 +26,22 @@ export const AdditionalInformationSection = ({ form }: AdditionalInformationSect
   ];
 
   // Function to add working days (excluding weekends)
-  const addWorkingDays = (date: Date, days: number): Date => {
-    let currentDate = new Date(date); // Create a new date object to avoid mutations
-    let remainingDays = days;
+  const addWorkingDays = (startDate: Date, daysToAdd: number): Date => {
+    console.log('Starting date:', startDate);
+    let currentDate = new Date(startDate);
+    let remainingDays = daysToAdd;
 
     while (remainingDays > 0) {
       currentDate = addDays(currentDate, 1);
       if (!isWeekend(currentDate)) {
         remainingDays--;
+        console.log('Added working day:', currentDate, 'Remaining days:', remainingDays);
+      } else {
+        console.log('Skipped weekend day:', currentDate);
       }
     }
 
+    console.log('Final date:', currentDate);
     return currentDate;
   };
 
@@ -45,11 +50,7 @@ export const AdditionalInformationSection = ({ form }: AdditionalInformationSect
     ? format(addWorkingDays(new Date(), 4), 'yyyy-MM-dd')
     : format(new Date(), 'yyyy-MM-dd');
 
-  // Function to disable weekend dates
-  const isWeekendDate = (dateString: string): boolean => {
-    const date = new Date(dateString);
-    return isWeekend(date);
-  };
+  console.log('Minimum due date calculated:', minDueDate);
 
   return (
     <FormSection title="Additional Information" className="pt-6 border-t">
@@ -90,7 +91,6 @@ export const AdditionalInformationSection = ({ form }: AdditionalInformationSect
               min={minDueDate}
               onChange={(e) => {
                 const selectedDate = new Date(e.target.value);
-                // Only prevent weekend selections
                 if (!isWeekend(selectedDate)) {
                   field.onChange(e);
                 } else {
