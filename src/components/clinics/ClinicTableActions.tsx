@@ -18,15 +18,19 @@ export function ClinicTableActions({ clinic }: ClinicTableActionsProps) {
     try {
       console.log('Sending invitation to:', email);
       
-      // First, check if the user already exists in auth
-      const { data: authUser, error: authError } = await supabase.auth.admin.getUserByEmail(email);
-      
-      if (authError) {
-        console.error('Error checking auth user:', authError);
-        throw authError;
+      // Check if user exists by attempting to get their profile
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('email', email)
+        .single();
+
+      if (profileError && profileError.code !== 'PGRST116') {
+        console.error('Error checking profile:', profileError);
+        throw profileError;
       }
 
-      if (authUser) {
+      if (profile) {
         console.log('User exists, sending password reset email');
         const { error: resetError } = await supabase.auth.resetPasswordForEmail(
           email,
@@ -61,7 +65,7 @@ export function ClinicTableActions({ clinic }: ClinicTableActionsProps) {
 
         if (signUpError) {
           if (signUpError.message.includes('already registered')) {
-            // User exists but wasn't found by getUserByEmail, send reset email
+            // User exists but wasn't found in profiles, send reset email
             const { error: resetError } = await supabase.auth.resetPasswordForEmail(
               email,
               {
@@ -101,15 +105,28 @@ export function ClinicTableActions({ clinic }: ClinicTableActionsProps) {
     try {
       console.log('Attempting to login as clinic:', email);
       
-      // First check if the user exists in auth
-      const { data: authUser, error: authError } = await supabase.auth.admin.getUserByEmail(email);
+      // Check if user exists by attempting to get their profile
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('email', email)
+        .single();
 
-      if (authError || !authUser) {
-        console.error('Error checking auth user or user not found:', authError);
+      if (profileError) {
+        console.error('Error checking profile:', profileError);
         toast({
           variant: "destructive",
           title: "Login Failed",
           description: "Could not find clinic user. Please make sure the clinic has been invited first.",
+        });
+        return;
+      }
+
+      if (!profile) {
+        toast({
+          variant: "destructive",
+          title: "Login Failed",
+          description: "Clinic user not found. Please invite the clinic first.",
         });
         return;
       }
@@ -120,7 +137,7 @@ export function ClinicTableActions({ clinic }: ClinicTableActionsProps) {
       // Sign in as the clinic user
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
-        password: 'Password1',
+        password: 'Password1', // Using the same temporary password as in invite
       });
 
       if (error) {
