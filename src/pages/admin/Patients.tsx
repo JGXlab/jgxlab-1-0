@@ -1,14 +1,35 @@
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Card } from "@/components/ui/card";
 import { Search, Users } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { EditPatientForm } from "@/components/patients/EditPatientForm";
+import { useToast } from "@/hooks/use-toast";
+import { Badge } from "@/components/ui/badge";
+import { PatientActions } from "@/components/patients/PatientActions";
+import { LabScriptHistoryModal } from "@/components/patients/LabScriptHistoryModal";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const Patients = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [editingPatient, setEditingPatient] = useState(null);
+  const [deletingPatient, setDeletingPatient] = useState(null);
+  const [selectedPatient, setSelectedPatient] = useState(null);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
   
   const { data: patients, isLoading } = useQuery({
     queryKey: ['admin-patients'],
@@ -34,6 +55,35 @@ const Patients = () => {
       return data;
     }
   });
+
+  const handleDeletePatient = async () => {
+    if (!deletingPatient) return;
+
+    try {
+      const { error } = await supabase
+        .from('patients')
+        .delete()
+        .eq('id', deletingPatient.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Patient deleted successfully",
+      });
+
+      queryClient.invalidateQueries({ queryKey: ['admin-patients'] });
+    } catch (error) {
+      console.error('Error deleting patient:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete patient",
+        variant: "destructive",
+      });
+    } finally {
+      setDeletingPatient(null);
+    }
+  };
 
   const filteredPatients = patients?.filter(patient => {
     const fullName = `${patient.first_name} ${patient.last_name}`.toLowerCase();
@@ -76,6 +126,7 @@ const Patients = () => {
                 <TableHead className="text-primary/80 font-semibold">Gender</TableHead>
                 <TableHead className="text-primary/80 font-semibold">Clinic</TableHead>
                 <TableHead className="text-primary/80 font-semibold">Created At</TableHead>
+                <TableHead className="text-primary/80 font-semibold text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -96,10 +147,21 @@ const Patients = () => {
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell className="capitalize text-gray-600">{patient.gender}</TableCell>
+                  <TableCell>
+                    <Badge variant="secondary" className="capitalize bg-accent text-accent-foreground">
+                      {patient.gender}
+                    </Badge>
+                  </TableCell>
                   <TableCell>{patient.clinics?.name || 'No clinic assigned'}</TableCell>
                   <TableCell className="text-gray-600">
                     {new Date(patient.created_at).toLocaleDateString()}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <PatientActions
+                      onEdit={() => setEditingPatient(patient)}
+                      onDelete={() => setDeletingPatient(patient)}
+                      onViewHistory={() => setSelectedPatient(patient)}
+                    />
                   </TableCell>
                 </TableRow>
               ))}
@@ -107,6 +169,48 @@ const Patients = () => {
           </Table>
         )}
       </Card>
+
+      <Dialog open={!!editingPatient} onOpenChange={(open) => !open && setEditingPatient(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Patient</DialogTitle>
+          </DialogHeader>
+          {editingPatient && (
+            <EditPatientForm
+              patient={editingPatient}
+              onSuccess={() => setEditingPatient(null)}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+
+      <AlertDialog open={!!deletingPatient} onOpenChange={(open) => !open && setDeletingPatient(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the patient
+              {deletingPatient && ` ${deletingPatient.first_name} ${deletingPatient.last_name}`}
+              and all associated data.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeletePatient} className="bg-red-600 text-white hover:bg-red-700">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {selectedPatient && (
+        <LabScriptHistoryModal
+          isOpen={!!selectedPatient}
+          onClose={() => setSelectedPatient(null)}
+          patientId={selectedPatient.id}
+          patientName={`${selectedPatient.first_name} ${selectedPatient.last_name}`}
+        />
+      )}
     </AdminLayout>
   );
 };
