@@ -135,10 +135,10 @@ export function ClinicsTable() {
   }
 
   return (
-    <div className="rounded-xl border border-[#E5DEFF] bg-white shadow-sm">
+    <div className="rounded-xl border border-[#D3E4FD] bg-white shadow-sm">
       <Table>
         <TableHeader>
-          <TableRow className="border-b border-[#E5DEFF] hover:bg-[#F1F0FB]">
+          <TableRow className="border-b border-[#D3E4FD] hover:bg-[#F8FAFC]">
             <TableHead className="text-sm font-semibold text-[#1A1F2C]">Clinic Name</TableHead>
             <TableHead className="text-sm font-semibold text-[#1A1F2C]">Doctor</TableHead>
             <TableHead className="text-sm font-semibold text-[#1A1F2C]">Contact Person</TableHead>
@@ -152,7 +152,7 @@ export function ClinicsTable() {
           {clinics?.map((clinic) => (
             <TableRow 
               key={clinic.id}
-              className="border-b border-[#E5DEFF] hover:bg-[#F1F0FB] transition-colors"
+              className="border-b border-[#D3E4FD] hover:bg-[#F8FAFC] transition-colors"
             >
               <TableCell className="font-medium text-[#403E43]">{clinic.name}</TableCell>
               <TableCell className="text-[#8E9196]">{clinic.doctor_name}</TableCell>
@@ -166,7 +166,7 @@ export function ClinicsTable() {
                   variant="outline"
                   size="sm"
                   onClick={() => handleInvite(clinic.email, clinic.name)}
-                  className="bg-white border-[#E5DEFF] text-[#7E69AB] hover:bg-[#F1F0FB] hover:text-[#6E59A5] transition-colors"
+                  className="bg-white border-[#D3E4FD] text-primary hover:bg-[#F8FAFC] hover:text-primary/90 transition-colors"
                 >
                   <UserPlus className="w-4 h-4 mr-2" />
                   Invite
