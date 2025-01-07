@@ -178,6 +178,7 @@ export type Database = {
           arch: string
           clinic_id: string | null
           created_at: string
+          design_url: string | null
           due_date: string
           express_design: string | null
           hold_comment: string | null
@@ -203,6 +204,7 @@ export type Database = {
           arch: string
           clinic_id?: string | null
           created_at?: string
+          design_url?: string | null
           due_date: string
           express_design?: string | null
           hold_comment?: string | null
@@ -228,6 +230,7 @@ export type Database = {
           arch?: string
           clinic_id?: string | null
           created_at?: string
+          design_url?: string | null
           due_date?: string
           express_design?: string | null
           hold_comment?: string | null
