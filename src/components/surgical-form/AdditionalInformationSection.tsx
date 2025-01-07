@@ -6,7 +6,7 @@ import { UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 import { formSchema } from "./formSchema";
 import { SelectionButton } from "./SelectionButton";
-import { addDays, format } from "date-fns";
+import { addDays, format, isWeekend } from "date-fns";
 
 interface AdditionalInformationSectionProps {
   form: UseFormReturn<z.infer<typeof formSchema>>;
@@ -25,10 +25,32 @@ export const AdditionalInformationSection = ({ form }: AdditionalInformationSect
     'ti-bar'
   ];
 
-  // Calculate minimum due date based on appliance type
-  const minDueDate = appliancesWithLeadTime.includes(applianceType) 
-    ? format(addDays(new Date(), 4), 'yyyy-MM-dd')
-    : format(new Date(), 'yyyy-MM-dd');
+  // Calculate minimum due date based on appliance type, accounting for weekends
+  const calculateMinDueDate = () => {
+    if (!appliancesWithLeadTime.includes(applianceType)) {
+      return format(new Date(), 'yyyy-MM-dd');
+    }
+
+    let date = new Date();
+    let daysToAdd = 4;
+    let daysAdded = 0;
+
+    while (daysAdded < daysToAdd) {
+      date = addDays(date, 1);
+      if (!isWeekend(date)) {
+        daysAdded++;
+      }
+    }
+
+    // If the calculated date falls on a weekend, move to next Monday
+    while (isWeekend(date)) {
+      date = addDays(date, 1);
+    }
+
+    return format(date, 'yyyy-MM-dd');
+  };
+
+  const minDueDate = calculateMinDueDate();
 
   return (
     <FormSection title="Additional Information" className="pt-6 border-t">
@@ -70,7 +92,7 @@ export const AdditionalInformationSection = ({ form }: AdditionalInformationSect
             />
             {appliancesWithLeadTime.includes(applianceType) && (
               <p className="text-sm text-muted-foreground mt-1">
-                This appliance type requires a minimum of 4 working days for design completion.
+                This appliance type requires a minimum of 4 working days (excluding weekends) for design completion.
               </p>
             )}
           </FormItem>
