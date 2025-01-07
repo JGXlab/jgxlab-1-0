@@ -43,6 +43,16 @@ export function ClinicProfileForm() {
         return null;
       }
 
+      // Split the address field into components if it exists
+      if (clinicData.address) {
+        const addressParts = clinicData.address.split(',').map(part => part.trim());
+        clinicData.street_address = addressParts[0] || '';
+        clinicData.city = addressParts[1] || '';
+        const stateZip = addressParts[2] ? addressParts[2].split(' ') : ['', ''];
+        clinicData.state = stateZip[0] || '';
+        clinicData.zip_code = stateZip[1] || '';
+      }
+
       return clinicData as Clinic;
     },
   });
@@ -61,6 +71,9 @@ export function ClinicProfileForm() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("No authenticated user found");
 
+      // Combine address fields for storage
+      const formattedAddress = `${data.street_address}, ${data.city}, ${data.state} ${data.zip_code}`;
+
       const { error } = await supabase
         .from("clinics")
         .update({
@@ -70,7 +83,7 @@ export function ClinicProfileForm() {
           doctor_name: data.doctor_name,
           contact_person: data.contact_person,
           contact_phone: data.contact_phone,
-          address: data.address,
+          address: formattedAddress,
         })
         .eq("user_id", user.id);
 
