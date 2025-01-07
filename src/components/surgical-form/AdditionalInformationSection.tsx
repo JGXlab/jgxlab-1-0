@@ -6,7 +6,7 @@ import { UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 import { formSchema } from "./formSchema";
 import { SelectionButton } from "./SelectionButton";
-import { addDays, format } from "date-fns";
+import { addDays, format, isWeekend } from "date-fns";
 
 interface AdditionalInformationSectionProps {
   form: UseFormReturn<z.infer<typeof formSchema>>;
@@ -25,10 +25,36 @@ export const AdditionalInformationSection = ({ form }: AdditionalInformationSect
     'ti-bar'
   ];
 
+  // Function to add working days (excluding weekends)
+  const addWorkingDays = (date: Date, days: number): Date => {
+    let currentDate = date;
+    let remainingDays = days;
+
+    while (remainingDays > 0) {
+      currentDate = addDays(currentDate, 1);
+      if (!isWeekend(currentDate)) {
+        remainingDays--;
+      }
+    }
+
+    // If the resulting date is a weekend, move to next Monday
+    while (isWeekend(currentDate)) {
+      currentDate = addDays(currentDate, 1);
+    }
+
+    return currentDate;
+  };
+
   // Calculate minimum due date based on appliance type
-  const minDueDate = appliancesWithLeadTime.includes(applianceType) 
-    ? format(addDays(new Date(), 4), 'yyyy-MM-dd')
+  const minDueDate = appliancesWithLeadTime.includes(applianceType)
+    ? format(addWorkingDays(new Date(), 4), 'yyyy-MM-dd')
     : format(new Date(), 'yyyy-MM-dd');
+
+  // Function to disable weekend dates
+  const isWeekendDate = (dateString: string): boolean => {
+    const date = new Date(dateString);
+    return isWeekend(date);
+  };
 
   return (
     <FormSection title="Additional Information" className="pt-6 border-t">
@@ -67,10 +93,20 @@ export const AdditionalInformationSection = ({ form }: AdditionalInformationSect
               className="max-w-xs bg-white" 
               {...field} 
               min={minDueDate}
+              onChange={(e) => {
+                // Prevent selection of weekend dates
+                if (!isWeekendDate(e.target.value)) {
+                  field.onChange(e);
+                } else {
+                  // If weekend is selected, don't update the value
+                  e.preventDefault();
+                  alert("Weekend dates cannot be selected. Please choose a weekday.");
+                }
+              }}
             />
             {appliancesWithLeadTime.includes(applianceType) && (
               <p className="text-sm text-muted-foreground mt-1">
-                This appliance type requires a minimum of 4 working days for design completion.
+                This appliance type requires a minimum of 4 working days (excluding weekends) for design completion.
               </p>
             )}
           </FormItem>
