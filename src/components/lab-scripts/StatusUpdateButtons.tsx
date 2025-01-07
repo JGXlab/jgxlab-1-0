@@ -145,7 +145,7 @@ export const StatusUpdateButtons = ({ script, onStatusUpdate }: StatusUpdateButt
       </div>
 
       <Dialog open={showHoldDialog} onOpenChange={setShowHoldDialog}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-[425px] bg-white">
           <DialogHeader>
             <DialogTitle>Hold Design</DialogTitle>
           </DialogHeader>
@@ -156,10 +156,10 @@ export const StatusUpdateButtons = ({ script, onStatusUpdate }: StatusUpdateButt
                 value={holdReason}
                 onValueChange={setHoldReason}
               >
-                <SelectTrigger id="hold-reason">
+                <SelectTrigger id="hold-reason" className="bg-white">
                   <SelectValue placeholder="Select reason" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white z-50">
                   <SelectItem value="incomplete_info">Hold for incomplete info</SelectItem>
                   <SelectItem value="incomplete_3d">Hold for incomplete 3D data</SelectItem>
                   <SelectItem value="approval">Hold for approval</SelectItem>
@@ -175,7 +175,7 @@ export const StatusUpdateButtons = ({ script, onStatusUpdate }: StatusUpdateButt
                 value={holdComment}
                 onChange={(e) => setHoldComment(e.target.value)}
                 placeholder="Add any additional comments..."
-                className="h-24"
+                className="h-24 bg-white"
               />
             </div>
           </div>
