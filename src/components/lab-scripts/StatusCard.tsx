@@ -62,10 +62,9 @@ export const StatusCard = ({
   <div 
     className={`
       relative p-4 rounded-lg cursor-pointer transition-all duration-300
-      hover:shadow-md hover:-translate-y-0.5 bg-white
+      hover:shadow-md hover:-translate-y-0.5 bg-white w-full
       ${isSelected ? 'ring-2 ring-[#9b87f5] shadow-sm' : ''}
       ${isHighlighted ? 'border border-[#9b87f5]' : ''}
-      min-w-[200px]
     `}
     onClick={onClick}
   >
