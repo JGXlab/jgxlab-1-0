@@ -17,6 +17,7 @@ import {
 import { DashboardStatusCards } from "@/components/design/dashboard/DashboardStatusCards";
 import { motion } from "framer-motion";
 import { DashboardCharts } from "@/components/design/dashboard/DashboardCharts";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 export default function DesignDashboard() {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -157,8 +158,10 @@ export default function DesignDashboard() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
           >
-            <DashboardStatusCards stats={stats} />
-            <DashboardCharts labScripts={labScripts} />
+            <TooltipProvider>
+              <DashboardStatusCards stats={stats} />
+              <DashboardCharts labScripts={labScripts} />
+            </TooltipProvider>
           </motion.div>
         </ScrollArea>
       </div>

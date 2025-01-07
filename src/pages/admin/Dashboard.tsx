@@ -7,6 +7,8 @@ import { Activity, TestTube, Clock, AlertCircle } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { useQuery } from "@tanstack/react-query";
 import { format, subDays } from "date-fns";
+import { DashboardStatusCards } from "@/components/design/dashboard/DashboardStatusCards";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
@@ -53,13 +55,26 @@ export default function AdminDashboard() {
     },
   });
 
+  // Calculate status counts for the status cards
+  const statusCounts = {
+    pending: labScripts.filter(script => script.status === 'pending').length,
+    inProgress: labScripts.filter(script => script.status === 'in_progress').length,
+    paused: labScripts.filter(script => script.status === 'paused').length,
+    onHold: labScripts.filter(script => script.status === 'on_hold').length,
+    incomplete: labScripts.filter(script => 
+      ['pending', 'in_progress', 'paused', 'on_hold'].includes(script.status)
+    ).length,
+    completed: labScripts.filter(script => script.status === 'completed').length,
+    all: labScripts.length
+  };
+
   // Calculate status counts for the pie chart
-  const statusCounts = labScripts.reduce((acc, script) => {
+  const statusCountsForPieChart = labScripts.reduce((acc, script) => {
     acc[script.status] = (acc[script.status] || 0) + 1;
     return acc;
   }, {});
 
-  const pieChartData = Object.entries(statusCounts).map(([status, count]) => ({
+  const pieChartData = Object.entries(statusCountsForPieChart).map(([status, count]) => ({
     name: status.charAt(0).toUpperCase() + status.slice(1),
     value: count,
   }));
@@ -93,125 +108,130 @@ export default function AdminDashboard() {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        {/* Key Metrics */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card className="bg-white">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Total Lab Scripts
-              </CardTitle>
-              <TestTube className="h-4 w-4 text-primary" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{totalScripts}</div>
-            </CardContent>
-          </Card>
+        <TooltipProvider>
+          {/* Status Cards */}
+          <DashboardStatusCards stats={statusCounts} />
 
-          <Card className="bg-white">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Pending Review
-              </CardTitle>
-              <Clock className="h-4 w-4 text-yellow-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{pendingScripts}</div>
-            </CardContent>
-          </Card>
+          {/* Key Metrics */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Card className="bg-white">
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  Total Lab Scripts
+                </CardTitle>
+                <TestTube className="h-4 w-4 text-primary" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{totalScripts}</div>
+              </CardContent>
+            </Card>
 
-          <Card className="bg-white">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Urgent Attention
-              </CardTitle>
-              <AlertCircle className="h-4 w-4 text-red-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{urgentScripts}</div>
-            </CardContent>
-          </Card>
+            <Card className="bg-white">
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  Pending Review
+                </CardTitle>
+                <Clock className="h-4 w-4 text-yellow-500" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{pendingScripts}</div>
+              </CardContent>
+            </Card>
 
-          <Card className="bg-white">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Completed Scripts
-              </CardTitle>
-              <Activity className="h-4 w-4 text-green-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{completedScripts}</div>
-            </CardContent>
-          </Card>
-        </div>
+            <Card className="bg-white">
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  Urgent Attention
+                </CardTitle>
+                <AlertCircle className="h-4 w-4 text-red-500" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{urgentScripts}</div>
+              </CardContent>
+            </Card>
 
-        {/* Charts */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {/* Submissions Trend */}
-          <Card className="bg-white">
-            <CardHeader>
-              <CardTitle>Lab Script Submissions Trend</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="h-[300px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={dailySubmissions}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis 
-                      dataKey="date" 
-                      tick={{ fontSize: 12 }}
-                      interval={6}
-                    />
-                    <YAxis tick={{ fontSize: 12 }} />
-                    <Tooltip />
-                    <Line 
-                      type="monotone" 
-                      dataKey="count" 
-                      stroke="#8884d8" 
-                      strokeWidth={2}
-                      dot={false}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            </CardContent>
-          </Card>
+            <Card className="bg-white">
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  Completed Scripts
+                </CardTitle>
+                <Activity className="h-4 w-4 text-green-500" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{completedScripts}</div>
+              </CardContent>
+            </Card>
+          </div>
 
-          {/* Status Distribution */}
-          <Card className="bg-white">
-            <CardHeader>
-              <CardTitle>Lab Script Status Distribution</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="h-[300px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={pieChartData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={60}
-                      outerRadius={80}
-                      fill="#8884d8"
-                      paddingAngle={5}
-                      dataKey="value"
-                      label={({ name, percent }) => 
-                        `${name} ${(percent * 100).toFixed(0)}%`
-                      }
-                    >
-                      {pieChartData.map((entry, index) => (
-                        <Cell 
-                          key={`cell-${index}`} 
-                          fill={COLORS[index % COLORS.length]} 
-                        />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+          {/* Charts */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {/* Submissions Trend */}
+            <Card className="bg-white">
+              <CardHeader>
+                <CardTitle>Lab Script Submissions Trend</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[300px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={dailySubmissions}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis 
+                        dataKey="date" 
+                        tick={{ fontSize: 12 }}
+                        interval={6}
+                      />
+                      <YAxis tick={{ fontSize: 12 }} />
+                      <Tooltip />
+                      <Line 
+                        type="monotone" 
+                        dataKey="count" 
+                        stroke="#8884d8" 
+                        strokeWidth={2}
+                        dot={false}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Status Distribution */}
+            <Card className="bg-white">
+              <CardHeader>
+                <CardTitle>Lab Script Status Distribution</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[300px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={pieChartData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={60}
+                        outerRadius={80}
+                        fill="#8884d8"
+                        paddingAngle={5}
+                        dataKey="value"
+                        label={({ name, percent }) => 
+                          `${name} ${(percent * 100).toFixed(0)}%`
+                        }
+                      >
+                        {pieChartData.map((entry, index) => (
+                          <Cell 
+                            key={`cell-${index}`} 
+                            fill={COLORS[index % COLORS.length]} 
+                          />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TooltipProvider>
       </div>
     </AdminLayout>
   );
