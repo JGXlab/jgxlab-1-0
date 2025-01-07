@@ -56,29 +56,53 @@ export const PaymentSection = ({
 
       if (freeTrialsError) {
         console.error('Error checking free trials:', freeTrialsError);
+        toast({
+          title: "Error",
+          description: "Failed to check free try-in eligibility",
+          variant: "destructive",
+        });
         return { isEligible: false };
       }
 
       if (existingFreeTrials) {
         console.log('Patient already had a free try-in');
+        toast({
+          title: "Not Eligible",
+          description: "This patient has already used their free printed try-in.",
+          variant: "default",
+        });
         return { isEligible: false };
       }
 
-      // Then check if patient has a surgical day appliance
+      // Then check if patient has a surgical day appliance that's either pending or completed
       const { data: surgicalAppliance, error: surgicalError } = await supabase
         .from('lab_scripts')
-        .select('id')
+        .select('id, status')
         .eq('patient_id', patientId)
         .eq('appliance_type', 'surgical-day')
+        .in('status', ['pending', 'completed'])
         .maybeSingle();
 
       if (surgicalError) {
         console.error('Error checking surgical appliances:', surgicalError);
+        toast({
+          title: "Error",
+          description: "Failed to check surgical appliance status",
+          variant: "destructive",
+        });
         return { isEligible: false };
       }
 
       const isEligible = !!surgicalAppliance && !existingFreeTrials;
       console.log('Free try-in eligibility:', isEligible);
+      
+      if (!isEligible && !surgicalAppliance) {
+        toast({
+          title: "Not Eligible",
+          description: "Free printed try-in is only available for patients with a surgical day appliance.",
+          variant: "default",
+        });
+      }
       
       return { isEligible };
     },
