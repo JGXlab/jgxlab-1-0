@@ -8,6 +8,10 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { PriceBreakdown } from "../PriceBreakdown";
+import { CouponField } from "../CouponField";
+import { UseFormReturn } from "react-hook-form";
+import { z } from "zod";
+import { formSchema } from "../formSchema";
 
 interface TotalAmountDisplayProps {
   basePrice: number;
@@ -18,6 +22,9 @@ interface TotalAmountDisplayProps {
   expressDesign: string;
   formattedApplianceType: string;
   isLoading?: boolean;
+  form?: UseFormReturn<z.infer<typeof formSchema>>;
+  patientId?: string;
+  onValidCoupon?: () => void;
 }
 
 export const TotalAmountDisplay = ({
@@ -29,7 +36,12 @@ export const TotalAmountDisplay = ({
   expressDesign,
   formattedApplianceType,
   isLoading = false,
+  form,
+  patientId,
+  onValidCoupon,
 }: TotalAmountDisplayProps) => {
+  const showCouponField = applianceType === 'printed-try-in' && form && patientId;
+
   return (
     <div className="space-y-2">
       <div className="flex items-center gap-2">
@@ -55,16 +67,27 @@ export const TotalAmountDisplay = ({
           </DialogContent>
         </Dialog>
       </div>
-      <div className="min-h-[2.5rem] flex items-center">
-        {isLoading ? (
-          <div className="flex items-center gap-2 text-primary">
-            <Loader2 className="h-5 w-5 animate-spin" />
-            <span className="text-lg font-medium">Calculating price...</span>
+      <div className="flex items-center gap-4">
+        <div className="min-h-[2.5rem] flex items-center">
+          {isLoading ? (
+            <div className="flex items-center gap-2 text-primary">
+              <Loader2 className="h-5 w-5 animate-spin" />
+              <span className="text-lg font-medium">Calculating price...</span>
+            </div>
+          ) : (
+            <p className="text-2xl font-semibold text-gray-900">
+              ${Number(totalAmount).toFixed(2)}
+            </p>
+          )}
+        </div>
+        {showCouponField && (
+          <div className="flex-1">
+            <CouponField 
+              form={form} 
+              patientId={patientId}
+              onValidCoupon={onValidCoupon || (() => {})}
+            />
           </div>
-        ) : (
-          <p className="text-2xl font-semibold text-gray-900">
-            ${Number(totalAmount).toFixed(2)}
-          </p>
         )}
       </div>
     </div>

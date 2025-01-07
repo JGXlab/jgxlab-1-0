@@ -34,6 +34,7 @@ export const PaymentSection = ({
   const [isCalculating, setIsCalculating] = useState(false);
 
   const isFreeScript = form.watch('is_free_printed_tryin');
+  const patientId = form.watch('patientId');
 
   const { data: basePrice = 0, isLoading: isPriceLoading } = useQuery({
     queryKey: ['service-price', applianceType],
@@ -157,6 +158,11 @@ export const PaymentSection = ({
           expressDesign={expressDesign}
           formattedApplianceType={formatApplianceType(applianceType)}
           isLoading={isLoading}
+          form={form}
+          patientId={patientId}
+          onValidCoupon={() => {
+            console.log('Valid coupon applied');
+          }}
         />
         <SubmitButton
           isSubmitting={isSubmitting}
