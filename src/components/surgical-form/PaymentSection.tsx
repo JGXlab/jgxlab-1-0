@@ -31,6 +31,46 @@ export const PaymentSection = ({
   const { toast } = useToast();
   const [totalAmount, setTotalAmount] = useState(0);
   const [lineItems, setLineItems] = useState<Array<{ price: string; quantity: number }>>([]);
+  const [isFreeTrialEligible, setIsFreeTrialEligible] = useState(false);
+
+  const patientId = form.watch('patientId');
+
+  // Check if patient is eligible for free printed try-in
+  const { data: eligibilityData, isLoading: isCheckingEligibility } = useQuery({
+    queryKey: ['free-tryin-eligibility', patientId],
+    queryFn: async () => {
+      if (!patientId || applianceType !== 'printed-try-in') return { isEligible: false };
+
+      console.log('Checking free try-in eligibility for patient:', patientId);
+
+      // First check if patient has any previous free try-ins
+      const { data: existingFreeTrials } = await supabase
+        .from('lab_scripts')
+        .select('id')
+        .eq('patient_id', patientId)
+        .eq('is_free_printed_tryin', true)
+        .single();
+
+      if (existingFreeTrials) {
+        console.log('Patient already had a free try-in');
+        return { isEligible: false };
+      }
+
+      // Then check if patient has a surgical day appliance
+      const { data: surgicalAppliance } = await supabase
+        .from('lab_scripts')
+        .select('id')
+        .eq('patient_id', patientId)
+        .eq('appliance_type', 'surgical-day')
+        .single();
+
+      const isEligible = !!surgicalAppliance && !existingFreeTrials;
+      console.log('Free try-in eligibility:', isEligible);
+      
+      return { isEligible };
+    },
+    enabled: !!patientId && applianceType === 'printed-try-in'
+  });
 
   const { data: basePrice = 0, isLoading: isPriceLoading } = useQuery({
     queryKey: ['service-price', applianceType],
@@ -58,6 +98,13 @@ export const PaymentSection = ({
     const updatePrices = async () => {
       setIsCalculating(true);
       try {
+        // If eligible for free try-in, set total to 0 and skip price calculation
+        if (eligibilityData?.isEligible) {
+          setTotalAmount(0);
+          setLineItems([]);
+          return;
+        }
+
         const result = await calculateTotalPrice(
           basePrice,
           { archType, needsNightguard, expressDesign, applianceType }
@@ -70,7 +117,7 @@ export const PaymentSection = ({
     };
 
     updatePrices();
-  }, [basePrice, archType, needsNightguard, expressDesign, applianceType]);
+  }, [basePrice, archType, needsNightguard, expressDesign, applianceType, eligibilityData?.isEligible]);
 
   console.log('Payment details:', {
     applianceType,
@@ -78,7 +125,8 @@ export const PaymentSection = ({
     archType,
     needsNightguard,
     expressDesign,
-    lineItems
+    lineItems,
+    isFreeTrialEligible: eligibilityData?.isEligible
   });
 
   const createCheckoutSession = useMutation({
@@ -86,6 +134,26 @@ export const PaymentSection = ({
       // Get the current user's ID
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('No user found');
+
+      // If it's a free try-in, create lab script directly without payment
+      if (eligibilityData?.isEligible) {
+        console.log('Creating free printed try-in lab script');
+        const { data: labScript, error } = await supabase
+          .from('lab_scripts')
+          .insert([{
+            ...formData,
+            user_id: user.id,
+            payment_status: 'paid',
+            amount_paid: 0,
+            is_free_printed_tryin: true,
+            payment_date: new Date().toISOString()
+          }])
+          .select()
+          .single();
+
+        if (error) throw error;
+        return { url: null, isFree: true };
+      }
 
       console.log('Creating checkout session with:', { formData, lineItems });
 
@@ -106,10 +174,17 @@ export const PaymentSection = ({
         throw new Error('No checkout URL returned from server');
       }
 
-      return data;
+      return { url: data.url, isFree: false };
     },
     onSuccess: (data) => {
-      if (data.url) {
+      if (data.isFree) {
+        toast({
+          title: "Success",
+          description: "Free printed try-in lab script created successfully!",
+        });
+        // Redirect to submitted lab scripts page
+        window.location.href = "/clinic/submittedlabscripts";
+      } else if (data.url) {
         window.location.href = data.url;
       }
     },
@@ -122,13 +197,6 @@ export const PaymentSection = ({
       });
     },
   });
-
-  const formatApplianceType = (type: string) => {
-    if (!type) return '';
-    return type.split('-').map(word => 
-      word.charAt(0).toUpperCase() + word.slice(1)
-    ).join(' ');
-  };
 
   const handleSubmitAndPay = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -146,7 +214,7 @@ export const PaymentSection = ({
     createCheckoutSession.mutate(values);
   };
 
-  const isLoading = isPriceLoading || isCalculating;
+  const isLoading = isPriceLoading || isCalculating || isCheckingEligibility;
 
   return (
     <div className="sticky bottom-0 bg-white border-t shadow-lg p-4">
@@ -158,14 +226,18 @@ export const PaymentSection = ({
           archType={archType}
           needsNightguard={needsNightguard}
           expressDesign={expressDesign}
-          formattedApplianceType={formatApplianceType(applianceType)}
+          formattedApplianceType={applianceType.split('-').map(word => 
+            word.charAt(0).toUpperCase() + word.slice(1)
+          ).join(' ')}
           isLoading={isLoading}
+          isFreeTrialEligible={eligibilityData?.isEligible}
         />
         <SubmitButton
           isSubmitting={isSubmitting}
           isPending={createCheckoutSession.isPending}
           onClick={handleSubmitAndPay}
           disabled={isLoading}
+          isFreeTrialEligible={eligibilityData?.isEligible}
         />
       </div>
     </div>

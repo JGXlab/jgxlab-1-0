@@ -6,29 +6,32 @@ interface SubmitButtonProps {
   isPending: boolean;
   onClick: (e: React.MouseEvent) => void;
   disabled?: boolean;
+  isFreeTrialEligible?: boolean;
 }
 
 export const SubmitButton = ({ 
   isSubmitting, 
   isPending, 
-  onClick,
-  disabled = false 
+  onClick, 
+  disabled,
+  isFreeTrialEligible = false
 }: SubmitButtonProps) => {
+  const isLoading = isSubmitting || isPending;
+  
   return (
     <Button
       type="submit"
-      size="lg"
-      className="min-w-[150px]"
+      className="min-w-[150px] bg-primary hover:bg-primary/90"
       onClick={onClick}
-      disabled={isSubmitting || isPending || disabled}
+      disabled={disabled || isLoading}
     >
-      {isSubmitting || isPending ? (
+      {isLoading ? (
         <>
           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          Processing...
+          {isFreeTrialEligible ? 'Creating...' : 'Processing...'}
         </>
       ) : (
-        "Submit & Pay"
+        isFreeTrialEligible ? 'Create Lab Script' : 'Proceed to Payment'
       )}
     </Button>
   );
