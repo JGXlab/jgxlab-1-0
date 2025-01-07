@@ -27,7 +27,7 @@ export const AdditionalInformationSection = ({ form }: AdditionalInformationSect
 
   // Function to add working days (excluding weekends)
   const addWorkingDays = (date: Date, days: number): Date => {
-    let currentDate = date;
+    let currentDate = new Date(date); // Create a new date object to avoid mutations
     let remainingDays = days;
 
     while (remainingDays > 0) {
@@ -35,11 +35,6 @@ export const AdditionalInformationSection = ({ form }: AdditionalInformationSect
       if (!isWeekend(currentDate)) {
         remainingDays--;
       }
-    }
-
-    // If the resulting date is a weekend, move to next Monday
-    while (isWeekend(currentDate)) {
-      currentDate = addDays(currentDate, 1);
     }
 
     return currentDate;
@@ -94,11 +89,11 @@ export const AdditionalInformationSection = ({ form }: AdditionalInformationSect
               {...field} 
               min={minDueDate}
               onChange={(e) => {
-                // Prevent selection of weekend dates
-                if (!isWeekendDate(e.target.value)) {
+                const selectedDate = new Date(e.target.value);
+                // Only prevent weekend selections
+                if (!isWeekend(selectedDate)) {
                   field.onChange(e);
                 } else {
-                  // If weekend is selected, don't update the value
                   e.preventDefault();
                   alert("Weekend dates cannot be selected. Please choose a weekday.");
                 }
