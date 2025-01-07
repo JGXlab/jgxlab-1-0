@@ -19,6 +19,7 @@ interface PaymentSectionProps {
   onSubmit: (values: z.infer<typeof formSchema>) => void;
   isSubmitting: boolean;
   form: UseFormReturn<z.infer<typeof formSchema>>;
+  onSuccess?: () => void;
 }
 
 export const PaymentSection = ({ 
@@ -28,7 +29,8 @@ export const PaymentSection = ({
   expressDesign = 'no',
   onSubmit, 
   isSubmitting,
-  form
+  form,
+  onSuccess
 }: PaymentSectionProps) => {
   const { toast } = useToast();
   const [totalAmount, setTotalAmount] = useState(0);
@@ -109,7 +111,11 @@ export const PaymentSection = ({
 
     // If total amount is 0, submit directly without creating checkout session
     if (totalAmount === 0) {
-      submitFreeLabScript.mutate(values);
+      submitFreeLabScript.mutate(values, {
+        onSuccess: () => {
+          onSuccess?.();
+        }
+      });
       return;
     }
 

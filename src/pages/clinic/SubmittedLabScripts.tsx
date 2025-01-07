@@ -20,6 +20,7 @@ import { ClinicNavHeader } from "@/components/clinic/ClinicNavHeader";
 import { Card } from "@/components/ui/card";
 import { LabScriptsPageHeader } from "@/components/lab-scripts/LabScriptsPageHeader";
 import { useLabScripts } from "@/hooks/use-lab-scripts";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function SubmittedLabScripts() {
   const [selectedScript, setSelectedScript] = useState<any>(null);
@@ -28,6 +29,7 @@ export default function SubmittedLabScripts() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
   const [searchParams] = useSearchParams();
+  const queryClient = useQueryClient();
   
   const { 
     verifyPayment, 
@@ -85,6 +87,11 @@ export default function SubmittedLabScripts() {
     setSelectedStatus(status);
   };
 
+  const handleFormSuccess = () => {
+    setIsNewLabScriptOpen(false);
+    queryClient.invalidateQueries({ queryKey: ['labScripts'] });
+  };
+
   return (
     <ClinicLayout>
       <div className="flex flex-col max-w-[1400px] w-full mx-auto h-screen py-8">
@@ -108,7 +115,7 @@ export default function SubmittedLabScripts() {
                 })}
                 isLoading={isLoading}
                 onPreview={handlePreview}
-                hideClinicColumn={true} // Add this prop to hide clinic column in clinic portal
+                hideClinicColumn={true}
               />
             </Card>
 
@@ -141,6 +148,7 @@ export default function SubmittedLabScripts() {
                       onSubmit={onSubmit}
                       isSubmitting={false}
                       form={form}
+                      onSuccess={handleFormSuccess}
                     />
                   </form>
                 </Form>
