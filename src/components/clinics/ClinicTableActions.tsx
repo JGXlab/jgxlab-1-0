@@ -45,12 +45,12 @@ export function ClinicTableActions({ clinic }: ClinicTableActionsProps) {
         }
 
         toast({
-          title: "Invitation Sent",
-          description: `A password reset link has been sent to ${email}`,
+          title: "Password Reset Link Sent",
+          description: `A password reset link has been sent to ${email}. The clinic must reset their password before logging in.`,
         });
       } else {
         console.log('Creating new user and sending invitation');
-        const tempPassword = 'Password1'; // Temporary password for initial login
+        const tempPassword = Math.random().toString(36).slice(-12) + 'A1!'; // Generate a secure random password
         
         const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
           email,
@@ -76,8 +76,8 @@ export function ClinicTableActions({ clinic }: ClinicTableActionsProps) {
             if (resetError) throw resetError;
 
             toast({
-              title: "Invitation Sent",
-              description: `A password reset link has been sent to ${email}`,
+              title: "Password Reset Link Sent",
+              description: `A password reset link has been sent to ${email}. The clinic must reset their password before logging in.`,
             });
             return;
           }
@@ -85,9 +85,19 @@ export function ClinicTableActions({ clinic }: ClinicTableActionsProps) {
         }
 
         if (signUpData.user) {
+          // Send password reset email immediately after signup
+          const { error: resetError } = await supabase.auth.resetPasswordForEmail(
+            email,
+            {
+              redirectTo: `${window.location.origin}/clinic/login`,
+            }
+          );
+
+          if (resetError) throw resetError;
+
           toast({
-            title: "User Created",
-            description: `Account created for ${email}. A confirmation email has been sent.`,
+            title: "Clinic Invited",
+            description: `Account created for ${email}. A password setup link has been sent.`,
           });
         }
       }
@@ -105,7 +115,7 @@ export function ClinicTableActions({ clinic }: ClinicTableActionsProps) {
     try {
       console.log('Attempting to login as clinic:', email);
       
-      // Check if user exists by attempting to get their profile
+      // Check if user exists and has completed setup
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('*')
@@ -131,32 +141,19 @@ export function ClinicTableActions({ clinic }: ClinicTableActionsProps) {
         return;
       }
 
-      // Sign out of current admin session
-      await supabase.auth.signOut();
+      // First ensure we're signed out
+      const { error: signOutError } = await supabase.auth.signOut();
+      if (signOutError) {
+        console.error('Error signing out:', signOutError);
+        // Continue anyway as the session might not exist
+      }
       
-      // Sign in as the clinic user
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password: 'Password1', // Using the same temporary password as in invite
+      toast({
+        title: "Notice",
+        description: "Please ask the clinic to set up their password using the link sent to their email before attempting to log in.",
       });
 
-      if (error) {
-        console.error('Error logging in as clinic:', error);
-        toast({
-          variant: "destructive",
-          title: "Login Failed",
-          description: "Could not login as clinic. The clinic may need to reset their password.",
-        });
-        return;
-      }
-
-      if (data.user) {
-        toast({
-          title: "Success",
-          description: `Logged in as clinic: ${email}`,
-        });
-        navigate("/clinic/dashboard");
-      }
+      navigate("/clinic/login");
     } catch (error) {
       console.error('Error in login as clinic handler:', error);
       toast({
