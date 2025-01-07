@@ -8,7 +8,6 @@ import { calculateTotalPrice } from "./utils/priceCalculations";
 import { TotalAmountDisplay } from "./payment/TotalAmountDisplay";
 import { SubmitButton } from "./payment/SubmitButton";
 import { useEffect, useState } from "react";
-import { useSubmitFreeLabScript } from "./payment/useSubmitFreeLabScript";
 
 interface PaymentSectionProps {
   applianceType: string;
@@ -45,20 +44,6 @@ export const PaymentSection = ({
     form.setValue('couponCode', '');
     setSurgicalDayArch(undefined);
   }, [patientId, form]);
-
-  // Add auth state change listener
-  useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_OUT') {
-        console.log('User signed out, redirecting to login');
-        window.location.href = '/';
-      }
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, []);
 
   const { data: basePrice = 0, isLoading: isPriceLoading } = useQuery({
     queryKey: ['service-price', applianceType],
@@ -104,8 +89,6 @@ export const PaymentSection = ({
 
     updatePrices();
   }, [basePrice, archType, needsNightguard, expressDesign, applianceType, isFreeScript, surgicalDayArch]);
-
-  const submitFreeLabScript = useSubmitFreeLabScript();
 
   const createCheckoutSession = useMutation({
     mutationFn: async (formData: z.infer<typeof formSchema>) => {
@@ -168,13 +151,6 @@ export const PaymentSection = ({
       return;
     }
 
-    // If total amount is 0 (free script), submit directly
-    if (totalAmount === 0) {
-      submitFreeLabScript.mutate(values);
-      return;
-    }
-
-    // Otherwise, create checkout session
     createCheckoutSession.mutate(values);
   };
 
@@ -202,7 +178,7 @@ export const PaymentSection = ({
           }}
         />
         <SubmitButton
-          isSubmitting={isSubmitting || submitFreeLabScript.isPending}
+          isSubmitting={isSubmitting}
           isPending={createCheckoutSession.isPending}
           onClick={handleSubmitAndPay}
           disabled={isLoading}
