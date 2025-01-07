@@ -6,25 +6,14 @@ import { DashboardMetrics } from "@/components/design/dashboard/DashboardMetrics
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { useToast } from "@/hooks/use-toast";
 
 export default function ClinicDashboard() {
-  const { toast } = useToast();
-  
-  const { data: labScripts = [], isError } = useQuery({
+  const { data: labScripts = [] } = useQuery({
     queryKey: ['dashboardLabScripts'],
     queryFn: async () => {
       console.log('Fetching lab scripts for dashboard...');
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        console.error('No user found');
-        toast({
-          title: "Authentication Error",
-          description: "Please sign in to view dashboard data",
-          variant: "destructive",
-        });
-        throw new Error("No user found");
-      }
+      if (!user) throw new Error("No user found");
 
       const { data, error } = await supabase
         .from('lab_scripts')
@@ -40,29 +29,13 @@ export default function ClinicDashboard() {
 
       if (error) {
         console.error('Error fetching lab scripts:', error);
-        toast({
-          title: "Error",
-          description: "Failed to fetch lab scripts",
-          variant: "destructive",
-        });
         throw error;
       }
 
       console.log('Fetched lab scripts:', data);
       return data || [];
     },
-    retry: 1,
   });
-
-  if (isError) {
-    return (
-      <ClinicLayout>
-        <div className="flex flex-col items-center justify-center h-screen">
-          <p className="text-red-500">Failed to load dashboard data. Please refresh the page.</p>
-        </div>
-      </ClinicLayout>
-    );
-  }
 
   return (
     <ClinicLayout>
@@ -71,7 +44,10 @@ export default function ClinicDashboard() {
           <ClinicNavHeader />
           <TooltipProvider>
             <div className="p-4 sm:p-6 lg:p-8 space-y-6">
+              {/* Status Cards */}
               <DashboardMetrics />
+
+              {/* Charts */}
               <DashboardCharts labScripts={labScripts} />
             </div>
           </TooltipProvider>

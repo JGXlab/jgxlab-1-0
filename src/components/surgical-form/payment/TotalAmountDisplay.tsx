@@ -18,7 +18,6 @@ interface TotalAmountDisplayProps {
   expressDesign: string;
   formattedApplianceType: string;
   isLoading?: boolean;
-  isFreeTrialEligible?: boolean;
 }
 
 export const TotalAmountDisplay = ({
@@ -30,7 +29,6 @@ export const TotalAmountDisplay = ({
   expressDesign,
   formattedApplianceType,
   isLoading = false,
-  isFreeTrialEligible = false,
 }: TotalAmountDisplayProps) => {
   return (
     <div className="space-y-2">
@@ -53,7 +51,6 @@ export const TotalAmountDisplay = ({
               expressDesign={expressDesign}
               applianceType={applianceType}
               formattedApplianceType={formattedApplianceType}
-              isFreeTrialEligible={isFreeTrialEligible}
             />
           </DialogContent>
         </Dialog>
@@ -63,11 +60,6 @@ export const TotalAmountDisplay = ({
           <div className="flex items-center gap-2 text-primary">
             <Loader2 className="h-5 w-5 animate-spin" />
             <span className="text-lg font-medium">Calculating price...</span>
-          </div>
-        ) : isFreeTrialEligible ? (
-          <div className="flex items-center gap-2">
-            <p className="text-2xl font-semibold text-green-600">FREE</p>
-            <span className="text-sm text-gray-500">(First printed try-in)</span>
           </div>
         ) : (
           <p className="text-2xl font-semibold text-gray-900">

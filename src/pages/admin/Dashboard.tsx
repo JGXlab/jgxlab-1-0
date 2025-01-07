@@ -70,11 +70,11 @@ export default function AdminDashboard() {
   const statusCountsForPieChart = labScripts.reduce((acc, script) => {
     acc[script.status] = (acc[script.status] || 0) + 1;
     return acc;
-  }, {} as Record<string, number>);
+  }, {});
 
   const pieChartData = Object.entries(statusCountsForPieChart).map(([status, count]) => ({
     name: status.charAt(0).toUpperCase() + status.slice(1),
-    value: count as number,
+    value: count,
   }));
 
   // Calculate daily submissions for the line chart

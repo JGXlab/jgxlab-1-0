@@ -8,7 +8,6 @@ interface PriceBreakdownProps {
   expressDesign: string;
   applianceType: string;
   formattedApplianceType: string;
-  isFreeTrialEligible?: boolean;
 }
 
 export const PriceBreakdown = ({
@@ -17,7 +16,6 @@ export const PriceBreakdown = ({
   expressDesign,
   applianceType,
   formattedApplianceType,
-  isFreeTrialEligible = false,
 }: PriceBreakdownProps) => {
   const isDual = archType === 'dual';
   const hasNightguard = needsNightguard === 'yes' && applianceType !== 'surgical-day';
@@ -43,7 +41,7 @@ export const PriceBreakdown = ({
   });
 
   const isLoading = isLoadingBase || (hasNightguard && isLoadingNightguard) || (hasExpressDesign && isLoadingExpress);
-  const baseTotal = isFreeTrialEligible ? 0 : basePrice * quantity;
+  const baseTotal = basePrice * quantity;
   const total = baseTotal + (hasNightguard ? nightguardPrice : 0) + (hasExpressDesign ? expressPrice : 0);
 
   if (isLoading) {
@@ -62,7 +60,6 @@ export const PriceBreakdown = ({
         <div className="flex justify-between items-center">
           <div className="flex-1">
             <span>{formattedApplianceType}</span>
-            {isFreeTrialEligible && <span className="text-green-600 ml-2">(Free first try-in)</span>}
             <span className="text-gray-500 ml-2">x{quantity}</span>
           </div>
           <span>${baseTotal.toFixed(2)}</span>
