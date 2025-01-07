@@ -6,6 +6,7 @@ import { UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 import { formSchema } from "./formSchema";
 import { SelectionButton } from "./SelectionButton";
+import { addDays, format } from "date-fns";
 
 interface AdditionalInformationSectionProps {
   form: UseFormReturn<z.infer<typeof formSchema>>;
@@ -14,6 +15,20 @@ interface AdditionalInformationSectionProps {
 export const AdditionalInformationSection = ({ form }: AdditionalInformationSectionProps) => {
   const applianceType = form.watch('applianceType');
   const showExpressDesign = applianceType !== 'surgical-day';
+
+  // Define appliance types that require 4 working days
+  const appliancesWithLeadTime = [
+    'printed-try-in',
+    'nightguard',
+    'direct-load-pmma',
+    'direct-load-zirconia',
+    'ti-bar'
+  ];
+
+  // Calculate minimum due date based on appliance type
+  const minDueDate = appliancesWithLeadTime.includes(applianceType) 
+    ? format(addDays(new Date(), 4), 'yyyy-MM-dd')
+    : format(new Date(), 'yyyy-MM-dd');
 
   return (
     <FormSection title="Additional Information" className="pt-6 border-t">
@@ -47,7 +62,17 @@ export const AdditionalInformationSection = ({ form }: AdditionalInformationSect
         render={({ field }) => (
           <FormItem>
             <FormLabel>Due Date</FormLabel>
-            <Input type="date" className="max-w-xs bg-white" {...field} />
+            <Input 
+              type="date" 
+              className="max-w-xs bg-white" 
+              {...field} 
+              min={minDueDate}
+            />
+            {appliancesWithLeadTime.includes(applianceType) && (
+              <p className="text-sm text-muted-foreground mt-1">
+                This appliance type requires a minimum of 4 working days for design completion.
+              </p>
+            )}
           </FormItem>
         )}
       />
