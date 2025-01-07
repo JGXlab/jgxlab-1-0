@@ -1,5 +1,6 @@
 import { ClinicLayout } from "@/components/clinic/ClinicLayout";
 import { ClinicProfileForm } from "@/components/clinic/ClinicProfileForm";
+import { PasswordChangeForm } from "@/components/clinic/PasswordChangeForm";
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ClinicNavHeader } from "@/components/clinic/ClinicNavHeader";
@@ -24,6 +25,11 @@ export default function MyAccount() {
               <Card className="bg-gradient-to-br from-white to-accent/30 border-none shadow-lg p-6">
                 <ClinicProfileForm />
               </Card>
+
+              <div className="mt-8">
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">Security Settings</h2>
+                <PasswordChangeForm />
+              </div>
             </div>
           </div>
         </ScrollArea>
