@@ -4,6 +4,7 @@ import { AdminLayout } from "@/components/admin/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { format, subDays } from "date-fns";
+import { DashboardStatusCards } from "@/components/design/dashboard/DashboardStatusCards";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { DashboardCharts } from "@/components/admin/dashboard/DashboardCharts";
 
@@ -65,16 +66,15 @@ export default function AdminDashboard() {
     all: labScripts.length
   };
 
-  // Calculate status counts for the pie chart with explicit number type
-  const statusCountsForPieChart: Record<string, number> = labScripts.reduce((acc, script) => {
-    const status = script.status;
-    acc[status] = (acc[status] || 0) + 1;
+  // Calculate status counts for the pie chart
+  const statusCountsForPieChart = labScripts.reduce((acc, script) => {
+    acc[script.status] = (acc[script.status] || 0) + 1;
     return acc;
-  }, {} as Record<string, number>);
+  }, {});
 
   const pieChartData = Object.entries(statusCountsForPieChart).map(([status, count]) => ({
     name: status.charAt(0).toUpperCase() + status.slice(1),
-    value: count // Now this is explicitly a number
+    value: count,
   }));
 
   // Calculate daily submissions for the line chart
@@ -94,6 +94,9 @@ export default function AdminDashboard() {
     <AdminLayout>
       <div className="space-y-6">
         <TooltipProvider>
+          {/* Status Cards */}
+          <DashboardStatusCards stats={statusCounts} />
+
           {/* Charts */}
           <DashboardCharts 
             dailySubmissions={dailySubmissions}
