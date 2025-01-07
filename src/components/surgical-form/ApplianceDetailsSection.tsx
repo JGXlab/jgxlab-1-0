@@ -31,7 +31,7 @@ export const ApplianceDetailsSection = ({ form }: ApplianceDetailsSectionProps) 
 
   const hideScrewSection = shouldHideScrewSection(treatmentType);
 
-  // Reset fields when switching to nightguard
+  // Reset fields when switching appliance type
   React.useEffect(() => {
     if (isNightguard) {
       form.setValue('treatmentType', '');
@@ -40,7 +40,10 @@ export const ApplianceDetailsSection = ({ form }: ApplianceDetailsSectionProps) 
       form.setValue('needsNightguard', '');
       form.setValue('shade', '');
     }
-  }, [isNightguard, form]);
+    // Reset coupon when appliance type changes
+    form.setValue('is_free_printed_tryin', false);
+    form.setValue('couponCode', '');
+  }, [applianceType, form]);
 
   // Reset screw type when treatment type changes to denture or one piece implant
   React.useEffect(() => {

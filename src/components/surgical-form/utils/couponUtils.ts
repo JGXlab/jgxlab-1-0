@@ -4,6 +4,7 @@ export interface CouponValidationResult {
   isValid: boolean;
   message: string;
   surgicalDayScript?: any;
+  archType?: string;
 }
 
 export const validateCoupon = async (couponCode: string, patientId: string): Promise<CouponValidationResult> => {
@@ -59,6 +60,7 @@ export const validateCoupon = async (couponCode: string, patientId: string): Pro
   return {
     isValid: true,
     message: "Valid coupon code - Free printed try-in will be applied",
-    surgicalDayScript
+    surgicalDayScript,
+    archType: surgicalDayScript.arch
   };
 };

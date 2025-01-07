@@ -32,6 +32,7 @@ export const PaymentSection = ({
   const [totalAmount, setTotalAmount] = useState(0);
   const [lineItems, setLineItems] = useState<Array<{ price: string; quantity: number }>>([]);
   const [isCalculating, setIsCalculating] = useState(false);
+  const [surgicalDayArch, setSurgicalDayArch] = useState<string | undefined>();
 
   const isFreeScript = form.watch('is_free_printed_tryin');
   const patientId = form.watch('patientId');
@@ -58,17 +59,18 @@ export const PaymentSection = ({
 
   useEffect(() => {
     const updatePrices = async () => {
-      if (isFreeScript) {
-        setTotalAmount(0);
-        setLineItems([]);
-        return;
-      }
-
       setIsCalculating(true);
       try {
         const result = await calculateTotalPrice(
           basePrice,
-          { archType, needsNightguard, expressDesign, applianceType }
+          { 
+            archType, 
+            needsNightguard, 
+            expressDesign, 
+            applianceType,
+            isFreeScript,
+            surgicalDayArch
+          }
         );
         setTotalAmount(result.total);
         setLineItems(result.lineItems);
@@ -78,7 +80,7 @@ export const PaymentSection = ({
     };
 
     updatePrices();
-  }, [basePrice, archType, needsNightguard, expressDesign, applianceType, isFreeScript]);
+  }, [basePrice, archType, needsNightguard, expressDesign, applianceType, isFreeScript, surgicalDayArch]);
 
   const createCheckoutSession = useMutation({
     mutationFn: async (formData: z.infer<typeof formSchema>) => {
@@ -160,8 +162,11 @@ export const PaymentSection = ({
           isLoading={isLoading}
           form={form}
           patientId={patientId}
-          onValidCoupon={() => {
+          onValidCoupon={(validationResult) => {
             console.log('Valid coupon applied');
+            if (validationResult?.archType) {
+              setSurgicalDayArch(validationResult.archType);
+            }
           }}
         />
         <SubmitButton

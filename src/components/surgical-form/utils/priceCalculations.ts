@@ -27,11 +27,13 @@ export const calculateTotalPrice = async (basePrice: number, options: {
   needsNightguard: string;
   expressDesign: string;
   applianceType: string;
+  isFreeScript?: boolean;
+  surgicalDayArch?: string;
 }): Promise<{ total: number; lineItems: Array<{ price: string; quantity: number }> }> => {
-  const { archType, needsNightguard, expressDesign, applianceType } = options;
+  const { archType, needsNightguard, expressDesign, applianceType, isFreeScript, surgicalDayArch } = options;
   const lineItems: Array<{ price: string; quantity: number }> = [];
 
-  console.log('Calculating price for:', { applianceType, archType, needsNightguard, expressDesign });
+  console.log('Calculating price for:', { applianceType, archType, needsNightguard, expressDesign, isFreeScript, surgicalDayArch });
 
   if (!applianceType) {
     console.log('No appliance type provided');
@@ -53,12 +55,34 @@ export const calculateTotalPrice = async (basePrice: number, options: {
   let totalPrice = 0;
   
   if (baseProduct?.stripe_price_id) {
-    const price = await fetchStripePrice(baseProduct.stripe_price_id);
-    totalPrice = price * (archType === 'dual' ? 2 : 1);
-    lineItems.push({
-      price: baseProduct.stripe_price_id,
-      quantity: archType === 'dual' ? 2 : 1
-    });
+    // If it's a free printed try-in with valid coupon
+    if (isFreeScript && applianceType === 'printed-try-in') {
+      // For dual arch surgical day, both arches are free
+      if (surgicalDayArch === 'dual' && archType === 'dual') {
+        totalPrice = 0;
+      }
+      // For single arch surgical day, only matching arch is free
+      else if ((surgicalDayArch === 'upper' && archType === 'upper') || 
+               (surgicalDayArch === 'lower' && archType === 'lower')) {
+        totalPrice = 0;
+      }
+      // Otherwise charge normal price
+      else {
+        const price = await fetchStripePrice(baseProduct.stripe_price_id);
+        totalPrice = price * (archType === 'dual' ? 2 : 1);
+        lineItems.push({
+          price: baseProduct.stripe_price_id,
+          quantity: archType === 'dual' ? 2 : 1
+        });
+      }
+    } else {
+      const price = await fetchStripePrice(baseProduct.stripe_price_id);
+      totalPrice = price * (archType === 'dual' ? 2 : 1);
+      lineItems.push({
+        price: baseProduct.stripe_price_id,
+        quantity: archType === 'dual' ? 2 : 1
+      });
+    }
   }
 
   // Add nightguard if selected (not for surgical-day)
@@ -73,7 +97,7 @@ export const calculateTotalPrice = async (basePrice: number, options: {
       console.error('Error fetching nightguard price:', nightguardError);
     } else if (nightguardPrice?.stripe_price_id) {
       const price = await fetchStripePrice(nightguardPrice.stripe_price_id);
-      totalPrice += price; // Add nightguard price only once
+      totalPrice += price;
       lineItems.push({
         price: nightguardPrice.stripe_price_id,
         quantity: 1
@@ -93,7 +117,7 @@ export const calculateTotalPrice = async (basePrice: number, options: {
       console.error('Error fetching express design price:', expressError);
     } else if (expressPrice?.stripe_price_id) {
       const price = await fetchStripePrice(expressPrice.stripe_price_id);
-      totalPrice += price; // Add express design price only once
+      totalPrice += price;
       lineItems.push({
         price: expressPrice.stripe_price_id,
         quantity: 1
