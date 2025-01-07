@@ -42,6 +42,17 @@ const App = () => {
 
   console.log('Portal type:', { isAdminPortal, isDesignPortal });
 
+  // Update page title based on portal type
+  React.useEffect(() => {
+    if (isAdminPortal) {
+      document.title = 'Admin_JGX Digital Lab';
+    } else if (isDesignPortal) {
+      document.title = 'Design_JGX Digital Lab';
+    } else {
+      document.title = 'JGX Digital Lab';
+    }
+  }, [isAdminPortal, isDesignPortal]);
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
