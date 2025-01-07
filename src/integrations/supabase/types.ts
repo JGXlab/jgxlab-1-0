@@ -178,6 +178,7 @@ export type Database = {
           arch: string
           clinic_id: string | null
           completion_comment: string | null
+          coupon_code: string | null
           created_at: string
           design_download_url: string | null
           design_url: string | null
@@ -207,6 +208,7 @@ export type Database = {
           arch: string
           clinic_id?: string | null
           completion_comment?: string | null
+          coupon_code?: string | null
           created_at?: string
           design_download_url?: string | null
           design_url?: string | null
@@ -236,6 +238,7 @@ export type Database = {
           arch?: string
           clinic_id?: string | null
           completion_comment?: string | null
+          coupon_code?: string | null
           created_at?: string
           design_download_url?: string | null
           design_url?: string | null
