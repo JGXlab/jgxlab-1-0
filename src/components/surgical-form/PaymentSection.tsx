@@ -46,6 +46,20 @@ export const PaymentSection = ({
     setSurgicalDayArch(undefined);
   }, [patientId, form]);
 
+  // Add auth state change listener
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_OUT') {
+        console.log('User signed out, redirecting to login');
+        window.location.href = '/';
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+
   const { data: basePrice = 0, isLoading: isPriceLoading } = useQuery({
     queryKey: ['service-price', applianceType],
     queryFn: async () => {

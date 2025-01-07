@@ -16,32 +16,39 @@ export const useSubmitFreeLabScript = () => {
 
       console.log('Submitting free lab script:', formData);
 
+      // Map form data to match database schema
+      const labScriptData = {
+        patient_id: formData.patientId,
+        appliance_type: formData.applianceType,
+        arch: formData.arch,
+        treatment_type: formData.treatmentType,
+        screw_type: formData.screwType,
+        other_screw_type: formData.otherScrewType,
+        vdo_details: formData.vdoDetails,
+        needs_nightguard: formData.needsNightguard,
+        shade: formData.shade,
+        due_date: formData.dueDate,
+        specific_instructions: formData.specificInstructions,
+        express_design: formData.expressDesign,
+        coupon_code: formData.couponCode,
+        is_free_printed_tryin: formData.is_free_printed_tryin,
+        user_id: user.id,
+        payment_status: 'paid',
+        amount_paid: 0,
+        payment_date: new Date().toISOString()
+      };
+
       const { data, error } = await supabase
         .from('lab_scripts')
-        .insert([{
-          patient_id: formData.patientId,
-          appliance_type: formData.applianceType,
-          arch: formData.arch,
-          treatment_type: formData.treatmentType,
-          screw_type: formData.screwType,
-          other_screw_type: formData.otherScrewType,
-          vdo_details: formData.vdoDetails,
-          needs_nightguard: formData.needsNightguard,
-          shade: formData.shade,
-          due_date: formData.dueDate,
-          specific_instructions: formData.specificInstructions,
-          express_design: formData.expressDesign,
-          coupon_code: formData.couponCode,
-          is_free_printed_tryin: formData.is_free_printed_tryin,
-          user_id: user.id,
-          payment_status: 'paid',
-          amount_paid: 0,
-          payment_date: new Date().toISOString()
-        }])
+        .insert([labScriptData])
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Database error:', error);
+        throw error;
+      }
+
       return data;
     },
     onSuccess: () => {
