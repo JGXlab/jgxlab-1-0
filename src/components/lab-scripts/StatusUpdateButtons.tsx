@@ -1,34 +1,64 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Play, CheckCircle } from "lucide-react";
+import { Play, CheckCircle, Download } from "lucide-react";
 import { TooltipProvider, TooltipTrigger, TooltipContent, Tooltip } from "@/components/ui/tooltip";
 import { useState } from "react";
 import { HoldDialog } from "./HoldDialog";
 import { StatusButtons } from "./StatusButtons";
+import { CompletionDialog } from "./CompletionDialog";
 
 interface StatusUpdateButtonsProps {
   script: {
     id: string;
     status: string;
+    design_download_url?: string;
   };
   onStatusUpdate: (id: string, status: string, reason?: string, comment?: string, designUrl?: string) => void;
 }
 
 export const StatusUpdateButtons = ({ script, onStatusUpdate }: StatusUpdateButtonsProps) => {
   const [showHoldDialog, setShowHoldDialog] = useState(false);
+  const [showCompletionDialog, setShowCompletionDialog] = useState(false);
   const status = script.status.toLowerCase();
 
   const handleHoldSubmit = (reason: string, comment: string, designUrl?: string) => {
-    console.log('Submitting hold with design URL:', designUrl); // Debug log
+    console.log('Submitting hold with design URL:', designUrl);
     onStatusUpdate(script.id, 'on_hold', reason, comment, designUrl);
     setShowHoldDialog(false);
   };
 
+  const handleCompletionSubmit = (comment: string, downloadUrl: string) => {
+    console.log('Completing design with download URL:', downloadUrl);
+    onStatusUpdate(script.id, 'completed', undefined, comment, downloadUrl);
+    setShowCompletionDialog(false);
+  };
+
   if (status === 'completed') {
     return (
-      <Badge className="bg-green-100 text-green-800 w-8 h-8 flex items-center justify-center p-0">
-        <CheckCircle className="w-4 h-4" />
-      </Badge>
+      <div className="flex items-center gap-2">
+        <Badge className="bg-green-100 text-green-800 w-8 h-8 flex items-center justify-center p-0">
+          <CheckCircle className="w-4 h-4" />
+        </Badge>
+        {script.design_download_url && (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <a
+                  href={script.design_download_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center w-8 h-8 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground"
+                >
+                  <Download className="h-4 w-4" />
+                </a>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Download Design</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        )}
+      </div>
     );
   }
 
@@ -81,13 +111,19 @@ export const StatusUpdateButtons = ({ script, onStatusUpdate }: StatusUpdateButt
       <StatusButtons
         onPause={() => onStatusUpdate(script.id, 'paused')}
         onHold={() => setShowHoldDialog(true)}
-        onComplete={() => onStatusUpdate(script.id, 'completed')}
+        onComplete={() => setShowCompletionDialog(true)}
       />
 
       <HoldDialog
         isOpen={showHoldDialog}
         onClose={() => setShowHoldDialog(false)}
         onSubmit={handleHoldSubmit}
+      />
+
+      <CompletionDialog
+        isOpen={showCompletionDialog}
+        onClose={() => setShowCompletionDialog(false)}
+        onSubmit={handleCompletionSubmit}
       />
     </>
   );

@@ -47,26 +47,6 @@ const DesignLabScripts = () => {
         throw error;
       }
 
-      // Update clinic_id for any lab scripts that don't have it set
-      const scriptsToUpdate = data?.filter(
-        script => !script.clinic_id && script.patients?.clinic_id
-      );
-
-      if (scriptsToUpdate && scriptsToUpdate.length > 0) {
-        console.log('Updating missing clinic IDs for lab scripts...');
-        
-        for (const script of scriptsToUpdate) {
-          const { error: updateError } = await supabase
-            .from('lab_scripts')
-            .update({ clinic_id: script.patients.clinic_id })
-            .eq('id', script.id);
-
-          if (updateError) {
-            console.error('Error updating clinic ID:', updateError);
-          }
-        }
-      }
-
       console.log('Fetched lab scripts:', data);
       return data;
     }
@@ -80,8 +60,13 @@ const DesignLabScripts = () => {
 
   const handleStatusUpdate = async (id: string, newStatus: string, reason?: string, comment?: string, designUrl?: string) => {
     try {
-      console.log('Updating status with:', { id, newStatus, reason, comment, designUrl }); // Debug log
-      const updateData: any = { status: newStatus };
+      console.log('Updating status with:', { id, newStatus, reason, comment, designUrl });
+      const updateData: any = { 
+        status: newStatus,
+        hold_reason: null,
+        hold_comment: null,
+        design_url: null
+      };
       
       if (newStatus === 'on_hold') {
         updateData.hold_reason = reason;
@@ -89,11 +74,9 @@ const DesignLabScripts = () => {
         if (reason === 'approval' && designUrl) {
           updateData.design_url = designUrl;
         }
-      } else {
-        // Clear hold data when changing to other statuses
-        updateData.hold_reason = null;
-        updateData.hold_comment = null;
-        updateData.design_url = null;
+      } else if (newStatus === 'completed' && designUrl) {
+        updateData.design_download_url = designUrl;
+        updateData.completion_comment = comment;
       }
 
       const { error } = await supabase
