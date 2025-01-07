@@ -18,6 +18,11 @@ export default function ClinicDashboard() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         console.error('No user found');
+        toast({
+          title: "Authentication Error",
+          description: "Please sign in to view dashboard data",
+          variant: "destructive",
+        });
         throw new Error("No user found");
       }
 
@@ -35,6 +40,11 @@ export default function ClinicDashboard() {
 
       if (error) {
         console.error('Error fetching lab scripts:', error);
+        toast({
+          title: "Error",
+          description: "Failed to fetch lab scripts",
+          variant: "destructive",
+        });
         throw error;
       }
 
@@ -42,14 +52,6 @@ export default function ClinicDashboard() {
       return data || [];
     },
     retry: 1,
-    onError: (error) => {
-      console.error('Error in lab scripts query:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load dashboard data. Please try again.",
-        variant: "destructive",
-      });
-    }
   });
 
   if (isError) {
