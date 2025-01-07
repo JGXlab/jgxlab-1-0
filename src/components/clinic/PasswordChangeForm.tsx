@@ -1,15 +1,32 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
 
 export function PasswordChangeForm() {
-  const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isPending, setIsPending] = useState(false);
+  const navigate = useNavigate();
+
+  // Check for valid session on mount
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session }, error } = await supabase.auth.getSession();
+      console.log("Checking session status:", session ? "Active" : "No session");
+      
+      if (error || !session) {
+        console.error("Session error:", error);
+        toast.error("Please log in again to change your password");
+        navigate("/admin/login");
+      }
+    };
+
+    checkSession();
+  }, [navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,16 +44,27 @@ export function PasswordChangeForm() {
     setIsPending(true);
 
     try {
+      console.log("Attempting to update password...");
       const { error } = await supabase.auth.updateUser({
         password: newPassword
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Password update error:", error);
+        if (error.message.includes("refresh_token_not_found")) {
+          toast.error("Session expired. Please log in again.");
+          navigate("/admin/login");
+        } else {
+          toast.error(error.message);
+        }
+        return;
+      }
 
+      console.log("Password updated successfully");
       toast.success("Password updated successfully");
-      setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
+      
     } catch (error) {
       console.error("Error updating password:", error);
       toast.error("Failed to update password. Please try again.");
