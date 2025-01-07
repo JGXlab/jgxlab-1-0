@@ -113,7 +113,11 @@ export const PaymentSection = ({
       return;
     }
 
-    createCheckoutSession.mutate(values);
+    createCheckoutSession.mutate({
+      formData: values,
+      lineItems,
+      applianceType
+    });
   };
 
   const isLoading = isPriceLoading || isCalculating;

@@ -58,17 +58,21 @@ export const useLabScriptMutations = () => {
   });
 
   const createCheckoutSession = useMutation({
-    mutationFn: async (formData: z.infer<typeof formSchema>) => {
+    mutationFn: async (params: { 
+      formData: z.infer<typeof formSchema>;
+      lineItems: Array<{ price: string; quantity: number }>;
+      applianceType: string;
+    }) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('No user found');
 
-      console.log('Creating checkout session with:', { formData, lineItems });
+      console.log('Creating checkout session with:', params);
 
       const { data, error } = await supabase.functions.invoke('create-checkout-session', {
         body: {
-          formData: { ...formData, userId: user.id },
-          lineItems,
-          applianceType,
+          formData: { ...params.formData, userId: user.id },
+          lineItems: params.lineItems,
+          applianceType: params.applianceType,
         },
       });
 
