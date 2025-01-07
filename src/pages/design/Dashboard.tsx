@@ -14,7 +14,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { StatsCards } from "@/components/design/dashboard/StatsCards";
+import { DashboardStatusCards } from "@/components/design/dashboard/DashboardStatusCards";
 import { motion } from "framer-motion";
 import { DashboardCharts } from "@/components/design/dashboard/DashboardCharts";
 
@@ -73,12 +73,13 @@ export default function DesignDashboard() {
   const stats = {
     pending: labScripts.filter(script => script.status === 'pending').length,
     inProgress: labScripts.filter(script => script.status === 'in_progress').length,
+    paused: labScripts.filter(script => script.status === 'paused').length,
+    onHold: labScripts.filter(script => script.status === 'on_hold').length,
+    incomplete: labScripts.filter(script => 
+      ['pending', 'in_progress', 'paused', 'on_hold'].includes(script.status)
+    ).length,
     completed: labScripts.filter(script => script.status === 'completed').length,
-    urgent: labScripts.filter(script => {
-      const dueDate = new Date(script.due_date);
-      const today = new Date();
-      return dueDate <= today && script.status !== 'completed';
-    }).length,
+    all: labScripts.length,
   };
 
   return (
@@ -156,7 +157,7 @@ export default function DesignDashboard() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
           >
-            <StatsCards stats={stats} />
+            <DashboardStatusCards stats={stats} />
             <DashboardCharts labScripts={labScripts} />
           </motion.div>
         </ScrollArea>
