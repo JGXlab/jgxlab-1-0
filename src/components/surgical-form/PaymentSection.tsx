@@ -131,7 +131,6 @@ export const PaymentSection = ({
 
   const createCheckoutSession = useMutation({
     mutationFn: async (formData: z.infer<typeof formSchema>) => {
-      // Get the current user's ID
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('No user found');
 
@@ -140,14 +139,25 @@ export const PaymentSection = ({
         console.log('Creating free printed try-in lab script');
         const { data: labScript, error } = await supabase
           .from('lab_scripts')
-          .insert([{
-            ...formData,
+          .insert({
+            patient_id: formData.patientId,
+            appliance_type: formData.applianceType,
+            arch: formData.arch,
+            treatment_type: formData.treatmentType,
+            screw_type: formData.screwType,
+            other_screw_type: formData.otherScrewType,
+            vdo_details: formData.vdoDetails,
+            needs_nightguard: formData.needsNightguard,
+            shade: formData.shade,
+            due_date: formData.dueDate,
+            specific_instructions: formData.specificInstructions,
+            express_design: formData.expressDesign,
             user_id: user.id,
             payment_status: 'paid',
             amount_paid: 0,
             is_free_printed_tryin: true,
             payment_date: new Date().toISOString()
-          }])
+          })
           .select()
           .single();
 
