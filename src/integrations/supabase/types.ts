@@ -180,6 +180,8 @@ export type Database = {
           created_at: string
           due_date: string
           express_design: string | null
+          hold_comment: string | null
+          hold_reason: string | null
           id: string
           needs_nightguard: string | null
           other_screw_type: string | null
@@ -203,6 +205,8 @@ export type Database = {
           created_at?: string
           due_date: string
           express_design?: string | null
+          hold_comment?: string | null
+          hold_reason?: string | null
           id?: string
           needs_nightguard?: string | null
           other_screw_type?: string | null
@@ -226,6 +230,8 @@ export type Database = {
           created_at?: string
           due_date?: string
           express_design?: string | null
+          hold_comment?: string | null
+          hold_reason?: string | null
           id?: string
           needs_nightguard?: string | null
           other_screw_type?: string | null

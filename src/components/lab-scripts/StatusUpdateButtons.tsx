@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Play, Pause, StopCircle, CheckCircle, MessageSquare, Info } from "lucide-react";
+import { Play, Pause, StopCircle, CheckCircle } from "lucide-react";
 import { Tooltip } from "@/components/ui/tooltip";
 import {
   TooltipContent,

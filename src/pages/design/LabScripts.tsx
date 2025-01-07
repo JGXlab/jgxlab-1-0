@@ -78,11 +78,22 @@ const DesignLabScripts = () => {
     setIsPreviewOpen(true);
   };
 
-  const handleStatusUpdate = async (id: string, newStatus: string) => {
+  const handleStatusUpdate = async (id: string, newStatus: string, reason?: string, comment?: string) => {
     try {
+      const updateData: any = { status: newStatus };
+      
+      if (newStatus === 'on_hold') {
+        updateData.hold_reason = reason;
+        updateData.hold_comment = comment;
+      } else {
+        // Clear hold data when changing to other statuses
+        updateData.hold_reason = null;
+        updateData.hold_comment = null;
+      }
+
       const { error } = await supabase
         .from('lab_scripts')
-        .update({ status: newStatus })
+        .update(updateData)
         .eq('id', id);
 
       if (error) throw error;
