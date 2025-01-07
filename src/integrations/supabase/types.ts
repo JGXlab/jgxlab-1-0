@@ -186,6 +186,7 @@ export type Database = {
           hold_comment: string | null
           hold_reason: string | null
           id: string
+          is_free_printed_tryin: boolean | null
           needs_nightguard: string | null
           other_screw_type: string | null
           patient_id: string
@@ -214,6 +215,7 @@ export type Database = {
           hold_comment?: string | null
           hold_reason?: string | null
           id?: string
+          is_free_printed_tryin?: boolean | null
           needs_nightguard?: string | null
           other_screw_type?: string | null
           patient_id: string
@@ -242,6 +244,7 @@ export type Database = {
           hold_comment?: string | null
           hold_reason?: string | null
           id?: string
+          is_free_printed_tryin?: boolean | null
           needs_nightguard?: string | null
           other_screw_type?: string | null
           patient_id?: string
