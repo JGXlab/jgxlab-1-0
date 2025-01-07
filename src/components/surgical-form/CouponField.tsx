@@ -32,14 +32,17 @@ export const CouponField = ({ form, patientId, onValidCoupon }: CouponFieldProps
       if (result.isValid) {
         toast.success(result.message);
         form.setValue('is_free_printed_tryin', true);
+        form.setValue('couponCode', couponCode);
         onValidCoupon();
       } else {
         toast.error(result.message);
         form.setValue('is_free_printed_tryin', false);
+        form.setValue('couponCode', '');
       }
     } catch (error) {
       console.error('Error validating coupon:', error);
       toast.error("Error validating coupon");
+      form.setValue('is_free_printed_tryin', false);
     } finally {
       setIsValidating(false);
     }
@@ -67,7 +70,7 @@ export const CouponField = ({ form, patientId, onValidCoupon }: CouponFieldProps
                 onClick={handleValidateCoupon}
                 disabled={isValidating}
               >
-                Validate
+                {isValidating ? 'Validating...' : 'Validate'}
               </Button>
             </div>
             <FormMessage />

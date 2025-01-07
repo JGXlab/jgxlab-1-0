@@ -40,7 +40,7 @@ export const validateCoupon = async (couponCode: string, patientId: string): Pro
   }
 
   if (!surgicalDayScript) {
-    return { isValid: false, message: "Invalid coupon code" };
+    return { isValid: false, message: "Invalid coupon code or no matching surgical day script found" };
   }
 
   // Check if coupon has been used
@@ -55,9 +55,10 @@ export const validateCoupon = async (couponCode: string, patientId: string): Pro
     return { isValid: false, message: "Coupon has already been used" };
   }
 
+  console.log('Coupon validation successful:', surgicalDayScript);
   return {
     isValid: true,
-    message: "Valid coupon code",
+    message: "Valid coupon code - Free printed try-in will be applied",
     surgicalDayScript
   };
 };
