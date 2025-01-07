@@ -6,6 +6,7 @@ import { DashboardMetrics } from "@/components/design/dashboard/DashboardMetrics
 import { RecentActivity } from "@/components/design/dashboard/RecentActivity";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 export default function ClinicDashboard() {
   const { data: labScripts = [] } = useQuery({
@@ -42,16 +43,18 @@ export default function ClinicDashboard() {
       <div className="flex flex-col max-w-[1400px] w-full mx-auto h-screen py-8">
         <ScrollArea className="h-full rounded-2xl bg-[#F6F6F7]">
           <ClinicNavHeader />
-          <div className="p-4 sm:p-6 lg:p-8 space-y-6">
-            {/* Status Cards */}
-            <DashboardMetrics />
+          <TooltipProvider>
+            <div className="p-4 sm:p-6 lg:p-8 space-y-6">
+              {/* Status Cards */}
+              <DashboardMetrics />
 
-            {/* Charts */}
-            <DashboardCharts labScripts={labScripts} />
+              {/* Charts */}
+              <DashboardCharts labScripts={labScripts} />
 
-            {/* Recent Activity */}
-            <RecentActivity labScripts={labScripts} />
-          </div>
+              {/* Recent Activity */}
+              <RecentActivity labScripts={labScripts} />
+            </div>
+          </TooltipProvider>
         </ScrollArea>
       </div>
     </ClinicLayout>
