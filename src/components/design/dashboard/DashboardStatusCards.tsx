@@ -30,9 +30,42 @@ export const DashboardStatusCards = ({ stats }: DashboardStatusCardsProps) => {
   const { data: filteredLabScripts = [] } = useQuery({
     queryKey: ['labScripts', selectedStatus],
     queryFn: async () => {
-      if (!selectedStatus) return [];
+      if (!selectedStatus) {
+        // For "All Scripts", fetch everything
+        const { data, error } = await supabase
+          .from('lab_scripts')
+          .select(`
+            *,
+            patients (
+              first_name,
+              last_name
+            )
+          `)
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        return data || [];
+      }
       
-      console.log('Fetching lab scripts for status:', selectedStatus);
+      if (selectedStatus === 'incomplete') {
+        // For "Incomplete", fetch all non-completed statuses
+        const { data, error } = await supabase
+          .from('lab_scripts')
+          .select(`
+            *,
+            patients (
+              first_name,
+              last_name
+            )
+          `)
+          .not('status', 'eq', 'completed')
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        return data || [];
+      }
+      
+      // For all other statuses, fetch by specific status
       const { data, error } = await supabase
         .from('lab_scripts')
         .select(`
@@ -45,15 +78,10 @@ export const DashboardStatusCards = ({ stats }: DashboardStatusCardsProps) => {
         .eq('status', selectedStatus)
         .order('created_at', { ascending: false });
 
-      if (error) {
-        console.error('Error fetching lab scripts:', error);
-        throw error;
-      }
-
-      console.log('Fetched filtered lab scripts:', data);
+      if (error) throw error;
       return data || [];
     },
-    enabled: !!selectedStatus,
+    enabled: isDialogOpen, // Only fetch when dialog is open
   });
 
   const cards = [
