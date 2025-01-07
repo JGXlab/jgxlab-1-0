@@ -3,7 +3,6 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { ClinicNavHeader } from "@/components/clinic/ClinicNavHeader";
 import { DashboardCharts } from "@/components/design/dashboard/DashboardCharts";
 import { DashboardMetrics } from "@/components/design/dashboard/DashboardMetrics";
-import { RecentActivity } from "@/components/design/dashboard/RecentActivity";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -50,9 +49,6 @@ export default function ClinicDashboard() {
 
               {/* Charts */}
               <DashboardCharts labScripts={labScripts} />
-
-              {/* Recent Activity */}
-              <RecentActivity labScripts={labScripts} />
             </div>
           </TooltipProvider>
         </ScrollArea>
