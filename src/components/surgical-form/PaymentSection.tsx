@@ -32,6 +32,32 @@ export const PaymentSection = ({
   const [totalAmount, setTotalAmount] = useState(0);
   const [lineItems, setLineItems] = useState<Array<{ price: string; quantity: number }>>([]);
 
+  const isFreeScript = form.watch('is_free_printed_tryin');
+
+  useEffect(() => {
+    const updatePrices = async () => {
+      if (isFreeScript) {
+        setTotalAmount(0);
+        setLineItems([]);
+        return;
+      }
+
+      setIsCalculating(true);
+      try {
+        const result = await calculateTotalPrice(
+          basePrice,
+          { archType, needsNightguard, expressDesign, applianceType }
+        );
+        setTotalAmount(result.total);
+        setLineItems(result.lineItems);
+      } finally {
+        setIsCalculating(false);
+      }
+    };
+
+    updatePrices();
+  }, [basePrice, archType, needsNightguard, expressDesign, applianceType, isFreeScript]);
+
   const { data: basePrice = 0, isLoading: isPriceLoading } = useQuery({
     queryKey: ['service-price', applianceType],
     queryFn: async () => {
@@ -50,35 +76,6 @@ export const PaymentSection = ({
       return data?.price ?? 0;
     },
     enabled: !!applianceType,
-  });
-
-  const [isCalculating, setIsCalculating] = useState(false);
-
-  useEffect(() => {
-    const updatePrices = async () => {
-      setIsCalculating(true);
-      try {
-        const result = await calculateTotalPrice(
-          basePrice,
-          { archType, needsNightguard, expressDesign, applianceType }
-        );
-        setTotalAmount(result.total);
-        setLineItems(result.lineItems);
-      } finally {
-        setIsCalculating(false);
-      }
-    };
-
-    updatePrices();
-  }, [basePrice, archType, needsNightguard, expressDesign, applianceType]);
-
-  console.log('Payment details:', {
-    applianceType,
-    basePrice,
-    archType,
-    needsNightguard,
-    expressDesign,
-    lineItems
   });
 
   const createCheckoutSession = useMutation({

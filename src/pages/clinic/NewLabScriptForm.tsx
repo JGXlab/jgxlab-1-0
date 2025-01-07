@@ -15,7 +15,8 @@ import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useMutation } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { CouponField } from "@/components/surgical-form/CouponField";
 
 export default function NewLabScriptForm() {
   const navigate = useNavigate();
@@ -96,7 +97,10 @@ export default function NewLabScriptForm() {
     arch: form.watch('arch'),
     needsNightguard: form.watch('needsNightguard'),
     expressDesign: form.watch('expressDesign'),
+    patientId: form.watch('patientId'),
   };
+
+  const showCouponField = watchedValues.applianceType === 'printed-try-in';
 
   return (
     <ClinicLayout>
@@ -130,6 +134,17 @@ export default function NewLabScriptForm() {
                   <div className="border-t border-gray-200 pt-8">
                     <ApplianceDetailsSection form={form} />
                   </div>
+                  {showCouponField && watchedValues.patientId && (
+                    <div className="border-t border-gray-200 pt-8">
+                      <CouponField 
+                        form={form} 
+                        patientId={watchedValues.patientId}
+                        onValidCoupon={() => {
+                          console.log('Valid coupon applied');
+                        }}
+                      />
+                    </div>
+                  )}
                   <div className="border-t border-gray-200 pt-8">
                     <AdditionalInformationSection form={form} />
                   </div>
