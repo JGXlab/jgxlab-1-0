@@ -66,7 +66,7 @@ export const Invoice = ({ labScript, onClose }: InvoiceProps) => {
   }
 
   return (
-    <div className="relative">
+    <div className="relative max-h-[calc(100vh-8rem)] overflow-hidden">
       <div className="flex justify-end gap-2 mb-4">
         <Button
           onClick={() => handlePrint(contentRef)}
@@ -88,16 +88,18 @@ export const Invoice = ({ labScript, onClose }: InvoiceProps) => {
           </Button>
         )}
       </div>
-      <Card 
-        ref={contentRef}
-        className="w-[210mm] h-[297mm] mx-auto shadow-none border-none bg-white invoice-content"
-      >
-        <div className="p-6 space-y-6 h-full">
-          <InvoiceHeader labScript={labScript} />
-          <BillingAddresses invoice={invoice} />
-          <InvoiceTable invoice={invoice} />
-        </div>
-      </Card>
+      <div className="overflow-y-auto max-h-[calc(100vh-12rem)] px-4">
+        <Card 
+          ref={contentRef}
+          className="w-full mx-auto shadow-none border-none bg-white invoice-content"
+        >
+          <div className="p-6 space-y-6">
+            <InvoiceHeader labScript={labScript} />
+            <BillingAddresses invoice={invoice} />
+            <InvoiceTable invoice={invoice} />
+          </div>
+        </Card>
+      </div>
     </div>
   );
 };
