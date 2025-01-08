@@ -67,28 +67,17 @@ export const Invoice = ({ labScript, onClose }: InvoiceProps) => {
 
   return (
     <div className="relative max-h-[calc(100vh-8rem)] overflow-hidden">
-      <div className="flex justify-end gap-2 mb-4">
+      <div className="absolute top-4 right-4 z-10">
         <Button
           onClick={() => handlePrint(contentRef)}
           size="icon"
           variant="outline"
-          className="m-4"
           title="Print Invoice"
         >
           <Printer className="h-4 w-4" />
         </Button>
-        {onClose && (
-          <Button
-            onClick={onClose}
-            size="sm"
-            variant="outline"
-            className="m-4"
-          >
-            Close
-          </Button>
-        )}
       </div>
-      <div className="overflow-y-auto max-h-[calc(100vh-12rem)] px-4">
+      <div className="overflow-y-auto max-h-[calc(100vh-12rem)] px-4 pt-16">
         <Card 
           ref={contentRef}
           className="w-full mx-auto shadow-none border-none bg-white invoice-content"
