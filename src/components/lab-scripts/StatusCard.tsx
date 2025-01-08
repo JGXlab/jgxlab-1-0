@@ -19,7 +19,7 @@ export const StatusCard = ({
     className={`
       rounded-full px-3.5 py-1.5 cursor-pointer transition-all duration-300
       hover:shadow-md hover:-translate-y-0.5 flex-shrink-0
-      ${color} ${isSelected ? 'ring-1 ring-[#9b87f5] shadow-sm' : ''}
+      ${color} ${isSelected ? 'ring-2 ring-[#9b87f5] shadow-sm' : ''}
       ${isHighlighted ? 'border border-[#9b87f5]' : ''}
       my-0.5
     `}
