@@ -15,7 +15,7 @@ export function LoginForm() {
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  // Check for existing session on mount
+  // Check for existing session and role on mount
   useEffect(() => {
     const checkSession = async () => {
       try {
@@ -29,8 +29,8 @@ export function LoginForm() {
             .single();
 
           if (profile?.role === 'clinic') {
-            console.log("Valid clinic user, redirecting to dashboard");
-            navigate("/clinic/dashboard");
+            console.log("Valid clinic user found, redirecting to dashboard");
+            navigate("/clinic/dashboard", { replace: true });
           }
         }
       } catch (error) {
@@ -47,21 +47,34 @@ export function LoginForm() {
       console.log("Auth state changed:", event, session?.user?.id);
       
       if (event === 'SIGNED_IN' && session?.user) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', session.user.id)
-          .single();
+        try {
+          const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', session.user.id)
+            .single();
 
-        if (profile?.role === 'clinic') {
-          navigate("/clinic/dashboard");
-        } else {
-          // If not a clinic user, sign them out
+          if (profileError) throw profileError;
+
+          if (profile?.role === 'clinic') {
+            console.log("Clinic role confirmed, redirecting to dashboard");
+            navigate("/clinic/dashboard", { replace: true });
+          } else {
+            console.log("Non-clinic user detected, signing out");
+            await supabase.auth.signOut();
+            toast({
+              variant: "destructive",
+              title: "Access Denied",
+              description: "You do not have permission to access the clinic portal.",
+            });
+          }
+        } catch (error) {
+          console.error("Profile check error:", error);
           await supabase.auth.signOut();
           toast({
             variant: "destructive",
-            title: "Access Denied",
-            description: "You do not have permission to access this area.",
+            title: "Error",
+            description: "An error occurred while checking your permissions.",
           });
         }
       }
@@ -85,9 +98,8 @@ export function LoginForm() {
       });
 
       if (error) {
-        console.error("Login error details:", error);
+        console.error("Login error:", error);
         
-        // Handle specific error cases
         if (error.message.includes("Invalid login credentials")) {
           toast({
             variant: "destructive",
@@ -113,23 +125,27 @@ export function LoginForm() {
       if (data.user) {
         console.log("Login successful, checking user role");
         
-        const { data: profile } = await supabase
+        const { data: profile, error: profileError } = await supabase
           .from('profiles')
           .select('role')
           .eq('id', data.user.id)
           .single();
 
+        if (profileError) throw profileError;
+
         if (profile?.role === 'clinic') {
+          console.log("Clinic role confirmed, redirecting to dashboard");
           toast({
             title: "Welcome back!",
             description: "Successfully logged in to your account.",
           });
-          navigate("/clinic/dashboard");
+          navigate("/clinic/dashboard", { replace: true });
         } else {
+          console.log("Non-clinic user detected, signing out");
           toast({
             variant: "destructive",
             title: "Access Denied",
-            description: "You do not have permission to access this area.",
+            description: "You do not have permission to access the clinic portal.",
           });
           await supabase.auth.signOut();
         }
