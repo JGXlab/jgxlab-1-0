@@ -12,8 +12,8 @@ interface PreviewContentProps {
 
 export const PreviewContent = ({ labScript, patient }: PreviewContentProps) => {
   return (
-    <ScrollArea className="max-h-[calc(100vh-12rem)]">
-      <div className="space-y-8">
+    <ScrollArea className="h-full">
+      <div className="space-y-8 pr-4">
         <PatientSection 
           patient={patient}
           createdAt={labScript.created_at}
