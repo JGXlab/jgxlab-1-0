@@ -5,10 +5,8 @@ import { User, Eye, Receipt, Building2, MoreVertical, Package, AlertCircle, Exte
 import { format } from "date-fns";
 import { getStatusColor, getPaymentStatusColor } from "./utils/statusStyles";
 import { StatusUpdateButtons } from "./StatusUpdateButtons";
-import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Invoice } from "./payment/Invoice";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { useState, useCallback } from "react";
+import { InvoicePreviewDialog } from "./payment/InvoicePreviewDialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -40,10 +38,15 @@ export const TableRowContent = ({
 }: TableRowContentProps) => {
   const [showInvoiceDialog, setShowInvoiceDialog] = useState(false);
 
-  const handleViewInvoice = (e: React.MouseEvent) => {
+  const handleViewInvoice = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     setShowInvoiceDialog(true);
-  };
+  }, []);
+
+  const handleCloseInvoice = useCallback(() => {
+    setShowInvoiceDialog(false);
+  }, []);
 
   const handleStatusUpdate = (id: string, status: string, reason?: string, comment?: string, designUrl?: string) => {
     if (onStatusUpdate) {
@@ -275,18 +278,11 @@ export const TableRowContent = ({
         </TableCell>
       </TableRow>
 
-      <Dialog open={showInvoiceDialog} onOpenChange={setShowInvoiceDialog}>
-        <DialogContent className="max-w-4xl h-[90vh] p-0 gap-0">
-          <DialogHeader className="px-2 py-3 border-b">
-            <DialogTitle>Invoice Preview</DialogTitle>
-          </DialogHeader>
-          <ScrollArea className="flex-1 h-full">
-            <div className="p-6">
-              <Invoice labScript={script} />
-            </div>
-          </ScrollArea>
-        </DialogContent>
-      </Dialog>
+      <InvoicePreviewDialog
+        isOpen={showInvoiceDialog}
+        onClose={handleCloseInvoice}
+        labScript={script}
+      />
     </>
   );
 };
