@@ -1,42 +1,50 @@
-import { LogIn } from "lucide-react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { Loader2 } from "lucide-react";
 
 interface ClinicActionsProps {
-  clinicEmail: string;
+  clinicId: string;
   clinicName: string;
+  clinicEmail: string;
+  authUserId: string;
 }
 
-export function ClinicActions({ clinicEmail, clinicName }: ClinicActionsProps) {
-  const { toast } = useToast();
+export const ClinicActions = ({ clinicId, clinicName, clinicEmail, authUserId }: ClinicActionsProps) => {
+  const [isSigningIn, setIsSigningIn] = useState(false);
 
   const handleSignInAsClinic = async () => {
     try {
-      console.log('Signing in as clinic:', clinicEmail);
-      
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session?.access_token) {
-        throw new Error('No active session found');
-      }
+      setIsSigningIn(true);
+      console.log("Signing in as clinic:", clinicEmail);
 
+      // Get the current session
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error('No active session');
+
+      // Call the edge function to get a one-time password
       const response = await fetch(
-        'https://zuwhzwfdourrvrwhrajj.functions.supabase.co/admin-signin-as-clinic',
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-signin-as-clinic`,
         {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
             'Authorization': `Bearer ${session.access_token}`,
+            'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ clinicUserId: clinicEmail }),
+          body: JSON.stringify({ clinicUserId: authUserId }),
         }
       );
 
       const data = await response.json();
+      console.log("Edge function response:", data);
 
       if (!response.ok) {
         throw new Error(data.error || 'Failed to generate login token');
+      }
+
+      if (!data.token) {
+        throw new Error('No token received from server');
       }
 
       // Sign out current admin user first
@@ -45,38 +53,43 @@ export function ClinicActions({ clinicEmail, clinicName }: ClinicActionsProps) {
       // Use the token to sign in as the clinic
       const { error: signInError } = await supabase.auth.signInWithPassword({
         email: clinicEmail,
-        password: data.token.toString(), // Ensure token is a string
+        password: data.token,
       });
 
-      if (signInError) throw signInError;
+      if (signInError) {
+        console.error("Sign in error:", signInError);
+        throw signInError;
+      }
 
       // Redirect to clinic dashboard after successful sign in
       window.location.href = '/clinic/dashboard';
       
-      toast({
-        title: "Success",
-        description: `Signed in as ${clinicName}`,
-      });
-      
+      toast.success(`Signed in as ${clinicName}`);
     } catch (error) {
-      console.error('Error in sign in as clinic handler:', error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error instanceof Error ? error.message : "An unexpected error occurred",
-      });
+      console.error("Error in sign in as clinic handler:", error);
+      toast.error(error instanceof Error ? error.message : "Failed to sign in as clinic");
+    } finally {
+      setIsSigningIn(false);
     }
   };
 
   return (
-    <Button
-      variant="outline"
-      size="sm"
-      onClick={handleSignInAsClinic}
-      className="bg-white border-[#D3E4FD] text-primary hover:bg-[#F8FAFC] hover:text-primary/90 transition-colors"
-    >
-      <LogIn className="w-4 h-4 mr-2" />
-      Sign in as Clinic
-    </Button>
+    <div className="flex items-center gap-2">
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={handleSignInAsClinic}
+        disabled={isSigningIn}
+      >
+        {isSigningIn ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Signing in...
+          </>
+        ) : (
+          'Sign in as Clinic'
+        )}
+      </Button>
+    </div>
   );
-}
+};

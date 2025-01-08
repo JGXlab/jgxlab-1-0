@@ -40,16 +40,19 @@ Deno.serve(async (req) => {
     const { clinicUserId } = await req.json()
     if (!clinicUserId) throw new Error('No clinic user ID provided')
 
-    // Generate a magic link token for the clinic user
-    const { data, error: signInError } = await supabase.auth.admin.generateLink({
-      type: 'magiclink',
-      email: clinicUserId,
-    })
+    // Generate a one-time password for the clinic user
+    const oneTimePassword = Math.random().toString(36).slice(-8)
+
+    // Update the user's password
+    const { error: updateError } = await supabase.auth.admin.updateUserById(
+      clinicUserId,
+      { password: oneTimePassword }
+    )
     
-    if (signInError) throw signInError
+    if (updateError) throw updateError
 
     return new Response(
-      JSON.stringify({ token: data }),
+      JSON.stringify({ token: oneTimePassword }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,
