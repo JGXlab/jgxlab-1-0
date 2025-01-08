@@ -6,7 +6,7 @@ import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { FileText, Loader2, Receipt } from "lucide-react";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { PreviewLabScriptModal } from "@/components/surgical-form/PreviewLabScriptModal";
 import { Invoice } from "@/components/lab-scripts/payment/Invoice";
 
@@ -60,14 +60,26 @@ export function LabScriptHistoryModal({ isOpen, onClose, patientId, patientName 
     }
   };
 
-  const handleViewInvoice = (labScript: any) => {
+  const handleClose = useCallback(() => {
+    setShowInvoice(false);
+    setSelectedInvoiceScript(null);
+    setSelectedLabScript(null);
+    onClose();
+  }, [onClose]);
+
+  const handleViewInvoice = useCallback((labScript: any) => {
     setSelectedInvoiceScript(labScript);
     setShowInvoice(true);
-  };
+  }, []);
+
+  const handleInvoiceClose = useCallback(() => {
+    setShowInvoice(false);
+    setSelectedInvoiceScript(null);
+  }, []);
 
   return (
     <>
-      <Dialog open={isOpen} onOpenChange={() => onClose()}>
+      <Dialog open={isOpen} onOpenChange={handleClose}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>Lab Script History - {patientName}</DialogTitle>
@@ -150,12 +162,15 @@ export function LabScriptHistoryModal({ isOpen, onClose, patientId, patientName 
       )}
 
       {showInvoice && selectedInvoiceScript && (
-        <Dialog open={showInvoice} onOpenChange={() => setShowInvoice(false)}>
+        <Dialog open={showInvoice} onOpenChange={handleInvoiceClose}>
           <DialogContent className="max-w-4xl">
             <DialogHeader>
               <DialogTitle>Invoice</DialogTitle>
             </DialogHeader>
-            <Invoice labScript={selectedInvoiceScript} />
+            <Invoice 
+              labScript={selectedInvoiceScript} 
+              onClose={handleInvoiceClose}
+            />
           </DialogContent>
         </Dialog>
       )}
