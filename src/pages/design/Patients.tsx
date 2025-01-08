@@ -89,32 +89,35 @@ const Patients = () => {
 
   return (
     <DesignLayout>
-      <div className="flex justify-end mb-8">
-        <PatientSearchBar
-          value={searchQuery}
-          onChange={setSearchQuery}
-        />
+      <div className="space-y-8">
+        <div className="flex justify-between items-center">
+          <h1 className="text-2xl font-semibold text-[#1A1F2C]">Patients</h1>
+          <PatientSearchBar
+            value={searchQuery}
+            onChange={setSearchQuery}
+          />
+        </div>
+
+        <Card className="overflow-hidden border-none shadow-sm bg-white/50 backdrop-blur-sm">
+          {isLoading ? (
+            <div className="flex items-center justify-center h-40">
+              <p className="text-[#8A898C]">Loading patients...</p>
+            </div>
+          ) : (
+            <PatientsAdminTable
+              patients={filteredPatients || []}
+              onEdit={setEditingPatient}
+              onDelete={setDeletingPatient}
+              onViewHistory={setSelectedPatient}
+            />
+          )}
+        </Card>
       </div>
 
-      <Card className="overflow-hidden border-none shadow-sm bg-white">
-        {isLoading ? (
-          <div className="flex items-center justify-center h-40">
-            <p className="text-muted-foreground">Loading patients...</p>
-          </div>
-        ) : (
-          <PatientsAdminTable
-            patients={filteredPatients || []}
-            onEdit={setEditingPatient}
-            onDelete={setDeletingPatient}
-            onViewHistory={setSelectedPatient}
-          />
-        )}
-      </Card>
-
       <Dialog open={!!editingPatient} onOpenChange={(open) => !open && setEditingPatient(null)}>
-        <DialogContent>
+        <DialogContent className="bg-white/95 backdrop-blur-sm">
           <DialogHeader>
-            <DialogTitle>Edit Patient</DialogTitle>
+            <DialogTitle className="text-[#1A1F2C]">Edit Patient</DialogTitle>
           </DialogHeader>
           {editingPatient && (
             <EditPatientForm
@@ -126,18 +129,23 @@ const Patients = () => {
       </Dialog>
 
       <AlertDialog open={!!deletingPatient} onOpenChange={(open) => !open && setDeletingPatient(null)}>
-        <AlertDialogContent>
+        <AlertDialogContent className="bg-white/95 backdrop-blur-sm">
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-            <AlertDialogDescription>
+            <AlertDialogTitle className="text-[#1A1F2C]">Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription className="text-[#8A898C]">
               This action cannot be undone. This will permanently delete the patient
               {deletingPatient && ` ${deletingPatient.first_name} ${deletingPatient.last_name}`}
               and all associated data.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeletePatient} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+            <AlertDialogCancel className="bg-[#F6F6F7] text-[#403E43] hover:bg-[#E5DEFF] hover:text-[#6E59A5]">
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleDeletePatient} 
+              className="bg-[#9b87f5] text-white hover:bg-[#7E69AB]"
+            >
               Delete
             </AlertDialogAction>
           </AlertDialogFooter>

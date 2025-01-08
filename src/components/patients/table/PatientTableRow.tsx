@@ -23,17 +23,17 @@ export function PatientTableRow({
   const clinicName = patient.clinics?.name;
 
   return (
-    <TableRow className="hover:bg-gray-50/50 transition-colors duration-200">
+    <TableRow className="hover:bg-[#F1F0FB]/30 transition-colors duration-200">
       <TableCell>
         <div className="flex items-center space-x-3">
-          <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-            <User className="h-4 w-4 text-primary" />
+          <div className="h-8 w-8 rounded-full bg-[#9b87f5]/10 flex items-center justify-center">
+            <User className="h-4 w-4 text-[#9b87f5]" />
           </div>
           <div>
-            <p className="font-medium text-gray-900">
+            <p className="font-medium text-[#1A1F2C]">
               {patient.first_name} {patient.last_name}
             </p>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-[#8A898C]">
               ID: {patient.id.slice(0, 8)}
             </p>
           </div>
@@ -42,28 +42,28 @@ export function PatientTableRow({
       {!isClinicPortal && (
         <TableCell>
           <div className="flex items-center space-x-2">
-            <div className="h-8 w-8 rounded-full bg-emerald-50 flex items-center justify-center">
-              <Building2 className="h-4 w-4 text-emerald-600" />
+            <div className="h-8 w-8 rounded-full bg-[#F2FCE2] flex items-center justify-center">
+              <Building2 className="h-4 w-4 text-[#6E59A5]" />
             </div>
-            <span className="text-gray-900">{clinicName || 'N/A'}</span>
+            <span className="text-[#1A1F2C]">{clinicName || 'N/A'}</span>
           </div>
         </TableCell>
       )}
       <TableCell>
         <Badge 
           variant="secondary" 
-          className="bg-accent text-accent-foreground capitalize"
+          className="bg-[#E5DEFF] text-[#6E59A5] capitalize border-none"
         >
           {patient.gender}
         </Badge>
       </TableCell>
       <TableCell>
-        <div className="text-sm text-gray-600">
+        <div className="text-sm text-[#8A898C]">
           {patient.date_of_birth ? format(new Date(patient.date_of_birth), 'MMM d, yyyy') : 'Not set'}
         </div>
       </TableCell>
       <TableCell>
-        <div className="text-sm text-gray-600">
+        <div className="text-sm text-[#8A898C]">
           {format(new Date(patient.created_at), 'MMM d, yyyy')}
         </div>
       </TableCell>

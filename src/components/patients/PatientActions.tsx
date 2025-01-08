@@ -1,5 +1,11 @@
 import { Button } from "@/components/ui/button";
-import { Pencil, Trash2, History } from "lucide-react";
+import { Eye, Pencil, Trash2, History } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface PatientActionsProps {
   onEdit: () => void;
@@ -9,31 +15,60 @@ interface PatientActionsProps {
 
 export function PatientActions({ onEdit, onDelete, onViewHistory }: PatientActionsProps) {
   return (
-    <div className="flex justify-end gap-2">
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={onViewHistory}
-        className="text-primary hover:text-primary hover:bg-primary/10 border-primary/20"
-      >
-        <History className="h-4 w-4" />
-      </Button>
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={onEdit}
-        className="text-primary hover:text-primary hover:bg-primary/10 border-primary/20"
-      >
-        <Pencil className="h-4 w-4" />
-      </Button>
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={onDelete}
-        className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
-      >
-        <Trash2 className="h-4 w-4" />
-      </Button>
+    <div className="flex items-center justify-end gap-2">
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onViewHistory}
+              className="h-8 w-8 rounded-full hover:bg-[#E5DEFF] hover:text-[#6E59A5] text-[#8A898C]"
+            >
+              <History className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>View History</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onEdit}
+              className="h-8 w-8 rounded-full hover:bg-[#E5DEFF] hover:text-[#6E59A5] text-[#8A898C]"
+            >
+              <Pencil className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Edit Patient</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onDelete}
+              className="h-8 w-8 rounded-full hover:bg-[#FFDEE2] hover:text-red-500 text-[#8A898C]"
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Delete Patient</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
     </div>
   );
 }
