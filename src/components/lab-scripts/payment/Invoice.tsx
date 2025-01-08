@@ -7,6 +7,7 @@ import { BillingAddresses } from "./BillingAddresses";
 import { InvoiceTable } from "./InvoiceTable";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
+import { useEffect } from "react";
 
 interface InvoiceProps {
   labScript: any;
@@ -35,6 +36,16 @@ export const Invoice = ({ labScript }: InvoiceProps) => {
     enabled: !!labScript.id,
   });
 
+  // Cleanup function to remove any leftover print styles
+  useEffect(() => {
+    return () => {
+      const printStyleSheet = document.getElementById('invoice-print-styles');
+      if (printStyleSheet) {
+        printStyleSheet.remove();
+      }
+    };
+  }, []);
+
   const handlePrint = () => {
     try {
       const printContent = document.querySelector('.invoice-content');
@@ -42,7 +53,12 @@ export const Invoice = ({ labScript }: InvoiceProps) => {
         throw new Error('Print content not found');
       }
       
-      const originalDisplay = document.body.style.display;
+      // Remove any existing print styles
+      const existingStyles = document.getElementById('invoice-print-styles');
+      if (existingStyles) {
+        existingStyles.remove();
+      }
+
       const printStyles = `
         @page { 
           size: A4;
@@ -91,10 +107,10 @@ export const Invoice = ({ labScript }: InvoiceProps) => {
       `;
       
       const styleSheet = document.createElement('style');
+      styleSheet.id = 'invoice-print-styles';
       styleSheet.textContent = printStyles;
       document.head.appendChild(styleSheet);
       
-      document.body.style.display = 'none';
       const printWindow = window.open('', '', 'width=800,height=600');
       if (!printWindow) {
         throw new Error('Could not open print window');
@@ -115,12 +131,17 @@ export const Invoice = ({ labScript }: InvoiceProps) => {
       printWindow.document.close();
       printWindow.focus();
       
-      // Wait for resources to load
+      // Wait for resources to load before printing
       setTimeout(() => {
         printWindow.print();
-        printWindow.close();
-        document.body.style.display = originalDisplay;
-        document.head.removeChild(styleSheet);
+        // Clean up after printing
+        setTimeout(() => {
+          printWindow.close();
+          const printStyleSheet = document.getElementById('invoice-print-styles');
+          if (printStyleSheet) {
+            printStyleSheet.remove();
+          }
+        }, 100);
       }, 250);
 
       toast({
