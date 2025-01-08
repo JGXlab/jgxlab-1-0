@@ -44,8 +44,50 @@ export const Invoice = ({ labScript }: InvoiceProps) => {
       
       const originalDisplay = document.body.style.display;
       const printStyles = `
-        @page { size: A4; margin: 0; }
-        body { margin: 1.6cm; }
+        @page { 
+          size: A4;
+          margin: 0;
+        }
+        @media print {
+          body { 
+            margin: 1.6cm;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+          * {
+            color-adjust: exact !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+          .invoice-content {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 20mm;
+            margin: 0;
+            background: white;
+            box-shadow: none;
+            font-size: 12pt;
+          }
+          .bg-primary, .text-primary, .border-primary {
+            color: #375bdc !important;
+            background-color: #375bdc !important;
+            border-color: #375bdc !important;
+          }
+          .bg-success, .text-success {
+            color: #22c55e !important;
+            background-color: #22c55e !important;
+          }
+          .bg-muted, .text-muted {
+            color: #64748b !important;
+            background-color: #64748b !important;
+          }
+          .text-card-foreground {
+            color: #0f172a !important;
+          }
+          .bg-accent {
+            background-color: #f8fafc !important;
+          }
+        }
       `;
       
       const styleSheet = document.createElement('style');
