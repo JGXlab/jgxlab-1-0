@@ -48,7 +48,6 @@ export function ClinicsTable() {
     try {
       console.log('Resetting password for:', userId);
       
-      // Get the current session
       const { data: { session } } = await supabase.auth.getSession();
       
       if (!session?.access_token) {
@@ -97,38 +96,38 @@ export function ClinicsTable() {
   }
 
   return (
-    <div className="rounded-xl border border-[#D3E4FD] bg-white shadow-sm">
+    <div className="rounded-xl border border-[#E2E8F0] bg-white shadow-sm overflow-hidden">
       <Table>
         <TableHeader>
-          <TableRow className="border-b border-[#D3E4FD] hover:bg-[#F8FAFC]">
-            <TableHead className="text-sm font-semibold text-[#1A1F2C]">Clinic Name</TableHead>
-            <TableHead className="text-sm font-semibold text-[#1A1F2C]">Doctor</TableHead>
-            <TableHead className="text-sm font-semibold text-[#1A1F2C]">Contact Person</TableHead>
-            <TableHead className="text-sm font-semibold text-[#1A1F2C]">Email</TableHead>
-            <TableHead className="text-sm font-semibold text-[#1A1F2C]">Phone</TableHead>
-            <TableHead className="text-sm font-semibold text-[#1A1F2C]">Address</TableHead>
-            <TableHead className="text-sm font-semibold text-[#1A1F2C]">Actions</TableHead>
+          <TableRow className="bg-[#F8FAFC] hover:bg-[#F1F5F9] border-b border-[#E2E8F0]">
+            <TableHead className="text-sm font-semibold text-[#1E293B]">Clinic Name</TableHead>
+            <TableHead className="text-sm font-semibold text-[#1E293B]">Doctor</TableHead>
+            <TableHead className="text-sm font-semibold text-[#1E293B]">Contact Person</TableHead>
+            <TableHead className="text-sm font-semibold text-[#1E293B]">Email</TableHead>
+            <TableHead className="text-sm font-semibold text-[#1E293B]">Phone</TableHead>
+            <TableHead className="text-sm font-semibold text-[#1E293B]">Address</TableHead>
+            <TableHead className="text-sm font-semibold text-[#1E293B]">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {clinics?.map((clinic) => (
             <TableRow 
               key={clinic.id}
-              className="border-b border-[#D3E4FD] hover:bg-[#F8FAFC] transition-colors"
+              className="border-b border-[#E2E8F0] hover:bg-[#F8FAFC] transition-colors"
             >
-              <TableCell className="font-medium text-[#403E43]">{clinic.name}</TableCell>
-              <TableCell className="text-[#8E9196]">{clinic.doctor_name}</TableCell>
-              <TableCell className="text-[#8E9196]">{clinic.contact_person}</TableCell>
-              <TableCell className="text-[#8E9196]">{clinic.email}</TableCell>
-              <TableCell className="text-[#8E9196]">{clinic.phone}</TableCell>
-              <TableCell className="text-[#8E9196]">{clinic.address}</TableCell>
+              <TableCell className="font-medium text-[#1E293B]">{clinic.name}</TableCell>
+              <TableCell className="text-[#64748B]">{clinic.doctor_name}</TableCell>
+              <TableCell className="text-[#64748B]">{clinic.contact_person}</TableCell>
+              <TableCell className="text-[#64748B]">{clinic.email}</TableCell>
+              <TableCell className="text-[#64748B]">{clinic.phone}</TableCell>
+              <TableCell className="text-[#64748B]">{clinic.address}</TableCell>
               <TableCell className="flex items-center gap-2">
                 <EditClinicDialog clinic={clinic} />
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => handlePasswordReset(clinic.auth_user_id, clinic.name)}
-                  className="bg-white border-[#D3E4FD] text-primary hover:bg-[#F8FAFC] hover:text-primary/90 transition-colors"
+                  className="bg-white border-[#E2E8F0] text-[#8B5CF6] hover:bg-[#F8FAFC] hover:text-[#7C3AED] hover:border-[#8B5CF6] transition-colors"
                 >
                   <KeyRound className="w-4 h-4 mr-2" />
                   Reset Password
@@ -140,7 +139,7 @@ export function ClinicsTable() {
             <TableRow>
               <TableCell 
                 colSpan={7} 
-                className="h-24 text-center text-[#8E9196]"
+                className="h-24 text-center text-[#64748B]"
               >
                 No clinics found
               </TableCell>
