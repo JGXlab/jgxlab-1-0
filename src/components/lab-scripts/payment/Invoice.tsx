@@ -8,6 +8,7 @@ import { InvoiceTable } from "./InvoiceTable";
 import { Button } from "@/components/ui/button";
 import { useEffect, useRef } from "react";
 import { usePrintHandler } from "./print/PrintHandler";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface InvoiceProps {
   labScript: any;
@@ -77,7 +78,7 @@ export const Invoice = ({ labScript, onClose }: InvoiceProps) => {
           <Printer className="h-4 w-4" />
         </Button>
       </div>
-      <div className="overflow-y-auto max-h-[calc(100vh-12rem)] px-4 pt-16">
+      <ScrollArea className="h-[calc(100vh-12rem)] px-4 pt-16">
         <Card 
           ref={contentRef}
           className="w-full mx-auto shadow-none border-none bg-white invoice-content"
@@ -88,7 +89,7 @@ export const Invoice = ({ labScript, onClose }: InvoiceProps) => {
             <InvoiceTable invoice={invoice} />
           </div>
         </Card>
-      </div>
+      </ScrollArea>
     </div>
   );
 };
