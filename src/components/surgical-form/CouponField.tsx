@@ -49,34 +49,33 @@ export const CouponField = ({ form, patientId, onValidCoupon }: CouponFieldProps
   };
 
   return (
-    <div className="space-y-2">
-      <FormField
-        control={form.control}
-        name="couponCode"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Coupon Code</FormLabel>
-            <div className="flex gap-2">
-              <FormControl>
-                <Input
-                  placeholder="Enter coupon code"
-                  {...field}
-                  className="bg-white"
-                />
-              </FormControl>
-              <Button 
-                type="button"
-                variant="secondary"
-                onClick={handleValidateCoupon}
-                disabled={isValidating}
-              >
-                {isValidating ? 'Validating...' : 'Validate'}
-              </Button>
-            </div>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-    </div>
+    <FormField
+      control={form.control}
+      name="couponCode"
+      render={({ field }) => (
+        <FormItem className="space-y-1.5">
+          <FormLabel className="text-sm font-medium text-gray-900">Coupon Code</FormLabel>
+          <div className="flex gap-2">
+            <FormControl>
+              <Input
+                placeholder="Enter coupon code"
+                {...field}
+                className="bg-white border-gray-200 focus:border-primary focus:ring-primary"
+              />
+            </FormControl>
+            <Button 
+              type="button"
+              variant="secondary"
+              onClick={handleValidateCoupon}
+              disabled={isValidating}
+              className="whitespace-nowrap hover:bg-secondary-hover transition-colors"
+            >
+              {isValidating ? 'Validating...' : 'Validate'}
+            </Button>
+          </div>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
   );
 };
