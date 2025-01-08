@@ -2,6 +2,7 @@ import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/comp
 import { Input } from "@/components/ui/input";
 import { UseFormReturn } from "react-hook-form";
 import { CreateClinicFormValues } from "../types/clinic-form";
+import { PhoneNumberInput } from "@/components/clinic/PhoneNumberInput";
 
 interface ClinicBasicInfoFieldsProps {
   form: UseFormReturn<CreateClinicFormValues>;
@@ -36,8 +37,8 @@ export function ClinicBasicInfoFields({ form }: ClinicBasicInfoFieldsProps) {
             <FormLabel className="text-sm font-medium text-gray-700">Email</FormLabel>
             <FormControl>
               <Input 
-                type="email" 
-                placeholder="Enter email" 
+                placeholder="Enter clinic email" 
+                type="email"
                 {...field}
                 className="h-11 bg-gray-50 border-gray-200 focus:border-primary focus:ring-primary"
               />
@@ -47,22 +48,10 @@ export function ClinicBasicInfoFields({ form }: ClinicBasicInfoFieldsProps) {
         )}
       />
 
-      <FormField
+      <PhoneNumberInput
         control={form.control}
         name="phone"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel className="text-sm font-medium text-gray-700">Phone</FormLabel>
-            <FormControl>
-              <Input 
-                placeholder="Enter phone number" 
-                {...field}
-                className="h-11 bg-gray-50 border-gray-200 focus:border-primary focus:ring-primary"
-              />
-            </FormControl>
-            <FormMessage className="text-xs" />
-          </FormItem>
-        )}
+        label="Phone Number"
       />
     </>
   );
