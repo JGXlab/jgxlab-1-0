@@ -162,15 +162,6 @@ export function ClinicsTable() {
               <TableCell className="text-[#8E9196]">{clinic.address}</TableCell>
               <TableCell className="flex items-center gap-2">
                 <EditClinicDialog clinic={clinic} />
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleInvite(clinic.email, clinic.name)}
-                  className="bg-white border-[#D3E4FD] text-primary hover:bg-[#F8FAFC] hover:text-primary/90 transition-colors"
-                >
-                  <UserPlus className="w-4 h-4 mr-2" />
-                  Invite
-                </Button>
               </TableCell>
             </TableRow>
           ))}
