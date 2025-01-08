@@ -1,7 +1,8 @@
+import { UseFormReturn } from "react-hook-form";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { UseFormReturn } from "react-hook-form";
 import { CreateClinicFormValues } from "../types/clinic-form";
+import { PhoneNumberInput } from "@/components/clinic/PhoneNumberInput";
 
 interface ClinicContactFieldsProps {
   form: UseFormReturn<CreateClinicFormValues>;
@@ -46,22 +47,10 @@ export function ClinicContactFields({ form }: ClinicContactFieldsProps) {
         )}
       />
 
-      <FormField
+      <PhoneNumberInput
         control={form.control}
         name="contactPhone"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel className="text-sm font-medium text-gray-700">POC Phone</FormLabel>
-            <FormControl>
-              <Input 
-                placeholder="Enter point of contact phone" 
-                {...field}
-                className="h-11 bg-gray-50 border-gray-200 focus:border-primary focus:ring-primary"
-              />
-            </FormControl>
-            <FormMessage className="text-xs" />
-          </FormItem>
-        )}
+        label="POC Phone"
       />
     </>
   );

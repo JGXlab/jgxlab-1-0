@@ -1,13 +1,13 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
-import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import { Form } from "@/components/ui/form";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { ClinicBasicInfoFields } from "./form/ClinicBasicInfoFields";
 import { ClinicContactFields } from "./form/ClinicContactFields";
+import { ClinicAddressFields } from "./form/ClinicAddressFields";
 import { clinicFormSchema, type CreateClinicFormValues } from "./types/clinic-form";
 
 export function CreateClinicForm() {
@@ -22,7 +22,10 @@ export function CreateClinicForm() {
       doctorName: "",
       contactPerson: "",
       contactPhone: "",
-      address: "",
+      street_address: "",
+      city: "",
+      state: "",
+      zip_code: "",
     },
   });
 
@@ -67,6 +70,9 @@ export function CreateClinicForm() {
 
       console.log("Auth account created, creating clinic record");
 
+      // Combine address fields for storage
+      const formattedAddress = `${values.street_address}, ${values.city}, ${values.state} ${values.zip_code}`;
+
       // Create clinic in database
       const { error: clinicError } = await supabase.from('clinics').insert({
         name: values.name,
@@ -75,7 +81,11 @@ export function CreateClinicForm() {
         doctor_name: values.doctorName,
         contact_person: values.contactPerson,
         contact_phone: values.contactPhone,
-        address: values.address,
+        address: formattedAddress,
+        street_address: values.street_address,
+        city: values.city,
+        state: values.state,
+        zip_code: values.zip_code,
         user_id: (await supabase.auth.getUser()).data.user?.id,
         auth_user_id: authData.user.id
       });
@@ -102,25 +112,7 @@ export function CreateClinicForm() {
           <ClinicBasicInfoFields form={form} />
           <ClinicContactFields form={form} />
         </div>
-
-        <FormField
-          control={form.control}
-          name="address"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-sm font-medium text-gray-700">Address</FormLabel>
-              <FormControl>
-                <Input 
-                  placeholder="Enter clinic address" 
-                  {...field}
-                  className="h-11 bg-gray-50 border-gray-200 focus:border-primary focus:ring-primary"
-                />
-              </FormControl>
-              <FormMessage className="text-xs" />
-            </FormItem>
-          )}
-        />
-
+        <ClinicAddressFields form={form} />
         <Button 
           type="submit" 
           className="w-full h-11 bg-primary hover:bg-primary-hover transition-colors duration-200"
