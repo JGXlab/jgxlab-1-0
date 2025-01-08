@@ -89,9 +89,9 @@ const Patients = () => {
   });
 
   return (
-    <div className="min-h-screen bg-[#F1F0FB]">
+    <>
       <DesignNavbar />
-      <div className="w-full h-full min-h-screen px-8 md:px-12 lg:px-16 py-8 bg-gradient-to-br from-[#F1F0FB] to-[#E5DEFF]">
+      <DesignLayout>
         <div className="space-y-8">
           <div className="flex justify-between items-center">
             <h1 className="text-2xl font-semibold text-[#1A1F2C]">Patients</h1>
@@ -163,8 +163,8 @@ const Patients = () => {
             patientName={`${selectedPatient.first_name} ${selectedPatient.last_name}`}
           />
         )}
-      </div>
-    </div>
+      </DesignLayout>
+    </>
   );
 };
 
