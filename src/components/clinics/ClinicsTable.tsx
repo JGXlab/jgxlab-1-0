@@ -44,24 +44,26 @@ export function ClinicsTable() {
     },
   });
 
-  const handlePasswordReset = async (email: string, clinicName: string) => {
+  const handlePasswordReset = async (userId: string, clinicName: string) => {
     try {
-      console.log('Resetting password for:', email);
+      console.log('Resetting password for:', userId);
       
-      // Update password directly using admin API
-      const { error } = await supabase.auth.admin.updateUserById(
-        email,
-        { password: 'Password123!' }
+      const response = await fetch(
+        'https://zuwhzwfdourrvrwhrajj.functions.supabase.co/reset-clinic-password',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${process.env.SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify({ userId }),
+        }
       );
 
-      if (error) {
-        console.error('Error resetting password:', error);
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: error.message,
-        });
-        return;
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to reset password');
       }
 
       toast({
