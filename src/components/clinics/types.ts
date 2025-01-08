@@ -11,4 +11,5 @@ export type Clinic = {
   city?: string;
   state?: string;
   zip_code?: string;
+  auth_user_id: string; // Added this field
 };
