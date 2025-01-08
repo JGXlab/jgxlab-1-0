@@ -29,6 +29,7 @@ export const PreviewContent = ({ labScript, patient }: PreviewContentProps) => {
           needsNightguard={labScript.needs_nightguard || ''}
           shade={labScript.shade || ''}
           expressDesign={labScript.express_design}
+          couponCode={labScript.coupon_code}
         />
         <InstructionsSection 
           instructions={labScript.specific_instructions}

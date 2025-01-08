@@ -10,6 +10,7 @@ interface ApplianceSectionProps {
   needsNightguard: string;
   shade: string;
   expressDesign?: string;
+  couponCode?: string;
 }
 
 const vdoDetailsMap = {
@@ -39,6 +40,7 @@ export const ApplianceSection = ({
   needsNightguard,
   shade,
   expressDesign,
+  couponCode,
 }: ApplianceSectionProps) => {
   const formatTreatmentType = (value: string) => {
     if (!value) return 'Not specified';
@@ -119,6 +121,13 @@ export const ApplianceSection = ({
             ? expressDesign.charAt(0).toUpperCase() + expressDesign.slice(1)
             : 'Not specified'} 
         />
+        {applianceType === 'surgical-day' && couponCode && (
+          <PreviewField 
+            label="Free Printed Try-in Coupon" 
+            value={couponCode}
+            className="font-semibold text-primary"
+          />
+        )}
       </div>
     </div>
   );
