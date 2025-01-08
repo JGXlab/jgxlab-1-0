@@ -1,5 +1,4 @@
 import { DesignLayout } from "@/components/design/DesignLayout";
-import { DesignNavbar } from "@/components/design/DesignNavbar";
 import { Card } from "@/components/ui/card";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -91,41 +90,38 @@ const Patients = () => {
   });
 
   return (
-    <div className="min-h-screen bg-[#F8F9FE]">
-      <DesignNavbar />
-      <div className="w-full h-full min-h-screen px-8 md:px-12 lg:px-16 py-8">
-        <div className="space-y-6">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center gap-4">
-              <PatientSearchBar
-                value={searchQuery}
-                onChange={setSearchQuery}
-              />
-              <Button 
-                className="bg-[#7C3AED] hover:bg-[#6D28D9] text-white font-medium px-4 py-2 rounded-full flex items-center gap-2"
-                onClick={() => setEditingPatient({})}
-              >
-                <Plus className="h-4 w-4" />
-                Add New Patient
-              </Button>
-            </div>
+    <DesignLayout>
+      <div className="max-w-[1600px] mx-auto space-y-6">
+        <div className="flex justify-between items-center">
+          <div className="flex items-center gap-4">
+            <PatientSearchBar
+              value={searchQuery}
+              onChange={setSearchQuery}
+            />
+            <Button 
+              className="bg-[#7C3AED] hover:bg-[#6D28D9] text-white font-medium px-4 py-2 rounded-full flex items-center gap-2"
+              onClick={() => setEditingPatient({})}
+            >
+              <Plus className="h-4 w-4" />
+              Add New Patient
+            </Button>
           </div>
-
-          <Card className="overflow-hidden border-none shadow-sm bg-white rounded-xl">
-            {isLoading ? (
-              <div className="flex items-center justify-center h-40">
-                <p className="text-[#8A898C]">Loading patients...</p>
-              </div>
-            ) : (
-              <PatientsAdminTable
-                patients={filteredPatients || []}
-                onEdit={setEditingPatient}
-                onDelete={setDeletingPatient}
-                onViewHistory={setSelectedPatient}
-              />
-            )}
-          </Card>
         </div>
+
+        <Card className="overflow-hidden border-none shadow-sm bg-white rounded-xl">
+          {isLoading ? (
+            <div className="flex items-center justify-center h-40">
+              <p className="text-[#8A898C]">Loading patients...</p>
+            </div>
+          ) : (
+            <PatientsAdminTable
+              patients={filteredPatients || []}
+              onEdit={setEditingPatient}
+              onDelete={setDeletingPatient}
+              onViewHistory={setSelectedPatient}
+            />
+          )}
+        </Card>
 
         <Dialog open={!!editingPatient} onOpenChange={(open) => !open && setEditingPatient(null)}>
           <DialogContent className="bg-white">
@@ -176,7 +172,7 @@ const Patients = () => {
           />
         )}
       </div>
-    </div>
+    </DesignLayout>
   );
 };
 
