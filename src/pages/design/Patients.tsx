@@ -93,89 +93,91 @@ const Patients = () => {
   return (
     <DesignLayout>
       <DesignNavbar />
-      <div className="max-w-[1600px] mx-auto space-y-6 p-8">
-        <div className="flex flex-col space-y-1.5">
-          <h2 className="text-2xl font-semibold text-[#1A1F2C]">Patients</h2>
-          <p className="text-[#8A898C]">Manage and view all patient records</p>
-        </div>
+      <div className="min-h-screen w-full px-8 md:px-12 lg:px-16 py-8 bg-gradient-to-br from-[#F1F0FB] to-[#E5DEFF]">
+        <div className="max-w-[1600px] mx-auto space-y-6">
+          <div className="flex flex-col space-y-1.5">
+            <h2 className="text-2xl font-semibold text-[#1A1F2C]">Patients</h2>
+            <p className="text-[#8A898C]">Manage and view all patient records</p>
+          </div>
 
-        <div className="flex justify-between items-center gap-4">
-          <PatientSearchBar
-            value={searchQuery}
-            onChange={setSearchQuery}
-          />
-          <Button 
-            className="bg-[#9b87f5] hover:bg-[#7E69AB] text-white font-medium px-4 py-2 rounded-full flex items-center gap-2 transition-colors duration-200"
-            onClick={() => setEditingPatient({})}
-          >
-            <Plus className="h-4 w-4" />
-            Add New Patient
-          </Button>
-        </div>
-
-        <Card className="overflow-hidden border-none shadow-sm bg-white rounded-xl">
-          {isLoading ? (
-            <div className="flex items-center justify-center h-40">
-              <p className="text-[#8A898C]">Loading patients...</p>
-            </div>
-          ) : (
-            <PatientsAdminTable
-              patients={filteredPatients || []}
-              onEdit={setEditingPatient}
-              onDelete={setDeletingPatient}
-              onViewHistory={setSelectedPatient}
+          <div className="flex justify-between items-center gap-4">
+            <PatientSearchBar
+              value={searchQuery}
+              onChange={setSearchQuery}
             />
-          )}
-        </Card>
+            <Button 
+              className="bg-[#9b87f5] hover:bg-[#7E69AB] text-white font-medium px-4 py-2 rounded-full flex items-center gap-2 transition-colors duration-200"
+              onClick={() => setEditingPatient({})}
+            >
+              <Plus className="h-4 w-4" />
+              Add New Patient
+            </Button>
+          </div>
 
-        <Dialog open={!!editingPatient} onOpenChange={(open) => !open && setEditingPatient(null)}>
-          <DialogContent className="bg-white">
-            <DialogHeader>
-              <DialogTitle className="text-[#1A1F2C]">
-                {editingPatient?.id ? 'Edit Patient' : 'Add New Patient'}
-              </DialogTitle>
-            </DialogHeader>
-            {editingPatient && (
-              <EditPatientForm
-                patient={editingPatient}
-                onSuccess={() => setEditingPatient(null)}
+          <Card className="overflow-hidden border-none shadow-sm bg-white/80 backdrop-blur-sm rounded-xl">
+            {isLoading ? (
+              <div className="flex items-center justify-center h-40">
+                <p className="text-[#8A898C]">Loading patients...</p>
+              </div>
+            ) : (
+              <PatientsAdminTable
+                patients={filteredPatients || []}
+                onEdit={setEditingPatient}
+                onDelete={setDeletingPatient}
+                onViewHistory={setSelectedPatient}
               />
             )}
-          </DialogContent>
-        </Dialog>
+          </Card>
 
-        <AlertDialog open={!!deletingPatient} onOpenChange={(open) => !open && setDeletingPatient(null)}>
-          <AlertDialogContent className="bg-white">
-            <AlertDialogHeader>
-              <AlertDialogTitle className="text-[#1A1F2C]">Are you sure?</AlertDialogTitle>
-              <AlertDialogDescription className="text-[#8A898C]">
-                This action cannot be undone. This will permanently delete the patient
-                {deletingPatient && ` ${deletingPatient.first_name} ${deletingPatient.last_name}`}
-                and all associated data.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel className="bg-[#F6F6F7] text-[#403E43] hover:bg-[#E5DEFF] hover:text-[#6E59A5]">
-                Cancel
-              </AlertDialogCancel>
-              <AlertDialogAction 
-                onClick={handleDeletePatient}
-                className="bg-red-500 text-white hover:bg-red-600"
-              >
-                Delete
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+          <Dialog open={!!editingPatient} onOpenChange={(open) => !open && setEditingPatient(null)}>
+            <DialogContent className="bg-white">
+              <DialogHeader>
+                <DialogTitle className="text-[#1A1F2C]">
+                  {editingPatient?.id ? 'Edit Patient' : 'Add New Patient'}
+                </DialogTitle>
+              </DialogHeader>
+              {editingPatient && (
+                <EditPatientForm
+                  patient={editingPatient}
+                  onSuccess={() => setEditingPatient(null)}
+                />
+              )}
+            </DialogContent>
+          </Dialog>
 
-        {selectedPatient && (
-          <LabScriptHistoryModal
-            isOpen={!!selectedPatient}
-            onClose={() => setSelectedPatient(null)}
-            patientId={selectedPatient.id}
-            patientName={`${selectedPatient.first_name} ${selectedPatient.last_name}`}
-          />
-        )}
+          <AlertDialog open={!!deletingPatient} onOpenChange={(open) => !open && setDeletingPatient(null)}>
+            <AlertDialogContent className="bg-white">
+              <AlertDialogHeader>
+                <AlertDialogTitle className="text-[#1A1F2C]">Are you sure?</AlertDialogTitle>
+                <AlertDialogDescription className="text-[#8A898C]">
+                  This action cannot be undone. This will permanently delete the patient
+                  {deletingPatient && ` ${deletingPatient.first_name} ${deletingPatient.last_name}`}
+                  and all associated data.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel className="bg-[#F6F6F7] text-[#403E43] hover:bg-[#E5DEFF] hover:text-[#6E59A5]">
+                  Cancel
+                </AlertDialogCancel>
+                <AlertDialogAction 
+                  onClick={handleDeletePatient}
+                  className="bg-red-500 text-white hover:bg-red-600"
+                >
+                  Delete
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+
+          {selectedPatient && (
+            <LabScriptHistoryModal
+              isOpen={!!selectedPatient}
+              onClose={() => setSelectedPatient(null)}
+              patientId={selectedPatient.id}
+              patientName={`${selectedPatient.first_name} ${selectedPatient.last_name}`}
+            />
+          )}
+        </div>
       </div>
     </DesignLayout>
   );
