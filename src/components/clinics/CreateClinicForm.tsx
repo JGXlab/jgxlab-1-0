@@ -76,6 +76,9 @@ export function CreateClinicForm() {
 
       console.log("Auth account created, creating clinic record");
 
+      // Construct the full address string
+      const fullAddress = `${values.street_address}, ${values.city}, ${values.state} ${values.zip_code}`;
+
       const { error: clinicError } = await supabase.from('clinics').insert({
         name: values.name,
         email: values.email,
@@ -83,6 +86,7 @@ export function CreateClinicForm() {
         doctor_name: values.doctor_name,
         contact_person: values.contact_person,
         contact_phone: values.contact_phone,
+        address: fullAddress, // Required field in the database
         street_address: values.street_address,
         city: values.city,
         state: values.state,
@@ -114,7 +118,7 @@ export function CreateClinicForm() {
           <ClinicContactFields form={form} />
         </div>
 
-        <ContactInfo control={form.control} />
+        <ContactInfo control={form.control as unknown as Control<Clinic>} />
 
         <Button 
           type="submit" 
