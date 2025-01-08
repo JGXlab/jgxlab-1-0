@@ -13,7 +13,6 @@ import { Button } from "@/components/ui/button";
 import { EditClinicDialog } from "./EditClinicDialog";
 import { Clinic } from "./types";
 import { KeyRound } from "lucide-react";
-import { toast } from "sonner";
 
 export function ClinicsTable() {
   const { toast } = useToast();
@@ -49,12 +48,10 @@ export function ClinicsTable() {
     try {
       console.log('Resetting password for:', email);
       
-      // Send password reset email
-      const { error } = await supabase.auth.resetPasswordForEmail(
+      // Update password directly using admin API
+      const { error } = await supabase.auth.admin.updateUserById(
         email,
-        {
-          redirectTo: `${window.location.origin}/admin/login`,
-        }
+        { password: 'Password123!' }
       );
 
       if (error) {
@@ -68,8 +65,8 @@ export function ClinicsTable() {
       }
 
       toast({
-        title: "Password Reset Email Sent",
-        description: `A password reset link has been sent to ${email}. Please check spam folder if not received.`,
+        title: "Password Reset Successfully",
+        description: `Password has been reset for ${clinicName}`,
       });
       
     } catch (error) {
@@ -121,7 +118,7 @@ export function ClinicsTable() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => handlePasswordReset(clinic.email, clinic.name)}
+                  onClick={() => handlePasswordReset(clinic.auth_user_id, clinic.name)}
                   className="bg-white border-[#D3E4FD] text-primary hover:bg-[#F8FAFC] hover:text-primary/90 transition-colors"
                 >
                   <KeyRound className="w-4 h-4 mr-2" />
