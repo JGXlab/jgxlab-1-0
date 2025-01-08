@@ -27,6 +27,7 @@ import DesignDashboard from "./pages/design/Dashboard";
 import DesignLabScripts from "./pages/design/LabScripts";
 import DesignSettings from "./pages/design/Settings";
 import DesignMyProfile from "./pages/design/MyProfile";
+import DesignPatients from "./pages/design/Patients";
 
 const queryClient = new QueryClient();
 
@@ -85,6 +86,7 @@ const App = () => {
                   <Route path="/design/labscripts" element={<DesignGuard><DesignLabScripts /></DesignGuard>} />
                   <Route path="/design/settings" element={<DesignGuard><DesignSettings /></DesignGuard>} />
                   <Route path="/design/myprofile" element={<DesignGuard><DesignMyProfile /></DesignGuard>} />
+                  <Route path="/design/patients" element={<DesignGuard><DesignPatients /></DesignGuard>} />
                   <Route path="*" element={<Navigate to="/design/login" replace />} />
                 </>
               ) : (
