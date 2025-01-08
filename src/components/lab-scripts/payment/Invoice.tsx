@@ -11,9 +11,10 @@ import { usePrintHandler } from "./print/PrintHandler";
 
 interface InvoiceProps {
   labScript: any;
+  onClose?: () => void;
 }
 
-export const Invoice = ({ labScript }: InvoiceProps) => {
+export const Invoice = ({ labScript, onClose }: InvoiceProps) => {
   const contentRef = useRef<HTMLDivElement>(null);
   const { handlePrint } = usePrintHandler();
 
@@ -66,15 +67,27 @@ export const Invoice = ({ labScript }: InvoiceProps) => {
 
   return (
     <div className="relative">
-      <Button
-        onClick={() => handlePrint(contentRef)}
-        size="icon"
-        variant="ghost"
-        className="absolute top-0 right-0 m-4"
-        title="Print Invoice"
-      >
-        <Printer className="h-4 w-4" />
-      </Button>
+      <div className="flex justify-end gap-2 mb-4">
+        <Button
+          onClick={() => handlePrint(contentRef)}
+          size="icon"
+          variant="outline"
+          className="m-4"
+          title="Print Invoice"
+        >
+          <Printer className="h-4 w-4" />
+        </Button>
+        {onClose && (
+          <Button
+            onClick={onClose}
+            size="sm"
+            variant="outline"
+            className="m-4"
+          >
+            Close
+          </Button>
+        )}
+      </div>
       <Card 
         ref={contentRef}
         className="w-[210mm] h-[297mm] mx-auto shadow-none border-none bg-white invoice-content"

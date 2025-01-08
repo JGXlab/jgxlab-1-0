@@ -1,7 +1,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, Download, FileText } from "lucide-react";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Invoice } from "./Invoice";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -36,21 +36,24 @@ export const PaymentSuccessDialog = ({
     enabled: !!paymentId,
   });
 
+  const handleClose = useCallback(() => {
+    setShowInvoice(false);
+    onClose();
+  }, [onClose]);
+
+  const handleInvoiceClose = useCallback(() => {
+    setShowInvoice(false);
+  }, []);
+
   if (showInvoice && labScript) {
     return (
-      <Dialog open={isOpen} onOpenChange={onClose}>
+      <Dialog open={isOpen} onOpenChange={handleClose}>
         <DialogContent className="sm:max-w-3xl">
           <DialogHeader>
             <DialogTitle className="text-center text-xl">Invoice</DialogTitle>
           </DialogHeader>
-          <Invoice labScript={labScript} />
+          <Invoice labScript={labScript} onClose={handleInvoiceClose} />
           <div className="flex justify-end space-x-2 mt-4">
-            <Button
-              variant="outline"
-              onClick={() => setShowInvoice(false)}
-            >
-              Back
-            </Button>
             {invoiceUrl && (
               <Button
                 variant="outline"
@@ -67,7 +70,7 @@ export const PaymentSuccessDialog = ({
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <div className="flex items-center justify-center mb-4">
