@@ -15,7 +15,7 @@ const formatPhoneNumber = (phoneNumber: string) => {
   
   // Check if it's a valid 10-digit number
   if (cleaned.length === 10) {
-    return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 6)}-${cleaned.slice(6)}`;
+    return `+1 ${cleaned.slice(0, 3)}-${cleaned.slice(3, 6)}-${cleaned.slice(6)}`;
   }
   
   // If it's not a 10-digit number, return the original
