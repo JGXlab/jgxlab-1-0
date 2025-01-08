@@ -19,17 +19,8 @@ export const clinicFormSchema = z.object({
   contactPhone: z.string().min(10, {
     message: "Please enter a valid contact phone number.",
   }),
-  street_address: z.string().min(5, {
-    message: "Street address must be at least 5 characters.",
-  }),
-  city: z.string().min(2, {
-    message: "City must be at least 2 characters.",
-  }),
-  state: z.string().length(2, {
-    message: "State must be 2 characters.",
-  }),
-  zip_code: z.string().length(5, {
-    message: "ZIP code must be 5 characters.",
+  address: z.string().min(5, {
+    message: "Address must be at least 5 characters.",
   }),
 });
 
