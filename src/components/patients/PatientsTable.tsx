@@ -1,13 +1,8 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { User } from "lucide-react";
 import {
   Table,
   TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
 } from "@/components/ui/table";
 import {
   AlertDialog,
@@ -23,9 +18,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { useState } from "react";
 import { EditPatientForm } from "./EditPatientForm";
 import { useToast } from "@/hooks/use-toast";
-import { Badge } from "@/components/ui/badge";
-import { PatientActions } from "./PatientActions";
 import { LabScriptHistoryModal } from "./LabScriptHistoryModal";
+import { PatientTableHeader } from "./table/PatientTableHeader";
+import { PatientTableRow } from "./table/PatientTableRow";
+import { EmptyPatientTable } from "./table/EmptyPatientTable";
 
 interface PatientsTableProps {
   clinicId?: string;
@@ -107,60 +103,20 @@ export function PatientsTable({ clinicId, searchTerm = "" }: PatientsTableProps)
     <>
       <div className="rounded-xl bg-white">
         <Table>
-          <TableHeader>
-            <TableRow className="bg-gray-50/50 hover:bg-gray-50/50 border-none">
-              <TableHead className="text-primary/80 font-semibold">Name</TableHead>
-              <TableHead className="text-primary/80 font-semibold">Gender</TableHead>
-              <TableHead className="text-primary/80 font-semibold">Date of Birth</TableHead>
-              <TableHead className="text-primary/80 font-semibold">Created At</TableHead>
-              <TableHead className="text-primary/80 font-semibold text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
+          <PatientTableHeader />
           <TableBody>
             {filteredPatients && filteredPatients.length > 0 ? (
               filteredPatients.map((patient) => (
-                <TableRow key={patient.id} className="hover:bg-gray-50/50 transition-colors duration-200">
-                  <TableCell>
-                    <div className="flex items-center space-x-3">
-                      <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-                        <User className="h-4 w-4 text-primary" />
-                      </div>
-                      <div>
-                        <p className="font-medium text-gray-900">
-                          {patient.first_name} {patient.last_name}
-                        </p>
-                        <p className="text-sm text-gray-600">
-                          ID: {patient.id.slice(0, 8)}
-                        </p>
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="secondary" className="capitalize bg-accent text-accent-foreground">
-                      {patient.gender}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-gray-600">
-                    {patient.date_of_birth ? new Date(patient.date_of_birth).toLocaleDateString() : 'Not set'}
-                  </TableCell>
-                  <TableCell className="text-gray-600">
-                    {new Date(patient.created_at).toLocaleDateString()}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <PatientActions
-                      onEdit={() => setEditingPatient(patient)}
-                      onDelete={() => setDeletingPatient(patient)}
-                      onViewHistory={() => setSelectedPatient(patient)}
-                    />
-                  </TableCell>
-                </TableRow>
+                <PatientTableRow
+                  key={patient.id}
+                  patient={patient}
+                  onEdit={setEditingPatient}
+                  onDelete={setDeletingPatient}
+                  onViewHistory={setSelectedPatient}
+                />
               ))
             ) : (
-              <TableRow>
-                <TableCell colSpan={5} className="text-center py-8 text-gray-500">
-                  {searchTerm ? "No patients found matching your search." : "No patients found. Add your first patient to get started."}
-                </TableCell>
-              </TableRow>
+              <EmptyPatientTable searchTerm={searchTerm} />
             )}
           </TableBody>
         </Table>
