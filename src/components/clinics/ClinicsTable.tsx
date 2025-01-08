@@ -13,7 +13,6 @@ import { Button } from "@/components/ui/button";
 import { EditClinicDialog } from "./EditClinicDialog";
 import { Clinic } from "./types";
 import { KeyRound } from "lucide-react";
-import { ClinicActions } from "./ClinicActions";
 
 export function ClinicsTable() {
   const { toast } = useToast();
@@ -49,6 +48,7 @@ export function ClinicsTable() {
     try {
       console.log('Resetting password for:', userId);
       
+      // Get the current session
       const { data: { session } } = await supabase.auth.getSession();
       
       if (!session?.access_token) {
@@ -133,10 +133,6 @@ export function ClinicsTable() {
                   <KeyRound className="w-4 h-4 mr-2" />
                   Reset Password
                 </Button>
-                <ClinicActions 
-                  clinicEmail={clinic.email}
-                  clinicName={clinic.name}
-                />
               </TableCell>
             </TableRow>
           ))}

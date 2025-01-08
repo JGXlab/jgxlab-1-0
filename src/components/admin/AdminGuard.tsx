@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2 } from "lucide-react";
 
 export const AdminGuard = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
@@ -13,28 +12,24 @@ export const AdminGuard = ({ children }: { children: React.ReactNode }) => {
     const checkAdmin = async () => {
       try {
         console.log("Checking admin access...");
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
         
-        // Get the current session first
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-        
-        if (sessionError) {
-          console.error("Session error:", sessionError);
-          throw new Error("Session verification failed");
+        if (userError) {
+          console.error("Error getting user:", userError);
+          throw new Error("Authentication failed");
         }
-
-        if (!session) {
-          console.log("No active session found, redirecting to login");
+        
+        if (!user) {
+          console.log("No user found, redirecting to login");
           navigate("/admin/login");
           return;
         }
 
-        console.log("Session found, verifying user:", session.user.id);
-        
-        // Get user profile to check role
+        console.log("User found, checking admin role for:", user.id);
         const { data: profile, error: profileError } = await supabase
           .from('profiles')
           .select('role')
-          .eq('id', session.user.id)
+          .eq('id', user.id)
           .single();
 
         if (profileError) {
@@ -45,7 +40,6 @@ export const AdminGuard = ({ children }: { children: React.ReactNode }) => {
         console.log("Profile data:", profile);
         if (!profile || profile.role !== 'admin') {
           console.log("User is not an admin, redirecting to login");
-          await supabase.auth.signOut();
           navigate("/admin/login");
           return;
         }
@@ -54,8 +48,6 @@ export const AdminGuard = ({ children }: { children: React.ReactNode }) => {
         setIsLoading(false);
       } catch (error) {
         console.error("Admin guard error:", error);
-        // Sign out the user if there's any error
-        await supabase.auth.signOut();
         toast({
           variant: "destructive",
           title: "Access Error",
@@ -65,34 +57,11 @@ export const AdminGuard = ({ children }: { children: React.ReactNode }) => {
       }
     };
 
-    // Set up auth state change listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log("Auth state changed:", event, session?.user?.id);
-      if (event === 'SIGNED_OUT') {
-        navigate("/admin/login");
-      } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-        checkAdmin();
-      }
-    });
-
-    // Initial check
     checkAdmin();
-
-    // Cleanup subscription
-    return () => {
-      subscription.unsubscribe();
-    };
   }, [navigate, toast]);
 
   if (isLoading) {
-    return (
-      <div className="fixed inset-0 flex items-center justify-center bg-white/80 backdrop-blur-sm">
-        <div className="flex flex-col items-center gap-3">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-sm text-muted-foreground animate-pulse">Verifying access...</p>
-        </div>
-      </div>
-    );
+    return <div>Loading...</div>;
   }
 
   return <>{children}</>;
