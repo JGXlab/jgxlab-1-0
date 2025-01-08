@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { User, Building2 } from "lucide-react";
 import { PatientActions } from "../PatientActions";
+import { useLocation } from "react-router-dom";
 
 interface PatientTableRowProps {
   patient: any;
@@ -17,6 +18,8 @@ export function PatientTableRow({
   onDelete, 
   onViewHistory 
 }: PatientTableRowProps) {
+  const location = useLocation();
+  const isClinicPortal = location.pathname.startsWith('/clinic');
   const clinicName = patient.clinics?.name;
 
   return (
@@ -36,14 +39,16 @@ export function PatientTableRow({
           </div>
         </div>
       </TableCell>
-      <TableCell>
-        <div className="flex items-center space-x-2">
-          <div className="h-8 w-8 rounded-full bg-emerald-50 flex items-center justify-center">
-            <Building2 className="h-4 w-4 text-emerald-600" />
+      {!isClinicPortal && (
+        <TableCell>
+          <div className="flex items-center space-x-2">
+            <div className="h-8 w-8 rounded-full bg-emerald-50 flex items-center justify-center">
+              <Building2 className="h-4 w-4 text-emerald-600" />
+            </div>
+            <span className="text-gray-900">{clinicName || 'N/A'}</span>
           </div>
-          <span className="text-gray-900">{clinicName || 'N/A'}</span>
-        </div>
-      </TableCell>
+        </TableCell>
+      )}
       <TableCell>
         <Badge 
           variant="secondary" 

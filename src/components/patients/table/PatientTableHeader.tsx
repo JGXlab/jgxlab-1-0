@@ -1,7 +1,11 @@
 import { TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { User, Calendar, Clock, Building2 } from "lucide-react";
+import { useLocation } from "react-router-dom";
 
 export function PatientTableHeader() {
+  const location = useLocation();
+  const isClinicPortal = location.pathname.startsWith('/clinic');
+
   return (
     <TableHeader>
       <TableRow className="bg-gray-50/50 hover:bg-gray-50/50 border-none">
@@ -11,12 +15,14 @@ export function PatientTableHeader() {
             <span>Patient Name</span>
           </div>
         </TableHead>
-        <TableHead className="text-primary/80 font-semibold">
-          <div className="flex items-center space-x-2">
-            <Building2 className="h-4 w-4" />
-            <span>Clinic</span>
-          </div>
-        </TableHead>
+        {!isClinicPortal && (
+          <TableHead className="text-primary/80 font-semibold">
+            <div className="flex items-center space-x-2">
+              <Building2 className="h-4 w-4" />
+              <span>Clinic</span>
+            </div>
+          </TableHead>
+        )}
         <TableHead className="text-primary/80 font-semibold">
           <div className="flex items-center space-x-2">
             <User className="h-4 w-4" />
