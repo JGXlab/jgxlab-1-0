@@ -2,6 +2,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Invoice } from "./Invoice";
 import { useCallback, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface InvoicePreviewDialogProps {
   isOpen: boolean;
@@ -10,6 +11,8 @@ interface InvoicePreviewDialogProps {
 }
 
 export const InvoicePreviewDialog = ({ isOpen, onClose, labScript }: InvoicePreviewDialogProps) => {
+  const navigate = useNavigate();
+
   // Cleanup function to ensure proper state reset
   useEffect(() => {
     return () => {
@@ -20,6 +23,8 @@ export const InvoicePreviewDialog = ({ isOpen, onClose, labScript }: InvoicePrev
   const handleClose = useCallback(() => {
     document.body.style.pointerEvents = 'auto';
     onClose();
+    // Refresh the current page
+    window.location.reload();
   }, [onClose]);
 
   return (
