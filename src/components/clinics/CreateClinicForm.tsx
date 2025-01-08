@@ -1,7 +1,14 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
-import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -30,7 +37,6 @@ export function CreateClinicForm() {
     try {
       console.log("Creating clinic with values:", values);
       
-      // First check if a clinic with this email already exists
       const { data: existingClinic } = await supabase
         .from('clinics')
         .select('id')
@@ -42,7 +48,6 @@ export function CreateClinicForm() {
         return;
       }
 
-      // Create auth account for the clinic
       console.log("Creating auth account for clinic");
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: values.email,
@@ -67,7 +72,6 @@ export function CreateClinicForm() {
 
       console.log("Auth account created, creating clinic record");
 
-      // Create clinic in database
       const { error: clinicError } = await supabase.from('clinics').insert({
         name: values.name,
         email: values.email,
