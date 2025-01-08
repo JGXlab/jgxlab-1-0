@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Eye, Pencil, Trash2, History } from "lucide-react";
+import { History, Pencil, Trash2 } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -23,7 +23,7 @@ export function PatientActions({ onEdit, onDelete, onViewHistory }: PatientActio
               variant="ghost"
               size="icon"
               onClick={onViewHistory}
-              className="h-8 w-8 rounded-full hover:bg-[#E5DEFF] hover:text-[#6E59A5] text-[#8A898C]"
+              className="h-8 w-8 rounded-full hover:bg-gray-100 text-gray-500"
             >
               <History className="h-4 w-4" />
             </Button>
@@ -41,7 +41,7 @@ export function PatientActions({ onEdit, onDelete, onViewHistory }: PatientActio
               variant="ghost"
               size="icon"
               onClick={onEdit}
-              className="h-8 w-8 rounded-full hover:bg-[#E5DEFF] hover:text-[#6E59A5] text-[#8A898C]"
+              className="h-8 w-8 rounded-full hover:bg-gray-100 text-gray-500"
             >
               <Pencil className="h-4 w-4" />
             </Button>
@@ -59,7 +59,7 @@ export function PatientActions({ onEdit, onDelete, onViewHistory }: PatientActio
               variant="ghost"
               size="icon"
               onClick={onDelete}
-              className="h-8 w-8 rounded-full hover:bg-[#FFDEE2] hover:text-red-500 text-[#8A898C]"
+              className="h-8 w-8 rounded-full hover:bg-red-50 text-gray-500 hover:text-red-500"
             >
               <Trash2 className="h-4 w-4" />
             </Button>

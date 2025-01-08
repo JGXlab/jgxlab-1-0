@@ -20,6 +20,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { PatientSearchBar } from "@/components/patients/PatientSearchBar";
 import { PatientsAdminTable } from "@/components/patients/PatientsAdminTable";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
 
 const Patients = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -89,19 +91,27 @@ const Patients = () => {
   });
 
   return (
-    <div className="min-h-screen bg-[#F1F0FB]">
+    <div className="min-h-screen bg-[#F8F9FE]">
       <DesignNavbar />
-      <div className="w-full h-full min-h-screen px-8 md:px-12 lg:px-16 py-8 bg-gradient-to-br from-[#F1F0FB] to-[#E5DEFF]">
-        <div className="space-y-8">
+      <div className="w-full h-full min-h-screen px-8 md:px-12 lg:px-16 py-8">
+        <div className="space-y-6">
           <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-semibold text-[#1A1F2C]">Patients</h1>
-            <PatientSearchBar
-              value={searchQuery}
-              onChange={setSearchQuery}
-            />
+            <div className="flex items-center gap-4">
+              <PatientSearchBar
+                value={searchQuery}
+                onChange={setSearchQuery}
+              />
+              <Button 
+                className="bg-[#7C3AED] hover:bg-[#6D28D9] text-white font-medium px-4 py-2 rounded-full flex items-center gap-2"
+                onClick={() => setEditingPatient({})}
+              >
+                <Plus className="h-4 w-4" />
+                Add New Patient
+              </Button>
+            </div>
           </div>
 
-          <Card className="overflow-hidden border-none shadow-sm bg-white/50 backdrop-blur-sm">
+          <Card className="overflow-hidden border-none shadow-sm bg-white rounded-xl">
             {isLoading ? (
               <div className="flex items-center justify-center h-40">
                 <p className="text-[#8A898C]">Loading patients...</p>
@@ -118,9 +128,11 @@ const Patients = () => {
         </div>
 
         <Dialog open={!!editingPatient} onOpenChange={(open) => !open && setEditingPatient(null)}>
-          <DialogContent className="bg-white/95 backdrop-blur-sm">
+          <DialogContent className="bg-white">
             <DialogHeader>
-              <DialogTitle className="text-[#1A1F2C]">Edit Patient</DialogTitle>
+              <DialogTitle className="text-[#1A1F2C]">
+                {editingPatient?.id ? 'Edit Patient' : 'Add New Patient'}
+              </DialogTitle>
             </DialogHeader>
             {editingPatient && (
               <EditPatientForm
@@ -132,7 +144,7 @@ const Patients = () => {
         </Dialog>
 
         <AlertDialog open={!!deletingPatient} onOpenChange={(open) => !open && setDeletingPatient(null)}>
-          <AlertDialogContent className="bg-white/95 backdrop-blur-sm">
+          <AlertDialogContent className="bg-white">
             <AlertDialogHeader>
               <AlertDialogTitle className="text-[#1A1F2C]">Are you sure?</AlertDialogTitle>
               <AlertDialogDescription className="text-[#8A898C]">
@@ -146,8 +158,8 @@ const Patients = () => {
                 Cancel
               </AlertDialogCancel>
               <AlertDialogAction 
-                onClick={handleDeletePatient} 
-                className="bg-[#9b87f5] text-white hover:bg-[#7E69AB]"
+                onClick={handleDeletePatient}
+                className="bg-red-500 text-white hover:bg-red-600"
               >
                 Delete
               </AlertDialogAction>
