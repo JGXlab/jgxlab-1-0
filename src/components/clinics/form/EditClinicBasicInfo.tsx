@@ -1,7 +1,9 @@
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { UseFormReturn } from "react-hook-form";
+import { UseFormReturn, Control } from "react-hook-form";
 import { EditClinicFormValues } from "../types/edit-clinic-form";
+import { PhoneNumberInput } from "@/components/clinic/PhoneNumberInput";
+import type { Clinic } from "@/components/clinics/types";
 
 interface EditClinicBasicInfoProps {
   form: UseFormReturn<EditClinicFormValues>;
@@ -47,22 +49,10 @@ export function EditClinicBasicInfo({ form }: EditClinicBasicInfoProps) {
         )}
       />
 
-      <FormField
-        control={form.control}
+      <PhoneNumberInput
+        control={form.control as unknown as Control<Clinic>}
         name="phone"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel className="text-sm font-medium text-gray-700">Phone</FormLabel>
-            <FormControl>
-              <Input 
-                placeholder="Enter phone number" 
-                {...field}
-                className="h-11 bg-gray-50 border-gray-200 focus:border-primary focus:ring-primary"
-              />
-            </FormControl>
-            <FormMessage className="text-xs" />
-          </FormItem>
-        )}
+        label="Phone Number"
       />
 
       <FormField
