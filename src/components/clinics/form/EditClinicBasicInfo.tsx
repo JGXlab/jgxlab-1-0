@@ -49,12 +49,6 @@ export function EditClinicBasicInfo({ form }: EditClinicBasicInfoProps) {
         )}
       />
 
-      <PhoneNumberInput
-        control={form.control as unknown as Control<Clinic>}
-        name="phone"
-        label="Phone Number"
-      />
-
       <FormField
         control={form.control}
         name="doctorName"
@@ -71,6 +65,12 @@ export function EditClinicBasicInfo({ form }: EditClinicBasicInfoProps) {
             <FormMessage className="text-xs" />
           </FormItem>
         )}
+      />
+
+      <PhoneNumberInput
+        control={form.control as unknown as Control<Clinic>}
+        name="phone"
+        label="Phone Number"
       />
     </div>
   );
