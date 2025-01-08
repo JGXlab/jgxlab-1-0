@@ -8,7 +8,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import type { Clinic } from "@/components/clinics/types";
-import { PhoneNumberInput } from "./PhoneNumberInput";
 
 interface ContactInfoProps {
   control: Control<Clinic>;
@@ -16,90 +15,66 @@ interface ContactInfoProps {
 
 export function ContactInfo({ control }: ContactInfoProps) {
   return (
-    <>
-      <div className="grid gap-6 md:grid-cols-2">
+    <div className="space-y-4">
+      <h3 className="text-lg font-medium">Address Information</h3>
+      
+      <FormField
+        control={control}
+        name="street_address"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Street Address</FormLabel>
+            <FormControl>
+              <Input {...field} placeholder="123 Main St" />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <div className="grid gap-4 md:grid-cols-3">
         <FormField
           control={control}
-          name="contact_person"
+          name="city"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Contact Person</FormLabel>
+              <FormLabel>City</FormLabel>
               <FormControl>
-                <Input {...field} />
+                <Input {...field} placeholder="City" />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        <PhoneNumberInput
-          control={control}
-          name="contact_phone"
-          label="Contact Phone"
-        />
-      </div>
-
-      <div className="space-y-4">
-        <h3 className="text-lg font-medium">Address Information</h3>
-        
         <FormField
           control={control}
-          name="street_address"
+          name="state"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Street Address</FormLabel>
+              <FormLabel>State</FormLabel>
               <FormControl>
-                <Input {...field} placeholder="123 Main St" />
+                <Input {...field} placeholder="CA" maxLength={2} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        <div className="grid gap-4 md:grid-cols-3">
-          <FormField
-            control={control}
-            name="city"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>City</FormLabel>
-                <FormControl>
-                  <Input {...field} placeholder="City" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={control}
-            name="state"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>State</FormLabel>
-                <FormControl>
-                  <Input {...field} placeholder="CA" maxLength={2} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={control}
-            name="zip_code"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>ZIP Code</FormLabel>
-                <FormControl>
-                  <Input {...field} placeholder="12345" maxLength={5} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+        <FormField
+          control={control}
+          name="zip_code"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>ZIP Code</FormLabel>
+              <FormControl>
+                <Input {...field} placeholder="12345" maxLength={5} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
       </div>
-    </>
+    </div>
   );
 }
