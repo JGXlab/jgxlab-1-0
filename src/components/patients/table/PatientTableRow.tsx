@@ -1,6 +1,7 @@
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { User } from "lucide-react";
+import { format } from "date-fns";
+import { User, Building2 } from "lucide-react";
 import { PatientActions } from "../PatientActions";
 
 interface PatientTableRowProps {
@@ -16,6 +17,8 @@ export function PatientTableRow({
   onDelete, 
   onViewHistory 
 }: PatientTableRowProps) {
+  const clinicName = patient.clinics?.name;
+
   return (
     <TableRow className="hover:bg-gray-50/50 transition-colors duration-200">
       <TableCell>
@@ -34,18 +37,30 @@ export function PatientTableRow({
         </div>
       </TableCell>
       <TableCell>
+        <div className="flex items-center space-x-2">
+          <div className="h-8 w-8 rounded-full bg-emerald-50 flex items-center justify-center">
+            <Building2 className="h-4 w-4 text-emerald-600" />
+          </div>
+          <span className="text-gray-900">{clinicName || 'N/A'}</span>
+        </div>
+      </TableCell>
+      <TableCell>
         <Badge 
           variant="secondary" 
-          className="capitalize bg-accent text-accent-foreground"
+          className="bg-accent text-accent-foreground capitalize"
         >
           {patient.gender}
         </Badge>
       </TableCell>
-      <TableCell className="text-gray-600">
-        {patient.date_of_birth ? new Date(patient.date_of_birth).toLocaleDateString() : 'Not set'}
+      <TableCell>
+        <div className="text-sm text-gray-600">
+          {patient.date_of_birth ? format(new Date(patient.date_of_birth), 'MMM d, yyyy') : 'Not set'}
+        </div>
       </TableCell>
-      <TableCell className="text-gray-600">
-        {new Date(patient.created_at).toLocaleDateString()}
+      <TableCell>
+        <div className="text-sm text-gray-600">
+          {format(new Date(patient.created_at), 'MMM d, yyyy')}
+        </div>
       </TableCell>
       <TableCell className="text-right">
         <PatientActions
