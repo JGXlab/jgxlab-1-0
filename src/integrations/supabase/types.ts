@@ -14,8 +14,6 @@ export type Database = {
           address: string
           auth_user_id: string
           city: string | null
-          contact_person: string | null
-          contact_phone: string | null
           created_at: string
           doctor_name: string
           email: string
@@ -31,8 +29,6 @@ export type Database = {
           address: string
           auth_user_id: string
           city?: string | null
-          contact_person?: string | null
-          contact_phone?: string | null
           created_at?: string
           doctor_name: string
           email: string
@@ -48,8 +44,6 @@ export type Database = {
           address?: string
           auth_user_id?: string
           city?: string | null
-          contact_person?: string | null
-          contact_phone?: string | null
           created_at?: string
           doctor_name?: string
           email?: string

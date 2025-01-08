@@ -114,12 +114,6 @@ export function ClinicsTable() {
             </TableHead>
             <TableHead className="text-primary/80 font-semibold">
               <div className="flex items-center space-x-2">
-                <User className="h-4 w-4" />
-                <span>Contact Person</span>
-              </div>
-            </TableHead>
-            <TableHead className="text-primary/80 font-semibold">
-              <div className="flex items-center space-x-2">
                 <Mail className="h-4 w-4" />
                 <span>Email</span>
               </div>
@@ -159,7 +153,6 @@ export function ClinicsTable() {
                 </div>
               </TableCell>
               <TableCell className="text-gray-600">{clinic.doctor_name}</TableCell>
-              <TableCell className="text-gray-600">{clinic.contact_person}</TableCell>
               <TableCell className="text-gray-600">{clinic.email}</TableCell>
               <TableCell className="text-gray-600">{clinic.phone}</TableCell>
               <TableCell className="text-gray-600">{clinic.address}</TableCell>
@@ -182,7 +175,7 @@ export function ClinicsTable() {
           {!clinics?.length && (
             <TableRow>
               <TableCell 
-                colSpan={7} 
+                colSpan={6} 
                 className="h-24 text-center text-gray-500"
               >
                 No clinics found

@@ -89,8 +89,6 @@ export function ClinicProfileForm() {
           email: data.email,
           phone: data.phone,
           doctor_name: data.doctor_name,
-          contact_person: data.contact_person,
-          contact_phone: data.contact_phone,
           address: formattedAddress,
         })
         .eq("user_id", user.id);
