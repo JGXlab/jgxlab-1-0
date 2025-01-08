@@ -93,21 +93,24 @@ const Patients = () => {
   return (
     <DesignLayout>
       <DesignNavbar />
-      <div className="max-w-[1600px] mx-auto space-y-6">
-        <div className="flex justify-between items-center">
-          <div className="flex items-center gap-4">
-            <PatientSearchBar
-              value={searchQuery}
-              onChange={setSearchQuery}
-            />
-            <Button 
-              className="bg-[#8B5CF6] hover:bg-[#7C3AED] text-white font-medium px-4 py-2 rounded-full flex items-center gap-2"
-              onClick={() => setEditingPatient({})}
-            >
-              <Plus className="h-4 w-4" />
-              Add New Patient
-            </Button>
-          </div>
+      <div className="max-w-[1600px] mx-auto space-y-6 p-8">
+        <div className="flex flex-col space-y-1.5">
+          <h2 className="text-2xl font-semibold text-[#1A1F2C]">Patients</h2>
+          <p className="text-[#8A898C]">Manage and view all patient records</p>
+        </div>
+
+        <div className="flex justify-between items-center gap-4">
+          <PatientSearchBar
+            value={searchQuery}
+            onChange={setSearchQuery}
+          />
+          <Button 
+            className="bg-[#9b87f5] hover:bg-[#7E69AB] text-white font-medium px-4 py-2 rounded-full flex items-center gap-2 transition-colors duration-200"
+            onClick={() => setEditingPatient({})}
+          >
+            <Plus className="h-4 w-4" />
+            Add New Patient
+          </Button>
         </div>
 
         <Card className="overflow-hidden border-none shadow-sm bg-white rounded-xl">
