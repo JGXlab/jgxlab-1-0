@@ -25,7 +25,11 @@ export const useClinicAuth = () => {
 
           if (profile?.role === 'clinic') {
             console.log("Valid clinic user found, redirecting to dashboard");
-            navigate("/clinic/dashboard", { replace: true });
+            navigate("/clinic/dashboard");
+          } else if (profile?.role === 'designer') {
+            navigate("/design/dashboard");
+          } else if (profile?.role === 'admin') {
+            navigate("/admin/dashboard");
           }
         }
       } catch (error) {
@@ -35,50 +39,6 @@ export const useClinicAuth = () => {
 
     checkSession();
   }, [navigate]);
-
-  // Set up auth state change listener
-  useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log("Auth state changed:", event, session?.user?.id);
-      
-      if (event === 'SIGNED_IN' && session?.user) {
-        try {
-          const { data: profile, error: profileError } = await supabase
-            .from('profiles')
-            .select('role')
-            .eq('id', session.user.id)
-            .single();
-
-          if (profileError) throw profileError;
-
-          if (profile?.role === 'clinic') {
-            console.log("Clinic role confirmed, redirecting to dashboard");
-            navigate("/clinic/dashboard", { replace: true });
-          } else {
-            console.log("Non-clinic user detected, signing out");
-            await supabase.auth.signOut();
-            toast({
-              variant: "destructive",
-              title: "Access Denied",
-              description: "You do not have permission to access the clinic portal.",
-            });
-          }
-        } catch (error) {
-          console.error("Profile check error:", error);
-          await supabase.auth.signOut();
-          toast({
-            variant: "destructive",
-            title: "Error",
-            description: "An error occurred while checking your permissions.",
-          });
-        }
-      }
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [navigate, toast]);
 
   const signIn = async (email: string, password: string) => {
     setIsPending(true);
@@ -92,26 +52,11 @@ export const useClinicAuth = () => {
 
       if (error) {
         console.error("Login error:", error);
-        
-        if (error.message.includes("Invalid login credentials")) {
-          toast({
-            variant: "destructive",
-            title: "Login Failed",
-            description: "Invalid email or password. Please check your credentials and try again.",
-          });
-        } else if (error.message.includes("Email not confirmed")) {
-          toast({
-            variant: "destructive",
-            title: "Email Not Verified",
-            description: "Please check your email and verify your account before logging in.",
-          });
-        } else {
-          toast({
-            variant: "destructive",
-            title: "Login Failed",
-            description: error.message,
-          });
-        }
+        toast({
+          variant: "destructive",
+          title: "Login Failed",
+          description: error.message,
+        });
         return;
       }
 
@@ -126,21 +71,37 @@ export const useClinicAuth = () => {
 
         if (profileError) throw profileError;
 
+        console.log("User profile:", profile);
+
         if (profile?.role === 'clinic') {
           console.log("Clinic role confirmed, redirecting to dashboard");
           toast({
             title: "Welcome back!",
             description: "Successfully logged in to your account.",
           });
-          navigate("/clinic/dashboard", { replace: true });
+          navigate("/clinic/dashboard");
+        } else if (profile?.role === 'designer') {
+          console.log("Designer role confirmed, redirecting to dashboard");
+          toast({
+            title: "Welcome back!",
+            description: "Successfully logged in to your account.",
+          });
+          navigate("/design/dashboard");
+        } else if (profile?.role === 'admin') {
+          console.log("Admin role confirmed, redirecting to dashboard");
+          toast({
+            title: "Welcome back!",
+            description: "Successfully logged in to your account.",
+          });
+          navigate("/admin/dashboard");
         } else {
-          console.log("Non-clinic user detected, signing out");
+          console.log("Invalid role, signing out");
+          await supabase.auth.signOut();
           toast({
             variant: "destructive",
             title: "Access Denied",
-            description: "You do not have permission to access the clinic portal.",
+            description: "You do not have permission to access this portal.",
           });
-          await supabase.auth.signOut();
         }
       }
     } catch (error) {
