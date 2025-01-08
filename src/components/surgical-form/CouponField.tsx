@@ -54,7 +54,6 @@ export const CouponField = ({ form, patientId, onValidCoupon }: CouponFieldProps
       name="couponCode"
       render={({ field }) => (
         <FormItem className="space-y-1.5">
-          <FormLabel className="text-sm font-medium text-gray-900">Coupon Code</FormLabel>
           <div className="flex gap-2">
             <FormControl>
               <Input
