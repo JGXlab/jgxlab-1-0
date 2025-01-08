@@ -10,13 +10,13 @@ export const clinicFormSchema = z.object({
   phone: z.string().min(10, {
     message: "Please enter a valid phone number.",
   }),
-  doctorName: z.string().min(2, {
+  doctor_name: z.string().min(2, {
     message: "Doctor name must be at least 2 characters.",
   }),
-  contactPerson: z.string().min(2, {
+  contact_person: z.string().min(2, {
     message: "Contact person name must be at least 2 characters.",
   }),
-  contactPhone: z.string().min(10, {
+  contact_phone: z.string().min(10, {
     message: "Please enter a valid contact phone number.",
   }),
   address: z.string().min(5, {

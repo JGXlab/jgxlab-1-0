@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { UseFormReturn } from "react-hook-form";
 import { CreateClinicFormValues } from "../types/clinic-form";
 import { PhoneNumberInput } from "@/components/clinic/PhoneNumberInput";
+import type { Clinic } from "@/components/clinics/types";
 
 interface ClinicBasicInfoFieldsProps {
   form: UseFormReturn<CreateClinicFormValues>;
@@ -49,7 +50,7 @@ export function ClinicBasicInfoFields({ form }: ClinicBasicInfoFieldsProps) {
       />
 
       <PhoneNumberInput
-        control={form.control}
+        control={form.control as unknown as Control<Clinic>}
         name="phone"
         label="Phone Number"
       />

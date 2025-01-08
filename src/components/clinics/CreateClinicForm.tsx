@@ -1,8 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
-import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import { Form } from "@/components/ui/form";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
@@ -19,9 +18,9 @@ export function CreateClinicForm() {
       name: "",
       email: "",
       phone: "",
-      doctorName: "",
-      contactPerson: "",
-      contactPhone: "",
+      doctor_name: "",
+      contact_person: "",
+      contact_phone: "",
       address: "",
     },
   });
@@ -72,9 +71,9 @@ export function CreateClinicForm() {
         name: values.name,
         email: values.email,
         phone: values.phone,
-        doctor_name: values.doctorName,
-        contact_person: values.contactPerson,
-        contact_phone: values.contactPhone,
+        doctor_name: values.doctor_name,
+        contact_person: values.contact_person,
+        contact_phone: values.contact_phone,
         address: values.address,
         user_id: (await supabase.auth.getUser()).data.user?.id,
         auth_user_id: authData.user.id
