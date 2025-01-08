@@ -130,44 +130,44 @@ export const PaymentSection = ({
   const isLoading = isPriceLoading || isCalculating;
 
   return (
-    <div className="sticky bottom-0 bg-white border-t shadow-lg p-4">
-      <div className="flex flex-col space-y-4">
-        <div className="flex justify-between items-start">
-          <TotalAmountDisplay
-            basePrice={basePrice}
-            totalAmount={totalAmount}
-            applianceType={applianceType}
-            archType={archType}
-            needsNightguard={needsNightguard}
-            expressDesign={expressDesign}
-            formattedApplianceType={formatApplianceType(applianceType)}
-            isLoading={isLoading}
-          />
-        </div>
-        
-        {applianceType === 'printed-try-in' && patientId && (
-          <div className="w-full max-w-md">
-            <CouponField 
-              form={form} 
-              patientId={patientId}
-              onValidCoupon={(validationResult?: { archType?: string }) => {
-                console.log('Valid coupon applied');
-                if (validationResult?.archType) {
-                  setSurgicalDayArch(validationResult.archType);
-                }
-              }}
+    <div className="sticky bottom-0 bg-white border-t shadow-lg py-2">
+      <div className="container mx-auto px-4">
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center justify-between">
+            <TotalAmountDisplay
+              basePrice={basePrice}
+              totalAmount={totalAmount}
+              applianceType={applianceType}
+              archType={archType}
+              needsNightguard={needsNightguard}
+              expressDesign={expressDesign}
+              formattedApplianceType={formatApplianceType(applianceType)}
+              isLoading={isLoading}
+            />
+            
+            {applianceType === 'printed-try-in' && patientId && (
+              <div className="w-[280px]">
+                <CouponField 
+                  form={form} 
+                  patientId={patientId}
+                  onValidCoupon={(validationResult?: { archType?: string }) => {
+                    console.log('Valid coupon applied');
+                    if (validationResult?.archType) {
+                      setSurgicalDayArch(validationResult.archType);
+                    }
+                  }}
+                />
+              </div>
+            )}
+
+            <SubmitButton
+              isSubmitting={isSubmitting || submitFreeLabScript.isPending}
+              isPending={createCheckoutSession.isPending}
+              onClick={handleSubmitAndPay}
+              disabled={isLoading}
+              totalAmount={totalAmount}
             />
           </div>
-        )}
-
-        <div className="flex justify-end">
-          <SubmitButton
-            isSubmitting={isSubmitting || submitFreeLabScript.isPending}
-            isPending={createCheckoutSession.isPending}
-            onClick={handleSubmitAndPay}
-            disabled={isLoading}
-            totalAmount={totalAmount}
-          />
         </div>
       </div>
     </div>
