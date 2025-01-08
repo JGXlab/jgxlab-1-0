@@ -1,4 +1,7 @@
 import { PreviewField } from "./PreviewField";
+import { Button } from "@/components/ui/button";
+import { Copy } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 
 interface ApplianceSectionProps {
   applianceType: string;
@@ -42,6 +45,8 @@ export const ApplianceSection = ({
   expressDesign,
   couponCode,
 }: ApplianceSectionProps) => {
+  const { toast } = useToast();
+
   const formatTreatmentType = (value: string) => {
     if (!value) return 'Not specified';
     if (!value.includes('|')) return value;
@@ -79,6 +84,23 @@ export const ApplianceSection = ({
   const formatVDODetails = (details: string) => {
     if (!details) return 'Not specified';
     return vdoDetailsMap[details as keyof typeof vdoDetailsMap] || details;
+  };
+
+  const handleCopyCode = async (code: string) => {
+    try {
+      await navigator.clipboard.writeText(code);
+      toast({
+        title: "Copied!",
+        description: "Coupon code copied to clipboard",
+      });
+    } catch (err) {
+      console.error('Failed to copy code:', err);
+      toast({
+        title: "Error",
+        description: "Failed to copy code to clipboard",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -122,11 +144,21 @@ export const ApplianceSection = ({
             : 'Not specified'} 
         />
         {applianceType === 'surgical-day' && couponCode && (
-          <PreviewField 
-            label="Free Printed Try-in Coupon" 
-            value={couponCode}
-            className="font-semibold text-primary"
-          />
+          <div className="flex flex-col space-y-1">
+            <p className="text-sm font-medium text-gray-500">Free Printed Try-in Coupon</p>
+            <div className="flex items-center space-x-2">
+              <div className="font-semibold text-primary">{couponCode}</div>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 p-0"
+                onClick={() => handleCopyCode(couponCode)}
+              >
+                <Copy className="h-4 w-4" />
+                <span className="sr-only">Copy code</span>
+              </Button>
+            </div>
+          </div>
         )}
       </div>
     </div>
