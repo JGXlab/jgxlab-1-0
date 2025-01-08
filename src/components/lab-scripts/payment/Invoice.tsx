@@ -74,34 +74,51 @@ export const Invoice = ({ labScript }: InvoiceProps) => {
             color-adjust: exact !important;
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
+            background-color: transparent !important;
           }
           .invoice-content {
             width: 210mm;
             min-height: 297mm;
             padding: 20mm;
             margin: 0;
-            background: white;
+            background: white !important;
             box-shadow: none;
             font-size: 12pt;
           }
-          .bg-primary, .text-primary, .border-primary {
+          .text-primary {
             color: #375bdc !important;
+            background: none !important;
+          }
+          .bg-primary {
             background-color: #375bdc !important;
+            color: white !important;
+          }
+          .border-primary {
             border-color: #375bdc !important;
           }
-          .bg-success, .text-success {
+          .text-success {
             color: #22c55e !important;
+            background: none !important;
+          }
+          .bg-success {
             background-color: #22c55e !important;
           }
-          .bg-muted, .text-muted {
+          .text-muted {
             color: #64748b !important;
+            background: none !important;
+          }
+          .bg-muted {
             background-color: #64748b !important;
           }
           .text-card-foreground {
             color: #0f172a !important;
+            background: none !important;
           }
           .bg-accent {
             background-color: #f8fafc !important;
+          }
+          [class*="text-"] {
+            background: none !important;
           }
         }
       `;
