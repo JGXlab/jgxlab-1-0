@@ -6,15 +6,17 @@ import { InvoiceHeader } from "./InvoiceHeader";
 import { BillingAddresses } from "./BillingAddresses";
 import { InvoiceTable } from "./InvoiceTable";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui/use-toast";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
+import { usePrintHandler } from "./print/PrintHandler";
 
 interface InvoiceProps {
   labScript: any;
 }
 
 export const Invoice = ({ labScript }: InvoiceProps) => {
-  const { toast } = useToast();
+  const contentRef = useRef<HTMLDivElement>(null);
+  const { handlePrint } = usePrintHandler();
+
   const { data: invoice, isLoading: isLoadingInvoice } = useQuery({
     queryKey: ['invoice', labScript.id],
     queryFn: async () => {
@@ -46,135 +48,6 @@ export const Invoice = ({ labScript }: InvoiceProps) => {
     };
   }, []);
 
-  const handlePrint = () => {
-    try {
-      const printContent = document.querySelector('.invoice-content');
-      if (!printContent) {
-        throw new Error('Print content not found');
-      }
-      
-      // Remove any existing print styles
-      const existingStyles = document.getElementById('invoice-print-styles');
-      if (existingStyles) {
-        existingStyles.remove();
-      }
-
-      const printStyles = `
-        @page { 
-          size: A4;
-          margin: 0;
-        }
-        @media print {
-          body { 
-            margin: 1.6cm;
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-          }
-          * {
-            color-adjust: exact !important;
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-            background-color: transparent !important;
-          }
-          .invoice-content {
-            width: 210mm;
-            min-height: 297mm;
-            padding: 20mm;
-            margin: 0;
-            background: white !important;
-            box-shadow: none;
-            font-size: 12pt;
-          }
-          .text-primary {
-            color: #375bdc !important;
-            background: none !important;
-          }
-          .bg-primary {
-            background-color: #375bdc !important;
-            color: white !important;
-          }
-          .border-primary {
-            border-color: #375bdc !important;
-          }
-          .text-success {
-            color: #22c55e !important;
-            background: none !important;
-          }
-          .bg-success {
-            background-color: #22c55e !important;
-          }
-          .text-muted {
-            color: #64748b !important;
-            background: none !important;
-          }
-          .bg-muted {
-            background-color: #64748b !important;
-          }
-          .text-card-foreground {
-            color: #0f172a !important;
-            background: none !important;
-          }
-          .bg-accent {
-            background-color: #f8fafc !important;
-          }
-          [class*="text-"] {
-            background: none !important;
-          }
-        }
-      `;
-      
-      const styleSheet = document.createElement('style');
-      styleSheet.id = 'invoice-print-styles';
-      styleSheet.textContent = printStyles;
-      document.head.appendChild(styleSheet);
-      
-      const printWindow = window.open('', '', 'width=800,height=600');
-      if (!printWindow) {
-        throw new Error('Could not open print window');
-      }
-      
-      printWindow.document.write(`
-        <html>
-          <head>
-            <title>Invoice</title>
-            ${document.head.innerHTML}
-          </head>
-          <body>
-            ${printContent.innerHTML}
-          </body>
-        </html>
-      `);
-      
-      printWindow.document.close();
-      printWindow.focus();
-      
-      // Wait for resources to load before printing
-      setTimeout(() => {
-        printWindow.print();
-        // Clean up after printing
-        setTimeout(() => {
-          printWindow.close();
-          const printStyleSheet = document.getElementById('invoice-print-styles');
-          if (printStyleSheet) {
-            printStyleSheet.remove();
-          }
-        }, 100);
-      }, 250);
-
-      toast({
-        title: "Print Started",
-        description: "The invoice print dialog should open shortly.",
-      });
-    } catch (error) {
-      console.error('Print error:', error);
-      toast({
-        title: "Print Error",
-        description: "Failed to print the invoice. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
-
   if (isLoadingInvoice) {
     return (
       <div className="flex items-center justify-center p-8">
@@ -194,7 +67,7 @@ export const Invoice = ({ labScript }: InvoiceProps) => {
   return (
     <div className="relative">
       <Button
-        onClick={handlePrint}
+        onClick={() => handlePrint(contentRef)}
         size="icon"
         variant="ghost"
         className="absolute top-0 right-0 m-4"
@@ -202,7 +75,10 @@ export const Invoice = ({ labScript }: InvoiceProps) => {
       >
         <Printer className="h-4 w-4" />
       </Button>
-      <Card className="w-[210mm] h-[297mm] mx-auto shadow-none border-none bg-white invoice-content">
+      <Card 
+        ref={contentRef}
+        className="w-[210mm] h-[297mm] mx-auto shadow-none border-none bg-white invoice-content"
+      >
         <div className="p-6 space-y-6 h-full">
           <InvoiceHeader labScript={labScript} />
           <BillingAddresses invoice={invoice} />
