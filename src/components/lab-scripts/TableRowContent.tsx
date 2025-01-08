@@ -1,18 +1,10 @@
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Eye, Receipt, MoreVertical, AlertCircle, ExternalLink, Download } from "lucide-react";
+import { Eye, AlertCircle, ExternalLink, Download } from "lucide-react";
 import { format } from "date-fns";
 import { getStatusColor, getPaymentStatusColor } from "./utils/statusStyles";
 import { StatusUpdateButtons } from "./StatusUpdateButtons";
-import { useState, useCallback } from "react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu";
 import {
   HoverCard,
   HoverCardContent,
@@ -169,30 +161,24 @@ export const TableRowContent = ({
               </Tooltip>
             </TooltipProvider>
           )}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 rounded-full text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-all duration-300 hover:scale-105"
-              >
-                <MoreVertical className="h-4 w-4" />
-                <span className="sr-only">More options</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent 
-              align="end" 
-              className="w-48 bg-white border border-gray-200 shadow-lg rounded-md"
-            >
-              <DropdownMenuItem 
-                onClick={(e) => onPreview(script, e)}
-                className="cursor-pointer hover:bg-gray-100"
-              >
-                <Eye className="mr-2 h-4 w-4" />
-                Preview Script
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={(e) => onPreview(script, e)}
+                  className="h-8 w-8 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground"
+                >
+                  <Eye className="h-4 w-4" />
+                  <span className="sr-only">Preview Script</span>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Preview Script</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       </TableCell>
     </TableRow>
