@@ -36,17 +36,23 @@ export function ClinicActions({ clinicEmail, clinicName }: ClinicActionsProps) {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to generate login link');
+        throw new Error(data.error || 'Failed to generate login token');
       }
+
+      // Sign out current admin user first
+      await supabase.auth.signOut();
 
       // Use the token to sign in as the clinic
       const { error: signInError } = await supabase.auth.signInWithPassword({
         email: clinicEmail,
-        password: data.token,
+        password: data.token.toString(), // Ensure token is a string
       });
 
       if (signInError) throw signInError;
 
+      // Redirect to clinic dashboard after successful sign in
+      window.location.href = '/clinic/dashboard';
+      
       toast({
         title: "Success",
         description: `Signed in as ${clinicName}`,
