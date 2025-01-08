@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { UserPlus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import {
   Table,
@@ -13,6 +12,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { EditClinicDialog } from "./EditClinicDialog";
 import { Clinic } from "./types";
+import { KeyRound } from "lucide-react";
+import { toast } from "sonner";
 
 export function ClinicsTable() {
   const { toast } = useToast();
@@ -31,7 +32,6 @@ export function ClinicsTable() {
         throw error;
       }
 
-      // Transform the data to include address fields
       const transformedData = data.map(clinic => ({
         ...clinic,
         street_address: '',
@@ -45,83 +45,39 @@ export function ClinicsTable() {
     },
   });
 
-  const handleInvite = async (email: string, clinicName: string) => {
+  const handlePasswordReset = async (email: string, clinicName: string) => {
     try {
-      console.log('Sending invitation to:', email);
+      console.log('Resetting password for:', email);
       
-      // First, check if the user already exists using maybeSingle() instead of single()
-      const { data: existingUser, error: userCheckError } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('email', email)
-        .maybeSingle();
+      // Send password reset email
+      const { error } = await supabase.auth.resetPasswordForEmail(
+        email,
+        {
+          redirectTo: `${window.location.origin}/admin/login`,
+        }
+      );
 
-      if (userCheckError) {
-        console.error('Error checking existing user:', userCheckError);
-        throw userCheckError;
+      if (error) {
+        console.error('Error resetting password:', error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: error.message,
+        });
+        return;
       }
 
-      if (existingUser) {
-        console.log('User already exists, sending password reset email');
-        // If user exists, just send a password reset email
-        const { error: resetError } = await supabase.auth.resetPasswordForEmail(
-          email,
-          {
-            redirectTo: `${window.location.origin}/admin/login`,
-          }
-        );
-
-        if (resetError) {
-          console.error('Error sending reset email:', resetError);
-          throw resetError;
-        }
-
-        toast({
-          title: "Invitation Sent",
-          description: `A password reset link has been sent to ${email}. Please check spam folder if not received.`,
-        });
-      } else {
-        console.log('Creating new user and sending invitation');
-        // If user doesn't exist, create them and send invitation
-        const { error: signUpError } = await supabase.auth.signUp({
-          email,
-          password: 'Password1',
-          options: {
-            data: {
-              clinic_name: clinicName,
-            },
-          }
-        });
-
-        if (signUpError) {
-          console.error('Error creating user:', signUpError);
-          throw signUpError;
-        }
-
-        // Send password reset email to new user
-        const { error: resetError } = await supabase.auth.resetPasswordForEmail(
-          email,
-          {
-            redirectTo: `${window.location.origin}/admin/login`,
-          }
-        );
-
-        if (resetError) {
-          console.error('Error sending reset email:', resetError);
-          throw resetError;
-        }
-
-        toast({
-          title: "User Created and Invited",
-          description: `An account has been created for ${email} and a password reset link has been sent. Please check spam folder if not received.`,
-        });
-      }
+      toast({
+        title: "Password Reset Email Sent",
+        description: `A password reset link has been sent to ${email}. Please check spam folder if not received.`,
+      });
+      
     } catch (error) {
-      console.error('Error in invite handler:', error);
+      console.error('Error in password reset handler:', error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: error instanceof Error ? error.message : "An unexpected error occurred. Please try again.",
+        description: error instanceof Error ? error.message : "An unexpected error occurred",
       });
     }
   };
@@ -162,6 +118,15 @@ export function ClinicsTable() {
               <TableCell className="text-[#8E9196]">{clinic.address}</TableCell>
               <TableCell className="flex items-center gap-2">
                 <EditClinicDialog clinic={clinic} />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handlePasswordReset(clinic.email, clinic.name)}
+                  className="bg-white border-[#D3E4FD] text-primary hover:bg-[#F8FAFC] hover:text-primary/90 transition-colors"
+                >
+                  <KeyRound className="w-4 h-4 mr-2" />
+                  Reset Password
+                </Button>
               </TableCell>
             </TableRow>
           ))}
