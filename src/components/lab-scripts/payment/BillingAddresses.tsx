@@ -9,6 +9,19 @@ interface BillingAddressesProps {
   };
 }
 
+const formatPhoneNumber = (phoneNumber: string) => {
+  // Remove all non-numeric characters
+  const cleaned = phoneNumber.replace(/\D/g, '');
+  
+  // Check if it's a valid 10-digit number
+  if (cleaned.length === 10) {
+    return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 6)}-${cleaned.slice(6)}`;
+  }
+  
+  // If it's not a 10-digit number, return the original
+  return phoneNumber;
+};
+
 export const BillingAddresses = ({ invoice }: BillingAddressesProps) => {
   return (
     <div className="grid grid-cols-2 gap-12">
@@ -24,7 +37,7 @@ export const BillingAddresses = ({ invoice }: BillingAddressesProps) => {
           <p>United States</p>
           <div className="flex items-center gap-2 pt-1">
             <Phone className="h-4 w-4 text-gray-400" />
-            <span>+1 718-812-2869</span>
+            <span>{formatPhoneNumber('718-812-2869')}</span>
           </div>
         </div>
       </div>
@@ -38,7 +51,7 @@ export const BillingAddresses = ({ invoice }: BillingAddressesProps) => {
           <p>{invoice.clinic_address}</p>
           <div className="flex items-center gap-2 pt-1">
             <Phone className="h-4 w-4 text-gray-400" />
-            <span>{invoice.clinic_phone}</span>
+            <span>{formatPhoneNumber(invoice.clinic_phone)}</span>
           </div>
           <div className="flex items-center gap-2">
             <Mail className="h-4 w-4 text-gray-400" />
