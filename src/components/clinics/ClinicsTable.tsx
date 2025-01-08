@@ -48,13 +48,20 @@ export function ClinicsTable() {
     try {
       console.log('Resetting password for:', userId);
       
+      // Get the current session
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session?.access_token) {
+        throw new Error('No active session found');
+      }
+
       const response = await fetch(
         'https://zuwhzwfdourrvrwhrajj.functions.supabase.co/reset-clinic-password',
         {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+            'Authorization': `Bearer ${session.access_token}`,
           },
           body: JSON.stringify({ userId }),
         }
