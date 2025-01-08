@@ -6,7 +6,7 @@ import { InvoiceHeader } from "./InvoiceHeader";
 import { BillingAddresses } from "./BillingAddresses";
 import { InvoiceTable } from "./InvoiceTable";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 
 interface InvoiceProps {
   labScript: any;
@@ -41,74 +41,45 @@ export const Invoice = ({ labScript }: InvoiceProps) => {
       if (!printContent) {
         throw new Error('Print content not found');
       }
-
-      // Create a new window for printing
-      const printWindow = window.open('', '_blank');
+      
+      const originalDisplay = document.body.style.display;
+      const printStyles = `
+        @page { size: A4; margin: 0; }
+        body { margin: 1.6cm; }
+      `;
+      
+      const styleSheet = document.createElement('style');
+      styleSheet.textContent = printStyles;
+      document.head.appendChild(styleSheet);
+      
+      document.body.style.display = 'none';
+      const printWindow = window.open('', '', 'width=800,height=600');
       if (!printWindow) {
         throw new Error('Could not open print window');
       }
-
-      // Add print-specific styles
-      const printStyles = `
-        @page {
-          size: A4;
-          margin: 20mm;
-        }
-        @media print {
-          body {
-            margin: 0;
-            padding: 0;
-            background: white;
-          }
-          .invoice-content {
-            width: 100%;
-            max-width: none;
-            margin: 0;
-            padding: 0;
-            box-shadow: none;
-            border: none;
-          }
-          .no-print {
-            display: none !important;
-          }
-        }
-        body {
-          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-        }
-        .invoice-content {
-          background: white;
-          padding: 40px;
-          min-height: 297mm;
-          width: 210mm;
-          margin: 0 auto;
-        }
-      `;
-
-      // Write the content to the new window
+      
       printWindow.document.write(`
-        <!DOCTYPE html>
         <html>
           <head>
-            <title>Invoice ${invoice?.payment_id || ''}</title>
-            <style>${printStyles}</style>
+            <title>Invoice</title>
+            ${document.head.innerHTML}
           </head>
           <body>
-            <div class="invoice-content">
-              ${printContent.innerHTML}
-            </div>
-            <script>
-              window.onload = () => {
-                setTimeout(() => {
-                  window.print();
-                  window.close();
-                }, 250);
-              };
-            </script>
+            ${printContent.innerHTML}
           </body>
         </html>
       `);
-
+      
       printWindow.document.close();
+      printWindow.focus();
+      
+      // Wait for resources to load
+      setTimeout(() => {
+        printWindow.print();
+        printWindow.close();
+        document.body.style.display = originalDisplay;
+        document.head.removeChild(styleSheet);
+      }, 250);
 
       toast({
         title: "Print Started",
@@ -146,13 +117,13 @@ export const Invoice = ({ labScript }: InvoiceProps) => {
         onClick={handlePrint}
         size="icon"
         variant="ghost"
-        className="absolute top-0 right-0 m-4 no-print"
+        className="absolute top-0 right-0 m-4"
         title="Print Invoice"
       >
         <Printer className="h-4 w-4" />
       </Button>
-      <Card className="w-[210mm] mx-auto shadow-none border-none bg-white invoice-content">
-        <div className="p-6 space-y-6">
+      <Card className="w-[210mm] h-[297mm] mx-auto shadow-none border-none bg-white invoice-content">
+        <div className="p-6 space-y-6 h-full">
           <InvoiceHeader labScript={labScript} />
           <BillingAddresses invoice={invoice} />
           <InvoiceTable invoice={invoice} />
