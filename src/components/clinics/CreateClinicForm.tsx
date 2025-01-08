@@ -15,6 +15,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { ClinicBasicInfoFields } from "./form/ClinicBasicInfoFields";
 import { ClinicContactFields } from "./form/ClinicContactFields";
+import { ContactInfo } from "@/components/clinic/ContactInfo";
 import { clinicFormSchema, type CreateClinicFormValues } from "./types/clinic-form";
 
 export function CreateClinicForm() {
@@ -29,7 +30,10 @@ export function CreateClinicForm() {
       doctor_name: "",
       contact_person: "",
       contact_phone: "",
-      address: "",
+      street_address: "",
+      city: "",
+      state: "",
+      zip_code: "",
     },
   });
 
@@ -79,7 +83,10 @@ export function CreateClinicForm() {
         doctor_name: values.doctor_name,
         contact_person: values.contact_person,
         contact_phone: values.contact_phone,
-        address: values.address,
+        street_address: values.street_address,
+        city: values.city,
+        state: values.state,
+        zip_code: values.zip_code,
         user_id: (await supabase.auth.getUser()).data.user?.id,
         auth_user_id: authData.user.id
       });
@@ -107,23 +114,7 @@ export function CreateClinicForm() {
           <ClinicContactFields form={form} />
         </div>
 
-        <FormField
-          control={form.control}
-          name="address"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-sm font-medium text-gray-700">Address</FormLabel>
-              <FormControl>
-                <Input 
-                  placeholder="Enter clinic address" 
-                  {...field}
-                  className="h-11 bg-gray-50 border-gray-200 focus:border-primary focus:ring-primary"
-                />
-              </FormControl>
-              <FormMessage className="text-xs" />
-            </FormItem>
-          )}
-        />
+        <ContactInfo control={form.control} />
 
         <Button 
           type="submit" 
