@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Play, CheckCircle, Download } from "lucide-react";
+import { Play, CheckCircle } from "lucide-react";
 import { TooltipProvider, TooltipTrigger, TooltipContent, Tooltip } from "@/components/ui/tooltip";
 import { useState } from "react";
 import { HoldDialog } from "./HoldDialog";
@@ -39,25 +39,6 @@ export const StatusUpdateButtons = ({ script, onStatusUpdate }: StatusUpdateButt
         <Badge className="bg-green-100 text-green-800 w-8 h-8 flex items-center justify-center p-0">
           <CheckCircle className="w-4 h-4" />
         </Badge>
-        {script.design_download_url && (
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <a
-                  href={script.design_download_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center w-8 h-8 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground"
-                >
-                  <Download className="h-4 w-4" />
-                </a>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Download Design</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        )}
       </div>
     );
   }
