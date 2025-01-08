@@ -14,18 +14,6 @@ export const validateCoupon = async (couponCode: string, patientId: string): Pro
     return { isValid: false, message: "Invalid coupon code or patient" };
   }
 
-  // Check if this patient already has a free printed try-in
-  const { data: existingFreeScript } = await supabase
-    .from('lab_scripts')
-    .select('id')
-    .eq('patient_id', patientId)
-    .eq('is_free_printed_tryin', true)
-    .maybeSingle();
-
-  if (existingFreeScript) {
-    return { isValid: false, message: "Patient has already used a free printed try-in" };
-  }
-
   // Find the surgical day script with this coupon
   const { data: surgicalDayScript, error } = await supabase
     .from('lab_scripts')
@@ -44,7 +32,23 @@ export const validateCoupon = async (couponCode: string, patientId: string): Pro
     return { isValid: false, message: "Invalid coupon code or no matching surgical day script found" };
   }
 
-  // Check if coupon has been used
+  // Check if a free printed try-in has already been used for this surgical day script's arch type
+  const { data: existingFreeScript } = await supabase
+    .from('lab_scripts')
+    .select('id')
+    .eq('patient_id', patientId)
+    .eq('is_free_printed_tryin', true)
+    .eq('arch', surgicalDayScript.arch)
+    .maybeSingle();
+
+  if (existingFreeScript) {
+    return { 
+      isValid: false, 
+      message: `Patient has already used a free printed try-in for ${surgicalDayScript.arch} arch` 
+    };
+  }
+
+  // Check if this specific coupon has been used
   const { data: usedCoupon } = await supabase
     .from('lab_scripts')
     .select('id')
@@ -53,7 +57,7 @@ export const validateCoupon = async (couponCode: string, patientId: string): Pro
     .maybeSingle();
 
   if (usedCoupon) {
-    return { isValid: false, message: "Coupon has already been used" };
+    return { isValid: false, message: "This coupon has already been used" };
   }
 
   console.log('Coupon validation successful:', surgicalDayScript);
