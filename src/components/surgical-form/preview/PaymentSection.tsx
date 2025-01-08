@@ -20,8 +20,22 @@ export const PaymentSection = ({ labScript }: PaymentSectionProps) => {
       }
       return response.json();
     },
-    enabled: labScript.payment_status === 'paid'
+    enabled: labScript.payment_status === 'paid' && !labScript.is_free_printed_tryin
   });
+
+  // If it's a free printed try-in with a coupon code, only show that
+  if (labScript.is_free_printed_tryin && labScript.coupon_code) {
+    return (
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold text-gray-900">Free Printed Try-in</h3>
+        <PreviewField 
+          label="Claimed Coupon Code" 
+          value={labScript.coupon_code}
+          className="font-semibold text-primary"
+        />
+      </div>
+    );
+  }
 
   if (labScript.payment_status !== 'paid') {
     return (
