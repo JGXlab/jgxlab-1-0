@@ -8,8 +8,8 @@ interface PreviewHeaderProps {
 
 export const PreviewHeader = ({ onDownload }: PreviewHeaderProps) => {
   return (
-    <DialogHeader className="flex flex-row items-center justify-between">
-      <DialogTitle className="text-2xl font-semibold text-gray-900">
+    <DialogHeader className="flex flex-row items-center justify-between p-6 border-b bg-gray-50/50">
+      <DialogTitle className="text-xl font-semibold text-gray-900">
         Lab Script Preview
       </DialogTitle>
       <Button 
@@ -17,6 +17,7 @@ export const PreviewHeader = ({ onDownload }: PreviewHeaderProps) => {
         size="icon" 
         variant="outline"
         title="Save as PDF"
+        className="h-9 w-9 transition-colors hover:bg-gray-100"
       >
         <Download className="h-4 w-4" />
       </Button>

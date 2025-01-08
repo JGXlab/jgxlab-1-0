@@ -168,26 +168,28 @@ export const PreviewLabScriptModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-3xl">
+      <DialogContent className="max-w-4xl p-0 gap-0 overflow-hidden rounded-xl border shadow-xl">
         <PreviewHeader onDownload={handleDownload} />
         
-        {isLoadingPatient && (
-          <div className="flex items-center justify-center p-8">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          </div>
-        )}
+        <div className="p-6">
+          {isLoadingPatient && (
+            <div className="flex items-center justify-center p-8">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+          )}
 
-        {patientError && (
-          <Alert variant="destructive" className="my-4">
-            <AlertDescription>
-              Unable to load patient information. The patient may have been deleted or you may not have permission to view their details.
-            </AlertDescription>
-          </Alert>
-        )}
+          {patientError && (
+            <Alert variant="destructive" className="mb-6">
+              <AlertDescription>
+                Unable to load patient information. The patient may have been deleted or you may not have permission to view their details.
+              </AlertDescription>
+            </Alert>
+          )}
 
-        {!isLoadingPatient && !patientError && (
-          <PreviewContent labScript={labScript} patient={patient} />
-        )}
+          {!isLoadingPatient && !patientError && (
+            <PreviewContent labScript={labScript} patient={patient} />
+          )}
+        </div>
       </DialogContent>
     </Dialog>
   );
