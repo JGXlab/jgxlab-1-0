@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, Control } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -17,6 +17,7 @@ import { ClinicBasicInfoFields } from "./form/ClinicBasicInfoFields";
 import { ClinicContactFields } from "./form/ClinicContactFields";
 import { ContactInfo } from "@/components/clinic/ContactInfo";
 import { clinicFormSchema, type CreateClinicFormValues } from "./types/clinic-form";
+import type { Clinic } from "./types";
 
 export function CreateClinicForm() {
   const queryClient = useQueryClient();
