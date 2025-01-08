@@ -108,7 +108,7 @@ const Patients = () => {
                 onChange={setSearchQuery}
               />
               <Button 
-                className="bg-[#9b87f5] hover:bg-[#7E69AB] text-white font-medium px-4 py-2 rounded-full flex items-center gap-2 transition-colors duration-200"
+                className="bg-[#0EA5E9] hover:bg-[#0284C7] text-white font-medium px-4 py-2 rounded-full flex items-center gap-2 transition-colors duration-200"
                 onClick={() => setEditingPatient({})}
               >
                 <Plus className="h-4 w-4" />
@@ -116,7 +116,7 @@ const Patients = () => {
               </Button>
             </div>
 
-            <Card className="bg-gradient-to-br from-white to-accent/30 border-none shadow-lg overflow-hidden">
+            <Card className="bg-gradient-to-br from-white to-[#F1F9FF] border-none shadow-lg overflow-hidden">
               {isLoading ? (
                 <div className="flex items-center justify-center h-40">
                   <p className="text-[#8A898C]">Loading patients...</p>
@@ -158,7 +158,7 @@ const Patients = () => {
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel className="bg-[#F6F6F7] text-[#403E43] hover:bg-[#E5DEFF] hover:text-[#6E59A5]">
+                  <AlertDialogCancel className="bg-[#F6F6F7] text-[#403E43] hover:bg-[#E5F3FF] hover:text-[#0EA5E9]">
                     Cancel
                   </AlertDialogCancel>
                   <AlertDialogAction 
