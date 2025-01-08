@@ -13,7 +13,7 @@ import type { Clinic } from "@/components/clinics/types";
 
 interface PhoneNumberInputProps {
   control: Control<Clinic>;
-  name: "phone" | "contact_phone";
+  name: "phone"; // Removed "contact_phone" since it no longer exists in the Clinic type
   label: string;
 }
 
