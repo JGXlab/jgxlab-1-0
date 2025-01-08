@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, FileCheck, Settings, UserRound, LogOut, Bell } from "lucide-react";
+import { LayoutDashboard, FileCheck, Settings, UserRound, LogOut, Bell, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -73,6 +73,18 @@ export const DesignNavbar = ({ isCollapsed, setIsCollapsed }: DesignNavbarProps)
           >
             <FileCheck className="h-3.5 w-3.5" />
             <span className="font-medium text-sm">Lab Scripts</span>
+          </button>
+          
+          <button 
+            onClick={() => navigate("/design/patients")}
+            className={`flex items-center space-x-1.5 px-4 h-10 rounded-full transition-all duration-200 ${
+              isActive("/design/patients") 
+                ? "bg-[#8B5CF6] text-white shadow-sm" 
+                : "text-gray-500 hover:bg-gray-100"
+            }`}
+          >
+            <Users className="h-3.5 w-3.5" />
+            <span className="font-medium text-sm">Patients</span>
           </button>
           
           <button 
