@@ -11,7 +11,7 @@ export const LabScriptsTableHeader = ({
   hideClinicColumn = false 
 }: LabScriptsTableHeaderProps) => {
   return (
-    <TableHeader>
+    <TableHeader className="sticky top-0 bg-white z-20">
       <TableRow className="bg-gray-50/50 hover:bg-gray-50/50 border-none">
         <TableHead className="text-primary/80 font-semibold">
           <div className="flex items-center space-x-2">
