@@ -92,7 +92,7 @@ export default function LabScripts() {
         <ScrollArea className="h-full rounded-2xl bg-[#F6F6F7]">
           <DesignNavbar />
           <div className="px-8 py-6 space-y-6">
-            <div className="bg-white/50 backdrop-blur-sm rounded-xl shadow-lg p-6">
+            <div className="sticky top-[57px] z-10 bg-white/50 backdrop-blur-sm rounded-xl shadow-lg p-6">
               <StatusCardsGrid 
                 statusCounts={statusCounts}
                 selectedStatus={selectedStatus}
