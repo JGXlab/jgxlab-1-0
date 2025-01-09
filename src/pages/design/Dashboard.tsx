@@ -46,10 +46,9 @@ export default function DesignDashboard() {
 
   return (
     <DesignLayout>
-      <div className="flex flex-col max-w-[1400px] w-full mx-auto h-screen py-8">
+      <div className="flex flex-col max-w-[1400px] w-full mx-auto h-[calc(100vh-4rem)]">
         <ScrollArea className="h-full rounded-2xl bg-[#F6F6F7]">
           <DesignNavbar />
-          
           <motion.div 
             className="p-4 sm:p-6 lg:p-8 space-y-6"
             initial={{ opacity: 0, y: 20 }}
