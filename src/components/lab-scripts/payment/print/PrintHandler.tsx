@@ -1,5 +1,4 @@
 import { useToast } from "@/components/ui/use-toast";
-import { getPrintStyles } from "./PrintStyles";
 
 interface PrintHandlerProps {
   contentRef: React.RefObject<HTMLDivElement>;
@@ -13,30 +12,32 @@ export const usePrintHandler = () => {
       if (!contentRef.current) {
         throw new Error('Print content not found');
       }
-      
-      // Remove any existing print styles
-      const existingStyles = document.getElementById('invoice-print-styles');
-      if (existingStyles) {
-        existingStyles.remove();
-      }
 
-      // Add print styles
-      const styleSheet = document.createElement('style');
-      styleSheet.id = 'invoice-print-styles';
-      styleSheet.textContent = getPrintStyles();
-      document.head.appendChild(styleSheet);
-      
       // Create print window with exact content
       const printWindow = window.open('', '', 'width=800,height=600');
       if (!printWindow) {
         throw new Error('Could not open print window');
       }
       
+      // Copy all styles from the current document
+      const styles = Array.from(document.styleSheets)
+        .map(styleSheet => {
+          try {
+            return Array.from(styleSheet.cssRules)
+              .map(rule => rule.cssText)
+              .join('\n');
+          } catch (e) {
+            console.log('Error accessing styleSheet:', e);
+            return '';
+          }
+        })
+        .join('\n');
+
       printWindow.document.write(`
         <html>
           <head>
             <title>Invoice</title>
-            ${document.head.innerHTML}
+            <style>${styles}</style>
           </head>
           <body>
             <div class="invoice-content">
@@ -55,11 +56,6 @@ export const usePrintHandler = () => {
         // Close window after printing
         setTimeout(() => {
           printWindow.close();
-          // Clean up print styles
-          const printStyleSheet = document.getElementById('invoice-print-styles');
-          if (printStyleSheet) {
-            printStyleSheet.remove();
-          }
         }, 100);
       }, 250);
 
