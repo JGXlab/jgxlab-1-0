@@ -2,7 +2,7 @@ import { TableCell, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { User } from "lucide-react";
-import { PatientActions } from "../PatientActions";
+import { PatientActions } from "@/components/patients/PatientActions";
 
 interface PatientTableRowProps {
   patient: any;
@@ -21,8 +21,8 @@ export function PatientTableRow({
     <TableRow className="hover:bg-gray-50/50 transition-colors duration-200">
       <TableCell>
         <div className="flex items-center space-x-3">
-          <div className="h-8 w-8 rounded-full bg-[#7C3AED]/10 flex items-center justify-center">
-            <User className="h-4 w-4 text-[#7C3AED]" />
+          <div className="h-8 w-8 rounded-full bg-[#4F46E5]/10 flex items-center justify-center">
+            <User className="h-4 w-4 text-[#4F46E5]" />
           </div>
           <div>
             <p className="font-medium text-gray-900">
