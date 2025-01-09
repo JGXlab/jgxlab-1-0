@@ -55,7 +55,7 @@ export const DesignNavbar = ({ isCollapsed, setIsCollapsed }: DesignNavbarProps)
             onClick={() => navigate("/design/dashboard")}
             className={`flex items-center space-x-1.5 px-4 h-10 rounded-full transition-all duration-200 ${
               isActive("/design/dashboard") 
-                ? "bg-[#0EA5E9] text-white shadow-sm" 
+                ? "bg-[#4F46E5] text-white shadow-sm" 
                 : "text-gray-500 hover:bg-gray-100"
             }`}
           >
@@ -67,7 +67,7 @@ export const DesignNavbar = ({ isCollapsed, setIsCollapsed }: DesignNavbarProps)
             onClick={() => navigate("/design/labscripts")}
             className={`flex items-center space-x-1.5 px-4 h-10 rounded-full transition-all duration-200 ${
               isActive("/design/labscripts") 
-                ? "bg-[#0EA5E9] text-white shadow-sm" 
+                ? "bg-[#4F46E5] text-white shadow-sm" 
                 : "text-gray-500 hover:bg-gray-100"
             }`}
           >
@@ -79,7 +79,7 @@ export const DesignNavbar = ({ isCollapsed, setIsCollapsed }: DesignNavbarProps)
             onClick={() => navigate("/design/patients")}
             className={`flex items-center space-x-1.5 px-4 h-10 rounded-full transition-all duration-200 ${
               isActive("/design/patients") 
-                ? "bg-[#0EA5E9] text-white shadow-sm" 
+                ? "bg-[#4F46E5] text-white shadow-sm" 
                 : "text-gray-500 hover:bg-gray-100"
             }`}
           >
@@ -91,7 +91,7 @@ export const DesignNavbar = ({ isCollapsed, setIsCollapsed }: DesignNavbarProps)
             onClick={() => navigate("/design/settings")}
             className={`flex items-center space-x-1.5 px-4 h-10 rounded-full transition-all duration-200 ${
               isActive("/design/settings") 
-                ? "bg-[#0EA5E9] text-white shadow-sm" 
+                ? "bg-[#4F46E5] text-white shadow-sm" 
                 : "text-gray-500 hover:bg-gray-100"
             }`}
           >
@@ -103,7 +103,7 @@ export const DesignNavbar = ({ isCollapsed, setIsCollapsed }: DesignNavbarProps)
             onClick={() => navigate("/design/myprofile")}
             className={`flex items-center space-x-1.5 px-4 h-10 rounded-full transition-all duration-200 ${
               isActive("/design/myprofile") 
-                ? "bg-[#0EA5E9] text-white shadow-sm" 
+                ? "bg-[#4F46E5] text-white shadow-sm" 
                 : "text-gray-500 hover:bg-gray-100"
             }`}
           >
@@ -115,7 +115,7 @@ export const DesignNavbar = ({ isCollapsed, setIsCollapsed }: DesignNavbarProps)
 
       {/* Right side - notifications and profile */}
       <div className="flex items-center space-x-4">
-        <button className="relative p-2 rounded-full bg-[#0EA5E9]/10 text-[#0EA5E9] hover:bg-[#0EA5E9]/20 transition-all duration-200">
+        <button className="relative p-2 rounded-full bg-[#4F46E5]/10 text-[#4F46E5] hover:bg-[#4F46E5]/20 transition-all duration-200">
           <Bell className="h-4 w-4" />
           <span className="absolute -top-0.5 -right-0.5 h-4 w-4 bg-red-500 rounded-full text-white text-[10px] flex items-center justify-center border-2 border-white">
             2
@@ -124,8 +124,8 @@ export const DesignNavbar = ({ isCollapsed, setIsCollapsed }: DesignNavbarProps)
         
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Avatar className="h-8 w-8 ring-2 ring-[#0EA5E9]/20 ring-offset-2 ring-offset-white transition-all duration-200 hover:ring-[#0EA5E9]/40 cursor-pointer">
-              <AvatarFallback className="bg-[#0EA5E9]/10 text-[#0EA5E9]">
+            <Avatar className="h-8 w-8 ring-2 ring-[#4F46E5]/20 ring-offset-2 ring-offset-white transition-all duration-200 hover:ring-[#4F46E5]/40 cursor-pointer">
+              <AvatarFallback className="bg-[#4F46E5]/10 text-[#4F46E5]">
                 <UserRound className="h-4 w-4" />
               </AvatarFallback>
             </Avatar>

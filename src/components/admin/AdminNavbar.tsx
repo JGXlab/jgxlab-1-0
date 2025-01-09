@@ -96,7 +96,7 @@ export const AdminNavbar = ({ isCollapsed, setIsCollapsed }: AdminNavbarProps) =
                 onClick={() => navigate(item.path)}
                 className={`flex items-center space-x-1.5 px-4 h-10 rounded-full transition-all duration-200 ${
                   isActivePath(item.path)
-                    ? "bg-primary text-white shadow-sm"
+                    ? "bg-[#4F46E5] text-white shadow-sm"
                     : "text-gray-500 hover:bg-gray-100"
                 }`}
               >
@@ -110,7 +110,7 @@ export const AdminNavbar = ({ isCollapsed, setIsCollapsed }: AdminNavbarProps) =
 
       {/* Right side - notifications and profile */}
       <div className="flex items-center space-x-4">
-        <button className="relative p-2 rounded-full bg-[#8B5CF6]/10 text-[#8B5CF6] hover:bg-[#8B5CF6]/20 transition-all duration-200">
+        <button className="relative p-2 rounded-full bg-[#4F46E5]/10 text-[#4F46E5] hover:bg-[#4F46E5]/20 transition-all duration-200">
           <Bell className="h-4 w-4" />
           <span className="absolute -top-0.5 -right-0.5 h-4 w-4 bg-red-500 rounded-full text-white text-[10px] flex items-center justify-center border-2 border-white">
             2
@@ -119,8 +119,8 @@ export const AdminNavbar = ({ isCollapsed, setIsCollapsed }: AdminNavbarProps) =
         
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Avatar className="h-8 w-8 ring-2 ring-[#8B5CF6]/20 ring-offset-2 ring-offset-white transition-all duration-200 hover:ring-[#8B5CF6]/40 cursor-pointer">
-              <AvatarFallback className="bg-[#8B5CF6]/10 text-[#8B5CF6]">
+            <Avatar className="h-8 w-8 ring-2 ring-[#4F46E5]/20 ring-offset-2 ring-offset-white transition-all duration-200 hover:ring-[#4F46E5]/40 cursor-pointer">
+              <AvatarFallback className="bg-[#4F46E5]/10 text-[#4F46E5]">
                 <UserRound className="h-4 w-4" />
               </AvatarFallback>
             </Avatar>
@@ -131,14 +131,14 @@ export const AdminNavbar = ({ isCollapsed, setIsCollapsed }: AdminNavbarProps) =
           >
             <DropdownMenuItem 
               onClick={() => navigate("/admin/settings")}
-              className="flex items-center space-x-2 cursor-pointer text-sm font-medium text-gray-700 hover:text-[#8B5CF6] hover:bg-gray-50 focus:text-[#8B5CF6] focus:bg-gray-50 px-4 py-2"
+              className="flex items-center space-x-2 cursor-pointer text-sm font-medium text-gray-700 hover:text-[#4F46E5] hover:bg-gray-50 focus:text-[#4F46E5] focus:bg-gray-50 px-4 py-2"
             >
               <UserRound className="h-4 w-4" />
               <span>My Profile</span>
             </DropdownMenuItem>
             <DropdownMenuItem 
               onClick={handleLogout}
-              className="flex items-center space-x-2 cursor-pointer text-sm font-medium text-gray-700 hover:text-[#8B5CF6] hover:bg-gray-50 focus:text-[#8B5CF6] focus:bg-gray-50 px-4 py-2"
+              className="flex items-center space-x-2 cursor-pointer text-sm font-medium text-gray-700 hover:text-[#4F46E5] hover:bg-gray-50 focus:text-[#4F46E5] focus:bg-gray-50 px-4 py-2"
             >
               <LogOut className="h-4 w-4" />
               <span>Logout</span>
