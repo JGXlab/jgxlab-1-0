@@ -88,11 +88,11 @@ export default function LabScripts() {
 
   return (
     <DesignLayout>
-      <div className="flex flex-col max-w-[1400px] w-full mx-auto h-screen py-8">
+      <div className="flex flex-col max-w-[1400px] w-full mx-auto h-[calc(100vh-4rem)] py-8">
         <ScrollArea className="h-full rounded-2xl bg-[#F6F6F7]">
           <DesignNavbar />
-          <div className="p-6 lg:p-8 space-y-6">
-            <div className="bg-white/50 backdrop-blur-sm rounded-xl shadow-lg p-4">
+          <div className="px-8 py-6 space-y-6">
+            <div className="bg-white/50 backdrop-blur-sm rounded-xl shadow-lg p-6">
               <StatusCardsGrid 
                 statusCounts={statusCounts}
                 selectedStatus={selectedStatus}
