@@ -23,7 +23,7 @@ export function PatientActions({ onEdit, onDelete, onViewHistory }: PatientActio
               variant="ghost"
               size="icon"
               onClick={onViewHistory}
-              className="h-8 w-8 rounded-full hover:bg-gray-100 text-gray-500"
+              className="h-8 w-8 rounded-full hover:bg-[#4F46E5]/10 text-gray-500 hover:text-[#4F46E5]"
             >
               <History className="h-4 w-4" />
             </Button>
@@ -41,7 +41,7 @@ export function PatientActions({ onEdit, onDelete, onViewHistory }: PatientActio
               variant="ghost"
               size="icon"
               onClick={onEdit}
-              className="h-8 w-8 rounded-full hover:bg-gray-100 text-gray-500"
+              className="h-8 w-8 rounded-full hover:bg-[#4F46E5]/10 text-gray-500 hover:text-[#4F46E5]"
             >
               <Pencil className="h-4 w-4" />
             </Button>
