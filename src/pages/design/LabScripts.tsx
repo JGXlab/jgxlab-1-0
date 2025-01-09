@@ -8,11 +8,13 @@ import { StatusCardsGrid } from "@/components/lab-scripts/StatusCardsGrid";
 import { LabScriptsTable } from "@/components/lab-scripts/LabScriptsTable";
 import { useToast } from "@/hooks/use-toast";
 import { PreviewLabScriptModal } from "@/components/surgical-form/PreviewLabScriptModal";
+import { LabScriptsPageHeader } from "@/components/lab-scripts/LabScriptsPageHeader";
 
 export default function LabScripts() {
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
   const [selectedScript, setSelectedScript] = useState<any>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const { toast } = useToast();
 
   const { data: labScripts = [], isLoading } = useQuery({
@@ -45,11 +47,26 @@ export default function LabScripts() {
 
   const filteredLabScripts = selectedStatus === 'incomplete'
     ? labScripts?.filter(script => 
-        ['pending', 'in_progress', 'paused', 'on_hold'].includes(script.status)
+        ['pending', 'in_progress', 'paused', 'on_hold'].includes(script.status) &&
+        (searchTerm === "" || 
+          script.patients?.first_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          script.patients?.last_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          script.patients?.clinics?.name?.toLowerCase().includes(searchTerm.toLowerCase()))
       )
     : selectedStatus
-      ? labScripts?.filter(script => script.status === selectedStatus)
-      : labScripts;
+      ? labScripts?.filter(script => 
+          script.status === selectedStatus &&
+          (searchTerm === "" || 
+            script.patients?.first_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            script.patients?.last_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            script.patients?.clinics?.name?.toLowerCase().includes(searchTerm.toLowerCase()))
+        )
+      : labScripts?.filter(script =>
+          searchTerm === "" || 
+          script.patients?.first_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          script.patients?.last_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          script.patients?.clinics?.name?.toLowerCase().includes(searchTerm.toLowerCase())
+        );
 
   const statusCounts = {
     new: labScripts?.filter(script => script.status === 'pending')?.length || 0,
@@ -93,7 +110,10 @@ export default function LabScripts() {
           <DesignNavbar />
           <div className="px-8 pb-1 pt-6 space-y-6">
             <div className="sticky top-[57px] z-10 bg-white/50 backdrop-blur-sm rounded-xl shadow-lg p-6">
-              <StatusCardsGrid 
+              <LabScriptsPageHeader 
+                searchTerm={searchTerm}
+                onSearchChange={setSearchTerm}
+                onNewLabScript={() => {}}
                 statusCounts={statusCounts}
                 selectedStatus={selectedStatus}
                 onStatusSelect={handleStatusSelect}

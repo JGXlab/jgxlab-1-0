@@ -33,10 +33,10 @@ export function LabScriptsPageHeader({
           <Search className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 group-hover:text-gray-600 z-10" />
           <input
             type="text"
-            placeholder="Search lab scripts..."
+            placeholder="Search patients or clinics..."
             value={searchTerm}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="w-full lg:w-[200px] pl-8 sm:pl-10 pr-2 sm:pr-4 py-1.5 sm:py-2 text-sm rounded-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 bg-white/50 backdrop-blur-sm transition-all duration-200 hover:bg-white"
+            className="w-full lg:w-[300px] pl-8 sm:pl-10 pr-2 sm:pr-4 py-1.5 sm:py-2 text-sm rounded-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 bg-white/50 backdrop-blur-sm transition-all duration-200 hover:bg-white"
           />
         </div>
         <Button
