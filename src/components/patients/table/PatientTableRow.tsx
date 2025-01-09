@@ -21,8 +21,8 @@ export function PatientTableRow({
     <TableRow className="hover:bg-gray-50/50 transition-colors duration-200">
       <TableCell>
         <div className="flex items-center space-x-3">
-          <div className="h-8 w-8 rounded-full bg-[#4F46E5]/10 flex items-center justify-center">
-            <User className="h-4 w-4 text-[#4F46E5]" />
+          <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+            <User className="h-4 w-4 text-primary" />
           </div>
           <div>
             <p className="font-medium text-gray-900">
