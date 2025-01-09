@@ -20,8 +20,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import { PatientSearchBar } from "@/components/patients/PatientSearchBar";
 import { PatientsAdminTable } from "@/components/patients/PatientsAdminTable";
-import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 const Patients = () => {
@@ -97,23 +95,11 @@ const Patients = () => {
         <ScrollArea className="h-full rounded-2xl bg-[#F6F6F7]">
           <DesignNavbar />
           <div className="p-4 sm:p-6 lg:p-8 space-y-6">
-            <div className="flex flex-col space-y-1.5">
-              <h2 className="text-2xl font-semibold text-[#1A1F2C]">Patients</h2>
-              <p className="text-[#8A898C]">Manage and view all patient records</p>
-            </div>
-
             <div className="flex justify-between items-center gap-4">
               <PatientSearchBar
                 value={searchQuery}
                 onChange={setSearchQuery}
               />
-              <Button 
-                className="bg-[#4F46E5] hover:bg-[#4338CA] text-white font-medium px-4 py-2 rounded-full flex items-center gap-2 transition-colors duration-200"
-                onClick={() => setEditingPatient({})}
-              >
-                <Plus className="h-4 w-4" />
-                Add New Patient
-              </Button>
             </div>
 
             <Card className="bg-white border-none shadow-lg overflow-hidden">
