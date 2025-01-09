@@ -8,6 +8,8 @@ import { InvoiceTable } from "./InvoiceTable";
 import { Button } from "@/components/ui/button";
 import { useRef } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import { InvoicePDF } from "./InvoicePDF";
 
 interface InvoiceProps {
   labScript: any;
@@ -38,23 +40,6 @@ export const Invoice = ({ labScript, onClose }: InvoiceProps) => {
     enabled: !!labScript.id,
   });
 
-  const handleDownload = async () => {
-    try {
-      const response = await fetch(labScript.invoice_url);
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `invoice-${labScript.id}.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error('Error downloading invoice:', error);
-    }
-  };
-
   if (isLoadingInvoice) {
     return (
       <div className="flex items-center justify-center p-8">
@@ -74,14 +59,25 @@ export const Invoice = ({ labScript, onClose }: InvoiceProps) => {
   return (
     <div className="relative max-h-[calc(100vh-8rem)] overflow-hidden">
       <div className="absolute top-4 right-4 z-10">
-        <Button
-          onClick={handleDownload}
-          size="icon"
-          variant="outline"
-          title="Download Invoice"
+        <PDFDownloadLink
+          document={<InvoicePDF labScript={labScript} invoice={invoice} />}
+          fileName={`invoice-${labScript.id}.pdf`}
         >
-          <Download className="h-4 w-4" />
-        </Button>
+          {({ loading }) => (
+            <Button
+              size="icon"
+              variant="outline"
+              title="Download Invoice"
+              disabled={loading}
+            >
+              {loading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Download className="h-4 w-4" />
+              )}
+            </Button>
+          )}
+        </PDFDownloadLink>
       </div>
       <ScrollArea className="h-[calc(100vh-12rem)] px-4 pt-16">
         <Card 
