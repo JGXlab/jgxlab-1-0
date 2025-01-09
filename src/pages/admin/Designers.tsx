@@ -1,6 +1,6 @@
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Card } from "@/components/ui/card";
-import { Bell, Search, UserPlus } from "lucide-react";
+import { Search, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -43,11 +43,6 @@ const Designers = () => {
               className="pl-8 pr-3 py-1.5 rounded-lg border border-gray-200 w-48 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
             />
           </div>
-          <button className="p-1.5 relative">
-            <Bell className="h-4 w-4" />
-            <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
-          </button>
-          <img src="/placeholder.svg" alt="Profile" className="w-8 h-8 rounded-full" />
         </div>
       </div>
 
