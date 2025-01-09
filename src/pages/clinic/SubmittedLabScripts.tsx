@@ -96,17 +96,19 @@ export default function SubmittedLabScripts() {
     <ClinicLayout>
       <ScrollArea className="h-full rounded-2xl bg-[#F6F6F7]">
         <ClinicNavHeader />
-        <div className="p-4 sm:p-6 lg:p-8 space-y-6">
-          <LabScriptsPageHeader
-            searchTerm={searchTerm}
-            onSearchChange={setSearchTerm}
-            onNewLabScript={() => setIsNewLabScriptOpen(true)}
-            statusCounts={statusCounts}
-            selectedStatus={selectedStatus}
-            onStatusSelect={handleStatusSelect}
-          />
+        <div className="px-8 pb-1 pt-6 space-y-6">
+          <div className="sticky top-[57px] z-10 bg-white/50 backdrop-blur-sm rounded-xl shadow-lg p-6">
+            <LabScriptsPageHeader 
+              searchTerm={searchTerm}
+              onSearchChange={setSearchTerm}
+              statusCounts={statusCounts}
+              selectedStatus={selectedStatus}
+              onStatusSelect={handleStatusSelect}
+              isDesignPortal={false}
+            />
+          </div>
 
-          <Card className="bg-gradient-to-br from-white to-accent/30 border-none shadow-lg">
+          <div className="bg-white/50 backdrop-blur-sm rounded-xl shadow-lg">
             <LabScriptsTable
               labScripts={labScripts.filter(script => {
                 const patientName = `${script.patients?.first_name} ${script.patients?.last_name}`.toLowerCase();
@@ -116,53 +118,53 @@ export default function SubmittedLabScripts() {
               onPreview={handlePreview}
               hideClinicColumn={true}
             />
-          </Card>
-
-          {selectedScript && (
-            <PreviewLabScriptModal
-              isOpen={isPreviewOpen}
-              onClose={() => {
-                setIsPreviewOpen(false);
-                setSelectedScript(null);
-              }}
-              labScriptId={selectedScript.id}
-            />
-          )}
-
-          <Dialog open={isNewLabScriptOpen} onOpenChange={setIsNewLabScriptOpen}>
-            <DialogContent className="max-w-3xl h-[90vh] flex flex-col">
-              <DialogHeader>
-                <DialogTitle>New Lab Script</DialogTitle>
-              </DialogHeader>
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 flex-1 overflow-y-auto">
-                  <PatientInformationSection form={form} />
-                  <ApplianceDetailsSection form={form} />
-                  <AdditionalInformationSection form={form} />
-                  <PaymentSection 
-                    applianceType={form.watch('applianceType')}
-                    archType={form.watch('arch')}
-                    needsNightguard={form.watch('needsNightguard')}
-                    expressDesign={form.watch('expressDesign')}
-                    onSubmit={onSubmit}
-                    isSubmitting={false}
-                    form={form}
-                    onSuccess={handleFormSuccess}
-                  />
-                </form>
-              </Form>
-            </DialogContent>
-          </Dialog>
-
-          {paymentDetails && (
-            <PaymentSuccessDialog
-              isOpen={showSuccessDialog}
-              onClose={closeSuccessDialog}
-              paymentId={paymentDetails.paymentId}
-              invoiceUrl={paymentDetails.invoiceUrl}
-            />
-          )}
+          </div>
         </div>
+
+        {selectedScript && (
+          <PreviewLabScriptModal
+            isOpen={isPreviewOpen}
+            onClose={() => {
+              setIsPreviewOpen(false);
+              setSelectedScript(null);
+            }}
+            labScriptId={selectedScript.id}
+          />
+        )}
+
+        <Dialog open={isNewLabScriptOpen} onOpenChange={setIsNewLabScriptOpen}>
+          <DialogContent className="max-w-3xl h-[90vh] flex flex-col">
+            <DialogHeader>
+              <DialogTitle>New Lab Script</DialogTitle>
+            </DialogHeader>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 flex-1 overflow-y-auto">
+                <PatientInformationSection form={form} />
+                <ApplianceDetailsSection form={form} />
+                <AdditionalInformationSection form={form} />
+                <PaymentSection 
+                  applianceType={form.watch('applianceType')}
+                  archType={form.watch('arch')}
+                  needsNightguard={form.watch('needsNightguard')}
+                  expressDesign={form.watch('expressDesign')}
+                  onSubmit={onSubmit}
+                  isSubmitting={false}
+                  form={form}
+                  onSuccess={handleFormSuccess}
+                />
+              </form>
+            </Form>
+          </DialogContent>
+        </Dialog>
+
+        {paymentDetails && (
+          <PaymentSuccessDialog
+            isOpen={showSuccessDialog}
+            onClose={closeSuccessDialog}
+            paymentId={paymentDetails.paymentId}
+            invoiceUrl={paymentDetails.invoiceUrl}
+          />
+        )}
       </ScrollArea>
     </ClinicLayout>
   );
