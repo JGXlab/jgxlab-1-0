@@ -1,15 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Download } from "lucide-react";
+import { Loader2, Printer } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { InvoiceHeader } from "./InvoiceHeader";
 import { BillingAddresses } from "./BillingAddresses";
 import { InvoiceTable } from "./InvoiceTable";
 import { Button } from "@/components/ui/button";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
+import { usePrintHandler } from "./print/PrintHandler";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { PDFDownloadLink } from "@react-pdf/renderer";
-import { InvoicePDF } from "./InvoicePDF";
 
 interface InvoiceProps {
   labScript: any;
@@ -18,6 +17,7 @@ interface InvoiceProps {
 
 export const Invoice = ({ labScript, onClose }: InvoiceProps) => {
   const contentRef = useRef<HTMLDivElement>(null);
+  const { handlePrint } = usePrintHandler();
 
   const { data: invoice, isLoading: isLoadingInvoice } = useQuery({
     queryKey: ['invoice', labScript.id],
@@ -40,6 +40,16 @@ export const Invoice = ({ labScript, onClose }: InvoiceProps) => {
     enabled: !!labScript.id,
   });
 
+  // Cleanup function to remove any leftover print styles
+  useEffect(() => {
+    return () => {
+      const printStyleSheet = document.getElementById('invoice-print-styles');
+      if (printStyleSheet) {
+        printStyleSheet.remove();
+      }
+    };
+  }, []);
+
   if (isLoadingInvoice) {
     return (
       <div className="flex items-center justify-center p-8">
@@ -59,25 +69,14 @@ export const Invoice = ({ labScript, onClose }: InvoiceProps) => {
   return (
     <div className="relative max-h-[calc(100vh-8rem)] overflow-hidden">
       <div className="absolute top-4 right-4 z-10">
-        <PDFDownloadLink
-          document={<InvoicePDF labScript={labScript} invoice={invoice} />}
-          fileName={`invoice-${labScript.id}.pdf`}
+        <Button
+          onClick={() => handlePrint(contentRef)}
+          size="icon"
+          variant="outline"
+          title="Print Invoice"
         >
-          {({ loading, error }) => (
-            <Button
-              size="icon"
-              variant="outline"
-              title="Download Invoice"
-              disabled={loading}
-            >
-              {loading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Download className="h-4 w-4" />
-              )}
-            </Button>
-          )}
-        </PDFDownloadLink>
+          <Printer className="h-4 w-4" />
+        </Button>
       </div>
       <ScrollArea className="h-[calc(100vh-12rem)] px-4 pt-16">
         <Card 
