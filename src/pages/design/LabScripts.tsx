@@ -16,7 +16,7 @@ export default function LabScripts() {
   const [searchTerm, setSearchTerm] = useState("");
   const { toast } = useToast();
 
-  const { data: labScripts = [], isLoading } = useQuery({
+  const { data: labScripts = [], isLoading, refetch } = useQuery({
     queryKey: ['designer-lab-scripts'],
     queryFn: async () => {
       console.log('Fetching lab scripts for designer...');
@@ -44,6 +44,43 @@ export default function LabScripts() {
       return data || [];
     },
   });
+
+  const handleStatusUpdate = async (id: string, status: string, reason?: string, comment?: string, designUrl?: string) => {
+    console.log('Updating status:', { id, status, reason, comment, designUrl });
+    const updateData: any = { status };
+    
+    if (status === 'on_hold') {
+      updateData.hold_reason = reason;
+      updateData.hold_comment = comment;
+      if (designUrl) updateData.design_url = designUrl;
+    }
+
+    if (status === 'completed') {
+      updateData.completion_comment = comment;
+      if (designUrl) updateData.design_download_url = designUrl;
+    }
+
+    const { error } = await supabase
+      .from('lab_scripts')
+      .update(updateData)
+      .eq('id', id);
+
+    if (error) {
+      console.error('Error updating status:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update status. Please try again.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    toast({
+      title: "Status Updated",
+      description: `Lab script status has been updated to ${status}.`,
+    });
+    refetch();
+  };
 
   const filteredLabScripts = selectedStatus === 'incomplete'
     ? labScripts?.filter(script => 
@@ -125,6 +162,7 @@ export default function LabScripts() {
                 labScripts={filteredLabScripts}
                 isLoading={isLoading}
                 onPreview={handlePreview}
+                onStatusUpdate={handleStatusUpdate}
                 isDesignPortal={true}
               />
             </div>
