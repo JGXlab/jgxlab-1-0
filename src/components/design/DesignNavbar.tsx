@@ -43,7 +43,6 @@ export const DesignNavbar = ({ isCollapsed, setIsCollapsed }: DesignNavbarProps)
 
   return (
     <div className="sticky top-0 w-full bg-white rounded-t-2xl px-6 py-3 flex items-center justify-between z-10">
-      {/* Left side - Logo and nav items */}
       <div className="flex items-center space-x-6">
         <div className="flex flex-col">
           <span className="text-xl font-bold tracking-tight font-inter">JGX Digital Lab</span>
@@ -113,7 +112,6 @@ export const DesignNavbar = ({ isCollapsed, setIsCollapsed }: DesignNavbarProps)
         </nav>
       </div>
 
-      {/* Right side - notifications and profile */}
       <div className="flex items-center space-x-4">
         <button className="relative p-2 rounded-full bg-[#4F46E5]/10 text-[#4F46E5] hover:bg-[#4F46E5]/20 transition-all duration-200">
           <Bell className="h-4 w-4" />

@@ -22,10 +22,8 @@ export default function DesignSettings() {
   const [language, setLanguage] = useState('English (US)');
   const [isCollapsed, setIsCollapsed] = useState(false);
 
-  // Wait for component to mount to avoid hydration mismatch
   useEffect(() => {
     setMounted(true);
-    // Load notification preference from localStorage
     const savedNotifications = localStorage.getItem('notifications') === 'true';
     setNotifications(savedNotifications);
   }, []);
@@ -36,7 +34,6 @@ export default function DesignSettings() {
         setNotifications(value);
         localStorage.setItem('notifications', value.toString());
         if (value) {
-          // Request notification permission
           Notification.requestPermission().then((permission) => {
             if (permission === 'granted') {
               toast.success('Notifications enabled');
@@ -60,10 +57,8 @@ export default function DesignSettings() {
   const handleLanguageChange = (newLanguage: string) => {
     setLanguage(newLanguage);
     toast.success(`Language changed to ${newLanguage}`);
-    // Here you would typically integrate with an i18n library
   };
 
-  // Avoid hydration mismatch by not rendering until mounted
   if (!mounted) return null;
 
   return (
@@ -80,7 +75,6 @@ export default function DesignSettings() {
             <Card className="p-6 bg-gradient-to-br from-white to-accent/30 border-none shadow-lg">
               <h2 className="text-lg font-semibold mb-4">Preferences</h2>
               <div className="space-y-6">
-                {/* Notifications */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
                     <Bell className="w-5 h-5 text-muted-foreground" />
@@ -95,7 +89,6 @@ export default function DesignSettings() {
                   />
                 </div>
 
-                {/* Dark Mode */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
                     <Moon className="w-5 h-5 text-muted-foreground" />
@@ -110,7 +103,6 @@ export default function DesignSettings() {
                   />
                 </div>
 
-                {/* Language */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
                     <Globe className="w-5 h-5 text-muted-foreground" />
@@ -121,7 +113,9 @@ export default function DesignSettings() {
                   </div>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="outline">Change Language</Button>
+                      <Button variant="outline" className="bg-white hover:bg-gray-50 border-gray-200">
+                        Change Language
+                      </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
                       <DropdownMenuItem onClick={() => handleLanguageChange('English (US)')}>
