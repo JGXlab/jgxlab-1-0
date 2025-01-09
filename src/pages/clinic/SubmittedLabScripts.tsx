@@ -94,78 +94,76 @@ export default function SubmittedLabScripts() {
 
   return (
     <ClinicLayout>
-      <div className="flex flex-col max-w-[1400px] w-full mx-auto h-screen py-8">
-        <ScrollArea className="h-full rounded-2xl bg-[#F6F6F7]">
-          <ClinicNavHeader />
-          <div className="p-4 sm:p-6 lg:p-8 space-y-6">
-            <LabScriptsPageHeader
-              searchTerm={searchTerm}
-              onSearchChange={setSearchTerm}
-              onNewLabScript={() => setIsNewLabScriptOpen(true)}
-              statusCounts={statusCounts}
-              selectedStatus={selectedStatus}
-              onStatusSelect={handleStatusSelect}
+      <ScrollArea className="h-full rounded-2xl bg-[#F6F6F7]">
+        <ClinicNavHeader />
+        <div className="p-4 sm:p-6 lg:p-8 space-y-6">
+          <LabScriptsPageHeader
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            onNewLabScript={() => setIsNewLabScriptOpen(true)}
+            statusCounts={statusCounts}
+            selectedStatus={selectedStatus}
+            onStatusSelect={handleStatusSelect}
+          />
+
+          <Card className="bg-gradient-to-br from-white to-accent/30 border-none shadow-lg">
+            <LabScriptsTable
+              labScripts={labScripts.filter(script => {
+                const patientName = `${script.patients?.first_name} ${script.patients?.last_name}`.toLowerCase();
+                return patientName.includes(searchTerm.toLowerCase());
+              })}
+              isLoading={isLoading}
+              onPreview={handlePreview}
+              hideClinicColumn={true}
             />
+          </Card>
 
-            <Card className="bg-gradient-to-br from-white to-accent/30 border-none shadow-lg">
-              <LabScriptsTable
-                labScripts={labScripts.filter(script => {
-                  const patientName = `${script.patients?.first_name} ${script.patients?.last_name}`.toLowerCase();
-                  return patientName.includes(searchTerm.toLowerCase());
-                })}
-                isLoading={isLoading}
-                onPreview={handlePreview}
-                hideClinicColumn={true}
-              />
-            </Card>
+          {selectedScript && (
+            <PreviewLabScriptModal
+              isOpen={isPreviewOpen}
+              onClose={() => {
+                setIsPreviewOpen(false);
+                setSelectedScript(null);
+              }}
+              labScriptId={selectedScript.id}
+            />
+          )}
 
-            {selectedScript && (
-              <PreviewLabScriptModal
-                isOpen={isPreviewOpen}
-                onClose={() => {
-                  setIsPreviewOpen(false);
-                  setSelectedScript(null);
-                }}
-                labScriptId={selectedScript.id}
-              />
-            )}
+          <Dialog open={isNewLabScriptOpen} onOpenChange={setIsNewLabScriptOpen}>
+            <DialogContent className="max-w-3xl h-[90vh] flex flex-col">
+              <DialogHeader>
+                <DialogTitle>New Lab Script</DialogTitle>
+              </DialogHeader>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 flex-1 overflow-y-auto">
+                  <PatientInformationSection form={form} />
+                  <ApplianceDetailsSection form={form} />
+                  <AdditionalInformationSection form={form} />
+                  <PaymentSection 
+                    applianceType={form.watch('applianceType')}
+                    archType={form.watch('arch')}
+                    needsNightguard={form.watch('needsNightguard')}
+                    expressDesign={form.watch('expressDesign')}
+                    onSubmit={onSubmit}
+                    isSubmitting={false}
+                    form={form}
+                    onSuccess={handleFormSuccess}
+                  />
+                </form>
+              </Form>
+            </DialogContent>
+          </Dialog>
 
-            <Dialog open={isNewLabScriptOpen} onOpenChange={setIsNewLabScriptOpen}>
-              <DialogContent className="max-w-3xl h-[90vh] flex flex-col">
-                <DialogHeader>
-                  <DialogTitle>New Lab Script</DialogTitle>
-                </DialogHeader>
-                <Form {...form}>
-                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 flex-1 overflow-y-auto">
-                    <PatientInformationSection form={form} />
-                    <ApplianceDetailsSection form={form} />
-                    <AdditionalInformationSection form={form} />
-                    <PaymentSection 
-                      applianceType={form.watch('applianceType')}
-                      archType={form.watch('arch')}
-                      needsNightguard={form.watch('needsNightguard')}
-                      expressDesign={form.watch('expressDesign')}
-                      onSubmit={onSubmit}
-                      isSubmitting={false}
-                      form={form}
-                      onSuccess={handleFormSuccess}
-                    />
-                  </form>
-                </Form>
-              </DialogContent>
-            </Dialog>
-
-            {paymentDetails && (
-              <PaymentSuccessDialog
-                isOpen={showSuccessDialog}
-                onClose={closeSuccessDialog}
-                paymentId={paymentDetails.paymentId}
-                invoiceUrl={paymentDetails.invoiceUrl}
-              />
-            )}
-          </div>
-        </ScrollArea>
-      </div>
+          {paymentDetails && (
+            <PaymentSuccessDialog
+              isOpen={showSuccessDialog}
+              onClose={closeSuccessDialog}
+              paymentId={paymentDetails.paymentId}
+              invoiceUrl={paymentDetails.invoiceUrl}
+            />
+          )}
+        </div>
+      </ScrollArea>
     </ClinicLayout>
   );
 }
