@@ -63,7 +63,7 @@ export const Invoice = ({ labScript, onClose }: InvoiceProps) => {
           document={<InvoicePDF labScript={labScript} invoice={invoice} />}
           fileName={`invoice-${labScript.id}.pdf`}
         >
-          {({ loading }) => (
+          {({ loading, error }) => (
             <Button
               size="icon"
               variant="outline"
