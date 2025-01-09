@@ -4,7 +4,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { DesignNavbar } from "@/components/design/DesignNavbar";
-import { StatusCardsGrid } from "@/components/lab-scripts/StatusCardsGrid";
 import { LabScriptsTable } from "@/components/lab-scripts/LabScriptsTable";
 import { useToast } from "@/hooks/use-toast";
 import { PreviewLabScriptModal } from "@/components/surgical-form/PreviewLabScriptModal";
@@ -29,7 +28,8 @@ export default function LabScripts() {
             first_name,
             last_name,
             clinics (
-              name
+              name,
+              doctor_name
             )
           )
         `)
@@ -113,10 +113,10 @@ export default function LabScripts() {
               <LabScriptsPageHeader 
                 searchTerm={searchTerm}
                 onSearchChange={setSearchTerm}
-                onNewLabScript={() => {}}
                 statusCounts={statusCounts}
                 selectedStatus={selectedStatus}
                 onStatusSelect={handleStatusSelect}
+                isDesignPortal={true}
               />
             </div>
 
