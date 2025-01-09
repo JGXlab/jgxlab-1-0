@@ -20,11 +20,13 @@ export const usePrintHandler = () => {
         existingStyles.remove();
       }
 
+      // Add print styles
       const styleSheet = document.createElement('style');
       styleSheet.id = 'invoice-print-styles';
       styleSheet.textContent = getPrintStyles();
       document.head.appendChild(styleSheet);
       
+      // Create print window with exact content
       const printWindow = window.open('', '', 'width=800,height=600');
       if (!printWindow) {
         throw new Error('Could not open print window');
@@ -37,7 +39,9 @@ export const usePrintHandler = () => {
             ${document.head.innerHTML}
           </head>
           <body>
-            ${contentRef.current.innerHTML}
+            <div class="invoice-content">
+              ${contentRef.current.innerHTML}
+            </div>
           </body>
         </html>
       `);
@@ -45,10 +49,13 @@ export const usePrintHandler = () => {
       printWindow.document.close();
       printWindow.focus();
       
+      // Print after a short delay to ensure styles are applied
       setTimeout(() => {
         printWindow.print();
+        // Close window after printing
         setTimeout(() => {
           printWindow.close();
+          // Clean up print styles
           const printStyleSheet = document.getElementById('invoice-print-styles');
           if (printStyleSheet) {
             printStyleSheet.remove();
