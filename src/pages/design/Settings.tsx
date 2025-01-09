@@ -63,7 +63,7 @@ export default function DesignSettings() {
 
   return (
     <DesignLayout>
-      <div className="flex flex-col max-w-[1400px] w-full mx-auto h-screen py-8">
+      <div className="flex flex-col max-w-[1400px] w-full mx-auto h-[calc(100vh-4rem)]">
         <ScrollArea className="h-full rounded-2xl bg-[#F6F6F7]">
           <DesignNavbar 
             isCollapsed={isCollapsed}
