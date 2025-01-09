@@ -11,12 +11,13 @@ import { PatientInformationSection } from "@/components/surgical-form/PatientInf
 import { ApplianceDetailsSection } from "@/components/surgical-form/ApplianceDetailsSection";
 import { AdditionalInformationSection } from "@/components/surgical-form/AdditionalInformationSection";
 import { PaymentSection } from "@/components/surgical-form/PaymentSection";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { usePaymentVerification } from "@/components/lab-scripts/payment/usePaymentVerification";
 import { PaymentSuccessDialog } from "@/components/lab-scripts/payment/PaymentSuccessDialog";
 import { z } from "zod";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ClinicNavHeader } from "@/components/clinic/ClinicNavHeader";
+import { Card } from "@/components/ui/card";
 import { LabScriptsPageHeader } from "@/components/lab-scripts/LabScriptsPageHeader";
 import { useLabScripts } from "@/hooks/use-lab-scripts";
 import { useQueryClient } from "@tanstack/react-query";
@@ -29,7 +30,6 @@ export default function SubmittedLabScripts() {
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
   const [searchParams] = useSearchParams();
   const queryClient = useQueryClient();
-  const navigate = useNavigate();
   
   const { 
     verifyPayment, 
@@ -92,10 +92,6 @@ export default function SubmittedLabScripts() {
     queryClient.invalidateQueries({ queryKey: ['labScripts'] });
   };
 
-  const handleNewLabScript = () => {
-    navigate('/clinic/addnewlabscript/new');
-  };
-
   return (
     <ClinicLayout>
       <ScrollArea className="h-full rounded-2xl bg-[#F6F6F7]">
@@ -105,7 +101,6 @@ export default function SubmittedLabScripts() {
             <LabScriptsPageHeader 
               searchTerm={searchTerm}
               onSearchChange={setSearchTerm}
-              onNewLabScript={handleNewLabScript}
               statusCounts={statusCounts}
               selectedStatus={selectedStatus}
               onStatusSelect={handleStatusSelect}
