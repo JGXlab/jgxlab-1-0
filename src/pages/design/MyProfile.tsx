@@ -28,7 +28,7 @@ export default function DesignMyProfile() {
   if (isLoading) {
     return (
       <DesignLayout>
-        <div className="flex flex-col max-w-[1400px] w-full mx-auto h-[calc(100vh-4rem)]">
+        <div className="flex flex-col max-w-[1400px] w-full mx-auto h-screen py-8">
           <ScrollArea className="h-full rounded-2xl bg-[#F6F6F7]">
             <DesignNavbar 
               isCollapsed={isCollapsed}
@@ -48,7 +48,7 @@ export default function DesignMyProfile() {
 
   return (
     <DesignLayout>
-      <div className="flex flex-col max-w-[1400px] w-full mx-auto h-[calc(100vh-4rem)]">
+      <div className="flex flex-col max-w-[1400px] w-full mx-auto h-screen py-8">
         <ScrollArea className="h-full rounded-2xl bg-[#F6F6F7]">
           <DesignNavbar 
             isCollapsed={isCollapsed}
