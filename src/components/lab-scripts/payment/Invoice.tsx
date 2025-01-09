@@ -38,6 +38,23 @@ export const Invoice = ({ labScript, onClose }: InvoiceProps) => {
     enabled: !!labScript.id,
   });
 
+  const handleDownload = async () => {
+    try {
+      const response = await fetch(labScript.invoice_url);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `invoice-${labScript.id}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error downloading invoice:', error);
+    }
+  };
+
   if (isLoadingInvoice) {
     return (
       <div className="flex items-center justify-center p-8">
@@ -58,7 +75,7 @@ export const Invoice = ({ labScript, onClose }: InvoiceProps) => {
     <div className="relative max-h-[calc(100vh-8rem)] overflow-hidden">
       <div className="absolute top-4 right-4 z-10">
         <Button
-          onClick={() => window.open(labScript.invoice_url, '_blank')}
+          onClick={handleDownload}
           size="icon"
           variant="outline"
           title="Download Invoice"
