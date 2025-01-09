@@ -42,7 +42,7 @@ export const DesignNavbar = ({ isCollapsed, setIsCollapsed }: DesignNavbarProps)
   };
 
   return (
-    <div className="sticky top-0 w-full bg-white rounded-t-2xl px-8 py-4 flex items-center justify-between z-10 shadow-sm">
+    <div className="sticky top-0 w-full bg-white rounded-t-2xl px-6 py-3 flex items-center justify-between z-10">
       <div className="flex items-center space-x-6">
         <div className="flex flex-col">
           <span className="text-xl font-bold tracking-tight font-inter">JGX Digital Lab</span>
