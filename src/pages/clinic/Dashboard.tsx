@@ -39,18 +39,20 @@ export default function ClinicDashboard() {
 
   return (
     <ClinicLayout>
-      <ScrollArea className="h-full rounded-2xl bg-[#F6F6F7]">
-        <ClinicNavHeader />
-        <TooltipProvider>
-          <div className="p-4 sm:p-6 lg:p-8 space-y-6">
-            {/* Status Cards */}
-            <DashboardMetrics />
+      <div className="flex flex-col max-w-[1400px] w-full mx-auto h-screen py-8">
+        <ScrollArea className="h-full rounded-2xl bg-[#F6F6F7]">
+          <ClinicNavHeader />
+          <TooltipProvider>
+            <div className="p-4 sm:p-6 lg:p-8 space-y-6">
+              {/* Status Cards */}
+              <DashboardMetrics />
 
-            {/* Charts */}
-            <DashboardCharts labScripts={labScripts} />
-          </div>
-        </TooltipProvider>
-      </ScrollArea>
+              {/* Charts */}
+              <DashboardCharts labScripts={labScripts} />
+            </div>
+          </TooltipProvider>
+        </ScrollArea>
+      </div>
     </ClinicLayout>
   );
 }
