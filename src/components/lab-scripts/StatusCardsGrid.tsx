@@ -64,7 +64,7 @@ export const StatusCardsGrid = ({ statusCounts, selectedStatus, onStatusSelect }
   ];
 
   return (
-    <div className="flex flex-nowrap gap-1.5 sm:gap-2 items-center overflow-x-auto scrollbar-hide min-w-0 w-full">
+    <div className="flex flex-nowrap gap-1.5 sm:gap-2 items-center overflow-x-auto min-w-0 w-full pb-2">
       {statusCards.map((card) => (
         <StatusCard
           key={card.label}

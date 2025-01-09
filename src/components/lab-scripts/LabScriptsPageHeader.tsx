@@ -22,7 +22,7 @@ export function LabScriptsPageHeader({
   isDesignPortal = false
 }: LabScriptsPageHeaderProps) {
   return (
-    <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 min-w-0">
+    <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 min-w-0 w-full">
       <div className="w-full lg:w-auto overflow-x-auto pb-2 lg:pb-0 -mx-2 px-2">
         <StatusCardsGrid 
           statusCounts={statusCounts}
@@ -30,7 +30,7 @@ export function LabScriptsPageHeader({
           onStatusSelect={onStatusSelect}
         />
       </div>
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 w-full lg:w-auto">
         <div className="relative group flex-1 lg:flex-none min-w-0">
           <Search className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 group-hover:text-gray-600 z-10" />
           <input
@@ -44,9 +44,9 @@ export function LabScriptsPageHeader({
         {!isDesignPortal && onNewLabScript && (
           <Button
             onClick={onNewLabScript}
-            className="whitespace-nowrap"
+            className="whitespace-nowrap shrink-0"
           >
-            <Plus className="h-4 w-4" />
+            <Plus className="h-4 w-4 mr-2" />
             Add Lab Script
           </Button>
         )}
