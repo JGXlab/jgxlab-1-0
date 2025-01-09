@@ -2,7 +2,7 @@ import { TableCell, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { User } from "lucide-react";
-import { PatientActions } from "../PatientActions";
+import { PatientActions } from "@/components/patients/PatientActions";
 
 interface PatientTableRowProps {
   patient: any;
