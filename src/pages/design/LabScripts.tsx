@@ -124,40 +124,42 @@ const DesignLabScripts = () => {
 
   return (
     <DesignLayout>
-      <ScrollArea className="h-full rounded-2xl bg-[#F6F6F7]">
-        <DesignNavbar />
-        <div className="p-6">
-          <div className="bg-white rounded-xl p-6 shadow-sm mb-6">
-            <StatusCardsGrid 
-              statusCounts={statusCounts} 
-              selectedStatus={selectedStatus}
-              onStatusSelect={setSelectedStatus}
-            />
+      <div className="flex flex-col max-w-[1400px] w-full mx-auto h-screen">
+        <ScrollArea className="h-full rounded-2xl bg-[#F6F6F7]">
+          <DesignNavbar />
+          <div className="p-4 sm:p-6 lg:p-8 space-y-6">
+            <div className="bg-white rounded-xl p-6 shadow-sm">
+              <StatusCardsGrid 
+                statusCounts={statusCounts} 
+                selectedStatus={selectedStatus}
+                onStatusSelect={setSelectedStatus}
+              />
+            </div>
+
+            <Card className="bg-gradient-to-br from-white to-accent/30 border-none shadow-lg overflow-hidden">
+              <LabScriptsTable
+                labScripts={filteredLabScripts || []}
+                isLoading={isLoading}
+                onPreview={handlePreview}
+                onStatusUpdate={handleStatusUpdate}
+                isDesignPortal={true}
+                hideClinicColumn={false}
+              />
+            </Card>
+
+            {selectedScript && (
+              <PreviewLabScriptModal
+                isOpen={isPreviewOpen}
+                onClose={() => {
+                  setIsPreviewOpen(false);
+                  setSelectedScript(null);
+                }}
+                labScriptId={selectedScript.id}
+              />
+            )}
           </div>
-
-          <Card className="bg-gradient-to-br from-white to-accent/30 border-none shadow-lg overflow-hidden">
-            <LabScriptsTable
-              labScripts={filteredLabScripts || []}
-              isLoading={isLoading}
-              onPreview={handlePreview}
-              onStatusUpdate={handleStatusUpdate}
-              isDesignPortal={true}
-              hideClinicColumn={false}
-            />
-          </Card>
-
-          {selectedScript && (
-            <PreviewLabScriptModal
-              isOpen={isPreviewOpen}
-              onClose={() => {
-                setIsPreviewOpen(false);
-                setSelectedScript(null);
-              }}
-              labScriptId={selectedScript.id}
-            />
-          )}
-        </div>
-      </ScrollArea>
+        </ScrollArea>
+      </div>
     </DesignLayout>
   );
 };
