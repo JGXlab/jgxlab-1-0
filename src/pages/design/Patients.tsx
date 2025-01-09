@@ -116,7 +116,7 @@ const Patients = () => {
               </Button>
             </div>
 
-            <Card className="bg-gradient-to-br from-white to-[#EEF2FF] border-none shadow-lg overflow-hidden">
+            <Card className="bg-white border-none shadow-lg overflow-hidden">
               {isLoading ? (
                 <div className="flex items-center justify-center h-40">
                   <p className="text-[#8A898C]">Loading patients...</p>
