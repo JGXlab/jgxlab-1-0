@@ -7,9 +7,12 @@ import { DesignNavbar } from "@/components/design/DesignNavbar";
 import { StatusCardsGrid } from "@/components/lab-scripts/StatusCardsGrid";
 import { LabScriptsTable } from "@/components/lab-scripts/LabScriptsTable";
 import { useToast } from "@/hooks/use-toast";
+import { PreviewLabScriptModal } from "@/components/surgical-form/PreviewLabScriptModal";
 
 export default function LabScripts() {
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
+  const [selectedScript, setSelectedScript] = useState<any>(null);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const { toast } = useToast();
 
   const { data: labScripts = [], isLoading } = useQuery({
@@ -49,8 +52,8 @@ export default function LabScripts() {
       : labScripts;
 
   const statusCounts = {
-    pending: labScripts?.filter(script => script.status === 'pending')?.length || 0,
-    inProgress: labScripts?.filter(script => script.status === 'in_progress')?.length || 0,
+    new: labScripts?.filter(script => script.status === 'pending')?.length || 0,
+    inProcess: labScripts?.filter(script => script.status === 'in_progress')?.length || 0,
     paused: labScripts?.filter(script => script.status === 'paused')?.length || 0,
     onHold: labScripts?.filter(script => script.status === 'on_hold')?.length || 0,
     incomplete: labScripts?.filter(script => 
@@ -77,13 +80,19 @@ export default function LabScripts() {
     });
   };
 
+  const handlePreview = (script: any, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedScript(script);
+    setIsPreviewOpen(true);
+  };
+
   return (
     <DesignLayout>
       <div className="flex flex-col max-w-[1400px] w-full mx-auto h-screen py-8">
         <ScrollArea className="h-full rounded-2xl bg-[#F6F6F7]">
           <DesignNavbar />
           <div className="p-6 lg:p-8 space-y-6">
-            <div className="bg-white/50 backdrop-blur-sm rounded-xl shadow-lg">
+            <div className="bg-white/50 backdrop-blur-sm rounded-xl shadow-lg p-4">
               <StatusCardsGrid 
                 statusCounts={statusCounts}
                 selectedStatus={selectedStatus}
@@ -95,10 +104,23 @@ export default function LabScripts() {
               <LabScriptsTable
                 labScripts={filteredLabScripts}
                 isLoading={isLoading}
+                onPreview={handlePreview}
+                isDesignPortal={true}
               />
             </div>
           </div>
         </ScrollArea>
+
+        {selectedScript && (
+          <PreviewLabScriptModal
+            isOpen={isPreviewOpen}
+            onClose={() => {
+              setIsPreviewOpen(false);
+              setSelectedScript(null);
+            }}
+            labScriptId={selectedScript.id}
+          />
+        )}
       </div>
     </DesignLayout>
   );
