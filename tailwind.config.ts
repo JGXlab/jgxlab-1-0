@@ -25,9 +25,9 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "#375bdc",
+          DEFAULT: "#4F46E5",
           foreground: "#FFFFFF",
-          hover: "#2847b3",
+          hover: "#4338CA",
         },
         secondary: {
           DEFAULT: "#64748b",
@@ -51,12 +51,12 @@ export default {
           foreground: "#94a3b8",
         },
         accent: {
-          DEFAULT: "#f8fafc",
-          foreground: "#0f172a",
+          DEFAULT: "#EEF2FF",
+          foreground: "#1A1F2C",
         },
         card: {
           DEFAULT: "#FFFFFF",
-          foreground: "#0f172a",
+          foreground: "#1A1F2C",
         },
       },
       keyframes: {
