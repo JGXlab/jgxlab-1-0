@@ -1,5 +1,6 @@
-import { Search } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 import { StatusCardsGrid } from "./StatusCardsGrid";
+import { Button } from "../ui/button";
 
 interface LabScriptsPageHeaderProps {
   searchTerm: string;
@@ -29,15 +30,26 @@ export function LabScriptsPageHeader({
           onStatusSelect={onStatusSelect}
         />
       </div>
-      <div className="relative group flex-1 lg:flex-none min-w-0">
-        <Search className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 group-hover:text-gray-600 z-10" />
-        <input
-          type="text"
-          placeholder="Search patients or clinics..."
-          value={searchTerm}
-          onChange={(e) => onSearchChange(e.target.value)}
-          className="w-full lg:w-[300px] pl-8 sm:pl-10 pr-2 sm:pr-4 py-1.5 sm:py-2 text-sm rounded-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 bg-white/50 backdrop-blur-sm transition-all duration-200 hover:bg-white"
-        />
+      <div className="flex items-center gap-4">
+        <div className="relative group flex-1 lg:flex-none min-w-0">
+          <Search className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 group-hover:text-gray-600 z-10" />
+          <input
+            type="text"
+            placeholder="Search patients or clinics..."
+            value={searchTerm}
+            onChange={(e) => onSearchChange(e.target.value)}
+            className="w-full lg:w-[300px] pl-8 sm:pl-10 pr-2 sm:pr-4 py-1.5 sm:py-2 text-sm rounded-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 bg-white/50 backdrop-blur-sm transition-all duration-200 hover:bg-white"
+          />
+        </div>
+        {!isDesignPortal && onNewLabScript && (
+          <Button
+            onClick={onNewLabScript}
+            className="whitespace-nowrap"
+          >
+            <Plus className="h-4 w-4" />
+            Add Lab Script
+          </Button>
+        )}
       </div>
     </div>
   );

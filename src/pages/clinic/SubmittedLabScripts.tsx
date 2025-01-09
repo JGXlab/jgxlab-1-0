@@ -11,7 +11,7 @@ import { PatientInformationSection } from "@/components/surgical-form/PatientInf
 import { ApplianceDetailsSection } from "@/components/surgical-form/ApplianceDetailsSection";
 import { AdditionalInformationSection } from "@/components/surgical-form/AdditionalInformationSection";
 import { PaymentSection } from "@/components/surgical-form/PaymentSection";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { usePaymentVerification } from "@/components/lab-scripts/payment/usePaymentVerification";
 import { PaymentSuccessDialog } from "@/components/lab-scripts/payment/PaymentSuccessDialog";
 import { z } from "zod";
@@ -23,6 +23,7 @@ import { useLabScripts } from "@/hooks/use-lab-scripts";
 import { useQueryClient } from "@tanstack/react-query";
 
 export default function SubmittedLabScripts() {
+  const navigate = useNavigate();
   const [selectedScript, setSelectedScript] = useState<any>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [isNewLabScriptOpen, setIsNewLabScriptOpen] = useState(false);
@@ -92,6 +93,10 @@ export default function SubmittedLabScripts() {
     queryClient.invalidateQueries({ queryKey: ['labScripts'] });
   };
 
+  const handleNewLabScript = () => {
+    navigate('/clinic/new-lab-script');
+  };
+
   return (
     <ClinicLayout>
       <ScrollArea className="h-full rounded-2xl bg-[#F6F6F7]">
@@ -101,6 +106,7 @@ export default function SubmittedLabScripts() {
             <LabScriptsPageHeader 
               searchTerm={searchTerm}
               onSearchChange={setSearchTerm}
+              onNewLabScript={handleNewLabScript}
               statusCounts={statusCounts}
               selectedStatus={selectedStatus}
               onStatusSelect={handleStatusSelect}
