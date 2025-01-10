@@ -40,7 +40,7 @@ const Patients = () => {
           *,
           clinics (
             name,
-            user_id
+            doctor_name
           )
         `)
         .order('created_at', { ascending: false });
