@@ -38,6 +38,7 @@ const Patients = () => {
           *,
           clinics (
             name,
+            doctor_name,
             user_id
           )
         `)
