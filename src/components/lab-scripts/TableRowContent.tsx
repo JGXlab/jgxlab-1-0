@@ -35,7 +35,6 @@ export const TableRowContent = ({
 }: TableRowContentProps) => {
   const [showInvoice, setShowInvoice] = useState(false);
 
-  // Format the hold reason to be more readable
   const formatHoldReason = (reason: string) => {
     return reason.split('_').map(word => 
       word.charAt(0).toUpperCase() + word.slice(1)
