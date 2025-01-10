@@ -36,10 +36,17 @@ export function PatientTableRow({
       </TableCell>
       <TableCell>
         <div className="flex items-center space-x-2">
-          <Building2 className="h-4 w-4 text-gray-400" />
-          <span className="text-sm text-gray-600">
-            {patient.clinics?.name || 'No clinic assigned'}
-          </span>
+          <div className="h-8 w-8 rounded-full bg-emerald-50 flex items-center justify-center">
+            <Building2 className="h-4 w-4 text-emerald-600" />
+          </div>
+          <div>
+            <p className="font-medium text-gray-900">
+              {patient.clinics?.name || 'No clinic assigned'}
+            </p>
+            <p className="text-sm text-gray-600">
+              {patient.clinics?.doctor_name ? `Dr. ${patient.clinics.doctor_name}` : 'No doctor assigned'}
+            </p>
+          </div>
         </div>
       </TableCell>
       <TableCell>
