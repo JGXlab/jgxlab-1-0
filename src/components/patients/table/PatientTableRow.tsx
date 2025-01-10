@@ -1,7 +1,7 @@
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
-import { User } from "lucide-react";
+import { User, Building2 } from "lucide-react";
 import { PatientActions } from "@/components/patients/PatientActions";
 
 interface PatientTableRowProps {
@@ -32,6 +32,14 @@ export function PatientTableRow({
               ID: {patient.id.slice(0, 8)}
             </p>
           </div>
+        </div>
+      </TableCell>
+      <TableCell>
+        <div className="flex items-center space-x-2">
+          <Building2 className="h-4 w-4 text-gray-400" />
+          <span className="text-sm text-gray-600">
+            {patient.clinics?.name || 'No clinic assigned'}
+          </span>
         </div>
       </TableCell>
       <TableCell>
