@@ -151,14 +151,21 @@ export const TableRowContent = ({
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <a
-                      href={script.design_download_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center justify-center w-8 h-8 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground"
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      asChild
+                      className="h-8 w-8 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground"
                     >
-                      <Download className="h-4 w-4" />
-                    </a>
+                      <a
+                        href={script.design_download_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <Download className="h-4 w-4" />
+                        <span className="sr-only">Download Design</span>
+                      </a>
+                    </Button>
                   </TooltipTrigger>
                   <TooltipContent>
                     <p>Download Design</p>
