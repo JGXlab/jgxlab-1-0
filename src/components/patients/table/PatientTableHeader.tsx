@@ -1,5 +1,5 @@
 import { TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { User, Calendar, Clock } from "lucide-react";
+import { User, Calendar, Clock, Building2 } from "lucide-react";
 
 export function PatientTableHeader() {
   return (
@@ -9,6 +9,12 @@ export function PatientTableHeader() {
           <div className="flex items-center space-x-2">
             <User className="h-4 w-4" />
             <span>Patient Name</span>
+          </div>
+        </TableHead>
+        <TableHead className="text-primary/80 font-semibold">
+          <div className="flex items-center space-x-2">
+            <Building2 className="h-4 w-4" />
+            <span>Clinic</span>
           </div>
         </TableHead>
         <TableHead className="text-primary/80 font-semibold">

@@ -1,7 +1,7 @@
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
-import { User } from "lucide-react";
+import { User, Building2 } from "lucide-react";
 import { PatientActions } from "@/components/patients/PatientActions";
 
 interface PatientTableRowProps {
@@ -30,6 +30,23 @@ export function PatientTableRow({
             </p>
             <p className="text-sm text-gray-500">
               ID: {patient.id.slice(0, 8)}
+            </p>
+          </div>
+        </div>
+      </TableCell>
+      <TableCell>
+        <div className="flex items-center space-x-2">
+          <div className="h-8 w-8 rounded-full bg-emerald-50 flex items-center justify-center">
+            <Building2 className="h-4 w-4 text-emerald-600" />
+          </div>
+          <div>
+            <p className="font-medium text-gray-900">
+              {patient.clinics?.name || 'No clinic assigned'}
+            </p>
+            <p className="text-sm text-gray-600">
+              {patient.clinics?.doctor_name && patient.clinics.doctor_name !== '' 
+                ? `Dr. ${patient.clinics.doctor_name}` 
+                : 'No doctor assigned'}
             </p>
           </div>
         </div>
