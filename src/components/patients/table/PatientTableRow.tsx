@@ -44,7 +44,9 @@ export function PatientTableRow({
               {patient.clinics?.name || 'No clinic assigned'}
             </p>
             <p className="text-sm text-gray-600">
-              {patient.clinics?.doctor_name ? `Dr. ${patient.clinics.doctor_name}` : 'No doctor assigned'}
+              {patient.clinics?.doctor_name && patient.clinics.doctor_name !== '' 
+                ? `Dr. ${patient.clinics.doctor_name}` 
+                : 'No doctor assigned'}
             </p>
           </div>
         </div>
