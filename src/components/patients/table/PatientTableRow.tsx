@@ -3,6 +3,8 @@ import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { User, Building2 } from "lucide-react";
 import { PatientActions } from "@/components/patients/PatientActions";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 interface PatientTableRowProps {
   patient: any;
@@ -17,6 +19,24 @@ export function PatientTableRow({
   onDelete, 
   onViewHistory 
 }: PatientTableRowProps) {
+  const { data: userProfile } = useQuery({
+    queryKey: ['userProfile'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('No user found');
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+      return profile;
+    }
+  });
+
+  const isClinicPortal = userProfile?.role === 'clinic';
+
   return (
     <TableRow className="hover:bg-gray-50/50 transition-colors duration-200">
       <TableCell>
@@ -34,23 +54,25 @@ export function PatientTableRow({
           </div>
         </div>
       </TableCell>
-      <TableCell>
-        <div className="flex items-center space-x-2">
-          <div className="h-8 w-8 rounded-full bg-emerald-50 flex items-center justify-center">
-            <Building2 className="h-4 w-4 text-emerald-600" />
+      {!isClinicPortal && (
+        <TableCell>
+          <div className="flex items-center space-x-2">
+            <div className="h-8 w-8 rounded-full bg-emerald-50 flex items-center justify-center">
+              <Building2 className="h-4 w-4 text-emerald-600" />
+            </div>
+            <div>
+              <p className="font-medium text-gray-900">
+                {patient.clinics?.name || 'No clinic assigned'}
+              </p>
+              <p className="text-sm text-gray-600">
+                {patient.clinics?.doctor_name && patient.clinics.doctor_name !== '' 
+                  ? `Dr. ${patient.clinics.doctor_name}` 
+                  : 'No doctor assigned'}
+              </p>
+            </div>
           </div>
-          <div>
-            <p className="font-medium text-gray-900">
-              {patient.clinics?.name || 'No clinic assigned'}
-            </p>
-            <p className="text-sm text-gray-600">
-              {patient.clinics?.doctor_name && patient.clinics.doctor_name !== '' 
-                ? `Dr. ${patient.clinics.doctor_name}` 
-                : 'No doctor assigned'}
-            </p>
-          </div>
-        </div>
-      </TableCell>
+        </TableCell>
+      )}
       <TableCell>
         <Badge 
           variant="secondary" 
