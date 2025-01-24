@@ -2,6 +2,7 @@ import { FormControl, FormItem, FormLabel, FormMessage } from "@/components/ui/f
 import { SelectionButton } from "./SelectionButton";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
+import { RequiredIndicator } from "./RequiredIndicator";
 
 interface ScrewTypeSelectorProps {
   value: string;
@@ -46,7 +47,9 @@ export const ScrewTypeSelector = ({ value, onChange, otherValue, onOtherValueCha
               value={otherValue}
               onChange={(e) => onOtherValueChange?.(e.target.value)}
               className="bg-white text-gray-900 placeholder:text-gray-500"
+              required
             />
+            <RequiredIndicator />
           </div>
         )}
       </div>

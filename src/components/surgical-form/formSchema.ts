@@ -6,7 +6,12 @@ export const formSchema = z.object({
   arch: z.string().min(1, "Please select arch type"),
   treatmentType: z.string().min(1, "Please select treatment type"),
   screwType: z.string().optional(),
-  otherScrewType: z.string().optional(),
+  otherScrewType: z.string().optional().refine((val, ctx) => {
+    if (ctx.parent.screwType === 'others' && (!val || val.trim() === '')) {
+      return false;
+    }
+    return true;
+  }, { message: "Please specify the screw type" }),
   vdoDetails: z.string().min(1, "Please select VDO details"),
   needsNightguard: z.string().optional(),
   shade: z.string().min(1, "Please select shade"),
