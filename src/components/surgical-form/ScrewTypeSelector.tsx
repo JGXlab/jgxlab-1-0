@@ -23,6 +23,9 @@ const screwTypeOptions = [
 export const ScrewTypeSelector = ({ value, onChange, otherValue, onOtherValueChange }: ScrewTypeSelectorProps) => {
   const handleOptionClick = (optionId: string) => {
     onChange(optionId);
+    if (optionId !== 'others') {
+      onOtherValueChange?.('');
+    }
   };
 
   return (
