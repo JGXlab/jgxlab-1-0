@@ -15,4 +15,12 @@ export const formSchema = z.object({
   expressDesign: z.string().optional(),
   couponCode: z.string().optional(),
   is_free_printed_tryin: z.boolean().optional(),
+}).superRefine((data, ctx) => {
+  if (data.screwType === 'others' && (!data.otherScrewType || data.otherScrewType.trim() === '')) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Please specify the screw type",
+      path: ['otherScrewType']
+    });
+  }
 });
