@@ -26,7 +26,13 @@ export const PaymentSuccessDialog = ({
     queryFn: async () => {
       const { data, error } = await supabase
         .from('lab_scripts')
-        .select('*')
+        .select(`
+          *,
+          invoices (
+            discount_amount,
+            promo_code
+          )
+        `)
         .eq('payment_id', paymentId)
         .single();
 
@@ -85,6 +91,17 @@ export const PaymentSuccessDialog = ({
               {paymentId}
             </p>
           </div>
+          {labScript?.invoices?.[0]?.promo_code && (
+            <div className="space-y-2">
+              <p className="text-sm font-medium text-gray-500">Applied Discount</p>
+              <p className="text-sm font-medium text-green-600">
+                Promo code {labScript.invoices[0].promo_code} applied
+                {labScript.invoices[0].discount_amount && 
+                  ` (-$${labScript.invoices[0].discount_amount.toFixed(2)})`
+                }
+              </p>
+            </div>
+          )}
           <div className="flex flex-col gap-2">
             <Button
               variant="outline"

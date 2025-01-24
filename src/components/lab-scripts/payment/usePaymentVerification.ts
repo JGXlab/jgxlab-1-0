@@ -57,12 +57,14 @@ export const usePaymentVerification = () => {
         });
         setShowSuccessDialog(true);
 
-        // Invalidate and refetch lab scripts query
+        // Invalidate and refetch lab scripts query to get updated data
         await queryClient.invalidateQueries({ queryKey: ['labScripts'] });
 
         toast({
           title: "Payment Successful",
-          description: "Your lab script has been submitted successfully.",
+          description: data.discountAmount > 0 
+            ? `Payment successful with ${data.promoCode} discount applied.`
+            : "Your lab script has been submitted successfully.",
         });
 
         return;
