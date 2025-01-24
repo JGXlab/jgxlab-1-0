@@ -28,6 +28,13 @@ export const ScrewTypeSelector = ({ value, onChange, otherValue, onOtherValueCha
     }
   };
 
+  const handleOtherValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    onOtherValueChange?.(newValue);
+    // Trigger form validation
+    onChange('others', newValue);
+  };
+
   return (
     <div className="space-y-3">
       <div className="grid grid-cols-4 gap-3 relative">
@@ -47,7 +54,7 @@ export const ScrewTypeSelector = ({ value, onChange, otherValue, onOtherValueCha
             <Input
               placeholder="*Specify Please"
               value={otherValue}
-              onChange={(e) => onOtherValueChange?.(e.target.value)}
+              onChange={handleOtherValueChange}
               className="bg-white text-gray-900 placeholder:text-gray-500"
               required
             />
