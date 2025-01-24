@@ -6,6 +6,8 @@ interface InvoiceTableProps {
     needs_nightguard: string;
     express_design: string;
     amount_paid: number;
+    discount_amount?: number;
+    promo_code?: string;
   };
 }
 
@@ -20,9 +22,10 @@ export const InvoiceTable = ({ invoice }: InvoiceTableProps) => {
   const totalAmount = invoice.amount_paid || 0;
   const hasNightguard = invoice.needs_nightguard === 'yes';
   const hasExpressDesign = invoice.express_design === 'yes';
+  const discountAmount = invoice.discount_amount || 0;
   
   // Base price calculation (working backwards from total)
-  let basePrice = totalAmount;
+  let basePrice = totalAmount + discountAmount; // Add back the discount to get original price
   if (hasNightguard) basePrice -= 50; // Subtract nightguard price
   if (hasExpressDesign) basePrice -= 50; // Subtract express design price
 
@@ -64,6 +67,22 @@ export const InvoiceTable = ({ invoice }: InvoiceTableProps) => {
           )}
         </tbody>
         <tfoot className="bg-gray-50/50">
+          <tr>
+            <td colSpan={2} className="py-4 px-4 text-right font-medium text-gray-900">Subtotal</td>
+            <td className="py-4 px-4 text-right font-medium text-gray-900">
+              ${(totalAmount + discountAmount).toFixed(2)}
+            </td>
+          </tr>
+          {discountAmount > 0 && (
+            <tr>
+              <td colSpan={2} className="py-4 px-4 text-right font-medium text-gray-900">
+                Discount {invoice.promo_code && `(${invoice.promo_code})`}
+              </td>
+              <td className="py-4 px-4 text-right font-medium text-red-600">
+                -${discountAmount.toFixed(2)}
+              </td>
+            </tr>
+          )}
           <tr className="border-t-2 border-gray-200">
             <td colSpan={2} className="py-4 px-4 text-right font-medium text-gray-900">Total</td>
             <td className="py-4 px-4 text-right font-medium text-gray-900">

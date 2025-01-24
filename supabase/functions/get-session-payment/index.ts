@@ -22,7 +22,7 @@ serve(async (req) => {
     })
 
     const session = await stripe.checkout.sessions.retrieve(sessionId, {
-      expand: ['payment_intent', 'invoice']
+      expand: ['payment_intent', 'invoice', 'total_details']
     })
 
     console.log('Retrieved session:', session)
@@ -59,6 +59,10 @@ serve(async (req) => {
 
       // Parse the form data from session metadata
       const formData = JSON.parse(session.metadata.formData)
+
+      // Get discount information
+      const discountAmount = session.total_details?.amount_discount || 0
+      const promoCode = session.total_details?.breakdown?.discounts?.[0]?.discount?.promotion_code?.code
 
       // Create the lab script after successful payment
       const { data: labScript, error: labScriptError } = await supabaseAdmin
@@ -116,7 +120,7 @@ serve(async (req) => {
         throw patientError
       }
 
-      // Create invoice record
+      // Create invoice record with discount information
       const { error: invoiceError } = await supabaseAdmin
         .from('invoices')
         .insert([{
@@ -131,7 +135,9 @@ serve(async (req) => {
           amount_paid: session.amount_total ? session.amount_total / 100 : 0,
           payment_id: session.payment_intent?.id,
           needs_nightguard: formData.needsNightguard,
-          express_design: formData.expressDesign
+          express_design: formData.expressDesign,
+          discount_amount: discountAmount ? discountAmount / 100 : 0,
+          promo_code: promoCode || null
         }])
 
       if (invoiceError) {
