@@ -7,6 +7,7 @@ import { z } from "zod";
 import { formSchema } from "./formSchema";
 import { SelectionButton } from "./SelectionButton";
 import { addDays, format, isWeekend } from "date-fns";
+import { RequiredIndicator } from "./RequiredIndicator";
 
 interface AdditionalInformationSectionProps {
   form: UseFormReturn<z.infer<typeof formSchema>>;
@@ -17,7 +18,6 @@ export const AdditionalInformationSection = ({ form }: AdditionalInformationSect
   const expressDesign = form.watch('expressDesign');
   const showExpressDesign = applianceType !== 'surgical-day';
 
-  // Define appliance types that require 4 working days
   const appliancesWithLeadTime = [
     'printed-try-in',
     'nightguard',
@@ -26,24 +26,19 @@ export const AdditionalInformationSection = ({ form }: AdditionalInformationSect
     'ti-bar'
   ];
 
-  // Calculate minimum due date based on appliance type and express design selection
   const calculateMinDueDate = () => {
-    // If express design is selected, allow next working day
     if (expressDesign === 'yes') {
       let nextDay = addDays(new Date(), 1);
-      // If next day is weekend, move to Monday
       while (isWeekend(nextDay)) {
         nextDay = addDays(nextDay, 1);
       }
       return format(nextDay, 'yyyy-MM-dd');
     }
 
-    // If not express design and not in lead time appliances, allow same day
     if (!appliancesWithLeadTime.includes(applianceType)) {
       return format(new Date(), 'yyyy-MM-dd');
     }
 
-    // Calculate 4 working days for lead time appliances
     let date = new Date();
     let daysToAdd = 4;
     let daysAdded = 0;
@@ -55,7 +50,6 @@ export const AdditionalInformationSection = ({ form }: AdditionalInformationSect
       }
     }
 
-    // If the calculated date falls on a weekend, move to next Monday
     while (isWeekend(date)) {
       date = addDays(date, 1);
     }
@@ -73,7 +67,7 @@ export const AdditionalInformationSection = ({ form }: AdditionalInformationSect
           name="expressDesign"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Express Design (within 24 hours)</FormLabel>
+              <FormLabel>Express Design (within 24 hours) <RequiredIndicator /></FormLabel>
               <div className="flex flex-wrap gap-4">
                 <SelectionButton
                   label="Yes"
@@ -96,7 +90,7 @@ export const AdditionalInformationSection = ({ form }: AdditionalInformationSect
         name="dueDate"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Due Date</FormLabel>
+            <FormLabel>Due Date <RequiredIndicator /></FormLabel>
             <Input 
               type="date" 
               className="max-w-xs bg-white" 
@@ -117,7 +111,7 @@ export const AdditionalInformationSection = ({ form }: AdditionalInformationSect
         name="specificInstructions"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Specific Instructions</FormLabel>
+            <FormLabel>Specific Instructions <RequiredIndicator /></FormLabel>
             <Textarea 
               placeholder="Enter any specific instructions or notes"
               className="min-h-[100px] resize-none bg-white"

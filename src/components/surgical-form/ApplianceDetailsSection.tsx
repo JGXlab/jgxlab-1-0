@@ -11,6 +11,7 @@ import { FormSection } from "./FormSection";
 import { UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 import { formSchema } from "./formSchema";
+import { RequiredIndicator } from "./RequiredIndicator";
 
 interface ApplianceDetailsSectionProps {
   form: UseFormReturn<z.infer<typeof formSchema>>;
@@ -22,7 +23,6 @@ export const ApplianceDetailsSection = ({ form }: ApplianceDetailsSectionProps) 
   const isNightguard = applianceType === 'nightguard';
   const isSurgicalDay = applianceType === 'surgical-day';
 
-  // Check if treatment type is denture or one piece implant
   const shouldHideScrewSection = (value: string) => {
     const [upper, lower] = value.split('|');
     return (upper === 'denture' || upper === 'one-piece-implant') && 
@@ -31,7 +31,6 @@ export const ApplianceDetailsSection = ({ form }: ApplianceDetailsSectionProps) 
 
   const hideScrewSection = shouldHideScrewSection(treatmentType);
 
-  // Reset fields when switching appliance type
   React.useEffect(() => {
     if (isNightguard) {
       form.setValue('treatmentType', '');
@@ -40,12 +39,10 @@ export const ApplianceDetailsSection = ({ form }: ApplianceDetailsSectionProps) 
       form.setValue('needsNightguard', '');
       form.setValue('shade', '');
     }
-    // Reset coupon when appliance type changes
     form.setValue('is_free_printed_tryin', false);
     form.setValue('couponCode', '');
   }, [applianceType, form]);
 
-  // Reset screw type when treatment type changes to denture or one piece implant
   React.useEffect(() => {
     if (hideScrewSection) {
       form.setValue('screwType', '');
@@ -60,7 +57,7 @@ export const ApplianceDetailsSection = ({ form }: ApplianceDetailsSectionProps) 
         name="applianceType"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Appliance Type</FormLabel>
+            <FormLabel>Appliance Type <RequiredIndicator /></FormLabel>
             <Select onValueChange={field.onChange} value={field.value}>
               <SelectTrigger className="bg-white">
                 <SelectValue placeholder="Select appliance type" />
@@ -83,7 +80,7 @@ export const ApplianceDetailsSection = ({ form }: ApplianceDetailsSectionProps) 
         name="arch"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Arch Type</FormLabel>
+            <FormLabel>Arch Type <RequiredIndicator /></FormLabel>
             <ArchSelector value={field.value} onChange={field.onChange} />
           </FormItem>
         )}
@@ -96,7 +93,7 @@ export const ApplianceDetailsSection = ({ form }: ApplianceDetailsSectionProps) 
             name="treatmentType"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Treatment Type</FormLabel>
+                <FormLabel>Treatment Type <RequiredIndicator /></FormLabel>
                 <TreatmentTypeSelector 
                   value={field.value} 
                   onChange={field.onChange}
@@ -112,7 +109,7 @@ export const ApplianceDetailsSection = ({ form }: ApplianceDetailsSectionProps) 
               name="screwType"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Screw Type</FormLabel>
+                  <FormLabel>Screw Type <RequiredIndicator /></FormLabel>
                   <ScrewTypeSelector 
                     value={field.value} 
                     onChange={field.onChange}
@@ -129,7 +126,7 @@ export const ApplianceDetailsSection = ({ form }: ApplianceDetailsSectionProps) 
             name="vdoDetails"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>VDO Details</FormLabel>
+                <FormLabel>VDO Details <RequiredIndicator /></FormLabel>
                 <VDODetailsSelector value={field.value} onChange={field.onChange} />
               </FormItem>
             )}
@@ -141,7 +138,7 @@ export const ApplianceDetailsSection = ({ form }: ApplianceDetailsSectionProps) 
               name="needsNightguard"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Do you need Nightguard?</FormLabel>
+                  <FormLabel>Do you need Nightguard? <RequiredIndicator /></FormLabel>
                   <NightguardSelector value={field.value} onChange={field.onChange} />
                 </FormItem>
               )}
@@ -153,7 +150,7 @@ export const ApplianceDetailsSection = ({ form }: ApplianceDetailsSectionProps) 
             name="shade"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Shade</FormLabel>
+                <FormLabel>Shade <RequiredIndicator /></FormLabel>
                 <ShadeSelector value={field.value} onChange={field.onChange} />
               </FormItem>
             )}
