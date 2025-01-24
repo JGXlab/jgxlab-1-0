@@ -41,6 +41,7 @@ export const PaymentSection = ({
 
   const isFreeScript = form.watch('is_free_printed_tryin');
   const patientId = form.watch('patientId');
+  const isFormValid = form.formState.isValid;
 
   const { submitFreeLabScript, createCheckoutSession } = useLabScriptMutations();
 
@@ -166,6 +167,7 @@ export const PaymentSection = ({
               onClick={handleSubmitAndPay}
               disabled={isLoading}
               totalAmount={totalAmount}
+              isValid={isFormValid}
             />
           </div>
         </div>

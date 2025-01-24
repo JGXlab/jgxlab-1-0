@@ -1,7 +1,7 @@
 import { FormControl, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { SelectionButton } from "./SelectionButton";
 import { Input } from "@/components/ui/input";
-import { RequiredIndicator } from "./RequiredIndicator";
+import { useState } from "react";
 
 interface ScrewTypeSelectorProps {
   value: string;
@@ -23,10 +23,6 @@ const screwTypeOptions = [
 export const ScrewTypeSelector = ({ value, onChange, otherValue, onOtherValueChange }: ScrewTypeSelectorProps) => {
   const handleOptionClick = (optionId: string) => {
     onChange(optionId);
-    // Reset other value when switching away from 'others'
-    if (optionId !== 'others') {
-      onOtherValueChange?.('');
-    }
   };
 
   return (
@@ -50,7 +46,6 @@ export const ScrewTypeSelector = ({ value, onChange, otherValue, onOtherValueCha
               value={otherValue}
               onChange={(e) => onOtherValueChange?.(e.target.value)}
               className="bg-white text-gray-900 placeholder:text-gray-500"
-              required
             />
           </div>
         )}
