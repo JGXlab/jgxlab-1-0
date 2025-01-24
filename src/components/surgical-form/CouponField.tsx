@@ -1,4 +1,4 @@
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import { FormField, FormItem, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 import { formSchema } from "./formSchema";
+import { Check, X } from "lucide-react";
 
 interface CouponFieldProps {
   form: UseFormReturn<z.infer<typeof formSchema>>;
@@ -16,6 +17,7 @@ interface CouponFieldProps {
 
 export const CouponField = ({ form, patientId, onValidCoupon }: CouponFieldProps) => {
   const [isValidating, setIsValidating] = useState(false);
+  const [showInput, setShowInput] = useState(false);
 
   const handleValidateCoupon = async () => {
     const couponCode = form.watch('couponCode');
@@ -34,6 +36,7 @@ export const CouponField = ({ form, patientId, onValidCoupon }: CouponFieldProps
         form.setValue('is_free_printed_tryin', true);
         form.setValue('couponCode', couponCode);
         onValidCoupon?.(result);
+        setShowInput(false);
       } else {
         toast.error(result.message);
         form.setValue('is_free_printed_tryin', false);
@@ -47,6 +50,19 @@ export const CouponField = ({ form, patientId, onValidCoupon }: CouponFieldProps
       setIsValidating(false);
     }
   };
+
+  if (!showInput) {
+    return (
+      <Button
+        type="button"
+        variant="ghost"
+        className="text-primary hover:text-primary/80 p-0 h-auto font-medium"
+        onClick={() => setShowInput(true)}
+      >
+        Apply Free Printed Try-in Coupon
+      </Button>
+    );
+  }
 
   return (
     <FormField
@@ -64,12 +80,25 @@ export const CouponField = ({ form, patientId, onValidCoupon }: CouponFieldProps
             </FormControl>
             <Button 
               type="button"
-              variant="secondary"
+              size="icon"
+              variant="ghost"
               onClick={handleValidateCoupon}
               disabled={isValidating}
-              className="whitespace-nowrap hover:bg-secondary-hover transition-colors"
+              className="h-10 w-10 text-primary hover:text-primary/80"
             >
-              {isValidating ? 'Validating...' : 'Validate'}
+              <Check className="h-4 w-4" />
+            </Button>
+            <Button 
+              type="button"
+              size="icon"
+              variant="ghost"
+              onClick={() => {
+                setShowInput(false);
+                form.setValue('couponCode', '');
+              }}
+              className="h-10 w-10 text-gray-500 hover:text-gray-700"
+            >
+              <X className="h-4 w-4" />
             </Button>
           </div>
           <FormMessage />
