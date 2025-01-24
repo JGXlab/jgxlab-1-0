@@ -15,4 +15,13 @@ export const formSchema = z.object({
   expressDesign: z.string().optional(),
   couponCode: z.string().optional(),
   is_free_printed_tryin: z.boolean().optional(),
+}).refine((data) => {
+  // Only validate otherScrewType if screwType is 'others'
+  if (data.screwType === 'others') {
+    return !!data.otherScrewType;
+  }
+  return true;
+}, {
+  message: "Please specify the screw type",
+  path: ["otherScrewType"]
 });
