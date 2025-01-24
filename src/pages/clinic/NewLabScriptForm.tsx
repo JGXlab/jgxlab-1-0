@@ -1,6 +1,6 @@
 import { ClinicLayout } from "@/components/clinic/ClinicLayout";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Eye } from "lucide-react";
+import { ArrowLeft, Eye, RefreshCcw } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Form } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
@@ -102,6 +102,27 @@ export default function NewLabScriptForm() {
 
   const showCouponField = watchedValues.applianceType === 'printed-try-in';
 
+  const handleReset = () => {
+    form.reset({
+      patientId: "",
+      applianceType: "",
+      arch: "",
+      treatmentType: "",
+      screwType: "",
+      otherScrewType: "",
+      vdoDetails: "",
+      needsNightguard: "no",
+      shade: "",
+      dueDate: "",
+      specificInstructions: "",
+      expressDesign: "no",
+    });
+    toast({
+      title: "Form Reset",
+      description: "All form fields have been reset to default values",
+    });
+  };
+
   return (
     <ClinicLayout>
       <div className="min-h-screen bg-[#F6F6F7]">
@@ -121,6 +142,15 @@ export default function NewLabScriptForm() {
                   <p className="text-sm text-gray-500">Create a new lab script request</p>
                 </div>
               </div>
+              <Button
+                variant="ghost"
+                onClick={handleReset}
+                className="text-gray-600 hover:text-gray-900"
+                type="button"
+              >
+                <RefreshCcw className="h-4 w-4" />
+                <span className="ml-2">Reset Details</span>
+              </Button>
             </div>
           </div>
         </div>
