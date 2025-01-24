@@ -7,7 +7,7 @@ export const formSchema = z.object({
   treatmentType: z.string().min(1, "Please select treatment type"),
   screwType: z.string().optional(),
   otherScrewType: z.string().optional().superRefine((val, ctx) => {
-    if (ctx.parent.screwType === 'others' && (!val || val.trim() === '')) {
+    if ((ctx as any).parent.screwType === 'others' && (!val || val.trim() === '')) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: "Please specify the screw type"
