@@ -26,6 +26,7 @@ serve(async (req) => {
       mode: 'payment',
       success_url: `${req.headers.get('origin')}/clinic/submittedlabscripts?payment_status=success&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${req.headers.get('origin')}/clinic/submittedlabscripts?payment_status=failed`,
+      allow_promotion_codes: true,
       metadata: {
         formData: JSON.stringify(formData),
         applianceType
