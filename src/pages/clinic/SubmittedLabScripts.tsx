@@ -113,9 +113,8 @@ export default function SubmittedLabScripts() {
       specificInstructions: "",
       expressDesign: "no",
     });
-    toast({
-      title: "Form Reset",
-      description: "All form fields have been reset to default values",
+    toast("Form has been reset", {
+      description: "All form fields have been reset to default values"
     });
   };
 
