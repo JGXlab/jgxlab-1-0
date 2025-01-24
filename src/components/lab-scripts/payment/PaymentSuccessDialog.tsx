@@ -1,6 +1,6 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, Download, FileText } from "lucide-react";
+import { CheckCircle, Download, FileText, Gift } from "lucide-react";
 import { useState, useCallback } from "react";
 import { Invoice } from "./Invoice";
 import { useQuery } from "@tanstack/react-query";
@@ -24,19 +24,25 @@ export const PaymentSuccessDialog = ({
   const { data: labScript } = useQuery({
     queryKey: ['labScript', paymentId],
     queryFn: async () => {
+      console.log('Fetching lab script for payment:', paymentId);
       const { data, error } = await supabase
         .from('lab_scripts')
         .select(`
           *,
           invoices (
             discount_amount,
-            promo_code
+            promo_code,
+            amount_paid
           )
         `)
         .eq('payment_id', paymentId)
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching lab script:', error);
+        throw error;
+      }
+      console.log('Fetched lab script:', data);
       return data;
     },
     enabled: !!paymentId,
@@ -50,6 +56,8 @@ export const PaymentSuccessDialog = ({
   const handleInvoiceClose = useCallback(() => {
     setShowInvoice(false);
   }, []);
+
+  const isZeroPayment = labScript?.invoices?.[0]?.amount_paid === 0;
 
   if (showInvoice && labScript) {
     return (
@@ -80,14 +88,20 @@ export const PaymentSuccessDialog = ({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <div className="flex items-center justify-center mb-4">
-            <CheckCircle className="h-12 w-12 text-green-500" />
+            {isZeroPayment ? (
+              <Gift className="h-12 w-12 text-green-500" />
+            ) : (
+              <CheckCircle className="h-12 w-12 text-green-500" />
+            )}
           </div>
-          <DialogTitle className="text-center text-xl">Payment Successful!</DialogTitle>
+          <DialogTitle className="text-center text-xl">
+            {isZeroPayment ? "Order Confirmed!" : "Payment Successful!"}
+          </DialogTitle>
         </DialogHeader>
         <div className="space-y-4 py-4">
           <div className="space-y-2">
-            <p className="text-sm font-medium text-gray-500">Payment ID</p>
-            <p className="text-sm font-mono bg-gray-50 p-2 rounded border">
+            <p className="text-sm font-medium text-gray-500">Order ID</p>
+            <p className="text-sm font-mono bg-gray-50 p-2 rounded border break-all">
               {paymentId}
             </p>
           </div>
