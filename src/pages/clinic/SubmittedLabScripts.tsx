@@ -20,6 +20,9 @@ import { ClinicNavHeader } from "@/components/clinic/ClinicNavHeader";
 import { LabScriptsPageHeader } from "@/components/lab-scripts/LabScriptsPageHeader";
 import { useLabScripts } from "@/hooks/use-lab-scripts";
 import { useQueryClient } from "@tanstack/react-query";
+import { Button } from "@/components/ui/button";
+import { RefreshCcw } from "lucide-react";
+import { toast } from "sonner";
 
 export default function SubmittedLabScripts() {
   const [selectedScript, setSelectedScript] = useState<any>(null);
@@ -95,6 +98,27 @@ export default function SubmittedLabScripts() {
     setIsNewLabScriptOpen(true);
   };
 
+  const handleReset = () => {
+    form.reset({
+      patientId: "",
+      applianceType: "",
+      arch: "",
+      treatmentType: "",
+      screwType: "",
+      otherScrewType: "",
+      vdoDetails: "",
+      needsNightguard: "no",
+      shade: "",
+      dueDate: "",
+      specificInstructions: "",
+      expressDesign: "no",
+    });
+    toast({
+      title: "Form Reset",
+      description: "All form fields have been reset to default values",
+    });
+  };
+
   return (
     <ClinicLayout>
       <ScrollArea className="h-full rounded-2xl bg-[#F6F6F7]">
@@ -138,8 +162,17 @@ export default function SubmittedLabScripts() {
 
         <Dialog open={isNewLabScriptOpen} onOpenChange={setIsNewLabScriptOpen}>
           <DialogContent className="max-w-3xl h-[90vh] flex flex-col">
-            <DialogHeader>
+            <DialogHeader className="flex flex-row items-center justify-between">
               <DialogTitle>New Lab Script</DialogTitle>
+              <Button
+                variant="ghost"
+                onClick={handleReset}
+                className="text-gray-600 hover:text-gray-900"
+                type="button"
+              >
+                <RefreshCcw className="h-4 w-4" />
+                <span className="ml-2">Reset Details</span>
+              </Button>
             </DialogHeader>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 flex-1 overflow-y-auto">
