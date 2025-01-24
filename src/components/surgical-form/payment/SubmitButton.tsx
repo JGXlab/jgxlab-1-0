@@ -7,7 +7,6 @@ interface SubmitButtonProps {
   onClick: (e: React.MouseEvent) => void;
   disabled?: boolean;
   totalAmount?: number;
-  isValid?: boolean;
 }
 
 export const SubmitButton = ({ 
@@ -15,8 +14,7 @@ export const SubmitButton = ({
   isPending, 
   onClick,
   disabled = false,
-  totalAmount = 0,
-  isValid = false
+  totalAmount = 0
 }: SubmitButtonProps) => {
   const buttonText = totalAmount === 0 ? "Submit" : "Submit & Pay";
 
@@ -26,7 +24,7 @@ export const SubmitButton = ({
       size="lg"
       className="min-w-[150px]"
       onClick={onClick}
-      disabled={isSubmitting || isPending || disabled || !isValid}
+      disabled={isSubmitting || isPending || disabled}
     >
       {isSubmitting || isPending ? (
         <>
