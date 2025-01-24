@@ -9,6 +9,8 @@ interface PDFInvoiceTableProps {
     needs_nightguard: string;
     express_design: string;
     amount_paid: number;
+    discount_amount?: number;
+    promo_code?: string;
   };
 }
 
@@ -23,8 +25,9 @@ export const PDFInvoiceTable = ({ invoice }: PDFInvoiceTableProps) => {
   const totalAmount = invoice?.amount_paid || 0;
   const hasNightguard = invoice?.needs_nightguard === 'yes';
   const hasExpressDesign = invoice?.express_design === 'yes';
+  const discountAmount = invoice?.discount_amount || 0;
   
-  let basePrice = totalAmount;
+  let basePrice = totalAmount + discountAmount;
   if (hasNightguard) basePrice -= 50;
   if (hasExpressDesign) basePrice -= 50;
 
@@ -64,12 +67,24 @@ export const PDFInvoiceTable = ({ invoice }: PDFInvoiceTableProps) => {
 
       <View style={styles.totalSection}>
         <View style={styles.totalRow}>
-          <Text style={styles.totalLabel}>Total</Text>
-          <Text style={styles.totalAmount}>${totalAmount.toFixed(2)}</Text>
+          <Text style={styles.totalLabel}>Subtotal</Text>
+          <Text style={styles.totalAmount}>${(totalAmount + discountAmount).toFixed(2)}</Text>
         </View>
+
+        {discountAmount > 0 && (
+          <View style={styles.totalRow}>
+            <Text style={styles.totalLabel}>
+              Discount {invoice?.promo_code ? `(${invoice.promo_code})` : ''}
+            </Text>
+            <Text style={[styles.totalAmount, styles.discountText]}>
+              -${discountAmount.toFixed(2)}
+            </Text>
+          </View>
+        )}
+
         <View style={styles.totalRow}>
-          <Text style={styles.totalLabel}>Amount Paid</Text>
-          <Text style={styles.paidAmount}>${totalAmount.toFixed(2)} USD</Text>
+          <Text style={styles.totalLabel}>Total</Text>
+          <Text style={styles.totalAmount}>${totalAmount.toFixed(2)} USD</Text>
         </View>
       </View>
     </View>

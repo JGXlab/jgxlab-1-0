@@ -145,4 +145,8 @@ export const styles = StyleSheet.create({
     width: 120,
     textAlign: 'right',
   },
+
+  discountText: {
+    color: '#DC2626', // Red color for discount amount
+  },
 });

@@ -116,12 +116,14 @@ export type Database = {
           clinic_name: string
           clinic_phone: string
           created_at: string
+          discount_amount: number | null
           express_design: string | null
           id: string
           lab_script_id: string
           needs_nightguard: string | null
           patient_name: string
           payment_id: string
+          promo_code: string | null
         }
         Insert: {
           amount_paid: number
@@ -132,12 +134,14 @@ export type Database = {
           clinic_name: string
           clinic_phone: string
           created_at?: string
+          discount_amount?: number | null
           express_design?: string | null
           id?: string
           lab_script_id: string
           needs_nightguard?: string | null
           patient_name: string
           payment_id: string
+          promo_code?: string | null
         }
         Update: {
           amount_paid?: number
@@ -148,12 +152,14 @@ export type Database = {
           clinic_name?: string
           clinic_phone?: string
           created_at?: string
+          discount_amount?: number | null
           express_design?: string | null
           id?: string
           lab_script_id?: string
           needs_nightguard?: string | null
           patient_name?: string
           payment_id?: string
+          promo_code?: string | null
         }
         Relationships: [
           {
