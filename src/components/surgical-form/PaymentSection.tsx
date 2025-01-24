@@ -132,7 +132,7 @@ export const PaymentSection = ({
   return (
     <div className="sticky bottom-0 bg-white border-t shadow-lg py-2">
       <div className="container mx-auto px-4">
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between">
             <TotalAmountDisplay
               basePrice={basePrice}
@@ -159,9 +159,7 @@ export const PaymentSection = ({
                 />
               </div>
             )}
-          </div>
 
-          <div className="flex justify-end">
             <SubmitButton
               isSubmitting={isSubmitting || submitFreeLabScript.isPending}
               isPending={createCheckoutSession.isPending}
