@@ -8,12 +8,17 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import type { Clinic } from "@/components/clinics/types";
+import { Star } from "lucide-react";
 
 interface ContactInfoProps {
   control: Control<Clinic>;
 }
 
 export function ContactInfo({ control }: ContactInfoProps) {
+  const RequiredIndicator = () => (
+    <Star className="inline-block w-2 h-2 text-destructive ml-1" />
+  );
+
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-medium">Address Information</h3>
@@ -23,9 +28,12 @@ export function ContactInfo({ control }: ContactInfoProps) {
         name="street_address"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Street Address</FormLabel>
+            <FormLabel>
+              Street Address
+              <RequiredIndicator />
+            </FormLabel>
             <FormControl>
-              <Input {...field} placeholder="123 Main St" />
+              <Input {...field} placeholder="123 Main St" required />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -38,9 +46,12 @@ export function ContactInfo({ control }: ContactInfoProps) {
           name="city"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>City</FormLabel>
+              <FormLabel>
+                City
+                <RequiredIndicator />
+              </FormLabel>
               <FormControl>
-                <Input {...field} placeholder="City" />
+                <Input {...field} placeholder="City" required />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -52,9 +63,12 @@ export function ContactInfo({ control }: ContactInfoProps) {
           name="state"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>State</FormLabel>
+              <FormLabel>
+                State
+                <RequiredIndicator />
+              </FormLabel>
               <FormControl>
-                <Input {...field} placeholder="CA" maxLength={2} />
+                <Input {...field} placeholder="CA" maxLength={2} required />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -66,9 +80,12 @@ export function ContactInfo({ control }: ContactInfoProps) {
           name="zip_code"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>ZIP Code</FormLabel>
+              <FormLabel>
+                ZIP Code
+                <RequiredIndicator />
+              </FormLabel>
               <FormControl>
-                <Input {...field} placeholder="12345" maxLength={5} />
+                <Input {...field} placeholder="12345" maxLength={5} required />
               </FormControl>
               <FormMessage />
             </FormItem>

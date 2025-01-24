@@ -1,7 +1,4 @@
-import React from "react";
 import { Control } from "react-hook-form";
-import PhoneInput from "react-phone-input-2";
-import "react-phone-input-2/lib/style.css";
 import {
   FormControl,
   FormField,
@@ -9,31 +6,38 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import type { Clinic } from "@/components/clinics/types";
+import { Star } from "lucide-react";
 
 interface PhoneNumberInputProps {
   control: Control<Clinic>;
-  name: "phone"; // Removed "contact_phone" since it no longer exists in the Clinic type
+  name: "phone";
   label: string;
+  required?: boolean;
 }
 
-export function PhoneNumberInput({ control, name, label }: PhoneNumberInputProps) {
+export function PhoneNumberInput({ control, name, label, required }: PhoneNumberInputProps) {
+  const RequiredIndicator = () => (
+    <Star className="inline-block w-2 h-2 text-destructive ml-1" />
+  );
+
   return (
     <FormField
       control={control}
       name={name}
-      render={({ field: { onChange, value } }) => (
+      render={({ field }) => (
         <FormItem>
-          <FormLabel>{label}</FormLabel>
+          <FormLabel>
+            {label}
+            {required && <RequiredIndicator />}
+          </FormLabel>
           <FormControl>
-            <PhoneInput
-              country="us"
-              value={value}
-              onChange={onChange}
-              inputClass="!w-full !h-10 !text-base !rounded-md !border !border-input"
-              containerClass="!w-full"
-              buttonClass="!border !border-input !rounded-l-md"
-              dropdownClass="!bg-white"
+            <Input
+              {...field}
+              type="tel"
+              placeholder="(123) 456-7890"
+              required={required}
             />
           </FormControl>
           <FormMessage />

@@ -9,12 +9,17 @@ import {
 import { Input } from "@/components/ui/input";
 import type { Clinic } from "@/components/clinics/types";
 import { PhoneNumberInput } from "./PhoneNumberInput";
+import { Star } from "lucide-react";
 
 interface BasicClinicInfoProps {
   control: Control<Clinic>;
 }
 
 export function BasicClinicInfo({ control }: BasicClinicInfoProps) {
+  const RequiredIndicator = () => (
+    <Star className="inline-block w-2 h-2 text-destructive ml-1" />
+  );
+
   return (
     <div className="grid gap-6 md:grid-cols-2">
       <FormField
@@ -22,9 +27,12 @@ export function BasicClinicInfo({ control }: BasicClinicInfoProps) {
         name="name"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Clinic Name</FormLabel>
+            <FormLabel>
+              Clinic Name
+              <RequiredIndicator />
+            </FormLabel>
             <FormControl>
-              <Input {...field} />
+              <Input {...field} required />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -36,9 +44,12 @@ export function BasicClinicInfo({ control }: BasicClinicInfoProps) {
         name="email"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Email</FormLabel>
+            <FormLabel>
+              Email
+              <RequiredIndicator />
+            </FormLabel>
             <FormControl>
-              <Input {...field} type="email" />
+              <Input {...field} type="email" required />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -49,6 +60,7 @@ export function BasicClinicInfo({ control }: BasicClinicInfoProps) {
         control={control}
         name="phone"
         label="Phone"
+        required
       />
 
       <FormField
@@ -56,9 +68,12 @@ export function BasicClinicInfo({ control }: BasicClinicInfoProps) {
         name="doctor_name"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Doctor Name</FormLabel>
+            <FormLabel>
+              Doctor Name
+              <RequiredIndicator />
+            </FormLabel>
             <FormControl>
-              <Input {...field} />
+              <Input {...field} required />
             </FormControl>
             <FormMessage />
           </FormItem>
