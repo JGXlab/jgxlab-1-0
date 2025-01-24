@@ -27,7 +27,8 @@ serve(async (req) => {
 
     console.log('Retrieved session:', session)
 
-    if (session.payment_status === 'paid') {
+    // Consider the payment successful if it's either paid or the total is 0
+    if (session.payment_status === 'paid' || session.amount_total === 0) {
       const supabaseUrl = Deno.env.get('SUPABASE_URL')
       const supabaseServiceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
       
@@ -48,7 +49,7 @@ serve(async (req) => {
         console.log('Lab script already exists for this payment:', existingLabScript.id)
         return new Response(
           JSON.stringify({ 
-            status: session.payment_status,
+            status: 'paid',
             paymentId: session.payment_intent?.id || null,
             amount_total: session.amount_total || 0,
             invoiceUrl: session.invoice?.invoice_pdf || null
@@ -82,8 +83,8 @@ serve(async (req) => {
           express_design: formData.expressDesign,
           user_id: formData.userId,
           payment_status: 'paid',
-          payment_id: session.payment_intent?.id,
-          amount_paid: session.amount_total ? session.amount_total / 100 : null,
+          payment_id: session.payment_intent?.id || `free_${sessionId}`, // Use a unique ID for free orders
+          amount_paid: session.amount_total ? session.amount_total / 100 : 0,
           payment_date: new Date().toISOString()
         }])
         .select()
@@ -133,7 +134,7 @@ serve(async (req) => {
           appliance_type: formData.applianceType,
           arch: formData.arch,
           amount_paid: session.amount_total ? session.amount_total / 100 : 0,
-          payment_id: session.payment_intent?.id,
+          payment_id: session.payment_intent?.id || `free_${sessionId}`,
           needs_nightguard: formData.needsNightguard,
           express_design: formData.expressDesign,
           discount_amount: discountAmount ? discountAmount / 100 : 0,
@@ -151,9 +152,11 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({ 
         status: session.payment_status,
-        paymentId: session.payment_intent?.id || null,
+        paymentId: session.payment_intent?.id || `free_${sessionId}`,
         amount_total: session.amount_total || 0,
-        invoiceUrl: session.invoice?.invoice_pdf || null
+        invoiceUrl: session.invoice?.invoice_pdf || null,
+        discountAmount: session.total_details?.amount_discount ? session.total_details.amount_discount / 100 : 0,
+        promoCode: session.total_details?.breakdown?.discounts?.[0]?.discount?.promotion_code?.code
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
