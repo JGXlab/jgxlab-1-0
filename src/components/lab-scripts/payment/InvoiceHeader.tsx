@@ -28,7 +28,7 @@ export const InvoiceHeader = ({ labScript }: InvoiceHeaderProps) => {
         <div className="space-y-1.5">
           <div className="flex items-start gap-2 text-sm text-gray-600">
             <span className="font-medium text-gray-900 shrink-0">Invoice No:</span>
-            <span className="font-mono break-all max-w-[200px]">{labScript.payment_id}</span>
+            <span className="font-mono break-all max-w-[300px]">{labScript.payment_id}</span>
           </div>
           <div className="flex items-center gap-2 text-sm text-gray-600">
             <span className="font-medium text-gray-900">Issue Date:</span>
