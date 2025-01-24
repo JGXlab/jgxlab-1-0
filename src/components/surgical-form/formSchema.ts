@@ -6,14 +6,7 @@ export const formSchema = z.object({
   arch: z.string().min(1, "Please select arch type"),
   treatmentType: z.string().min(1, "Please select treatment type"),
   screwType: z.string().optional(),
-  otherScrewType: z.string().optional().superRefine((val, ctx) => {
-    if ((ctx as any).parent.screwType === 'others' && (!val || val.trim() === '')) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Please specify the screw type"
-      });
-    }
-  }),
+  otherScrewType: z.string().optional(),
   vdoDetails: z.string().min(1, "Please select VDO details"),
   needsNightguard: z.string().optional(),
   shade: z.string().min(1, "Please select shade"),
