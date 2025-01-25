@@ -65,8 +65,8 @@ export function CreateClinicForm() {
 
       console.log("Got admin session, creating clinic user");
 
-      // Create the clinic user using the admin API
-      const response = await fetch('/api/admin/create-clinic-user', {
+      // Create the clinic user using the edge function
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-clinic-user`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
