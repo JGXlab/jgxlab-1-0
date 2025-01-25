@@ -19,16 +19,24 @@ serve(async (req) => {
 
     const { email, password, clinicName } = await req.json()
 
+    console.log('Creating clinic user with email:', email)
+
     const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
       email,
       password,
       email_confirm: true,
       user_metadata: {
         clinic_name: clinicName,
+        role: 'clinic'
       },
     })
 
-    if (authError) throw authError
+    if (authError) {
+      console.error('Error creating clinic user:', authError)
+      throw authError
+    }
+
+    console.log('Successfully created clinic user:', authData.user.id)
 
     return new Response(
       JSON.stringify({ user: authData.user }),
@@ -38,6 +46,7 @@ serve(async (req) => {
       },
     )
   } catch (error) {
+    console.error('Error in create-clinic-user function:', error)
     return new Response(
       JSON.stringify({ error: error.message }),
       {

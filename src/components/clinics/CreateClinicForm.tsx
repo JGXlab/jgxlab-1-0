@@ -66,7 +66,7 @@ export function CreateClinicForm() {
       console.log("Got admin session, creating clinic user");
 
       // Create the clinic user using the admin API
-      const { data: adminAuthData, error: adminAuthError } = await fetch('/api/admin/create-clinic-user', {
+      const response = await fetch('/api/admin/create-clinic-user', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -77,13 +77,16 @@ export function CreateClinicForm() {
           password: 'Password123!', // Default password
           clinicName: values.name,
         }),
-      }).then(res => res.json());
+      });
 
-      if (adminAuthError) {
-        console.error('Error creating auth account:', adminAuthError);
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Error creating auth account:', errorData);
         toast.error("Failed to create clinic account. Please try again.");
         return;
       }
+
+      const adminAuthData = await response.json();
 
       if (!adminAuthData?.user) {
         toast.error("Failed to create clinic account. Please try again.");
