@@ -65,30 +65,17 @@ export function CreateClinicForm() {
 
       console.log("Got admin session, creating clinic user");
 
-      // Create the clinic user using the edge function
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-clinic-user`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`
-        },
-        body: JSON.stringify({
+      // Create the clinic user using Supabase Edge Function
+      const { data: adminAuthData, error: functionError } = await supabase.functions.invoke('create-clinic-user', {
+        body: {
           email: values.email,
           password: 'Password123!', // Default password
           clinicName: values.name,
-        }),
+        }
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error('Error creating auth account:', errorData);
-        toast.error("Failed to create clinic account. Please try again.");
-        return;
-      }
-
-      const adminAuthData = await response.json();
-
-      if (!adminAuthData?.user) {
+      if (functionError || !adminAuthData?.user) {
+        console.error('Error creating auth account:', functionError);
         toast.error("Failed to create clinic account. Please try again.");
         return;
       }
