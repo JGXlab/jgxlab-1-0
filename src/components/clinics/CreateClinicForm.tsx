@@ -18,9 +18,12 @@ import { ClinicContactFields } from "./form/ClinicContactFields";
 import { ContactInfo } from "@/components/clinic/ContactInfo";
 import { clinicFormSchema, type CreateClinicFormValues } from "./types/clinic-form";
 import type { Clinic } from "./types";
+import { DialogClose } from "@/components/ui/dialog";
+import { useRef } from "react";
 
 export function CreateClinicForm() {
   const queryClient = useQueryClient();
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
   
   const form = useForm<CreateClinicFormValues>({
     resolver: zodResolver(clinicFormSchema),
@@ -51,24 +54,26 @@ export function CreateClinicForm() {
         return;
       }
 
-      console.log("Creating auth account for clinic");
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: values.email,
-        password: 'Password123!', // Default password
-        options: {
-          data: {
-            clinic_name: values.name,
-          },
-        }
-      });
+      // First create the clinic user using the admin API
+      const { data: adminAuthData, error: adminAuthError } = await fetch('/api/admin/create-clinic-user', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: values.email,
+          password: 'Password123!', // Default password
+          clinicName: values.name,
+        }),
+      }).then(res => res.json());
 
-      if (authError) {
-        console.error('Error creating auth account:', authError);
+      if (adminAuthError) {
+        console.error('Error creating auth account:', adminAuthError);
         toast.error("Failed to create clinic account. Please try again.");
         return;
       }
 
-      if (!authData.user) {
+      if (!adminAuthData?.user) {
         toast.error("Failed to create clinic account. Please try again.");
         return;
       }
@@ -88,8 +93,8 @@ export function CreateClinicForm() {
         city: values.city,
         state: values.state,
         zip_code: values.zip_code,
-        user_id: (await supabase.auth.getUser()).data.user?.id,
-        auth_user_id: authData.user.id
+        user_id: adminAuthData.user.id,
+        auth_user_id: adminAuthData.user.id
       });
 
       if (clinicError) {
@@ -101,6 +106,7 @@ export function CreateClinicForm() {
       toast.success("Clinic created successfully!");
       queryClient.invalidateQueries({ queryKey: ['clinics'] });
       form.reset();
+      closeButtonRef.current?.click();
     } catch (error) {
       console.error('Error creating clinic:', error);
       toast.error("Failed to create clinic. Please try again.");
@@ -117,12 +123,15 @@ export function CreateClinicForm() {
 
         <ContactInfo control={form.control as unknown as Control<Clinic>} />
 
-        <Button 
-          type="submit" 
-          className="w-full h-11 bg-primary hover:bg-primary-hover transition-colors duration-200"
-        >
-          Create Clinic
-        </Button>
+        <div className="flex justify-end space-x-4">
+          <DialogClose ref={closeButtonRef} className="hidden" />
+          <Button 
+            type="submit" 
+            className="w-full h-11 bg-primary hover:bg-primary-hover transition-colors duration-200"
+          >
+            Create Clinic
+          </Button>
+        </div>
       </form>
     </Form>
   );
