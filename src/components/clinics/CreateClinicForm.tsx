@@ -54,21 +54,23 @@ export function CreateClinicForm() {
         return;
       }
 
-      // Get current admin user
-      const { data: { user: adminUser }, error: adminError } = await supabase.auth.getUser();
+      // Get the admin session first
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
       
-      if (adminError || !adminUser) {
-        console.error('Error getting admin user:', adminError);
+      if (sessionError || !session) {
+        console.error('Error getting admin session:', sessionError);
         toast.error("Admin session expired. Please log in again.");
         return;
       }
 
-      // First create the clinic user using the admin API
+      console.log("Got admin session, creating clinic user");
+
+      // Create the clinic user using the admin API
       const { data: adminAuthData, error: adminAuthError } = await fetch('/api/admin/create-clinic-user', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`
+          'Authorization': `Bearer ${session.access_token}`
         },
         body: JSON.stringify({
           email: values.email,
