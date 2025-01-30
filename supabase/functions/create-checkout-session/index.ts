@@ -28,7 +28,13 @@ serve(async (req) => {
     const metadataStr = JSON.stringify(minimalMetadata)
     if (metadataStr.length > 500) {
       console.error('Metadata too long:', metadataStr.length)
-      throw new Error('Metadata exceeds maximum length')
+      return new Response(
+        JSON.stringify({ error: 'Metadata exceeds maximum length' }),
+        { 
+          status: 400, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      )
     }
 
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
@@ -36,18 +42,17 @@ serve(async (req) => {
       httpClient: Stripe.createFetchHttpClient(),
     })
 
+    console.log('Creating checkout session with metadata:', minimalMetadata)
     const session = await stripe.checkout.sessions.create({
       line_items: lineItems,
       mode: 'payment',
       success_url: `${req.headers.get('origin')}/clinic/submittedlabscripts?payment_status=success&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${req.headers.get('origin')}/clinic/submittedlabscripts?payment_status=failed`,
       allow_promotion_codes: true,
-      metadata: {
-        formData: metadataStr
-      }
+      metadata: minimalMetadata
     })
 
-    console.log('Created checkout session:', session)
+    console.log('Created checkout session:', session.id)
 
     return new Response(
       JSON.stringify({ url: session.url }),
