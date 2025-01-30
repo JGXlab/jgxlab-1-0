@@ -178,18 +178,16 @@ export default function SubmittedLabScripts() {
                 <PatientInformationSection form={form} />
                 <ApplianceDetailsSection form={form} />
                 <AdditionalInformationSection form={form} />
-
-<PaymentSection 
-  applianceType={form.watch('applianceType')}
-  archType={form.watch('arch')}
-  needsNightguard={form.watch('needsNightguard')}
-  expressDesign={form.watch('expressDesign')}
-  onSubmit={onSubmit}
-  isSubmitting={false}
-  form={form}
-  onSuccess={handleFormSuccess}
-/>
-
+                <PaymentSection 
+                  applianceType={form.watch('applianceType')}
+                  archType={form.watch('arch')}
+                  needsNightguard={form.watch('needsNightguard')}
+                  expressDesign={form.watch('expressDesign')}
+                  onSubmit={onSubmit}
+                  isSubmitting={false}
+                  form={form}
+                  onSuccess={handleFormSuccess}
+                />
               </form>
             </Form>
           </DialogContent>
@@ -207,4 +205,3 @@ export default function SubmittedLabScripts() {
     </ClinicLayout>
   );
 }
-

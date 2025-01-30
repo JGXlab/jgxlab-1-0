@@ -13,43 +13,27 @@ serve(async (req) => {
   }
 
   try {
-    const { formData, lineItems } = await req.json()
-    console.log('Received request:', { formData, lineItems })
-
-    // Create minimal metadata with just the draft ID
-    const metadata = {
-      draftId: formData.draftId
-    }
-
-    // Convert to string and verify length
-    const metadataStr = JSON.stringify(metadata)
-    if (metadataStr.length > 500) {
-      console.error('Metadata too long:', metadataStr.length)
-      return new Response(
-        JSON.stringify({ error: 'Metadata exceeds maximum length' }),
-        { 
-          status: 400, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      )
-    }
+    const { formData, lineItems, applianceType } = await req.json()
+    console.log('Received request:', { formData, lineItems, applianceType })
 
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
       apiVersion: '2023-10-16',
       httpClient: Stripe.createFetchHttpClient(),
     })
 
-    console.log('Creating checkout session with metadata:', metadata)
     const session = await stripe.checkout.sessions.create({
       line_items: lineItems,
       mode: 'payment',
       success_url: `${req.headers.get('origin')}/clinic/submittedlabscripts?payment_status=success&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${req.headers.get('origin')}/clinic/submittedlabscripts?payment_status=failed`,
       allow_promotion_codes: true,
-      metadata: metadata
+      metadata: {
+        formData: JSON.stringify(formData),
+        applianceType
+      }
     })
 
-    console.log('Created checkout session:', session.id)
+    console.log('Created checkout session:', session)
 
     return new Response(
       JSON.stringify({ url: session.url }),

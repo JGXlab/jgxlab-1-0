@@ -179,17 +179,15 @@ export default function NewLabScriptForm() {
                     <AdditionalInformationSection form={form} />
                   </div>
                   <div className="border-t border-gray-200 pt-8">
-
-<PaymentSection 
-  applianceType={watchedValues.applianceType}
-  archType={watchedValues.arch}
-  needsNightguard={watchedValues.needsNightguard}
-  expressDesign={watchedValues.expressDesign}
-  onSubmit={onSubmit}
-  isSubmitting={isPending}
-  form={form}
-/>
-
+                    <PaymentSection 
+                      applianceType={watchedValues.applianceType}
+                      archType={watchedValues.arch}
+                      needsNightguard={watchedValues.needsNightguard}
+                      expressDesign={watchedValues.expressDesign}
+                      onSubmit={onSubmit}
+                      isSubmitting={isPending}
+                      form={form}
+                    />
                   </div>
                 </div>
               </form>
