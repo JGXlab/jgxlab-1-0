@@ -17,9 +17,16 @@ serve(async (req) => {
     console.log('Received request:', { formData, lineItems, applianceType })
 
     // Create a trimmed version of formData for metadata
-    const metadataFormData = {
+    const trimmedFormData = {
       ...formData,
       specificInstructions: formData.specificInstructions?.substring(0, 450) + (formData.specificInstructions?.length > 450 ? '...' : '')
+    }
+
+    // Convert to string and check length
+    const metadataStr = JSON.stringify(trimmedFormData)
+    if (metadataStr.length > 500) {
+      console.error('Metadata too long even after trimming:', metadataStr.length)
+      throw new Error('Metadata exceeds maximum length even after trimming')
     }
 
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
@@ -34,8 +41,7 @@ serve(async (req) => {
       cancel_url: `${req.headers.get('origin')}/clinic/submittedlabscripts?payment_status=failed`,
       allow_promotion_codes: true,
       metadata: {
-        formData: JSON.stringify(metadataFormData),
-        applianceType
+        formData: metadataStr
       }
     })
 

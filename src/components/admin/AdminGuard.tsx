@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -6,8 +5,8 @@ import { Loader2 } from "lucide-react";
 
 export const AdminGuard = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const checkAdmin = async () => {
@@ -32,36 +31,34 @@ export const AdminGuard = ({ children }: { children: React.ReactNode }) => {
         const { data: { user }, error: userError } = await supabase.auth.getUser();
         
         if (userError) {
-          console.error("Error getting user:", userError);
-          throw new Error("Authentication failed");
+          console.error("User error:", userError);
+          throw userError;
         }
-        
+
         if (!user) {
           console.log("No user found, redirecting to login");
           navigate("/admin/login");
           return;
         }
 
-        console.log("User found, checking admin role for:", user.id);
         const { data: profile, error: profileError } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', user.id)
+          .from("profiles")
+          .select("role")
+          .eq("id", user.id)
           .single();
 
         if (profileError) {
-          console.error("Error fetching profile:", profileError);
-          throw new Error("Failed to verify admin access");
+          console.error("Profile error:", profileError);
+          throw profileError;
         }
 
-        console.log("Profile data:", profile);
-        if (!profile || profile.role !== 'admin') {
-          console.log("User is not an admin, redirecting to login");
+        if (!profile || profile.role !== "admin") {
+          console.log("User is not an admin, redirecting");
           navigate("/admin/login");
           return;
         }
 
-        console.log("Admin access granted!");
+        console.log("Admin access verified");
         setIsLoading(false);
       } catch (error) {
         console.error("Admin guard error:", error);
@@ -75,7 +72,7 @@ export const AdminGuard = ({ children }: { children: React.ReactNode }) => {
         toast({
           variant: "destructive",
           title: "Access Error",
-          description: error instanceof Error ? error.message : "Failed to verify admin access",
+          description: "You do not have permission to access this area.",
         });
         navigate("/admin/login");
       }
@@ -84,7 +81,7 @@ export const AdminGuard = ({ children }: { children: React.ReactNode }) => {
     // Set up auth state change listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       console.log("Auth state changed:", event, session?.user?.id);
-      if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
+      if (event === 'SIGNED_OUT') {
         navigate("/admin/login");
       } else if (event === 'SIGNED_IN') {
         checkAdmin();
