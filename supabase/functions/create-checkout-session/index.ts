@@ -16,6 +16,12 @@ serve(async (req) => {
     const { formData, lineItems, applianceType } = await req.json()
     console.log('Received request:', { formData, lineItems, applianceType })
 
+    // Create a trimmed version of formData for metadata
+    const metadataFormData = {
+      ...formData,
+      specificInstructions: formData.specificInstructions?.substring(0, 450) + (formData.specificInstructions?.length > 450 ? '...' : '')
+    }
+
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
       apiVersion: '2023-10-16',
       httpClient: Stripe.createFetchHttpClient(),
@@ -28,7 +34,7 @@ serve(async (req) => {
       cancel_url: `${req.headers.get('origin')}/clinic/submittedlabscripts?payment_status=failed`,
       allow_promotion_codes: true,
       metadata: {
-        formData: JSON.stringify(formData),
+        formData: JSON.stringify(metadataFormData),
         applianceType
       }
     })
