@@ -1,177 +1,212 @@
-import { useToast } from "@/hooks/use-toast";
-import { z } from "zod";
-import { formSchema } from "./formSchema";
-import { UseFormReturn } from "react-hook-form";
-import { calculateTotalPrice } from "./utils/priceCalculations";
-import { TotalAmountDisplay } from "./payment/TotalAmountDisplay";
-import { SubmitButton } from "./payment/SubmitButton";
-import { useEffect, useState } from "react";
-import { useLabScriptMutations } from "./mutations/useLabScriptMutations";
-import { formatApplianceType } from "./utils/formatters";
+import { PreviewField } from "./preview/PreviewField";
+import { Button } from "@/components/ui/button";
+import { Download, Loader2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import { Tables } from "@/integrations/supabase/types";
+import { format } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
-import { CouponField } from "./CouponField";
+import { toast } from "sonner";
 
 interface PaymentSectionProps {
+  labScript: Tables<"lab_scripts">;
+  form: any;
+  onSubmit: (values: any) => void;
+  isSubmitting: boolean;
   applianceType: string;
   archType: string;
-  needsNightguard?: string;
-  expressDesign?: string;
-  onSubmit: (values: z.infer<typeof formSchema>) => void;
-  isSubmitting: boolean;
-  form: UseFormReturn<z.infer<typeof formSchema>>;
+  needsNightguard: string;
+  expressDesign: string;
   onSuccess?: () => void;
 }
 
 export const PaymentSection = ({ 
-  applianceType, 
-  archType, 
-  needsNightguard = 'no',
-  expressDesign = 'no',
-  onSubmit, 
-  isSubmitting,
+  labScript, 
   form,
+  onSubmit,
+  isSubmitting,
+  applianceType,
+  archType,
+  needsNightguard,
+  expressDesign,
   onSuccess
 }: PaymentSectionProps) => {
-  const { toast } = useToast();
-  const [totalAmount, setTotalAmount] = useState(0);
-  const [lineItems, setLineItems] = useState<Array<{ price: string; quantity: number }>>([]);
-  const [isCalculating, setIsCalculating] = useState(false);
-  const [surgicalDayArch, setSurgicalDayArch] = useState<string | undefined>();
-
-  const isFreeScript = form.watch('is_free_printed_tryin');
-  const patientId = form.watch('patientId');
-  const isFormValid = form.formState.isValid;
-
-  const { submitFreeLabScript, createCheckoutSession } = useLabScriptMutations();
-
-  // Watch for patient changes and reset coupon
-  useEffect(() => {
-    console.log('Patient changed, resetting coupon');
-    form.setValue('is_free_printed_tryin', false);
-    form.setValue('couponCode', '');
-    setSurgicalDayArch(undefined);
-  }, [patientId, form]);
-
-  const { data: basePrice = 0, isLoading: isPriceLoading } = useQuery({
-    queryKey: ['service-price', applianceType],
+  const { data: paymentInfo, isLoading } = useQuery({
+    queryKey: ['payment', labScript.id],
     queryFn: async () => {
-      if (!applianceType) return 0;
-      const { data, error } = await supabase
-        .from('service_prices')
-        .select('price')
-        .eq('service_name', applianceType)
-        .maybeSingle();
-
-      if (error) {
-        console.error('Error fetching price:', error);
-        return 0;
+      console.log('Fetching payment info for lab script:', labScript.id);
+      const response = await fetch(`/api/get-payment-info?labScriptId=${labScript.id}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch payment information');
       }
-
-      return data?.price ?? 0;
+      return response.json();
     },
-    enabled: !!applianceType,
+    enabled: labScript.payment_status === 'paid' && !labScript.is_free_printed_tryin
   });
 
-  useEffect(() => {
-    const updatePrices = async () => {
-      setIsCalculating(true);
-      try {
-        const result = await calculateTotalPrice(
-          basePrice,
-          { 
-            archType, 
-            needsNightguard, 
-            expressDesign, 
-            applianceType,
-            isFreeScript,
-            surgicalDayArch
-          }
-        );
-        setTotalAmount(result.total);
-        setLineItems(result.lineItems);
-      } finally {
-        setIsCalculating(false);
+  const handlePayment = async () => {
+    try {
+      const formValues = form.getValues();
+      console.log('Form values for payment:', formValues);
+
+      // First, save the draft
+      const { data: draft, error: draftError } = await supabase
+        .from('lab_scripts_draft')
+        .insert([{
+          patient_id: formValues.patientId,
+          appliance_type: formValues.applianceType,
+          arch: formValues.arch,
+          treatment_type: formValues.treatmentType,
+          screw_type: formValues.screwType,
+          other_screw_type: formValues.otherScrewType,
+          vdo_details: formValues.vdoDetails,
+          needs_nightguard: formValues.needsNightguard,
+          shade: formValues.shade,
+          due_date: formValues.dueDate,
+          specific_instructions: formValues.specificInstructions,
+          express_design: formValues.expressDesign,
+        }])
+        .select()
+        .single();
+
+      if (draftError) {
+        console.error('Error saving draft:', draftError);
+        toast.error('Error saving lab script draft');
+        return;
       }
-    };
 
-    updatePrices();
-  }, [basePrice, archType, needsNightguard, expressDesign, applianceType, isFreeScript, surgicalDayArch]);
+      console.log('Created draft lab script:', draft);
 
-  const handleSubmitAndPay = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    const values = form.getValues();
-    
-    if (Object.keys(form.formState.errors).length > 0) {
-      toast({
-        title: "Validation Error",
-        description: "Please fill in all required fields correctly.",
-        variant: "destructive",
+      // Calculate line items based on selections
+      const lineItems = [];
+      
+      // Add base price for appliance type
+      if (applianceType === 'surgical') {
+        lineItems.push({ price: 'price_surgical', quantity: 1 });
+      } else if (applianceType === 'surgical-day') {
+        lineItems.push({ price: 'price_surgical_day', quantity: 1 });
+      }
+
+      // Add nightguard if selected
+      if (needsNightguard === 'yes') {
+        lineItems.push({ price: 'price_nightguard', quantity: 1 });
+      }
+
+      // Add express design if selected
+      if (expressDesign === 'yes') {
+        lineItems.push({ price: 'price_express', quantity: 1 });
+      }
+
+      // Create checkout session with draft ID in metadata
+      const response = await fetch('/api/create-checkout-session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          lineItems,
+          formData: {
+            draftId: draft.id
+          }
+        }),
       });
-      return;
-    }
 
-    // If total amount is 0, submit directly without creating checkout session
-    if (totalAmount === 0) {
-      submitFreeLabScript.mutate(values, {
-        onSuccess: () => {
-          onSuccess?.();
-        }
-      });
-      return;
-    }
+      if (!response.ok) {
+        throw new Error('Failed to create checkout session');
+      }
 
-    createCheckoutSession.mutate({
-      formData: values,
-      lineItems,
-      applianceType
-    });
+      const { url } = await response.json();
+      console.log('Redirecting to checkout URL:', url);
+      window.location.href = url;
+    } catch (error) {
+      console.error('Payment error:', error);
+      toast.error('Error processing payment');
+    }
   };
 
-  const isLoading = isPriceLoading || isCalculating;
+  // If it's a free printed try-in with a coupon code, only show that
+  if (labScript.is_free_printed_tryin && labScript.coupon_code) {
+    return (
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold text-gray-900">Free Printed Try-in</h3>
+        <PreviewField 
+          label="Claimed Coupon Code" 
+          value={labScript.coupon_code}
+          className="font-semibold text-primary"
+        />
+      </div>
+    );
+  }
+
+  if (labScript.payment_status !== 'paid') {
+    return (
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold text-gray-900">Payment Details</h3>
+        <PreviewField 
+          label="Payment Status" 
+          value={<span className="text-yellow-600">Pending Payment</span>} 
+        />
+        <Button 
+          onClick={handlePayment}
+          className="w-full"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Processing...
+            </>
+          ) : (
+            'Proceed to Payment'
+          )}
+        </Button>
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center p-4">
+        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
-    <div className="sticky bottom-0 bg-white border-t shadow-lg py-2">
-      <div className="container mx-auto px-4">
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center justify-between">
-            <TotalAmountDisplay
-              basePrice={basePrice}
-              totalAmount={totalAmount}
-              applianceType={applianceType}
-              archType={archType}
-              needsNightguard={needsNightguard}
-              expressDesign={expressDesign}
-              formattedApplianceType={formatApplianceType(applianceType)}
-              isLoading={isLoading}
-            />
-            
-            {applianceType === 'printed-try-in' && patientId && (
-              <div className="w-[280px]">
-                <CouponField 
-                  form={form} 
-                  patientId={patientId}
-                  onValidCoupon={(validationResult?: { archType?: string }) => {
-                    console.log('Valid coupon applied');
-                    if (validationResult?.archType) {
-                      setSurgicalDayArch(validationResult.archType);
-                    }
-                  }}
-                />
-              </div>
-            )}
-
-            <SubmitButton
-              isSubmitting={isSubmitting || submitFreeLabScript.isPending}
-              isPending={createCheckoutSession.isPending}
-              onClick={handleSubmitAndPay}
-              disabled={isLoading}
-              totalAmount={totalAmount}
-              isValid={isFormValid}
-            />
-          </div>
-        </div>
+    <div className="space-y-4">
+      <h3 className="text-lg font-semibold text-gray-900">Payment Details</h3>
+      <div className="grid grid-cols-2 gap-4">
+        <PreviewField 
+          label="Payment Status" 
+          value={<span className="text-green-600">Paid</span>} 
+        />
+        <PreviewField 
+          label="Amount Paid" 
+          value={labScript.amount_paid ? `$${labScript.amount_paid.toFixed(2)}` : 'N/A'} 
+        />
+        <PreviewField 
+          label="Payment ID" 
+          value={labScript.payment_id || 'N/A'} 
+        />
+        <PreviewField 
+          label="Payment Date" 
+          value={labScript.payment_date 
+            ? format(new Date(labScript.payment_date), 'MMM d, yyyy h:mm a')
+            : 'N/A'
+          } 
+        />
       </div>
+      {paymentInfo?.invoice_url && (
+        <div className="pt-4">
+          <Button 
+            variant="outline" 
+            className="w-full"
+            onClick={() => window.open(paymentInfo.invoice_url, '_blank')}
+          >
+            <Download className="mr-2 h-4 w-4" />
+            Download Invoice
+          </Button>
+        </div>
+      )}
     </div>
   );
 };

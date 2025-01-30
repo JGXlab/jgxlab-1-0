@@ -13,19 +13,16 @@ serve(async (req) => {
   }
 
   try {
-    const { formData, lineItems, applianceType } = await req.json()
-    console.log('Received request:', { formData, lineItems, applianceType })
+    const { formData, lineItems } = await req.json()
+    console.log('Received request:', { formData, lineItems })
 
-    // Create a minimal version of formData for metadata
-    const minimalMetadata = {
-      patientId: formData.patientId,
-      applianceType: formData.applianceType,
-      arch: formData.arch,
-      userId: formData.userId
+    // Create minimal metadata with just the draft ID
+    const metadata = {
+      draftId: formData.draftId
     }
 
     // Convert to string and verify length
-    const metadataStr = JSON.stringify(minimalMetadata)
+    const metadataStr = JSON.stringify(metadata)
     if (metadataStr.length > 500) {
       console.error('Metadata too long:', metadataStr.length)
       return new Response(
@@ -42,14 +39,14 @@ serve(async (req) => {
       httpClient: Stripe.createFetchHttpClient(),
     })
 
-    console.log('Creating checkout session with metadata:', minimalMetadata)
+    console.log('Creating checkout session with metadata:', metadata)
     const session = await stripe.checkout.sessions.create({
       line_items: lineItems,
       mode: 'payment',
       success_url: `${req.headers.get('origin')}/clinic/submittedlabscripts?payment_status=success&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${req.headers.get('origin')}/clinic/submittedlabscripts?payment_status=failed`,
       allow_promotion_codes: true,
-      metadata: minimalMetadata
+      metadata: metadata
     })
 
     console.log('Created checkout session:', session.id)
