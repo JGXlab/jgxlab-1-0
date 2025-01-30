@@ -112,6 +112,12 @@ export const PaymentSection = ({
     }
 
     try {
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        throw new Error('No authenticated user found');
+      }
+
       // Save to draft table first
       const { data: draftData, error: draftError } = await supabase
         .from('lab_scripts_draft')
@@ -130,6 +136,7 @@ export const PaymentSection = ({
           express_design: values.expressDesign,
           is_free_printed_tryin: values.is_free_printed_tryin,
           coupon_code: values.couponCode,
+          user_id: user.id,
         })
         .select()
         .single();
