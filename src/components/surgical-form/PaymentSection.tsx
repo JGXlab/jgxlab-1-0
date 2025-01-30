@@ -111,21 +111,76 @@ export const PaymentSection = ({
       return;
     }
 
-    // If total amount is 0, submit directly without creating checkout session
-    if (totalAmount === 0) {
-      submitFreeLabScript.mutate(values, {
-        onSuccess: () => {
-          onSuccess?.();
-        }
-      });
-      return;
-    }
+    try {
+      // Save to draft table first
+      const { data: draftData, error: draftError } = await supabase
+        .from('lab_scripts_draft')
+        .insert({
+          patient_id: values.patientId,
+          appliance_type: values.applianceType,
+          arch: values.arch,
+          treatment_type: values.treatmentType,
+          screw_type: values.screwType,
+          other_screw_type: values.otherScrewType,
+          vdo_details: values.vdoDetails,
+          needs_nightguard: values.needsNightguard,
+          shade: values.shade,
+          due_date: values.dueDate,
+          specific_instructions: values.specificInstructions,
+          express_design: values.expressDesign,
+          is_free_printed_tryin: values.is_free_printed_tryin,
+          coupon_code: values.couponCode,
+        })
+        .select()
+        .single();
 
-    createCheckoutSession.mutate({
-      formData: values,
-      lineItems,
-      applianceType
-    });
+      if (draftError) {
+        console.error('Error saving draft:', draftError);
+        throw new Error('Failed to save draft lab script');
+      }
+
+      console.log('Draft saved successfully:', draftData);
+
+      // If total amount is 0, submit directly without creating checkout session
+      if (totalAmount === 0) {
+        submitFreeLabScript.mutate(values, {
+          onSuccess: () => {
+            onSuccess?.();
+          }
+        });
+        return;
+      }
+
+      // Create checkout session with limited metadata
+      const metadataValues = {
+        patientId: values.patientId,
+        applianceType: values.applianceType,
+        arch: values.arch,
+        treatmentType: values.treatmentType,
+        screwType: values.screwType,
+        otherScrewType: values.otherScrewType,
+        vdoDetails: values.vdoDetails,
+        needsNightguard: values.needsNightguard,
+        shade: values.shade,
+        dueDate: values.dueDate,
+        expressDesign: values.expressDesign,
+        draftId: draftData.id
+      };
+
+      createCheckoutSession.mutate({
+        formData: metadataValues,
+        lineItems,
+        applianceType
+      });
+
+    } catch (error) {
+      console.error('Error in handleSubmitAndPay:', error);
+      toast({
+        title: "Error",
+        description: "Failed to process your request. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const isLoading = isPriceLoading || isCalculating;

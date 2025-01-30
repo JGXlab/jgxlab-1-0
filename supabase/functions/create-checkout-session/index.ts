@@ -28,7 +28,7 @@ serve(async (req) => {
       cancel_url: `${req.headers.get('origin')}/clinic/submittedlabscripts?payment_status=failed`,
       allow_promotion_codes: true,
       metadata: {
-        formData: JSON.stringify(formData),
+        draftId: formData.draftId,
         applianceType
       }
     })
