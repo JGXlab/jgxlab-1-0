@@ -6,11 +6,14 @@ import { Tables } from "@/integrations/supabase/types";
 import { format } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { UseFormReturn } from "react-hook-form";
+import { z } from "zod";
+import { formSchema } from "./formSchema";
 
 interface PaymentSectionProps {
-  labScript: Tables<"lab_scripts">;
-  form: any;
-  onSubmit: (values: any) => void;
+  labScript?: Tables<"lab_scripts">;
+  form: UseFormReturn<z.infer<typeof formSchema>>;
+  onSubmit: (values: z.infer<typeof formSchema>) => void;
   isSubmitting: boolean;
   applianceType: string;
   archType: string;
@@ -31,16 +34,16 @@ export const PaymentSection = ({
   onSuccess
 }: PaymentSectionProps) => {
   const { data: paymentInfo, isLoading } = useQuery({
-    queryKey: ['payment', labScript.id],
+    queryKey: ['payment', labScript?.id],
     queryFn: async () => {
-      console.log('Fetching payment info for lab script:', labScript.id);
-      const response = await fetch(`/api/get-payment-info?labScriptId=${labScript.id}`);
+      console.log('Fetching payment info for lab script:', labScript?.id);
+      const response = await fetch(`/api/get-payment-info?labScriptId=${labScript?.id}`);
       if (!response.ok) {
         throw new Error('Failed to fetch payment information');
       }
       return response.json();
     },
-    enabled: labScript.payment_status === 'paid' && !labScript.is_free_printed_tryin
+    enabled: labScript?.payment_status === 'paid' && !labScript?.is_free_printed_tryin
   });
 
   const handlePayment = async () => {
@@ -49,9 +52,12 @@ export const PaymentSection = ({
       console.log('Form values for payment:', formValues);
 
       // First, save the draft
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("No user found");
+
       const { data: draft, error: draftError } = await supabase
         .from('lab_scripts_draft')
-        .insert([{
+        .insert({
           patient_id: formValues.patientId,
           appliance_type: formValues.applianceType,
           arch: formValues.arch,
@@ -64,7 +70,8 @@ export const PaymentSection = ({
           due_date: formValues.dueDate,
           specific_instructions: formValues.specificInstructions,
           express_design: formValues.expressDesign,
-        }])
+          user_id: user.id
+        })
         .select()
         .single();
 
@@ -124,7 +131,7 @@ export const PaymentSection = ({
   };
 
   // If it's a free printed try-in with a coupon code, only show that
-  if (labScript.is_free_printed_tryin && labScript.coupon_code) {
+  if (labScript?.is_free_printed_tryin && labScript?.coupon_code) {
     return (
       <div className="space-y-4">
         <h3 className="text-lg font-semibold text-gray-900">Free Printed Try-in</h3>
@@ -137,7 +144,7 @@ export const PaymentSection = ({
     );
   }
 
-  if (labScript.payment_status !== 'paid') {
+  if (labScript && labScript.payment_status !== 'paid') {
     return (
       <div className="space-y-4">
         <h3 className="text-lg font-semibold text-gray-900">Payment Details</h3>
@@ -145,6 +152,28 @@ export const PaymentSection = ({
           label="Payment Status" 
           value={<span className="text-yellow-600">Pending Payment</span>} 
         />
+        <Button 
+          onClick={handlePayment}
+          className="w-full"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Processing...
+            </>
+          ) : (
+            'Proceed to Payment'
+          )}
+        </Button>
+      </div>
+    );
+  }
+
+  if (!labScript) {
+    return (
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold text-gray-900">Payment Details</h3>
         <Button 
           onClick={handlePayment}
           className="w-full"
