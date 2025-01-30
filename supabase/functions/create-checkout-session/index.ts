@@ -16,17 +16,19 @@ serve(async (req) => {
     const { formData, lineItems, applianceType } = await req.json()
     console.log('Received request:', { formData, lineItems, applianceType })
 
-    // Create a trimmed version of formData for metadata
-    const trimmedFormData = {
-      ...formData,
-      specificInstructions: formData.specificInstructions?.substring(0, 450) + (formData.specificInstructions?.length > 450 ? '...' : '')
+    // Create a minimal version of formData for metadata
+    const minimalMetadata = {
+      patientId: formData.patientId,
+      applianceType: formData.applianceType,
+      arch: formData.arch,
+      userId: formData.userId
     }
 
-    // Convert to string and check length
-    const metadataStr = JSON.stringify(trimmedFormData)
+    // Convert to string and verify length
+    const metadataStr = JSON.stringify(minimalMetadata)
     if (metadataStr.length > 500) {
-      console.error('Metadata too long even after trimming:', metadataStr.length)
-      throw new Error('Metadata exceeds maximum length even after trimming')
+      console.error('Metadata too long:', metadataStr.length)
+      throw new Error('Metadata exceeds maximum length')
     }
 
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
