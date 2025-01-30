@@ -58,8 +58,13 @@ serve(async (req) => {
         )
       }
 
-      // Parse the form data from session metadata
-      const formData = JSON.parse(session.metadata.formData)
+      // Get metadata from session
+      const metadata = session.metadata
+      console.log('Session metadata:', metadata)
+
+      if (!metadata || !metadata.patientId || !metadata.applianceType || !metadata.arch || !metadata.userId) {
+        throw new Error('Missing required metadata')
+      }
 
       // Get discount information
       const discountAmount = session.total_details?.amount_discount || 0
@@ -69,21 +74,12 @@ serve(async (req) => {
       const { data: labScript, error: labScriptError } = await supabaseAdmin
         .from('lab_scripts')
         .insert([{
-          patient_id: formData.patientId,
-          appliance_type: formData.applianceType,
-          arch: formData.arch,
-          treatment_type: formData.treatmentType,
-          screw_type: formData.screwType,
-          other_screw_type: formData.otherScrewType,
-          vdo_details: formData.vdoDetails,
-          needs_nightguard: formData.needsNightguard,
-          shade: formData.shade,
-          due_date: formData.dueDate,
-          specific_instructions: formData.specificInstructions,
-          express_design: formData.expressDesign,
-          user_id: formData.userId,
+          patient_id: metadata.patientId,
+          appliance_type: metadata.applianceType,
+          arch: metadata.arch,
+          user_id: metadata.userId,
           payment_status: 'paid',
-          payment_id: session.payment_intent?.id || `free_${sessionId}`, // Use a unique ID for free orders
+          payment_id: session.payment_intent?.id || `free_${sessionId}`,
           amount_paid: session.amount_total ? session.amount_total / 100 : 0,
           payment_date: new Date().toISOString()
         }])
@@ -101,7 +97,7 @@ serve(async (req) => {
       const { data: clinic, error: clinicError } = await supabaseAdmin
         .from('clinics')
         .select('*')
-        .eq('user_id', formData.userId)
+        .eq('user_id', metadata.userId)
         .single()
 
       if (clinicError) {
@@ -113,7 +109,7 @@ serve(async (req) => {
       const { data: patient, error: patientError } = await supabaseAdmin
         .from('patients')
         .select('*')
-        .eq('id', formData.patientId)
+        .eq('id', metadata.patientId)
         .single()
 
       if (patientError) {
@@ -131,12 +127,10 @@ serve(async (req) => {
           clinic_phone: clinic.phone,
           clinic_address: clinic.address,
           patient_name: `${patient.first_name} ${patient.last_name}`,
-          appliance_type: formData.applianceType,
-          arch: formData.arch,
+          appliance_type: metadata.applianceType,
+          arch: metadata.arch,
           amount_paid: session.amount_total ? session.amount_total / 100 : 0,
           payment_id: session.payment_intent?.id || `free_${sessionId}`,
-          needs_nightguard: formData.needsNightguard,
-          express_design: formData.expressDesign,
           discount_amount: discountAmount ? discountAmount / 100 : 0,
           promo_code: promoCode || null
         }])
