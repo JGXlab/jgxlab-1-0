@@ -44,7 +44,7 @@ export const usePaymentVerification = () => {
         throw new Error('Failed to verify payment');
       }
 
-      if (data.status === 'paid') {
+      if (data.status === 'paid' || data.status === 'complete') {
         console.log('Payment confirmed as paid');
         
         // Add session to verified set

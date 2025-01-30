@@ -28,7 +28,7 @@ serve(async (req) => {
     console.log('Retrieved session:', session)
 
     // Consider the payment successful if it's either paid or the total is 0
-    if (session.payment_status === 'paid' || session.amount_total === 0) {
+    if (session.payment_status === 'paid' || session.payment_status === 'complete' || session.amount_total === 0) {
       const supabaseUrl = Deno.env.get('SUPABASE_URL')
       const supabaseServiceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
       
@@ -37,6 +37,20 @@ serve(async (req) => {
       }
 
       const supabaseAdmin = createClient(supabaseUrl, supabaseServiceRoleKey)
+
+      // Get the draft data first
+      const { data: draftData, error: draftError } = await supabaseAdmin
+        .from('lab_scripts_draft')
+        .select('*')
+        .eq('id', session.metadata.draftId)
+        .single()
+
+      if (draftError) {
+        console.error('Error fetching draft:', draftError)
+        throw draftError
+      }
+
+      console.log('Found draft data:', draftData)
 
       // Check if a lab script with this payment_id already exists
       const { data: existingLabScript } = await supabaseAdmin
@@ -58,32 +72,17 @@ serve(async (req) => {
         )
       }
 
-      // Parse the form data from session metadata
-      const formData = JSON.parse(session.metadata.formData)
-
       // Get discount information
       const discountAmount = session.total_details?.amount_discount || 0
       const promoCode = session.total_details?.breakdown?.discounts?.[0]?.discount?.promotion_code?.code
 
-      // Create the lab script after successful payment
+      // Create the lab script after successful payment using draft data
       const { data: labScript, error: labScriptError } = await supabaseAdmin
         .from('lab_scripts')
         .insert([{
-          patient_id: formData.patientId,
-          appliance_type: formData.applianceType,
-          arch: formData.arch,
-          treatment_type: formData.treatmentType,
-          screw_type: formData.screwType,
-          other_screw_type: formData.otherScrewType,
-          vdo_details: formData.vdoDetails,
-          needs_nightguard: formData.needsNightguard,
-          shade: formData.shade,
-          due_date: formData.dueDate,
-          specific_instructions: formData.specificInstructions,
-          express_design: formData.expressDesign,
-          user_id: formData.userId,
+          ...draftData,
           payment_status: 'paid',
-          payment_id: session.payment_intent?.id || `free_${sessionId}`, // Use a unique ID for free orders
+          payment_id: session.payment_intent?.id || `free_${sessionId}`,
           amount_paid: session.amount_total ? session.amount_total / 100 : 0,
           payment_date: new Date().toISOString()
         }])
@@ -101,7 +100,7 @@ serve(async (req) => {
       const { data: clinic, error: clinicError } = await supabaseAdmin
         .from('clinics')
         .select('*')
-        .eq('user_id', formData.userId)
+        .eq('user_id', draftData.user_id)
         .single()
 
       if (clinicError) {
@@ -113,7 +112,7 @@ serve(async (req) => {
       const { data: patient, error: patientError } = await supabaseAdmin
         .from('patients')
         .select('*')
-        .eq('id', formData.patientId)
+        .eq('id', draftData.patient_id)
         .single()
 
       if (patientError) {
@@ -131,12 +130,12 @@ serve(async (req) => {
           clinic_phone: clinic.phone,
           clinic_address: clinic.address,
           patient_name: `${patient.first_name} ${patient.last_name}`,
-          appliance_type: formData.applianceType,
-          arch: formData.arch,
+          appliance_type: draftData.appliance_type,
+          arch: draftData.arch,
           amount_paid: session.amount_total ? session.amount_total / 100 : 0,
           payment_id: session.payment_intent?.id || `free_${sessionId}`,
-          needs_nightguard: formData.needsNightguard,
-          express_design: formData.expressDesign,
+          needs_nightguard: draftData.needs_nightguard,
+          express_design: draftData.express_design,
           discount_amount: discountAmount ? discountAmount / 100 : 0,
           promo_code: promoCode || null
         }])
