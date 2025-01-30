@@ -62,8 +62,20 @@ serve(async (req) => {
       const metadata = session.metadata
       console.log('Session metadata:', metadata)
 
-      if (!metadata || !metadata.patientId || !metadata.applianceType || !metadata.arch || !metadata.userId) {
-        throw new Error('Missing required metadata')
+      if (!metadata) {
+        throw new Error('Missing metadata')
+      }
+
+      // Get the original form data from the lab_scripts_draft table
+      const { data: draftScript, error: draftError } = await supabaseAdmin
+        .from('lab_scripts_draft')
+        .select('*')
+        .eq('id', metadata.draftId)
+        .single()
+
+      if (draftError || !draftScript) {
+        console.error('Error fetching draft script:', draftError)
+        throw new Error('Could not find draft lab script')
       }
 
       // Get discount information
@@ -74,10 +86,19 @@ serve(async (req) => {
       const { data: labScript, error: labScriptError } = await supabaseAdmin
         .from('lab_scripts')
         .insert([{
-          patient_id: metadata.patientId,
-          appliance_type: metadata.applianceType,
-          arch: metadata.arch,
-          user_id: metadata.userId,
+          patient_id: draftScript.patient_id,
+          appliance_type: draftScript.appliance_type,
+          arch: draftScript.arch,
+          treatment_type: draftScript.treatment_type,
+          screw_type: draftScript.screw_type,
+          other_screw_type: draftScript.other_screw_type,
+          vdo_details: draftScript.vdo_details,
+          needs_nightguard: draftScript.needs_nightguard,
+          shade: draftScript.shade,
+          due_date: draftScript.due_date,
+          specific_instructions: draftScript.specific_instructions,
+          express_design: draftScript.express_design,
+          user_id: draftScript.user_id,
           payment_status: 'paid',
           payment_id: session.payment_intent?.id || `free_${sessionId}`,
           amount_paid: session.amount_total ? session.amount_total / 100 : 0,
@@ -97,7 +118,7 @@ serve(async (req) => {
       const { data: clinic, error: clinicError } = await supabaseAdmin
         .from('clinics')
         .select('*')
-        .eq('user_id', metadata.userId)
+        .eq('user_id', draftScript.user_id)
         .single()
 
       if (clinicError) {
@@ -109,7 +130,7 @@ serve(async (req) => {
       const { data: patient, error: patientError } = await supabaseAdmin
         .from('patients')
         .select('*')
-        .eq('id', metadata.patientId)
+        .eq('id', draftScript.patient_id)
         .single()
 
       if (patientError) {
@@ -127,10 +148,12 @@ serve(async (req) => {
           clinic_phone: clinic.phone,
           clinic_address: clinic.address,
           patient_name: `${patient.first_name} ${patient.last_name}`,
-          appliance_type: metadata.applianceType,
-          arch: metadata.arch,
+          appliance_type: draftScript.appliance_type,
+          arch: draftScript.arch,
           amount_paid: session.amount_total ? session.amount_total / 100 : 0,
           payment_id: session.payment_intent?.id || `free_${sessionId}`,
+          needs_nightguard: draftScript.needs_nightguard,
+          express_design: draftScript.express_design,
           discount_amount: discountAmount ? discountAmount / 100 : 0,
           promo_code: promoCode || null
         }])
@@ -138,6 +161,17 @@ serve(async (req) => {
       if (invoiceError) {
         console.error('Error creating invoice:', invoiceError)
         throw invoiceError
+      }
+
+      // Delete the draft after successful creation
+      const { error: deleteDraftError } = await supabaseAdmin
+        .from('lab_scripts_draft')
+        .delete()
+        .eq('id', metadata.draftId)
+
+      if (deleteDraftError) {
+        console.error('Error deleting draft:', deleteDraftError)
+        // Don't throw here, as the main operation succeeded
       }
 
       console.log('Created invoice for lab script:', labScript.id)
