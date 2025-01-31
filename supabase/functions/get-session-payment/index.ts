@@ -61,6 +61,18 @@ serve(async (req) => {
 
       if (existingLabScript) {
         console.log('Lab script already exists for this payment:', existingLabScript.id)
+        // Delete the draft since we already have a lab script
+        const { error: deleteDraftError } = await supabaseAdmin
+          .from('lab_scripts_draft')
+          .delete()
+          .eq('id', session.metadata.draftId)
+
+        if (deleteDraftError) {
+          console.error('Error deleting draft:', deleteDraftError)
+        } else {
+          console.log('Successfully deleted draft after finding existing lab script')
+        }
+
         return new Response(
           JSON.stringify({ 
             status: 'paid',
@@ -96,6 +108,18 @@ serve(async (req) => {
       }
 
       console.log('Created lab script after payment:', labScript)
+
+      // Delete the draft after successful creation of lab script
+      const { error: deleteDraftError } = await supabaseAdmin
+        .from('lab_scripts_draft')
+        .delete()
+        .eq('id', session.metadata.draftId)
+
+      if (deleteDraftError) {
+        console.error('Error deleting draft:', deleteDraftError)
+      } else {
+        console.log('Successfully deleted draft after creating lab script')
+      }
 
       // Get clinic details
       const { data: clinic, error: clinicError } = await supabaseAdmin
