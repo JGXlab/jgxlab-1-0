@@ -53,6 +53,7 @@ interface PDFApplianceSectionProps {
   vdoDetails: string;
   needsNightguard: string;
   shade: string;
+  expressDesign?: string; // Added this prop to match the interface
 }
 
 export const PDFApplianceSection = ({
@@ -64,6 +65,7 @@ export const PDFApplianceSection = ({
   vdoDetails,
   needsNightguard,
   shade,
+  expressDesign,
 }: PDFApplianceSectionProps) => {
   const formatTreatmentType = (value: string) => {
     if (!value) return 'Not specified';
@@ -140,6 +142,14 @@ export const PDFApplianceSection = ({
               value={shade ? shade.toUpperCase() : 'Not specified'}
             />
           </View>
+          {expressDesign && (
+            <View style={styles.column}>
+              <PDFPreviewField 
+                label="Express Design"
+                value={expressDesign.charAt(0).toUpperCase() + expressDesign.slice(1)}
+              />
+            </View>
+          )}
         </View>
       </View>
     </View>
