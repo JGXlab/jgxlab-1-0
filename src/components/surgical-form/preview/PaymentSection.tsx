@@ -60,7 +60,7 @@ export const PaymentSection = ({ labScript }: PaymentSectionProps) => {
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-semibold text-gray-900">Payment Details</h3>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <PreviewField 
           label="Payment Status" 
           value={<span className="text-green-600">Paid</span>} 
@@ -69,10 +69,16 @@ export const PaymentSection = ({ labScript }: PaymentSectionProps) => {
           label="Amount Paid" 
           value={labScript.amount_paid ? `$${labScript.amount_paid.toFixed(2)}` : 'N/A'} 
         />
-        <PreviewField 
-          label="Payment ID" 
-          value={labScript.payment_id || 'N/A'} 
-        />
+        <div className="sm:col-span-2">
+          <PreviewField 
+            label="Payment ID" 
+            value={
+              <div className="break-all">
+                {labScript.payment_id || 'N/A'}
+              </div>
+            } 
+          />
+        </div>
         <PreviewField 
           label="Payment Date" 
           value={labScript.payment_date 
