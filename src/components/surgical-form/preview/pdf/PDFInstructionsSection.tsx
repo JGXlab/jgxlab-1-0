@@ -9,11 +9,9 @@ export const PDFInstructionsSection = ({ instructions }: PDFInstructionsSectionP
   <View style={styles.section}>
     <Text style={styles.sectionTitle}>Specific Instructions</Text>
     <View style={styles.instructionsBox}>
-      {instructions ? (
-        <Text style={styles.instructionsText}>{instructions}</Text>
-      ) : (
-        <Text style={styles.placeholder}>No specific instructions provided</Text>
-      )}
+      <Text style={styles.instructionsText}>
+        {instructions || 'No specific instructions provided'}
+      </Text>
     </View>
   </View>
 );
