@@ -27,31 +27,32 @@ serve(async (req) => {
 
     console.log('Retrieved session:', session)
 
+    // Initialize Supabase Admin client
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')
+    const supabaseServiceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+    
+    if (!supabaseUrl || !supabaseServiceRoleKey) {
+      throw new Error('Missing Supabase configuration')
+    }
+
+    const supabaseAdmin = createClient(supabaseUrl, supabaseServiceRoleKey)
+
+    // Get the draft data first
+    const { data: draftData, error: draftError } = await supabaseAdmin
+      .from('lab_scripts_draft')
+      .select('*')
+      .eq('id', session.metadata.draftId)
+      .single()
+
+    if (draftError) {
+      console.error('Error fetching draft:', draftError)
+      throw draftError
+    }
+
+    console.log('Found draft data:', draftData)
+
     // Consider the payment successful if it's either paid or the total is 0
     if (session.payment_status === 'paid' || session.payment_status === 'complete' || session.amount_total === 0) {
-      const supabaseUrl = Deno.env.get('SUPABASE_URL')
-      const supabaseServiceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
-      
-      if (!supabaseUrl || !supabaseServiceRoleKey) {
-        throw new Error('Missing Supabase configuration')
-      }
-
-      const supabaseAdmin = createClient(supabaseUrl, supabaseServiceRoleKey)
-
-      // Get the draft data first
-      const { data: draftData, error: draftError } = await supabaseAdmin
-        .from('lab_scripts_draft')
-        .select('*')
-        .eq('id', session.metadata.draftId)
-        .single()
-
-      if (draftError) {
-        console.error('Error fetching draft:', draftError)
-        throw draftError
-      }
-
-      console.log('Found draft data:', draftData)
-
       // Check if a lab script with this payment_id already exists
       const { data: existingLabScript } = await supabaseAdmin
         .from('lab_scripts')
@@ -61,116 +62,95 @@ serve(async (req) => {
 
       if (existingLabScript) {
         console.log('Lab script already exists for this payment:', existingLabScript.id)
-        // Delete the draft since we already have a lab script
-        const { error: deleteDraftError } = await supabaseAdmin
-          .from('lab_scripts_draft')
-          .delete()
-          .eq('id', session.metadata.draftId)
+      } else {
+        // Create the lab script after successful payment using draft data
+        const { data: labScript, error: labScriptError } = await supabaseAdmin
+          .from('lab_scripts')
+          .insert([{
+            ...draftData,
+            status: 'pending',
+            payment_status: 'paid',
+            payment_id: session.payment_intent?.id || `free_${sessionId}`,
+            amount_paid: session.amount_total ? session.amount_total / 100 : 0,
+            payment_date: new Date().toISOString()
+          }])
+          .select()
+          .single()
 
-        if (deleteDraftError) {
-          console.error('Error deleting draft:', deleteDraftError)
-        } else {
-          console.log('Successfully deleted draft after finding existing lab script')
+        if (labScriptError) {
+          console.error('Error creating lab script:', labScriptError)
+          throw labScriptError
         }
 
-        return new Response(
-          JSON.stringify({ 
-            status: 'paid',
-            paymentId: session.payment_intent?.id || null,
-            amount_total: session.amount_total || 0,
-            invoiceUrl: session.invoice?.invoice_pdf || null
-          }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        )
+        console.log('Created lab script after payment:', labScript)
+
+        // Get clinic details
+        const { data: clinic, error: clinicError } = await supabaseAdmin
+          .from('clinics')
+          .select('*')
+          .eq('user_id', draftData.user_id)
+          .single()
+
+        if (clinicError) {
+          console.error('Error fetching clinic:', clinicError)
+          throw clinicError
+        }
+
+        // Get patient details
+        const { data: patient, error: patientError } = await supabaseAdmin
+          .from('patients')
+          .select('*')
+          .eq('id', draftData.patient_id)
+          .single()
+
+        if (patientError) {
+          console.error('Error fetching patient:', patientError)
+          throw patientError
+        }
+
+        // Get discount information
+        const discountAmount = session.total_details?.amount_discount || 0
+        const promoCode = session.total_details?.breakdown?.discounts?.[0]?.discount?.promotion_code?.code
+
+        // Create invoice record with discount information
+        const { error: invoiceError } = await supabaseAdmin
+          .from('invoices')
+          .insert([{
+            lab_script_id: labScript.id,
+            clinic_name: clinic.name,
+            clinic_email: clinic.email,
+            clinic_phone: clinic.phone,
+            clinic_address: clinic.address,
+            patient_name: `${patient.first_name} ${patient.last_name}`,
+            appliance_type: draftData.appliance_type,
+            arch: draftData.arch,
+            amount_paid: session.amount_total ? session.amount_total / 100 : 0,
+            payment_id: session.payment_intent?.id || `free_${sessionId}`,
+            needs_nightguard: draftData.needs_nightguard,
+            express_design: draftData.express_design,
+            discount_amount: discountAmount ? discountAmount / 100 : 0,
+            promo_code: promoCode || null
+          }])
+
+        if (invoiceError) {
+          console.error('Error creating invoice:', invoiceError)
+          throw invoiceError
+        }
+
+        console.log('Created invoice for lab script:', labScript.id)
       }
+    }
 
-      // Get discount information
-      const discountAmount = session.total_details?.amount_discount || 0
-      const promoCode = session.total_details?.breakdown?.discounts?.[0]?.discount?.promotion_code?.code
+    // Delete the draft regardless of payment status
+    const { error: deleteDraftError } = await supabaseAdmin
+      .from('lab_scripts_draft')
+      .delete()
+      .eq('id', session.metadata.draftId)
 
-      // Create the lab script after successful payment using draft data
-      const { data: labScript, error: labScriptError } = await supabaseAdmin
-        .from('lab_scripts')
-        .insert([{
-          ...draftData,
-          status: 'pending', // Explicitly set status to pending
-          payment_status: 'paid',
-          payment_id: session.payment_intent?.id || `free_${sessionId}`,
-          amount_paid: session.amount_total ? session.amount_total / 100 : 0,
-          payment_date: new Date().toISOString()
-        }])
-        .select()
-        .single()
-
-      if (labScriptError) {
-        console.error('Error creating lab script:', labScriptError)
-        throw labScriptError
-      }
-
-      console.log('Created lab script after payment:', labScript)
-
-      // Delete the draft after successful creation of lab script
-      const { error: deleteDraftError } = await supabaseAdmin
-        .from('lab_scripts_draft')
-        .delete()
-        .eq('id', session.metadata.draftId)
-
-      if (deleteDraftError) {
-        console.error('Error deleting draft:', deleteDraftError)
-      } else {
-        console.log('Successfully deleted draft after creating lab script')
-      }
-
-      // Get clinic details
-      const { data: clinic, error: clinicError } = await supabaseAdmin
-        .from('clinics')
-        .select('*')
-        .eq('user_id', draftData.user_id)
-        .single()
-
-      if (clinicError) {
-        console.error('Error fetching clinic:', clinicError)
-        throw clinicError
-      }
-
-      // Get patient details
-      const { data: patient, error: patientError } = await supabaseAdmin
-        .from('patients')
-        .select('*')
-        .eq('id', draftData.patient_id)
-        .single()
-
-      if (patientError) {
-        console.error('Error fetching patient:', patientError)
-        throw patientError
-      }
-
-      // Create invoice record with discount information
-      const { error: invoiceError } = await supabaseAdmin
-        .from('invoices')
-        .insert([{
-          lab_script_id: labScript.id,
-          clinic_name: clinic.name,
-          clinic_email: clinic.email,
-          clinic_phone: clinic.phone,
-          clinic_address: clinic.address,
-          patient_name: `${patient.first_name} ${patient.last_name}`,
-          appliance_type: draftData.appliance_type,
-          arch: draftData.arch,
-          amount_paid: session.amount_total ? session.amount_total / 100 : 0,
-          payment_id: session.payment_intent?.id || `free_${sessionId}`,
-          needs_nightguard: draftData.needs_nightguard,
-          express_design: draftData.express_design,
-          discount_amount: discountAmount ? discountAmount / 100 : 0,
-          promo_code: promoCode || null
-        }])
-
-      if (invoiceError) {
-        console.error('Error creating invoice:', invoiceError)
-        throw invoiceError
-      }
-
-      console.log('Created invoice for lab script:', labScript.id)
+    if (deleteDraftError) {
+      console.error('Error deleting draft:', deleteDraftError)
+    } else {
+      console.log('Successfully deleted draft after payment processing')
     }
 
     return new Response(
