@@ -65,10 +65,6 @@ export const PaymentSection = ({ labScript }: PaymentSectionProps) => {
           label="Payment Status" 
           value={<span className="text-green-600">Paid</span>} 
         />
-        <PreviewField 
-          label="Amount Paid" 
-          value={labScript.amount_paid ? `$${labScript.amount_paid.toFixed(2)}` : 'N/A'} 
-        />
         <div className="sm:col-span-2">
           <PreviewField 
             label="Payment ID" 

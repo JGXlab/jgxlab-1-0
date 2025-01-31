@@ -8,9 +8,6 @@ import { useEffect, useState } from "react";
 import { Tables } from "@/integrations/supabase/types";
 import { z } from "zod";
 import { formSchema } from "./formSchema";
-import { pdf } from '@react-pdf/renderer';
-import { LabScriptPDF } from "./preview/LabScriptPDF";
-import { useToast } from "@/components/ui/use-toast";
 import { PreviewHeader } from "./preview/PreviewHeader";
 import { PreviewContent } from "./preview/PreviewContent";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -29,7 +26,6 @@ export const PreviewLabScriptModal = ({
   labScriptId,
   formData,
 }: PreviewLabScriptModalProps) => {
-  const { toast } = useToast();
   const [labScript, setLabScript] = useState<Tables<"lab_scripts"> | null>(null);
 
   // Transform formData to lab script if available
@@ -129,47 +125,12 @@ export const PreviewLabScriptModal = ({
     };
   }, [labScriptId]);
 
-  const handleDownload = async () => {
-    if (!labScript || !patient) {
-      toast({
-        title: "Error",
-        description: "Cannot generate PDF: missing lab script or patient data",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    try {
-      const blob = await pdf(<LabScriptPDF labScript={labScript} patient={patient} />).toBlob();
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `lab-script-${labScript.id}.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-
-      toast({
-        title: "Success",
-        description: "Lab script PDF has been downloaded",
-      });
-    } catch (error) {
-      console.error('Error generating PDF:', error);
-      toast({
-        title: "Error",
-        description: "Failed to generate PDF",
-        variant: "destructive",
-      });
-    }
-  };
-
   if (!labScript) return null;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl h-[90vh] flex flex-col p-0 gap-0">
-        <PreviewHeader onDownload={handleDownload} />
+        <PreviewHeader />
         
         <div className="flex-1 overflow-auto px-6 py-4">
           {isLoadingPatient && (
