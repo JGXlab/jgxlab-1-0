@@ -12,32 +12,30 @@ interface PreviewContentProps {
 
 export const PreviewContent = ({ labScript, patient }: PreviewContentProps) => {
   return (
-    <ScrollArea className="h-full">
-      <div className="space-y-8 pr-4">
-        <PatientSection 
-          patient={patient}
-          createdAt={labScript.created_at}
-          dueDate={labScript.due_date}
-        />
-        <ApplianceSection 
-          applianceType={labScript.appliance_type}
-          arch={labScript.arch}
-          treatmentType={labScript.treatment_type}
-          screwType={labScript.screw_type || ''}
-          otherScrewType={labScript.other_screw_type}
-          vdoDetails={labScript.vdo_details || ''}
-          needsNightguard={labScript.needs_nightguard || ''}
-          shade={labScript.shade || ''}
-          expressDesign={labScript.express_design}
-          couponCode={labScript.coupon_code}
-        />
-        <InstructionsSection 
-          instructions={labScript.specific_instructions}
-        />
-        <PaymentSection 
-          labScript={labScript}
-        />
-      </div>
-    </ScrollArea>
+    <div className="space-y-8">
+      <PatientSection 
+        patient={patient}
+        createdAt={labScript.created_at}
+        dueDate={labScript.due_date}
+      />
+      <ApplianceSection 
+        applianceType={labScript.appliance_type}
+        arch={labScript.arch}
+        treatmentType={labScript.treatment_type}
+        screwType={labScript.screw_type || ''}
+        otherScrewType={labScript.other_screw_type}
+        vdoDetails={labScript.vdo_details || ''}
+        needsNightguard={labScript.needs_nightguard || ''}
+        shade={labScript.shade || ''}
+        expressDesign={labScript.express_design}
+        couponCode={labScript.coupon_code}
+      />
+      <InstructionsSection 
+        instructions={labScript.specific_instructions}
+      />
+      <PaymentSection 
+        labScript={labScript}
+      />
+    </div>
   );
 };

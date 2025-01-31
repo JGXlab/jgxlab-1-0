@@ -168,10 +168,10 @@ export const PreviewLabScriptModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl h-[90vh] flex flex-col p-0 gap-0 overflow-hidden rounded-xl border shadow-xl">
+      <DialogContent className="max-w-4xl h-[90vh] flex flex-col p-0 gap-0">
         <PreviewHeader onDownload={handleDownload} />
         
-        <div className="flex-1 overflow-hidden p-6">
+        <div className="flex-1 overflow-auto px-6 py-4">
           {isLoadingPatient && (
             <div className="flex items-center justify-center p-8">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
