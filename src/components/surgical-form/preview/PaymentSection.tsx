@@ -57,6 +57,13 @@ export const PaymentSection = ({ labScript }: PaymentSectionProps) => {
     );
   }
 
+  // Calculate the amount to display - use paymentInfo.amount_total if available, otherwise fall back to labScript.amount_paid
+  const amountToDisplay = paymentInfo?.amount_total 
+    ? (paymentInfo.amount_total / 100).toFixed(2) 
+    : labScript.amount_paid 
+      ? labScript.amount_paid.toFixed(2)
+      : null;
+
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-semibold text-gray-900">Payment Details</h3>
@@ -67,7 +74,7 @@ export const PaymentSection = ({ labScript }: PaymentSectionProps) => {
         />
         <PreviewField 
           label="Amount Paid" 
-          value={labScript.amount_paid ? `$${labScript.amount_paid.toFixed(2)}` : 'N/A'} 
+          value={amountToDisplay ? `$${amountToDisplay}` : 'N/A'} 
         />
         <div className="sm:col-span-2">
           <PreviewField 
