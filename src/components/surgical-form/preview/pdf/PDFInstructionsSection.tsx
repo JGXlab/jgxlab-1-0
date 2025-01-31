@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet } from '@react-pdf/renderer';
+import { View, Text } from '@react-pdf/renderer';
 import { styles } from './PDFStyles';
 
 interface PDFInstructionsSectionProps {

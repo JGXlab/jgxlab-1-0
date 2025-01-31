@@ -54,6 +54,8 @@ export const styles = StyleSheet.create({
     lineHeight: 1.5,
     flexWrap: 'wrap',
     width: '100%',
+    maxWidth: '100%',
+    wordBreak: 'break-word',
   },
   placeholder: {
     fontSize: 12,
