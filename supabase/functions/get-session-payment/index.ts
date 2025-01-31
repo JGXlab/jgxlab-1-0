@@ -81,6 +81,7 @@ serve(async (req) => {
         .from('lab_scripts')
         .insert([{
           ...draftData,
+          status: 'pending', // Explicitly set status to pending
           payment_status: 'paid',
           payment_id: session.payment_intent?.id || `free_${sessionId}`,
           amount_paid: session.amount_total ? session.amount_total / 100 : 0,
