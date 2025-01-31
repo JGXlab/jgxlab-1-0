@@ -45,6 +45,7 @@ export const styles = StyleSheet.create({
   infoRow: {
     flexDirection: 'row',
     marginBottom: 6,
+    flexWrap: 'wrap', // Add wrap for long content
   },
   infoLabel: {
     fontSize: 14,
@@ -54,6 +55,8 @@ export const styles = StyleSheet.create({
   infoValue: {
     fontSize: 14,
     color: '#0f172a',
+    flex: 1,
+    flexWrap: 'wrap', // Enable text wrapping
   },
   companyInfo: {
     fontSize: 14,
@@ -88,6 +91,7 @@ export const styles = StyleSheet.create({
     fontSize: 14,
     color: '#64748b',
     lineHeight: 1.5,
+    flexWrap: 'wrap', // Enable text wrapping
   },
   table: {
     marginTop: 32,
@@ -107,12 +111,17 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     borderBottom: '1 solid #e2e8f0',
     padding: '16',
+    flexWrap: 'wrap', // Enable wrapping for long content
   },
   tableCell: {
     fontSize: 14,
     color: '#0f172a',
+    flexWrap: 'wrap', // Enable text wrapping
   },
-  col1: { flex: 2 },
+  col1: { 
+    flex: 2,
+    flexWrap: 'wrap', // Enable text wrapping for description column
+  },
   col2: { width: 80, textAlign: 'center' },
   col3: { width: 120, textAlign: 'right' },
   totalSection: {
@@ -145,8 +154,7 @@ export const styles = StyleSheet.create({
     width: 120,
     textAlign: 'right',
   },
-
   discountText: {
-    color: '#DC2626', // Red color for discount amount
+    color: '#DC2626',
   },
 });
